@@ -1,62 +1,3 @@
-# def queryUrlToken():
-# 	import urllib
-# 	import mysql.connector
-# 	from package import Package
-# 	from nltk import FreqDist
-# 	cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
-# 	cursor = cnx.cursor()
-# 	query = "select app, add_header, hst, path, agent from packages where httptype = 0"
-# 	cursor.execute(query)
-
-# 	singlecounter = {}
-# 	hostcounter = {}
-# 	tokencounter = {}
-
-# 	for app, add_header, hst, path, agent in cursor:
-# 		package = Package()
-# 		package.set_path(path)
-
-# 		singlecounter.setdefault(add_header, FreqDist())
-# 		hostcounter.setdefault(add_header+'$'+hst, FreqDist())
-# 		singlecounter[add_header].inc(app)
-# 		hostcounter[add_header+'$'+hst].inc(app)
-
-# 		singlecounter.setdefault(hst, FreqDist())
-# 		singlecounter[hst].inc(app)
-
-# 		singlecounter.setdefault(agent, FreqDist())
-# 		hostcounter.setdefault(agent+'$'+hst, FreqDist())
-# 		singlecounter[agent].inc(app)
-# 		hostcounter[agent+'$'+hst].inc(app)
-		
-# 		for k, v in package.querys.items():
-# 			tokencounter.setdefault(k,FreqDist())
-# 			tokencounter[k].inc(app)
-# 			if len(v) > 0:
-# 				if(len(v)>1):
-# 					print path, app
-# 				for i in v:
-# 					if len(i) > 0:
-# 						# isegs = i.split('=')
-# 						# if len(isegs) > 2:
-# 						# 	print 'ERROR', i, app
-
-# 						# if len(isegs) > 1:
-# 						# 	k=k+isegs[0]
-# 						# 	i=isegs[1]						
-# 						singlecounter.setdefault(k+'$'+i, FreqDist())
-# 						hostcounter.setdefault(k+'$'+i+'$'+hst, FreqDist())
-# 						singlecounter[k+'$'+i].inc(app)
-# 						hostcounter[k+'$'+i+'$'+hst].inc(app)
-
-# 	# token == token+app
-# 	for identify, applist in singlecounter.items():
-# 			if len(applist) == 1:
-# 				for app,count in applist.items():
-# 					if identify not in tokencounter or count == tokencounter[identify][app]:
-# 						cursor.execute('insert into features (app, feature, count) values(%s,%s,%s)', (app, identify, count))
-
-# 	cnx.commit()
 class TreeNode:
 	def __init__(self, father, value):
 		self.children = []
@@ -207,6 +148,7 @@ def hostNToken():
 						cursor.execute('insert into features (host, token, app, value, count, tkappnum) values(%s,%s,%s,%s, %s, %s)', (host, token, app, value, count, tkappnum))
 	
 	cnx.commit()
+	cursor.close()
 	cnx.close()
 
 def test_algo():
@@ -216,7 +158,7 @@ def test_algo():
 	from nltk import FreqDist
 	cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
 	cursor = cnx.cursor()
-	query = 'select app, token, host, value from features'
+	query = 'select app, token, host, value from features_bak'
 	cursor.execute(query)
 	root = TreeNode(None, None)
 	# Build the tree
@@ -256,6 +198,10 @@ def test_algo():
 					correct_ids.append(id)
 				else:
 					print predict.get_value(), app
+					value = predict.get_father()[0].get_value()
+					token = predict.get_father()[0].get_father()[0].get_value()
+					host =  predict.get_father()[0].get_father()[0].get_father()[0].get_value()
+					print "rules: %s\t%s\t%s" % (value, token, host)
 					wrong += 1
 
 	upquery = "update packages set classified = %s where id = %s"	

@@ -9,18 +9,24 @@ def test_train(writedb):
 	sqldao = SqlDao()
 	
 
-	query = 'select app, hst from packages group by app, hst '
+	query = 'select app, hst, name from packages group by app, hst'
 	cursor = sqldao.execute(query)
 
-	for app, host in cursor:
+	for app, host,name in cursor:
+
 		package = Package()
 		package.set_app(app)
 		package.set_host(host)
+		package.set_name(name)
+		
 		hostcmp.process(package)
 	rst_hst_app, rst_hst_company = hostcmp.result()
 
 	for k,v in rst_hst_app.items():
-		print k,v
+		print k,'->',v
+	print '-' * 10
+	for k,v in rst_hst_company.items():
+		print k,'->',v
 
 	if writedb:
 		query = 'insert into test_rules (app, hst) values (%s, %s)'
@@ -82,10 +88,18 @@ def test_cluster():
 		hst_cluster.process(package)
 		pkg_cluster.process(package)
 
+	query = 'select hst from test_rules'
+	cursor = sqldao.execute(query)
+	exist_hosts = set()
+	for host in cursor:
+		exist_hosts.add(host[0])
+
 	pkg_rst = pkg_cluster.result()
 	hst_rst = hst_cluster.result(pkg_rst)
 	rst = host_analyz.analyz_clst(hst_rst)
+
 	for apps,hostlsts in rst.items():
+		hostlsts = hostlsts - exist_hosts
 		print apps, "$$$$$", ','.join(hostlsts)
 		print
 
@@ -94,29 +108,35 @@ def test_agent(writedb):
 	sqldao = SqlDao()
 	
 
-	query = 'select app, hst, agent from packages where app = \'com.acmeaom.android.myradar\' group by app, agent'
+	query = 'select app, hst, agent, name from packages group by app, agent'
 	cursor = sqldao.execute(query)
 
-	for app, hst, agent in cursor:
+	for app, hst, agent,name in cursor:
 		package = Package()
+		package.set_name(name)
 		package.set_app(app)
 		package.set_agent(agent)
 		package.set_host(hst)
 		agnt.process(package)
 	rst = agnt.result()
+	for k,v,x in rst:
+		print k.decode('utf-8'), v.decode('utf-8')
+
+	print len(rst)
 
 	if writedb:
 		query = 'insert into test_rules (app, agent) values (%s, %s)'
-		for app,agent in rst:
+		for app,agent,x in rst:
 			sqldao.execute(query, (app,agent))
+	sqldao.close()
 
 if __name__ == '__main__':
 
 	if sys.argv[1] == 'train':
-		test_train(False)
+		test_train(True)
 	elif sys.argv[1] == 'classify':
 		test_classify()
 	elif sys.argv[1] == 'cluster':
 		test_cluster()
 	elif sys.argv[1] == 'agent':
-		test_agent(False)
+		test_agent(True)

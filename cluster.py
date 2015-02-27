@@ -64,20 +64,71 @@ class ClusterHost:
 
 	def __init__(self):
 		self.app_host = {}
+		self.app_domain = {}
 
 	def process(self, package):
 		app = package.app
 		host = package.host
 		secdomain = package.secdomain
 		self.app_host.setdefault(app, set())
+		self.app_domain.setdefault(app, set())
 		if secdomain != None:
+			self.app_domain[app].add(secdomain)
 			self.app_host[app].add(host) # MARK
 
-	def result(self, contrains):
+	def if_putin(self, appset, app, company):
+		putin = False
+		for a in appset:
+			putin = putin or (self.app_domain[a] == self.app_domain[app]) or (company[a] == company[app])
+		return putin
+
+	def result(self, constrains):
+		clusters = []
+		app_company = {}
+		indx = 0
+		for company,apps in constrains.items():
+			for app in apps:
+				app_company[app] = company
+		
+		for app in self.app_host.keys():
+			putin = True
+			clstids = set()
+			for i in range(len(clusters)):
+				if self.if_putin(clusters[i], app, app_company):
+					clstids.add(i)
+
+			new_set = {app}
+			if len(clstids) > 0:
+				new_set = set()
+				for id in clstids:
+					new_set |= clusters[id]
+
+				for id in clstids:
+					del clusters[id]
+
+			clusters.append(new_set)
+
+
+		rst = {}
+		for cluster in clusters:
+			key = ','.join(cluster)
+			hosts = set()
+			for app in cluster:
+				hosts |= self.app_host[app]
+			value = ','.join(hosts)
+			rst[key] = value
+
+		return rst
+
+
+
+
+
+	def result2(self, contrains):
 		"""
 		app1,app2 \t {hst1, hst2, hst3}
 		"""
-		
+		 
 		host_app = {}
 		for app, hostlst in self.app_host.items():
 			hostlstln = ','.join(hostlst)
