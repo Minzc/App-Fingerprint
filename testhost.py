@@ -4,12 +4,18 @@ from package import Package
 from nltk import FreqDist
 from sqldao import SqlDao
 import sys
+
+TRAIN_SELECT_QUERY = 'select app, hst, name from packages group by app, hst'
+TRAIN_INSERT_QUERY = 'insert into rules (app, hst) values (%s, %s)'
+TRAIN_INSERT_CMP_QUERY = 'insert into rules (app, company, hst) values (%s,%s, %s)'
+TEST_SELECT_QUERY = 'select app, company, hst from test_rules'
+
 def test_train(writedb):
 	hostcmp = HostApp()
 	sqldao = SqlDao()
 	
 
-	query = 'select app, hst, name from packages group by app, hst'
+	query = TRAIN_SELECT_QUERY
 	cursor = sqldao.execute(query)
 
 	for app, host,name in cursor:
@@ -18,22 +24,22 @@ def test_train(writedb):
 		package.set_app(app)
 		package.set_host(host)
 		package.set_name(name)
-		
+
 		hostcmp.process(package)
 	rst_hst_app, rst_hst_company = hostcmp.result()
 
-	for k,v in rst_hst_app.items():
-		print k,'->',v
+	# for k,v in rst_hst_app.items():
+		# print k,'->',v
 	print '-' * 10
-	for k,v in rst_hst_company.items():
-		print k,'->',v
+	# for k,v in rst_hst_company.items():
+		# print k,'->',v
 
 	if writedb:
-		query = 'insert into test_rules (app, hst) values (%s, %s)'
+		query = TRAIN_INSERT_QUERY
 		for k,v in rst_hst_app.items():
 			sqldao.execute(query, (v,k))
 
-		query = 'insert into test_rules (app, company, hst) values (%s,%s, %s)'
+		query = TRAIN_INSERT_CMP_QUERY
 		for host,apps in rst_hst_company.items():
 			for app, company in apps:
 				sqldao.execute(query, (app,company, host))
@@ -42,7 +48,7 @@ def test_train(writedb):
 
 def test_classify():
 	sqldao = SqlDao()
-	query = 'select app, company, hst from test_rules'
+	query = TEST_SELECT_QUERY
 	cursor = sqldao.execute(query)
 	host_rules = {}
 	company_rules = {}
@@ -125,7 +131,7 @@ def test_agent(writedb):
 	print len(rst)
 
 	if writedb:
-		query = 'insert into test_rules (app, agent) values (%s, %s)'
+		query = 'insert into rules (app, agent) values (%s, %s)'
 		for app,agent,x in rst:
 			sqldao.execute(query, (app,agent))
 	sqldao.close()

@@ -64,7 +64,7 @@ for train, test in kf:
 	path_algo.host_tree(train_set)
 	rst = classifier.classify(True, test_set.values())
 	correct = evaluate(rst, test_set)
-	algo.hostNToken(train_set)
+	algo.train(train_set)
 	tmprst = algo.test_algo(test_set.values())
 	rst = merge_rst(rst, tmprst)
 	correct += evaluate(rst, test_set)

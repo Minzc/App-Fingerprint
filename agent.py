@@ -145,6 +145,7 @@ def test_agent():
 				correct += 1
 			else:
 				print rst,'#',record.app
+			sqldao.execute('UPDATE packages SET classified = %s WHERE id = %s', (2, record.id))
 	print counter, correct
 
 if __name__ == '__main__':

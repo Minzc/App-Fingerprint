@@ -1,8 +1,57 @@
 from nltk import FreqDist
 from utils import loadfile
-from utils import loadcategory
-from utils import tpdomain
 import sys
+from sqldao import SqlDao
+from utils import app_clean
+from utils import Relation
+from utils import top_domain
+from utils import lower_all
+from nltk import FreqDist
+from utils import app_clean
+from package import Package
+from utils import load_pkgs
+def stat_path():
+	sqldao = SqlDao()
+	counter = Relation()
+	records = []
+	for app, path, name, company in sqldao.execute('select app, path, name, company from packages where httptype = \'0\' '):
+		package = Package()
+		package.set_app(app)
+		package.set_path(path)
+		package.set_company(company)
+		package.set_name(name)
+		records.append(package)
+	count = 0
+	for pk in records:
+		path = pk.path
+		namesegs = set(pk.name.split(' '))
+
+		appsegs = set(app_clean(pk.app).split('.'))
+		appsegs |= namesegs
+		pathsegs = path.split('/')
+		for pathseg in pathsegs:
+			for appseg in appsegs:
+				if appseg in pathseg and len(appseg) > 1:
+					print appseg
+					count += 1
+					break
+	print count, len(records)
+
+
+def stat_add_header():
+	sqldao = SqlDao()
+	counter = Relation()
+	for app, header in sqldao.execute('select app, add_header from packages where httptype = \'0\' '):
+		headers = {h.split(':')[0] for h in header.split('\n')}
+		for h in headers:
+			counter.add(h, app)
+	sort = FreqDist()
+	for k, v in counter.get().items():
+		sort.inc(k ,len(v))
+	for k,v in sort.items():
+		print k, v
+
+#stat_add_header()
 
 def stat_hstNapp(filepath):
 	counter = FreqDist()
@@ -231,13 +280,348 @@ def findAppNHost():
 			if appseg in hstsegs:
 				print appname, hst
 		
+def group_path():
+	from package import Package
+	from utils import app_clean
+
+	QUERY = 'SELECT app, name, path,hst FROM packages'
+	sqldao = SqlDao()
+	sqldao2 = SqlDao()
+	cursor = sqldao.execute(QUERY)
+	QUERY = 'INSERT INTO rules (app, tpdomain, hst, company, agent) VALUES (%s,%s,%s,%s,%s)'
+	for app, name, path,hst in cursor:
+		package = Package()
+		app = app_clean(app)
+		package.set_app(app)
+		package.set_name(name)
+		package.set_path(path)
+		pathsegs = package.path.split('/')
+		evidence = ''
+		store = False
+		for p in pathsegs:
+			for nameseg in package.name.split(' '):
+				if nameseg in p and len(nameseg) > 0:
+					store = True
+					evidence = evidence + '$' + nameseg
+			for appseg in package.app.split('.'):
+				if appseg in p and len(nameseg) > 0:
+					store = True
+					evidence = evidence + '$' + appseg
+		if store:
+			# print 'insert', (app, evidence, path, hst,'')
+			sqldao2.execute(QUERY, (app, evidence, path, hst,''))
 
 
-findAppNHost()
-#adserverNkey()
-#hst_n_secdomain()
-#hst_clst_id('/Users/congzicun/Yunio/fortinet/src/host_cluster.txt')
-#stat_relation('/Users/congzicun/Yunio/fortinet/src/appNtokens.txt', 0, 2, 'statToken.csv')
-#statUrlToken('/Users/congzicun/Yunio/fortinet/src/urltmp.csv')
-# stat_hstNapp('categoryNhost.txt')
-#stat_catNapp('categoryNhost.txt')
+
+
+def group_host():
+	sqldao = SqlDao()
+	QUERY = 'SELECT app, feature FROM appfeatures'
+	cursor = sqldao.execute(QUERY)
+	appfs = Relation()
+	for app, feature in cursor:
+		appfs.add(app, feature)
+
+	QUERY = 'SELECT app,add_header,hst from packages group by app, hst, add_header'
+	relation = Relation() # host -> company
+	companyfs = Relation()
+
+	hosturl = Relation()
+	has_addhder = set()
+	
+
+	for app, header, host in cursor:
+		app = app.lower()
+		header = header.lower()
+
+		app = app_clean(app)
+		company = app.split('.')[-1]
+		
+
+		# add product
+		for p in app.split('.')[:-1]:
+			product.add(company, p)
+
+		# add name
+		for p in name.split(' '):
+			if len(p) > 1:
+				productname.add(company, p)
+
+		sechost = top_domain(host)
+		if sechost != None:
+			relation.add(sechost, company)
+			hosturl.add(sechost, host)
+			if 'x-requested-with' in header:
+				has_addhder.add(sechost)
+
+
+	INSERT = 'INSERT INTO rules (app, tpdomain, hst, company, agent) VALUES (%s,%s,%s,%s,%s)'
+	for host, companies in relation.get().items():
+		if len(companies) == 1:
+			url = host
+			if len(hosturl.get()[host]) == 1:
+				for p in hosturl.get()[host]:
+					url = p
+
+			for company in companies:
+				if company in host:
+					sqldao.execute(INSERT, ('app', '',host, company,1))
+				elif host in has_addhder:
+					sqldao.execute(INSERT, ('app', '',host, company,2))
+				elif host.split('.')[0] in company or host.split('-')[0] in company:
+					sqldao.execute(INSERT, ('app', host.split('.')[0],host, company,3))
+				else:
+					value = 0
+					# product name in host
+					evidence = ''
+					for p in product.get().get(company,()):
+						if host == 'schoolofdragons.com':
+							print '$$$$',p
+						if p in host.split('.')[0]:
+							evidence = p
+							value = 4
+					if value == 0:
+						for p in productname.get().get(company,()):
+							if p in host.split('.')[0]:
+								evidence += p
+								value = 5
+					if value == 0:
+						for p in productname.get().get(company,()):
+							if p in url.split('.')[:-1]:
+								evidence += p
+								value = 6
+								host = url
+					if value == 0:
+						for p in product.get().get(company,()):
+							if p in url.split('.')[:-1]:
+								evidence = p
+								value = 7
+								host = url
+
+					sqldao.execute(INSERT, ('app', evidence, host, company,value))
+	sqldao.close()
+
+from utils import name_clean
+from utils import none2str
+def app_features():
+	def gen_features(segs):
+		for i in range(len(segs)):
+			if len(segs[i]) > 0:
+				for j in range(len(segs)):
+					if len(segs[j]) > 0:
+						msg = ''
+						if i == j:
+							msg = segs[i]
+						else:
+							msg = segs[i] + '.' + segs[j]
+							fapp.add(msg, app)
+							fcategory.add(msg, category)
+							fcompany.add(msg, company)
+							msg = segs[i] + segs[j]
+						fapp.add(msg, app)
+						fcategory.add(msg, category)
+						fcompany.add(msg, company)
+
+	QUERY = 'SELECT app, name, company, category, dev FROM apps'
+	sqldao = SqlDao()
+	fapp = Relation()
+	fcompany = Relation()
+	fcategory = Relation()
+	
+
+	for app, name, company, category, dev in sqldao.execute(QUERY):
+		app, name, company, category, dev = lower_all((app,name,company,category,dev))
+
+		appsegs = app_clean(app).split('.')
+		namesegs = name_clean(name).split(' ')
+		companysegs = name_clean(none2str(company)).split(' ')
+		devsegs = name_clean(none2str(dev)).split(' ')
+		
+		gen_features(appsegs)
+		gen_features(namesegs)
+		gen_features(companysegs)
+		gen_features(devsegs)
+
+	def insert(query, relation):
+		for f, objs in relation.get().items():
+			if f == 'sony':
+				print app
+			if len(objs) == 1:
+				for obj in objs:
+					sqldao.execute(QUERY, (obj, f))
+	QUERY = 'INSERT INTO appfeatures (app, feature) VALUES (%s,%s)'
+	insert(QUERY, fapp)
+
+	QUERY = 'INSERT INTO appfeatures (company, feature) VALUES (%s,%s)'
+	insert(QUERY, fcompany)
+	
+
+	QUERY = 'INSERT INTO appfeatures (category, feature) VALUES (%s,%s)'
+	insert(QUERY, fcategory)
+
+	sqldao.close()
+
+
+def gen_rules(time):
+	from utils import load_dict
+	from utils import backward_maxmatch
+	from utils import max_wordlen
+	from utils import min_wordlen
+	dic = load_dict()
+	sqldao = SqlDao()
+	QUERY = 'SELECT app, feature, company, category FROM appfeatures'
+	cursor = sqldao.execute(QUERY)
+	fapp = {}
+	fcompany = {}
+	fcategory = {}
+	for app, feature,company, category in cursor:
+		if app:
+			fapp[feature] = app
+		if company:
+			fcompany[feature] = company
+		if category:
+			fcategory[feature] = category
+
+	QUERY = 'SELECT app,hst,company,add_header from packages group by app, hst'
+	INSERT = 'INSERT INTO rules (app, hst) VALUES (%s,%s)'
+	
+	rulesdao = SqlDao()
+	hostapp = Relation()
+	hostcompany = Relation()
+
+	for app, hst, company,header in sqldao.execute(QUERY):
+		app, hst, company,header = lower_all((app, hst, company,header))
+		hst = hst.split(':')[0].replace('www.','')
+
+		# if time == 2 and 'x-requested-with' in header:
+		# 	continue
+		if company:
+			hostcompany.add(hst, company)
+		# hst = hst.replace('-','')
+		hostapp.add(hst, app)
+
+	for hst, apps in hostapp.get().items():
+		if hst == 'tzooimg.com':
+			print apps
+		if len(apps) == 1 and hst[-1] != '.':
+			for app in apps:
+				rulesdao.execute(INSERT, (app, hst))
+
+	# INSERT = 'INSERT INTO rules (company, hst) VALUES (%s,%s)'
+	# for hst, companies in hostcompany.get().items():
+	# 	if len(companies) == 1:
+	# 		company = companies.pop()
+	# 		prdct = set()
+	# 		wds = backward_maxmatch(hst, dic, max_wordlen, min_wordlen)
+	# 		for wd in wds:
+	# 			if hst == 'whalesharkmedia.d1.sc.omtrdc.net':
+	# 				print prdct,wd
+	# 				print fcompany.get(wd,'')
+	# 			if fcompany.get(wd,'') == company:
+	# 				prdct.add(company)
+	# 		if len(prdct) == 1:
+	# 			rulesdao.execute(INSERT, (prdct.pop(), hst))
+
+	rulesdao.close()
+
+def stat_origin_header():
+	QUERY = "select id, app, add_header, path, refer, hst, agent, company,name from packages where httptype=0"
+	records = []
+	sqldao = SqlDao()
+
+	for id, app, add_header, path, refer, host, agent, company,name in sqldao.execute(QUERY):
+		package = Package()
+		package.set_app(app)
+		package.set_path(path)
+		package.set_id(id)
+		package.set_add_header(add_header)
+		package.set_refer(refer)
+		package.set_host(host)
+		package.set_agent(agent)
+		package.set_company(company)
+		package.set_name(name)
+		records.append(package)
+	relation = Relation()
+	for record in records:
+		for h in record.add_header.split('\n'):
+			if 'origin' in h:
+				relation.add(h, record.app)
+	for k,v in relation.get().items():
+		if len(v) == 1:
+			print k, v
+		else:
+			print '#', k, v
+
+def stat_refer():
+	QUERY = "select id, app, add_header, path, refer, hst, agent, company,name from packages where httptype=0"
+	records = []
+	sqldao = SqlDao()
+
+	for id, app, add_header, path, refer, host, agent, company,name in sqldao.execute(QUERY):
+		if refer:
+			package = Package()
+			package.set_app(app)
+			package.set_path(refer)
+			package.set_id(id)
+			package.set_add_header(add_header)
+			package.set_refer(refer)
+			package.set_host(host)
+			package.set_agent(agent)
+			package.set_company(company)
+			package.set_name(name)
+			records.append(package)
+
+
+	parameters = set()
+	for record in records:
+		if record.app in record.origPath:
+			for k in record.querys:
+				if record.app in record.querys[k]:
+					parameters.add(k)
+	apps = set()
+	pkgNum = 0
+	for record in records:
+		for parameter in parameters:
+			if parameter in record.querys:
+				print '1', record.querys[parameter]
+				if record.app not in record.querys[parameter]:
+					print '2', record.app, record.querys[parameter], parameter, record.origPath
+				else:
+					pkgNum += 1 
+					apps.add(record.app)
+	
+	print 'pkgNum:', pkgNum, 'appNum:', len(apps), 'Total:', len(records)
+def stat_path():
+	records = load_pkgs()
+
+	specialPath = set()
+	apps = set()
+	pkgNum = 0
+	for record in records:
+		if record.app in record.path:
+			pkgNum += 1
+			apps.add(record.app)
+			specialPath.add(record.path)
+	
+	
+	print 'pkgNum:', pkgNum, 'appNum:', len(apps), 'Total:', len(records)
+
+def stat_host_app():
+	from utils import none2str
+	records = load_pkgs()
+	relation = Relation()
+	appComponay = {}
+	appName = {}
+	for record in records:
+		relation.add(record.host, record.app+'$'+none2str(record.company)+'$'+none2str(record.name))
+		appComponay[record.app] = record.company
+	apps = set()
+	for k, v in relation.get().items():
+		if len(v) == 1:
+
+			a =  v.items()[0][0]
+			apps.add(a)
+			print k, v
+	print 'apps:', len(apps)
+
+stat_host_app()

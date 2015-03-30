@@ -1,3 +1,13 @@
+from utils import load_tfidf
+from sqldao import SqlDao
+from utils import processPath
+import math
+from utils import Relation
+from nltk import FreqDist
+import urllib
+import mysql.connector
+from package import Package
+from utils import app_clean
 class TreeNode:
 	def __init__(self, father, value):
 		self.children = []
@@ -5,8 +15,10 @@ class TreeNode:
 		self.value = value
 		self.status = 1
 		self.counter=0
-		self.leaf = []
-
+		self.leaf = {}
+		self.addInfo = {}
+	def set_addinfo(self, key, value):
+		self.addInfo[key] = value
 
 	def inc_counter(self):
 		self.counter += 1
@@ -40,7 +52,7 @@ class TreeNode:
 		return ','.join([child.get_value() for child in self.children])
 
 	def add_leaf(self, node):
-		self.leaf.append(node)
+		self.leaf[node.get_value()] = node
 
 	def get_all_leaf(self):
 		return self.leaf
@@ -48,168 +60,322 @@ class TreeNode:
 	def add_father(self, node):
 		self.father.append(node)
 
-def add_node(root, tree_path):
+def add_node(root, treePath, vnodeIndex, addinfo=None):
 	tree_node = root
-	host = tree_path[0]
-	token = tree_path[1]
+	host = treePath[0]
+	token = treePath[1]
+	appnode = None
+	valuenode = None
 
-	while len(tree_path)>0:
-		node_value = tree_path[0]
-		tree_path = tree_path[1:]
+	for i in range(len(treePath)):
+		node_value = treePath[i]
 		child_node = tree_node.get_child(node_value)
+		
 		# not adding leaf node
 		if child_node == None:
 			# not leaf node
-			if len(tree_path) != 0:
+			if i == 0 or i == 1 or i == 2:
 				child_node = TreeNode(tree_node, node_value)
 				tree_node.add_child(child_node)
-			else:
-				token_node = tree_node.get_father()[0]
-				for app_node in token_node.get_all_leaf():
-					if node_value == app_node.get_value():
-						child_node = app_node
+			elif i == 3: # value node shared among the forest
+				child_node = vnodeIndex.get(node_value, None)
 				if child_node == None:
 					child_node = TreeNode(tree_node, node_value)
-					tree_node.add_child(child_node)
-					token_node.add_leaf(child_node)
+					vnodeIndex[node_value] = child_node
 				else:
 					child_node.add_father(tree_node)
-		
+				tree_node.add_child(child_node)
 
 		child_node.inc_counter()
 		tree_node = child_node
-	# return valuenode
-	return tree_node.get_father(), tree_node
+		if i == 3:
+			valuenode = tree_node
+		elif i == 2:
+			appnode = tree_node
+	if addinfo:
+		for k,v in addinfo.items():
+			appnode.set_addinfo(k,v)
+	return appnode, valuenode
 
+def _train(package, vnodes, appnodes, root, kvs):
+	hst = package.secdomain
+	app = package.app
+	addinfo = {}
+	addinfo['company'] = package.company
 
+	if hst != None:
+		for key, values in kvs:
+			for value in values:
+				if len(value) > 0:
+					treePath = (hst, key, app, value)
+					if app == 'com.driftwood.galaxybowl.free' and value == 'dum020g - frozen princess dress up':
+						print treePath
+					appnode, valuenode = add_node(root, treePath, vnodes, addinfo)
+					# vnodes[valuenode.get_value()] = valuenode
+					appnodes.append(appnode)
+	return appnodes, vnodes
 
-def hostNToken():
-	import urllib
-	import mysql.connector
-	from package import Package
-	from nltk import FreqDist
-	cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
-	cursor = cnx.cursor()
-	query = "select app, add_header, hst, path, agent from packages where httptype = 0"
-	cursor.execute(query)
-
-	root = TreeNode(None, None)
-	valuenode = set()
-	appnode = set()
-
+def _get_train_set():
+	training_data = []
+	sqldao = SqlDao()
+	query = 'SELECT app, add_header, hst, path, agent,name, company FROM packages WHERE httptype=0 '
 	# Build Tree
-	for app, add_header, hst, path, agent in cursor:
+	for app, add_header, hst, path, agent, name, company in sqldao.execute(query):
 		package = Package()
+		package.set_app(app)
 		package.set_path(path)
 		package.set_host(hst)
-		hst = package.secdomain
+		package.set_name(name)
+		package.set_company(company)
+		training_data.append(package)
+	return training_data
 
-		if hst != None:
-			for key, values in package.querys.items():			
-				for value in values:
-					if len(value) > 0:
-						tree_path = (hst, key, value, app)
-						value_node, app_node = add_node(root, tree_path)
-						valuenode |= set(value_node)
-						appnode.add(app_node)
-		
-		# tree_path = (hst, 'add_header', add_header, app)
-		# app_node = add_node(root, tree_path)
-		# valuenode.add(app_node)
+def hostNToken(training_data=None):
 
-		# tree_path = (hst, 'agent', agent, app)
-		# app_node = add_node(root, tree_path)
-		# valuenode.add(app_node)
+	sqldao = SqlDao()
+	sqldao.execute('TRUNCATE TABLE features')
+
+	if not training_data:
+		training_data = _get_train_set()
+	
+	vnodes = {}
+	appnodes = []
+	root = TreeNode(None, None)
+	serviceKey = Relation()
+	for package in training_data:
+		appnode, vnodes = _train(package, vnodes, appnodes, root, package.querys.items())
+		for k,v in package.querys.items():
+			if package.app in v or package.name in v:
+				serviceKey.add(package, k)
+
 
 	# Prune	
-	for node in valuenode:
-		if len(node.get_all_child()) > 1:
-			for father in node.get_father():
-				father.set_status(0)
-	for node in appnode:
-		if len(node.get_father()) > 1:
-			for valuenode in node.get_father():
-				valuenode.get_father()[0].set_status(0)
+	for vnode in vnodes.values():
+		appvalues = set()
+		cmpvalues = set()
+		for appnode in vnode.get_father():
+			appvalues.add(appnode.get_value())
+			cmpvalues.add(appnode.addInfo.get('company',''))
+
+		if (len(appvalues) > 1 and len(cmpvalues) > 1) or len(vnode.get_value()) < 3:
+			for appnode in vnode.get_father():
+				if appnode.get_father()[0].get_value() == 'bnd' and 'manage.com' in appnode.get_father()[0].get_father()[0].get_value(): 
+					print appvalues, vnode.get_value(), len(appnode.get_father())
+				appnode.get_father()[0].set_status(0)
+
+	for appnode in appnodes:
+		if len(appnode.get_all_child()) > 1:
+			for tokennode in appnode.get_father():
+				if tokennode.get_value() == 'bnd' and 'manage.com' in tokennode.get_father()[0].get_value():
+					for n in appnode.get_all_child():
+						print n.get_value()
+					print '#' * 10
+				tokennode.set_status(0)
 
 	# Persist
 	hostnodes = root.get_all_child()
 	
+	sqldao = SqlDao()
+	for hostnode in hostnodes:
+		host = hostnode.get_value()
+		for tokennode in hostnode.get_all_child():
+			token = tokennode.get_value()
+			if tokennode.get_value() == 'bnd' and 'manage.com' in host:
+				print 'ok', tokennode.get_status()
+
+			if tokennode.get_status() == 1 or (host in serviceKey.get() and tokennode.get_value() in serviceKey.get()[host]):
+				tkappnum = len(tokennode.get_all_child())
+				# print 'tkappnum', tkappnum
+				rules = Relation()
+				for appnode in tokennode.get_all_child():
+					app = appnode.get_value()
+					company = appnode.addInfo.get('company')
+					if not company: company = ''
+					# print 'app:',app,'childnum', len(appnode.get_all_child())
+					for valuenode in appnode.get_all_child():
+						# print 'value:', valuenode.get_value(), 'fathernum:',len(valuenode.get_father())
+						value = valuenode.get_value()
+						count = appnode.get_counter()
+						rules.addCnt(value, app+'$'+company, count)
+					
+				usedValue = set()
+				for value, appCount in rules.get().items():
+					companies = set()
+					app = None
+					for cmpapp, count in appCount.items():
+						tmpapp, company = cmpapp.split('$')
+						companies.add(company)
+						if not app:
+							app = tmpapp
+					if len(appCount.keys()) == 1:
+						# print 'app', app, 'count', count, 'value', value
+						sqldao.execute('insert into features (host, token, app, value, count, tkappnum) values(%s,%s,%s,%s, %s, %s)', (host, token, app, value, count, tkappnum))
+					elif len(companies) == 1:
+						sqldao.execute('insert into features (host, token, company, value, count, tkappnum) values(%s,%s,%s,%s, %s, %s)', (host, token, companies.pop(), value, count, tkappnum))
+						
+	
+	sqldao.close()
+
+
+def train(training_data=None):
+
+	root = TreeNode(None, None)
+	vnodes = {}
+	appnodes = []
+
+	sqldao = SqlDao()
+	sqldao.execute('TRUNCATE TABLE features')
+	QUERY = 'SELECT app, add_header, hst FROM packages WHERE httptype = 0 and add_header != \'\''
+
+	if not training_data:
+		sqldao = SqlDao()
+		# Build Tree
+		for app, add_header,hst in sqldao.execute(QUERY):
+			package = Package()
+			package.set_app(app)
+			package.set_host(hst)
+			
+			kvs = {}
+			splitpos = add_header.find(':')
+			key = add_header[0:splitpos].strip()
+			value = add_header[splitpos+1:].strip()
+			kvs[key] = [value]
+			
+			appnode, vnodes = _train(package, vnodes, appnodes, root, kvs.items())
+	else:
+		for package in training_data:
+			appnode, vnodes = _train(package, vnodes, appnodes, root)
+
+	# Prune	
+	for vnode in vnodes.values():
+		appvalues = set()
+		for appnode in vnode.get_father():
+			appvalues.add(appnode.get_value())
+		if len(appvalues) > 1 or len(vnode.get_value()) < 3:
+			for appnode in vnode.get_father():
+				# print 'ok', appnode.get_father()[0].get_value()
+				appnode.get_father()[0].set_status(0)
+				if appnode.get_father()[0].get_value() == 'X-Requested-With':
+					print '$$$', vnode.get_value(), appvalues,appnode.get_father()[0].get_father()[0].get_value()
+
+	for appnode in appnodes:
+		if len(appnode.get_all_child()) > 1:
+			for tokennode in appnode.get_father():
+				tokennode.set_status(0)
+
+	# Persist
+	hostnodes = root.get_all_child()
+	
+	sqldao = SqlDao()
 	for hostnode in hostnodes:
 		host = hostnode.get_value()
 		for tokennode in hostnode.get_all_child():
 			token = tokennode.get_value()
 			if tokennode.get_status() == 1:
 				tkappnum = len(tokennode.get_all_child())
-				for valuenode in tokennode.get_all_child():
-					value = valuenode.get_value()
-					for appnode in valuenode.get_all_child():
-						app = appnode.get_value()
+				# print 'tkappnum', tkappnum
+				for appnode in tokennode.get_all_child():
+					app = appnode.get_value()
+					# print 'app:',app,'childnum', len(appnode.get_all_child())
+					for valuenode in appnode.get_all_child():
+						# print 'value:', valuenode.get_value(), 'fathernum:',len(valuenode.get_father())
+						value = valuenode.get_value()
 						count = appnode.get_counter()
-						cursor.execute('insert into features (host, token, app, value, count, tkappnum) values(%s,%s,%s,%s, %s, %s)', (host, token, app, value, count, tkappnum))
-	
-	cnx.commit()
-	cursor.close()
-	cnx.close()
+						sqldao.execute('insert into features (host, header, app, value, count, tkappnum) values(%s,%s,%s,%s, %s, %s)', (host, token, app, value, count, tkappnum))
+	sqldao.close()
 
-def test_algo():
-	import urllib
-	import mysql.connector
-	from package import Package
-	from nltk import FreqDist
-	cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
-	cursor = cnx.cursor()
-	query = 'select app, token, host, value from features_bak'
-	cursor.execute(query)
+def _buildTestTree():
+	sqldao = SqlDao()
+	query = 'SELECT app, token, host, value FROM features'
 	root = TreeNode(None, None)
-	# Build the tree
-	for app, token, host, value in cursor:
-		tree_path = (host, token, value, app)
-		add_node(root, tree_path)
+	vnodes = {}
+	serviceKey = {}
 
-	query = "select id, app, add_header, hst, path, agent from packages where httptype = 0"
-	correct = 0
-	wrong = 0
-	total = 0
-	cursor.execute(query)
-	correct_ids = []
-	for id, app, add_header, hst, path, agent in cursor:		
+	# Build the tree
+	for app, token, host, value in sqldao.execute(query):
+		treePath = (host, token, value, app)
+		add_node(root, treePath, vnodes)
+	sqldao.close()
+	return root
+
+def _test(package, root):
+	hst = package.secdomain
+	app = package.app
+	company = package.company
+	predict_app = None
+	
+	if hst:
+		predict = None
+		for key, values in package.querys.items():			
+			for value in values:
+				if value:
+					treePath = (hst, key, value)
+					treeNode = root
+					while len(treePath) > 0 and treeNode != None:
+						treeNode = treeNode.get_child(treePath[0])
+						treePath = treePath[1:]
+					# treeNode is valuenode
+					if treeNode:
+						predict = treeNode.get_all_child()[0]
+					
+
+		if predict:
+			predict_app = predict.get_value()
+				
+	return predict_app
+
+def _get_test_set():
+	query = "SELECT id, app, add_header, hst, path, agent, name, company FROM packages WHERE httptype = 0"
+	sqldao = SqlDao()
+	test_set = []
+	for id, app, add_header, hst, path, agent,name,company in sqldao.execute(query):		
 		package = Package()
+		package.set_id(id)
+		package.set_app(app)
 		package.set_path(path)
 		package.set_host(hst)
-		hst = package.secdomain
-		if hst != None:
-			total += 1
-			predict = None
-			for key, values in package.querys.items():			
-				for value in values:
-					if len(value) > 0:
-						tree_path = (hst, key, value)
-						tree_node = root
-						while len(tree_path) > 0 and tree_node != None:
-							tree_node = tree_node.get_child(tree_path[0])
-							tree_path = tree_path[1:]
-						if tree_node != None:
-							predict = tree_node.get_all_child()[0]
-						
+		package.set_name(name)
+		package.set_company(company)
+		test_set.append(package)
+	sqldao.close()
+	return test_set
 
-			if predict != None :
-				if predict.get_value() == app:
-					correct += 1
-					correct_ids.append(id)
-				else:
-					print predict.get_value(), app
-					value = predict.get_father()[0].get_value()
-					token = predict.get_father()[0].get_father()[0].get_value()
-					host =  predict.get_father()[0].get_father()[0].get_father()[0].get_value()
-					print "rules: %s\t%s\t%s" % (value, token, host)
-					wrong += 1
+def test_algo(test_set = None):
+
+	root = _buildTestTree()
+	correct = 0
+	wrong = 0
+	correct_ids = []
+	
+	if not test_set:
+		test_set = _get_test_set()
+
+	rst = {}
+	for package in test_set:
+		predict_app = _test(package, root)
+		if predict_app:
+			rst[package.id] = predict_app
+			if predict_app == package.app or predict_app == package.company:
+				correct += 1
+				correct_ids.append(package.id)
+			else:
+				wrong += 1
+				# print predict.get_value(), app
+				# value = predict.get_value()
+				# token = predict.get_father()[0].get_value()
+				# host =  predict.get_father()[0].get_father()[0].get_value()
+				# print "rules: %s\t%s\t%s" % (value, token, host)
 
 	upquery = "update packages set classified = %s where id = %s"	
-	for id in correct_ids:
-		cursor.execute(upquery, (1, id))
-	cnx.commit()
+	sqldao = SqlDao()
+	for pid in correct_ids:
+		sqldao.execute(upquery, (10, pid))
+	sqldao.close()
 
-	print 'Total:%s\tCorrect:%s\tWrong:%s' % (total, correct, wrong)
+	print 'Total:%s\tCorrect:%s\tWrong:%s' % (len(test_set), correct, wrong)
+	return rst
+
+
 
 
 
@@ -222,3 +388,93 @@ if __name__ == '__main__':
 		test_algo()
 	elif sys.argv[1] == 'train':
 		hostNToken()
+	elif sys.argv[1] == 'header':
+		hostNheader()
+
+
+# def decisiontree(records, tfidf):
+# 	"""
+# 	[label, set(feature1, feature2, ..., featureN)]
+# 	"""
+# 	rules = {}
+# 	gloablfeatures = FreqDist()
+# 	for record in records:
+# 		for f in record[1]:
+# 			if len(f) > 0:
+# 				gloablfeatures.inc(f)
+# 	while(len(records) > 0):
+# 		features = FreqDist()
+# 		for record in records:
+# 			for f in record[1]:
+# 				if len(f) > 0:
+# 					features.inc(f)
+# 		mine = entrophy(records)
+# 		if mine == 0:
+# 			"""
+# 			If there is only one class in records, select the most frequent feature
+# 			in the set. If many features have the same frequency, select the one that
+# 			is less frequent in the global set.
+# 			"""
+# 			score = 0
+# 			bestf = None
+# 			app,_ = records[0][0].split('$')
+# 			for f, v in features.items():
+# 				if tfidf[f][app] > score:
+# 					bestf = f
+# 					score = tfidf[f][app]
+# 			rules[bestf] = records[0][0]
+# 			print '1. bestf is ', bestf
+# 			break
+# 		else:
+# 			bestf = None
+# 			total = len(records) * 1.0
+# 			class_one = []
+# 			class_two = []
+# 			for feature in features.keys():
+# 				if feature in rules:
+# 					continue
+# 				have, other = [], []
+# 				for record in records:
+# 					if feature in record[1]:
+# 						have.append(record)
+# 					else:
+# 						other.append(record)
+
+# 				e = len(have) / total * entrophy(have) + len(other) / total * entrophy(other)
+# 				print feature, e, mine, e ==mine
+# 				if e < mine:
+# 					mine = e
+# 					bestf = feature
+# 				elif e == mine and (features[bestf] > features[feature] or bestf == None):
+# 					bestf = feature
+
+# 			print '2. bestf is ', bestf
+# 			if bestf:
+# 				accuracy = FreqDist()
+# 				for record in records:
+# 					if bestf in record[1]:
+# 						accuracy.inc(record[0])
+# 						class_one.append(record)
+# 					else:	
+# 						class_two.append(record)
+# 				if accuracy.values()[0] * 1.0 / len(class_one) >= 0.9:
+# 					rules[bestf] = accuracy.keys()[0]
+# 					records = class_two
+# 				else:
+# 					break
+# 			else:
+# 				break
+# 	return rules
+
+
+
+# def entrophy(records):
+	
+# 	total = len(records) * 1.0
+# 	counter = FreqDist()
+# 	for record in records:
+# 		counter.inc(record[0])
+# 	e = 0
+# 	for k,v in counter.items():
+# 		e += (v/total) * math.log((v/total))
+# 	return e * -1.0
