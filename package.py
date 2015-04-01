@@ -3,6 +3,9 @@ class Package:
 	def set_id(self, id):
 		self.id = id
 
+	def set_dst(self, dst):
+		self.dst = dst
+	
 	def set_name(self, app_name):
 		if app_name:
 			packapp_name = app_name.lower().replace('-',' ').replace('_',' ').replace(',',' ')

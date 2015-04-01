@@ -154,10 +154,7 @@ def tf_idf(data_set = None):
 def gen_cmar_data(limit = None):
 	
 	records = load_pkgs(limit)
-	feature_index = {}
-	app_index = {}
 	train_data = []
-	f_indx = 0
 	f_counter = FreqDist()
 	f_company = Relation()
 
@@ -167,13 +164,16 @@ def gen_cmar_data(limit = None):
 		for pathseg in pathsegs:
 			f_counter.inc(pathseg)
 			f_company.add(pathseg, record.company)
+	
 	valid_f = set()
-
 	for k, v in f_counter.items():
 		if v > 1 and len(f_company.get()[k]) < 4:
 			valid_f.add(k)
 
-	
+	app_index = {}
+	feature_index = {}
+	f_indx = 0
+
 	for record in records:
 		pathsegs = filter(None, record.path.split('/'))
 		recordVec = []
@@ -183,27 +183,35 @@ def gen_cmar_data(limit = None):
 
 			if pathseg not in feature_index:
 				f_indx += 1
-				feature_index[pathseg] = f_indx
-			f_counter.inc(feature_index[pathseg])
+				feature_index[pathseg] = f_indx	
+			
 			recordVec.append(feature_index[pathseg])
-			f_company.add(feature_index[pathseg], record.company)
-		train_data.append((record.app, recordVec))
+		
+		host = record.host
+		if not host:
+			host = record.dst
+
+		train_data.append(((record.app, host), sorted(set(recordVec), reverse = True)))
+	
 
 	fwriter = open('record_vec.txt', 'w')
 	# train_data
 	# (app, [f1, f2, f3])
-	
+	# 
+	recordHost = []
+	encodedRecords = []
 	for record in train_data:
 		outstr = ''
-
-		for f in sorted({i for i in record[1] if f_counter[i] > 1 and len(f_company.get()[i]) < 4}, reverse = True):
+		for f in record[1]:
 			outstr = str(f) + ' ' + outstr
 		if outstr:
-			if record[0] not in app_index:
+			if record[0][0] not in app_index:
 				f_indx += 1
-				app_index[record[0]] = f_indx
-			outstr += str(app_index[record[0]])
+				app_index[record[0][0]] = f_indx
+			outstr += str(app_index[record[0][0]])
+			recordHost.append(record[0][1])
 			fwriter.write(outstr+'\n')
+
 	fwriter.close()
 	fwriter = open('app_index.txt', 'w')
 	for k, v in app_index.items():
@@ -212,6 +220,10 @@ def gen_cmar_data(limit = None):
 	fwriter = open('feature_index.txt', 'w')
 	for k, v in feature_index.items():
 		fwriter.write(k.encode('utf-8')+'\t'+str(v)+'\n')
+	fwriter.close()
+	fwriter = open('records_host.txt', 'w')
+	for k in recordHost:
+		fwriter.write(k.encode('utf-8')+'\n')
 	fwriter.close()
 	print 'output files are app_index.txt, feature_index.txt, record_vec.txt'
 	print 'number of classes:', len(app_index)

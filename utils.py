@@ -20,10 +20,12 @@ max_wordlen, min_wordlen = 100, 2
 
 
 def loadfile(filepath, parser):
-	for ln in open(filepath):
+	f = open(filepath)
+	for ln in f:
 		ln = ln.strip()
 		if len(ln) != 0:
 			parser(ln)
+	f.close()
 
 def name_clean(name):
 	name = regex_enpunc.sub(' ', name)
@@ -140,10 +142,10 @@ def load_pkgs(limit = None):
 	sqldao = SqlDao()
 	QUERY = None
 	if not limit:
-		QUERY = "select id, app, add_header, path, refer, hst, agent, company,name from packages where httptype=0"
+		QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst from packages where httptype=0"
 	else:
-		QUERY = "select id, app, add_header, path, refer, hst, agent, company,name from packages where httptype=0 limit " + str(limit)
-	for id, app, add_header, path, refer, host, agent, company,name in sqldao.execute(QUERY):
+		QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst from packages where httptype=0 limit " + str(limit)
+	for id, app, add_header, path, refer, host, agent, company,name, dst in sqldao.execute(QUERY):
 		package = Package()
 		package.set_app(app)
 		package.set_path(path)
@@ -154,6 +156,9 @@ def load_pkgs(limit = None):
 		package.set_agent(agent)
 		package.set_company(company)
 		package.set_name(name)
+		if dst == None:
+			print id
+		package.set_dst(dst)
 		records.append(package)
 	return records
 
