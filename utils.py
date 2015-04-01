@@ -156,8 +156,6 @@ def load_pkgs(limit = None):
 		package.set_agent(agent)
 		package.set_company(company)
 		package.set_name(name)
-		if dst == None:
-			print id
 		package.set_dst(dst)
 		records.append(package)
 	return records
