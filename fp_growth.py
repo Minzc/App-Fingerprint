@@ -63,7 +63,7 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
         # sorted according to item's frequence
         # first by support then by itemnum
         transaction.sort(key=lambda v: (items[v], v), reverse=True)
-        print '[DEBUG]', transaction
+        # print '[DEBUG]', transaction
         transaction = transaction + [label]
         return transaction
 
@@ -102,12 +102,13 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
 
                 yield (found_set, support, support_dist) if include_support else found_set
 
-                # Build a conditional tree and recursively search for frequent
-                # itemsets within it.
-                cond_tree = conditional_tree_from_paths(tree.prefix_paths(item),
-                    minimum_support)
-                for s in find_with_suffix(cond_tree, found_set):
-                    yield s # pass along the good news to our caller
+                if len(support_dist) > 1:
+                    # Build a conditional tree and recursively search for frequent
+                    # itemsets within it.
+                    cond_tree = conditional_tree_from_paths(tree.prefix_paths(item),
+                        minimum_support)
+                    for s in find_with_suffix(cond_tree, found_set):
+                        yield s # pass along the good news to our caller
 
             for node in nodes:
                 if node.parent is not None: # the node might already be an orphan
