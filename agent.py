@@ -3,6 +3,7 @@ from utils import agent_clean
 from sqldao import SqlDao
 from package import Package
 from utils import none2str
+from utils import load_pkgs
 import re
 
 def _get_app_features(pkgsegs):
@@ -59,11 +60,9 @@ def _train(train_set):
 							rst[agent[0]] = app
 							agentftr.add(agent[0], k)
 
-
 	return _extract_general_frs(agentftr, rst)
 
 
-	
 
 def _extract_general_frs(agentftr, rst):
 	tmprst = {}
@@ -80,22 +79,9 @@ def _extract_general_frs(agentftr, rst):
 
 def mine_agent():
 	QUERY = "select id, app, add_header, path, refer, hst, agent, company,name from packages where httptype=0"
-	records = []
+	records = load_pkgs()
 	sqldao = SqlDao()
 	sqldao.execute('DELETE FROM rules WHERE agent IS NOT NULL')
-
-	for id, app, add_header, path, refer, host, agent, company,name in sqldao.execute(QUERY):
-		package = Package()
-		package.set_app(app)
-		package.set_path(path)
-		package.set_id(id)
-		package.set_add_header(add_header)
-		package.set_refer(refer)
-		package.set_host(host)
-		package.set_agent(agent)
-		package.set_company(company)
-		package.set_name(name)
-		records.append(package)
 
 	rst = _train(records)
 	QUERY = 'INSERT INTO rules (app, agent) VALUES(%s, %s)'
@@ -119,21 +105,9 @@ class AgentRuler:
 
 def test_agent():
 	QUERY = "select id, app, add_header, path, refer, hst, agent, company,name from packages where httptype=0"
-	records = []
+	records = load_pkgs()
 	sqldao = SqlDao()
 
-	for id, app, add_header, path, refer, host, agent, company,name in sqldao.execute(QUERY):
-		package = Package()
-		package.set_app(app)
-		package.set_path(path)
-		package.set_id(id)
-		package.set_add_header(add_header)
-		package.set_refer(refer)
-		package.set_host(host)
-		package.set_agent(agent)
-		package.set_company(company)
-		package.set_name(name)
-		records.append(package)
 	agent_classifier = AgentRuler()
 	counter = 0
 	correct = 0

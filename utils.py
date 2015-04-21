@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # 
-
-import tldextract		
+	
 import re
 import string
 import tldextract
 from sqldao import SqlDao
 import re
 from package import Package
+import random
 
 regex_enpunc = re.compile("[" + string.punctuation + "]")
 
@@ -18,6 +18,30 @@ extract = tldextract.TLDExtract(
 
 max_wordlen, min_wordlen = 100, 2
 
+def stratified_r_sample(N, records):
+	strata = {}
+	for record in records:
+		if record.app not in strata:
+			strata[record.app] = []
+		strata[record.app].append(record)
+
+	sample = []
+	for app, pks in strata.items():
+		n = max(1, 1.0 * len(pks) / len(records) * N)
+		sample += reservoir_sample(n, pks)
+	return sample
+
+def reservoir_sample(N, records):
+	
+	sample = []
+ 
+	for i,line in enumerate(records):
+		if i < N:
+			sample.append(line)
+		elif i >= N and random.random() < N/float(i+1):
+			replace = random.randint(0,len(sample)-1)
+			sample[replace] = line
+	return sample
 
 def loadfile(filepath, parser):
 	f = open(filepath)

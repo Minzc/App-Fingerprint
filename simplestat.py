@@ -10,32 +10,54 @@ from nltk import FreqDist
 from utils import app_clean
 from package import Package
 from utils import load_pkgs
+
+
 def stat_path():
 	sqldao = SqlDao()
-	counter = Relation()
-	records = []
-	for app, path, name, company in sqldao.execute('select app, path, name, company from packages where httptype = \'0\' '):
-		package = Package()
-		package.set_app(app)
-		package.set_path(path)
-		package.set_company(company)
-		package.set_name(name)
-		records.append(package)
+	counter = FreqDist()
+	records = load_pkgs()
+	
 	count = 0
+	l_max = 0
+	total = 0
 	for pk in records:
-		path = pk.path
-		namesegs = set(pk.name.split(' '))
+		counter.inc(pk.app)
+		# l = set()
+		# pathsegs = filter(None,pk.path.split('/'))
+		# for i in pathsegs:
+		# 	if len(i) < 2:
+		# 		continue
+		# 	l.add(i.replace(' ',''))
+		# 	counter.inc(i.replace(' ',''))
 
-		appsegs = set(app_clean(pk.app).split('.'))
-		appsegs |= namesegs
-		pathsegs = path.split('/')
-		for pathseg in pathsegs:
-			for appseg in appsegs:
-				if appseg in pathseg and len(appseg) > 1:
-					print appseg
-					count += 1
-					break
-	print count, len(records)
+		# queries = pk.querys
+		# for k, vs in filter(None,queries.items()):
+		# 	if len(k) < 2:
+		# 		continue
+		# 	counter.inc(k.replace(' ',''))
+		# 	l.add(k.replace(' ',''))
+		# 	for v in vs:
+		# 		if len(v) < 2:
+		# 			continue
+		# 		l.add(v.replace(' ',''))
+		# 		counter.inc(v.replace(' ','').replace('\n',''))
+
+		# for head_seg in filter(None,pk.add_header.split('\n')):
+		# 	if len(head_seg) < 2:
+		# 		continue
+		# 	l.add(head_seg.replace(' ','').replace(' ','').strip())
+		# 	counter.inc(head_seg.replace(' ','').replace(' ','').strip())
+
+		# for agent_seg in filter(None,pk.agent.split(' ')):
+		# 	if len(agent_seg) < 2:
+		# 		continue
+		# 	l.add(agent_seg.replace(' ','').replace(' ',''))
+		# 	counter.inc(agent_seg.replace(' ',''))
+		# l_max = max(l_max, len(l))
+		# total += len(l)
+		
+	for k, v in counter.items():
+		print v
 
 
 def stat_add_header():
@@ -591,20 +613,20 @@ def stat_refer():
 					apps.add(record.app)
 	
 	print 'pkgNum:', pkgNum, 'appNum:', len(apps), 'Total:', len(records)
-def stat_path():
-	records = load_pkgs()
+# def stat_path():
+# 	records = load_pkgs()
 
-	specialPath = set()
-	apps = set()
-	pkgNum = 0
-	for record in records:
-		if record.app in record.path:
-			pkgNum += 1
-			apps.add(record.app)
-			specialPath.add(record.path)
+# 	specialPath = set()
+# 	apps = set()
+# 	pkgNum = 0
+# 	for record in records:
+# 		if record.app in record.path:
+# 			pkgNum += 1
+# 			apps.add(record.app)
+# 			specialPath.add(record.path)
 	
 	
-	print 'pkgNum:', pkgNum, 'appNum:', len(apps), 'Total:', len(records)
+# 	print 'pkgNum:', pkgNum, 'appNum:', len(apps), 'Total:', len(records)
 
 def stat_host_app():
 	from utils import none2str
@@ -624,4 +646,4 @@ def stat_host_app():
 			print k, v
 	print 'apps:', len(apps)
 
-stat_host_app()
+stat_path()

@@ -277,6 +277,7 @@ def _test(package, root):
 	return predict_app
 
 def test_algo(test_set = None):
+	import urlparse
 
 	root = _buildTestTree()
 	correct = 0
@@ -289,6 +290,14 @@ def test_algo(test_set = None):
 	rst = {}
 	for package in test_set:
 		predictRst = _test(package, root)
+		if not predictRst and package.refer:
+			tmpHost = urlparse.urlparse(package.refer).netloc
+			package.set_host(tmpHost)
+			tmpQuery = urlparse.urlparse(package.refer).query
+			tmpPath = urlparse.urlparse(package.refer).path
+			package.set_path(tmpPath+'?'+tmpQuery)
+			predictRst = _test(package, root)
+
 		if predictRst:
 			predict_app, predict_company = predictRst
 			rst[package.id] = predictRst
@@ -296,8 +305,7 @@ def test_algo(test_set = None):
 				correct += 1
 				correct_ids.append(package.id)
 			else:
-				wrong += 1
-				
+				wrong += 1			
 
 	upquery = "update packages set classified = %s where id = %s"	
 	sqldao = SqlDao()
