@@ -73,8 +73,7 @@ def _get_record_f(record):
     for agent_seg in filter(None, record.agent.split(' ')):
         if len(agent_seg) < 2:
           features.append(agent_seg.replace(' ', ''))
-    
-    # Last feature is host
+
     features.append(record.host)
     return features
 
@@ -87,17 +86,12 @@ def _encode_data(records=None):
     f_company = Relation()
 
     for record in records:
-        features = _get_record_f(record)
-
-        recordVec = []
-        for pathseg in features:
+        for pathseg in _get_record_f(record):
             f_counter.inc(pathseg)
             f_company.add(pathseg, record.company)
 
-    valid_f = set()
-    for k, v in f_counter.items():
-        if v > 1 and len(f_company.get()[k]) < 4:
-            valid_f.add(k)
+    valid_f = {k for k, v in f_counter.iteritems() if v > 1 and len(f_company.get()[k]) < 4}
+    
 
     appIndx = {}
     featureIndx = {}
@@ -191,7 +185,6 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
     # 			fNodes[ft] = FNode(ft)
     # 		fNodes[ft].inc(app)
     
-    def reformat(transaction):
 
     ###########################
     # FP-tree Version
