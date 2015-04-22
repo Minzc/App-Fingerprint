@@ -11,7 +11,7 @@ import app_txt_f
 from utils import reservoir_sample
 from utils import stratified_r_sample
 
-LIMIT = None
+LIMIT = 1000
 
 def merge_rst(rst, tmprst):
 	for r in tmprst.keys():

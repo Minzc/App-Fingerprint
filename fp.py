@@ -79,18 +79,19 @@ def _get_record_f(record):
 
 
 def _encode_data(records=None):
+    from collections import defaultdict
     if not records:
         records = load_pkgs(limit)
     train_data = []
-    f_counter = FreqDist()
-    f_company = Relation()
+    f_counter = defaultdict(int)
+    f_company = defaultdict(set)
 
     for record in records:
         for pathseg in _get_record_f(record):
-            f_counter.inc(pathseg)
-            f_company.add(pathseg, record.company)
+            f_counter[pathseg] += 1
+            f_company[pathseg].add(record.company)
 
-    valid_f = {k for k, v in f_counter.iteritems() if v > 1 and len(f_company.get()[k]) < 4}
+    valid_f = {k for k, v in f_counter.iteritems() if v > 1 and len(f_company[k]) < 4}
     
 
     appIndx = {}
