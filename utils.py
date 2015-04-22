@@ -18,6 +18,10 @@ extract = tldextract.TLDExtract(
 
 max_wordlen, min_wordlen = 100, 2
 
+def rever_map(mapObj):
+    """ revert the key value of a map """
+    return {v: k for k, v in mapObj.items()}
+
 def stratified_r_sample(N, records):
 	strata = {}
 	for record in records:

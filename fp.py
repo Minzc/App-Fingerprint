@@ -1,25 +1,23 @@
 import sys
-
-
-from nltk import FreqDist
-from fp_growth import find_frequent_itemsets
-from utils import loadfile
-from utils import Relation
 import operator
+from fp_growth import find_frequent_itemsets
+from utils import loadfile, rever_map, Relation
+from itertools import imap
+from collections import defaultdict, namedtuple
 
 
 class FNode:
     def __init__(self, feature):
         self.feature = feature
-        self.appCounter = FreqDist()
+        self.appCounter = defaultdict(int)
 
     def inc(self, app):
-        self.appCounter.inc(app)
+        self.appCounter[app] += 1
 
     def genRules(self):
         totalNum = sum(self.appCounter.values())
         # feature, app, support, confidence
-        return [(self.feature, app, 1.0 * num, 1.0 * num / totalNum) for app, num in self.appCounter.items()]
+        return [(self.feature, app, 1.0 * num, 1.0 * num / totalNum) for app, num in self.appCounter.iteritems()]
 
 
 class FPRuler:
@@ -76,17 +74,11 @@ def _get_record_f(record):
     host = record.host if record.host else record.dst
     features.append(host)
     features.append(record.app)
-    # if record.host:
-    #   features.append(record.host)
-    # else:
-    #   features.append(record.dst)
 
     return features
 
 
 def _encode_data(records=None, minimum_support = 2):
-    from itertools import imap
-    from collections import defaultdict
     if not records:
         records = load_pkgs(limit)
     
@@ -112,16 +104,18 @@ def _encode_data(records=None, minimum_support = 2):
     processed_transactions, items = _get_transactions(records)
 
     itemIndx = defaultdict(lambda: len(itemIndx))
-
+    recordHost = []
     def _encode_transaction(transaction):
         """Change string items to numbers"""
         host = transaction[-2]
         app = transaction[-1]
         # Prune infrequent items
         # Host and app are not included in transaction now
-        encode_transaction = [ itemIndx[item] for item in set(transaction[:-2]) 
+        # encode_transaction = [ itemIndx[item] for item in set(transaction[:-2])
+        # encode_transaction.append(itemIndx[host])
+        encode_transaction = [ itemIndx[item] for item in set(transaction[:-1])
                 if item in items]
-        encode_transaction.append(itemIndx[host])
+        recordHost.append(host)
         return (app, encode_transaction)
 
     train_data = []
@@ -131,19 +125,19 @@ def _encode_data(records=None, minimum_support = 2):
     # train_data
     # all features are encoded; decode dictionary is itemIndx
     # ((app, [f1, f2, f3, host]))
-    start_indx = len(itemIndx)
+    # 1 is added to avoid index overlap 
+    start_indx = len(itemIndx) + 1
     appIndx = defaultdict(lambda : start_indx + len(appIndx))
-    recordHost = []
     encodedRecords = []
+
     for app, encode_transaction in train_data:
-        host = encode_transaction[-1]
+        # host = encode_transaction[-1]
         # Append class lable at the end of a transaction
         encode_transaction.append(appIndx[app])
-        recordHost.append(host)
         encodedRecords.append(encode_transaction)
 
     # encodedRecords: ([Features, app])
-    return encodedRecords, _rever_map(appIndx), _rever_map(itemIndx), recordHost
+    return encodedRecords, rever_map(appIndx), rever_map(itemIndx), recordHost
 
 
 def _rever_map(mapObj):
@@ -185,38 +179,48 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
     ###########################
     # Single Item Version
     ###########################
-    # for record in records:
-    # # fts, app = record, record[-1]
-    # fts, app = record
-    # 	for ft in fts:
-    # 		if ft not in fNodes:
-    # 			fNodes[ft] = FNode(ft)
-    # 		fNodes[ft].inc(app)
-    
+    """
+    rules = []
+    for transaction in transactions:
+        fts, app = transaction[:-1], transaction[-1]
+        for ft in fts:
+            if ft not in fNodes:
+               fNodes[ft] = FNode(ft)
+            fNodes[ft].inc(app)
+    for fNode in fNodes.values():
+        for rule in fNode.genRules():
+            feature, app, support, confidence = rule
+            if support > tSupport and confidence > tConfidence:
+                rules.append(({feature},  confidence, support, app))
+    """
 
     ###########################
     # FP-tree Version
     ###########################
+    rules = []
     for itemset, support, tag_dist in find_frequent_itemsets(transactions, tSupport, True):
-        if max(tag_dist.values()) * 1.0 / support > tConfidence:
-            print itemset , support, tag_dist 
-    rules = {}
-    # for fNode in fNodes.values():
-    #     for rule in fNode.genRules():
-    #         feature, app, support, confidence = rule
-    #         if support > tSupport and confidence > tConfidence:
-    #             rules[feature] = (app, support, confidence)
-    print "Finish Rule Generating"
+        max_clss = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
+        if tag_dist[max_clss] * 1.0 / support > tConfidence:
+            confidence = max(tag_dist.values()) * 1.0 / support
+            rules.append((frozenset(itemset), confidence, support, max_clss))
+    
+    print ">>>Finish Rule Generating"
     return rules
 
 
-def _prune_rules(rules, records):
+def _prune_rules(t_rules, records):
+    # Sort generated rules according to its confidence, support and length
+    t_rules.sort(key=lambda v: (v[1], v[2], len(v[0])), reverse=True)
     finalRules = set()
+    rules = set()
+    for k, _,_,_ in t_rules:
+        if len(k) == 1:
+            rules |= k
 
-    for hstindx, record in enumerate(records):
-        for feature in record[0]:
-            if frozenset([feature]) in rules:
-                finalRules.add((feature, record[1], hstindx))
+    for lnNum, record in enumerate( records ):
+        for feature in record:
+            if feature in rules:
+                finalRules.add((feature, record[-1], lnNum))
     return finalRules
 
 
@@ -234,9 +238,6 @@ def mine_fp(records, tSuppoert, tConfidence):
     # change encoded features back to string
     decodedRules = set()
     for rule in rules:
-        featureIndx[rule[0]]
-        appIndx[rule[1]]
-        recordHost[rule[2]]
         decodedRules.add((featureIndx[rule[0]], appIndx[rule[1]], recordHost[rule[2]]))
 
     classifier = FPRuler()
@@ -244,21 +245,21 @@ def mine_fp(records, tSuppoert, tConfidence):
     ################################################
     # Mine Company Features
     ################################################
-
-
     for record in records:
         if record.company:
             record.app = record.company
     encodedRecords, appIndx, featureIndx, recordHost = _encode_data(records)
+    # (feature, app, host index)
     rules = _gen_rules(encodedRecords, tSuppoert, tConfidence, _rever_map(featureIndx))
+    # feature, app, host
+    # rules : set()
     rules = _prune_rules(rules, encodedRecords)
+    # change encoded features back to string
     decodedRules = set()
     for rule in rules:
-        featureIndx[rule[0]]
-        appIndx[rule[1]]
-        recordHost[rule[2]]
         decodedRules.add((featureIndx[rule[0]], appIndx[rule[1]], recordHost[rule[2]]))
     classifier.addRules(decodedRules)
+    
     return classifier
 
 
@@ -286,7 +287,6 @@ def mining_fp_local(filepath, tSuppoert, tConfidence):
     for rule in rules:
         coveredApp.add(rule[1])
         rule = (featureIndx[rule[0]], appIndx[rule[1]], recordHost[rule[2]])
-        print rule
 
     print 'total:', len(records), 'coverage:', coverage, 'totalApp:', len(totalApp), 'coverApp:', len(coveredApp)
 

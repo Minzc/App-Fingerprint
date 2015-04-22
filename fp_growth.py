@@ -112,11 +112,14 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
 
             for node in nodes:
                 if node.parent is not None: # the node might already be an orphan
+                    if len(node.children) > 0:
+                        print 'error'
                     node.parent.remove(node)
 
     # Search for frequent itemsets, and yield the results we find.
     for itemset in find_with_suffix(master, []):
         yield itemset
+
 
 class FPTree(object):
     """
@@ -373,6 +376,9 @@ class FPNode(object):
                 for k, v in child.clsses.items():
                     self.assign_clss(k, v)
 
+                if len(child.children) > 0:
+                    print child
+                    
                 assert len(child.children) <= 0
 
                 for sub_child in child.children:
