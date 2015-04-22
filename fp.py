@@ -91,7 +91,8 @@ def _encode_data(records=None):
             f_counter[pathseg] += 1
             f_company[pathseg].add(record.company)
 
-    valid_f = {k for k, v in f_counter.iteritems() if v > 1 and len(f_company[k]) < 4}
+    valid_f = {k for k, v in f_counter.iteritems() 
+        if v > 1 and len(f_company[k]) < 4}
     
 
     appIndx = {}
