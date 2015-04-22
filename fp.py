@@ -78,33 +78,38 @@ def _get_record_f(record):
     return features
 
 
-def _encode_data(records=None):
+def _encode_data(records=None, minimum_support = 2):
     from collections import defaultdict
     if not records:
         records = load_pkgs(limit)
+
     train_data = []
     f_counter = defaultdict(int)
     f_company = defaultdict(set)
+    processed_transactions = []
 
     for record in records:
-        for pathseg in _get_record_f(record):
+        transaction = _get_record_f(record)
+        processed_transactions.append(transaction)
+        for pathseg in transaction:
             f_counter[pathseg] += 1
             f_company[pathseg].add(record.company)
 
-    valid_f = {k for k, v in f_counter.iteritems() 
-        if v > 1 and len(f_company[k]) < 4}
-    
+    # Get frequent 1-items
+    items = {k for k, v in f_counter.iteritems() 
+        if v > minimum_support and len(f_company[k]) < 4}
 
     appIndx = {}
     featureIndx = {}
     f_indx = 0
 
-    for record in records:
-        features = _get_record_f(record)
+    for transaction in processed_transactions:
+        # Prune infrequent items
+        transaction = {item for item in transaction if item in items}
         recordVec = []
-        for pathseg in features:
+        for pathseg in transaction:
 
-            if pathseg not in valid_f:
+            if pathseg not in items:
                 continue
 
             if pathseg not in featureIndx:
