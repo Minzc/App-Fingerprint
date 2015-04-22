@@ -73,76 +73,77 @@ def _get_record_f(record):
     for agent_seg in filter(None, record.agent.split(' ')):
         if len(agent_seg) < 2:
           features.append(agent_seg.replace(' ', ''))
+    host = record.host if record.host else record.dst
+    features.append(host)
+    features.append(record.app)
+    # if record.host:
+    #   features.append(record.host)
+    # else:
+    #   features.append(record.dst)
 
-    features.append(record.host)
     return features
 
 
 def _encode_data(records=None, minimum_support = 2):
+    from itertools import imap
     from collections import defaultdict
     if not records:
         records = load_pkgs(limit)
+    
+    def _get_transactions(records):
+      """Change package to transaction"""
+      f_counter = defaultdict(int)
+      f_company = defaultdict(set)
+      processed_transactions = []
+
+      for record in records:
+          transaction = _get_record_f(record)
+          processed_transactions.append(transaction)
+          # Last item is app
+          for item in transaction[:-1]:
+              f_counter[item] += 1
+              f_company[item].add(record.company)
+
+      # Get frequent 1-item
+      items = {k for k, v in f_counter.iteritems() 
+          if v > minimum_support and len(f_company[k]) < 4}
+      return processed_transactions, items
+
+    processed_transactions, items = _get_transactions(records)
+
+    itemIndx = defaultdict(lambda: len(itemIndx))
+
+    def _encode_transaction(transaction):
+        """Change string items to numbers"""
+        host = transaction[-2]
+        app = transaction[-1]
+        # Prune infrequent items
+        # Host and app are not included in transaction now
+        encode_transaction = [ itemIndx[item] for item in set(transaction[:-2]) 
+                if item in items]
+        encode_transaction.append(itemIndx[host])
+        return (app, encode_transaction)
 
     train_data = []
-    f_counter = defaultdict(int)
-    f_company = defaultdict(set)
-    processed_transactions = []
-
-    for record in records:
-        transaction = _get_record_f(record)
-        processed_transactions.append(transaction)
-        for pathseg in transaction:
-            f_counter[pathseg] += 1
-            f_company[pathseg].add(record.company)
-
-    # Get frequent 1-items
-    items = {k for k, v in f_counter.iteritems() 
-        if v > minimum_support and len(f_company[k]) < 4}
-
-    appIndx = {}
-    featureIndx = {}
-    f_indx = 0
-
-    for transaction in processed_transactions:
-        # Prune infrequent items
-        transaction = {item for item in transaction if item in items}
-        recordVec = []
-        for pathseg in transaction:
-
-            if pathseg not in items:
-                continue
-
-            if pathseg not in featureIndx:
-                f_indx += 1
-                featureIndx[pathseg] = f_indx
-
-            recordVec.append(featureIndx[pathseg])
-
-        # if pathseg == 'petshop':
-        # print 'DEBUG  OK', featureIndx[pathseg]
-
-        host = record.host
-        if not host:
-            host = record.dst
-
-        train_data.append(((record.app, record.host), sorted(set(recordVec), reverse=True)))
-
+    for trans_tuple in imap(_encode_transaction, processed_transactions):
+        train_data.append(trans_tuple)
 
     # train_data
-    # ((app, host), [f1, f2, f3])
+    # all features are encoded; decode dictionary is itemIndx
+    # ((app, [f1, f2, f3, host]))
+    start_indx = len(itemIndx)
+    appIndx = defaultdict(lambda : start_indx + len(appIndx))
     recordHost = []
     encodedRecords = []
-    for record in train_data:
-        if record[0][0] not in appIndx:
-            f_indx += 1
-            appIndx[record[0][0]] = f_indx
-        record[1].append(appIndx[record[0][0]])
-        encodedRecords.append(record[1])
-        # encodedRecords.append(({i for i in record[1]}, appIndx[record[0][0]]))
-        recordHost.append(record[0][1])
+    for app, encode_transaction in train_data:
+        host = encode_transaction[-1]
+        # Append class lable at the end of a transaction
+        encode_transaction.append(appIndx[app])
+        recordHost.append(host)
+        encodedRecords.append(encode_transaction)
 
-    # encodedRecords: ({Features}, app)
-    return encodedRecords, _rever_map(appIndx), _rever_map(featureIndx), recordHost
+    # encodedRecords: ([Features, app])
+    return encodedRecords, _rever_map(appIndx), _rever_map(itemIndx), recordHost
 
 
 def _rever_map(mapObj):
