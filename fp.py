@@ -5,6 +5,7 @@ from nltk import FreqDist
 from fp_growth import find_frequent_itemsets
 from utils import loadfile
 from utils import Relation
+import operator
 
 
 class FNode:
@@ -53,27 +54,27 @@ class FPRuler:
 
 
 def _get_record_f(record):
+    """Get package features"""
     features = filter(None, record.path.split('/'))
-    queries = record.querys
-    for k, vs in filter(None, queries.items()):
-        if len(k) < 2:
-            continue
-        features.append(k)
-        for v in vs:
-            if len(v) < 2:
-                continue
-            features.append(v.replace(' ', '').replace('\n', ''))
+    # queries = record.querys
+    # for k, vs in filter(None, queries.items()):
+    #     if len(k) < 2:
+    #         continue
+    #     features.append(k)
+    #     for v in vs:
+    #         if len(v) < 2:
+    #             continue
+    #         features.append(v.replace(' ', '').replace('\n', ''))
 
     for head_seg in filter(None, record.add_header.split('\n')):
-        if len(head_seg) < 2:
-            continue
-        features.append(head_seg.replace(' ', '').strip())
+        if len(head_seg) > 2:
+            features.append(head_seg.replace(' ', '').strip())
 
     for agent_seg in filter(None, record.agent.split(' ')):
         if len(agent_seg) < 2:
-            continue
-        features.append(agent_seg.replace(' ', ''))
-
+          features.append(agent_seg.replace(' ', ''))
+    
+    # Last feature is host
     features.append(record.host)
     return features
 
@@ -134,9 +135,9 @@ def _encode_data(records=None):
         if record[0][0] not in appIndx:
             f_indx += 1
             appIndx[record[0][0]] = f_indx
-        # record[1].append(appIndx[record[0][0]])
-        # encodedRecords.append(record[1])
-        encodedRecords.append(({i for i in record[1]}, appIndx[record[0][0]]))
+        record[1].append(appIndx[record[0][0]])
+        encodedRecords.append(record[1])
+        # encodedRecords.append(({i for i in record[1]}, appIndx[record[0][0]]))
         recordHost.append(record[0][1])
 
     # encodedRecords: ({Features}, app)
@@ -189,17 +190,22 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
     # 		if ft not in fNodes:
     # 			fNodes[ft] = FNode(ft)
     # 		fNodes[ft].inc(app)
+    
+    def reformat(transaction):
 
     ###########################
     # FP-tree Version
     ###########################
-    find_frequent_itemsets(transactions, tSupport)
+    for itemset, support, tag_dist in find_frequent_itemsets(transactions, tSupport, True):
+        if max(tag_dist.values()) * 1.0 / support > tConfidence:
+            print itemset , support, tag_dist 
     rules = {}
     # for fNode in fNodes.values():
     #     for rule in fNode.genRules():
     #         feature, app, support, confidence = rule
     #         if support > tSupport and confidence > tConfidence:
     #             rules[feature] = (app, support, confidence)
+    print "Finish Rule Generating"
     return rules
 
 

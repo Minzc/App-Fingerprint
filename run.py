@@ -102,6 +102,7 @@ for train, test in kf:
 	precision += correct  * 1.0 /len(rst)
 	recall += len(rst)  * 1.0 / len(test_set) * 1.0
 	insert_rst(rst)
+        break
 
 print 'Precision:', precision / 10.0, 'Recall:', recall / 10.0, 'App:', discoveried_app / 10.0
 
