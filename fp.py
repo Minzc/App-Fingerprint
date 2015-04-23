@@ -40,9 +40,10 @@ class FPRuler:
         for rulesID, rules in enumerate(self.rulesSet):
             rst = set()
             features = _get_record_f(record)
-            for feature in features:
-                if record.host in rules and feature in rules[record.host]:
-                    rst.add(rules[record.host][feature])
+            if record.host in rules:
+                for rule, label in rules[record.host].iteritems():
+                    if rule.issubset(features):
+                        rst.add(label)
             # TODO handle multiple predicted apps
             if len(rst) > 0:
                 labelRsts.append(rst.pop())
@@ -211,17 +212,13 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
 def _prune_rules(t_rules, records):
     # Sort generated rules according to its confidence, support and length
     t_rules.sort(key=lambda v: (v[1], v[2], len(v[0])), reverse=True)
-    finalRules = set()
-    rules = set()
-    for k, _,_,_ in t_rules:
-        if len(k) == 1:
-            rules |= k
+    cover_num = [0] * len(records)
+    for rule, _, _, classlabel in t_rules:
+        for r_id, record in enumerate( records):
+            if rule.issubset(record) and cover_num[r_id] < 4:
+                cover_num[r_id] += 1
+                yield (rule, classlabel, r_id)
 
-    for lnNum, record in enumerate( records ):
-        for feature in record:
-            if feature in rules:
-                finalRules.add((feature, record[-1], lnNum))
-    return finalRules
 
 
 def mine_fp(records, tSuppoert, tConfidence):
@@ -238,7 +235,9 @@ def mine_fp(records, tSuppoert, tConfidence):
     # change encoded features back to string
     decodedRules = set()
     for rule in rules:
-        decodedRules.add((featureIndx[rule[0]], appIndx[rule[1]], recordHost[rule[2]]))
+        rule_str = {featureIndx[itemcode] for itemcode in rule[0]}
+        rule_str = frozenset(rule_str)
+        decodedRules.add((rule_str, appIndx[rule[1]], recordHost[rule[2]]))
 
     classifier = FPRuler()
     classifier.addRules(decodedRules)
@@ -257,7 +256,9 @@ def mine_fp(records, tSuppoert, tConfidence):
     # change encoded features back to string
     decodedRules = set()
     for rule in rules:
-        decodedRules.add((featureIndx[rule[0]], appIndx[rule[1]], recordHost[rule[2]]))
+        rule_str = {featureIndx[itemcode] for itemcode in rule[0]}
+        rule_str = frozenset(rule_str)
+        decodedRules.add((rule_str, appIndx[rule[1]], recordHost[rule[2]]))
     classifier.addRules(decodedRules)
     
     return classifier

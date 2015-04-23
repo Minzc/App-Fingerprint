@@ -5,7 +5,7 @@ import fp
 from utils import load_pkgs
 
 
-LIMIT = 100
+LIMIT = None
 
 
 def merge_rst(rst, tmprst):
