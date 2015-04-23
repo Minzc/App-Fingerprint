@@ -6,7 +6,6 @@ import re
 import string
 import tldextract
 from sqldao import SqlDao
-import re
 from package import Package
 import random
 

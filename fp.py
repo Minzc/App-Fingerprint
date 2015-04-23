@@ -1,7 +1,7 @@
 import sys
 import operator
 from fp_growth import find_frequent_itemsets
-from utils import loadfile, rever_map, Relation
+from utils import loadfile, rever_map
 from itertools import imap
 from collections import defaultdict, namedtuple
 
@@ -175,7 +175,7 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
     # Apriori Version
     ###########################
     # apriori = Apriori(transactions)
-    # fNodes = apriori.apriori(tSuppoert)
+    # fNodes = apriori.apriori(tSupport)
 
     ###########################
     # Single Item Version
@@ -209,26 +209,30 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
     return rules
 
 
-def _prune_rules(t_rules, records):
+def _prune_rules(t_rules, records, min_cover = 3):
+    import datetime
+    ts = datetime.datetime.now()
     # Sort generated rules according to its confidence, support and length
     t_rules.sort(key=lambda v: (v[1], v[2], len(v[0])), reverse=True)
     cover_num = [0] * len(records)
+    records = [ set(record) for record in records ]
     for rule, _, _, classlabel in t_rules:
         for r_id, record in enumerate( records):
-            if rule.issubset(record) and cover_num[r_id] < 4:
+            if cover_num[r_id] <= min_cover and rule.issubset(record):
                 cover_num[r_id] += 1
                 yield (rule, classlabel, r_id)
+    print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
 
 
 
-def mine_fp(records, tSuppoert, tConfidence):
+def mine_fp(records, tSupport, tConfidence):
     ################################################
     # Mine App Features
     ################################################
 
     encodedRecords, appIndx, featureIndx, recordHost = _encode_data(records)
     # (feature, app, host index)
-    rules = _gen_rules(encodedRecords, tSuppoert, tConfidence, _rever_map(featureIndx))
+    rules = _gen_rules(encodedRecords, tSupport, tConfidence, _rever_map(featureIndx))
     # feature, app, host
     # rules : set()
     rules = _prune_rules(rules, encodedRecords)
@@ -249,7 +253,7 @@ def mine_fp(records, tSuppoert, tConfidence):
             record.app = record.company
     encodedRecords, appIndx, featureIndx, recordHost = _encode_data(records)
     # (feature, app, host index)
-    rules = _gen_rules(encodedRecords, tSuppoert, tConfidence, _rever_map(featureIndx))
+    rules = _gen_rules(encodedRecords, tSupport, tConfidence, _rever_map(featureIndx))
     # feature, app, host
     # rules : set()
     rules = _prune_rules(rules, encodedRecords)
@@ -264,14 +268,14 @@ def mine_fp(records, tSuppoert, tConfidence):
     return classifier
 
 
-def mining_fp_local(filepath, tSuppoert, tConfidence):
+def mining_fp_local(filepath, tSupport, tConfidence):
     records = _load_data(filepath)
     appIndx = _load_appindx('app_index.txt')
     featureIndx = _load_findx('featureIndx.txt')
     recordHost = _load_records_hst('records_host.txt')
 
     # (feature, app, host index)
-    rules = _gen_rules(records, tSuppoert, tConfidence)
+    rules = _gen_rules(records, tSupport, tConfidence)
 
     # feature, app, host
     rules = _prune_rules(rules, records)
@@ -355,6 +359,6 @@ class Apriori:
 
 if __name__ == '__main__':
     if sys.argv[1] == 'mine':
-        mining_fp_local(sys.argv[2], tSuppoert=int(sys.argv[3]), tConfidence=float(sys.argv[4]))
+        mining_fp_local(sys.argv[2], tSupport=int(sys.argv[3]), tConfidence=float(sys.argv[4]))
 	
 

@@ -1,5 +1,5 @@
 from sklearn.cross_validation import KFold
-
+import datetime
 from sqldao import SqlDao
 import fp
 from utils import load_pkgs
@@ -79,8 +79,12 @@ for train, test in kf:
     #####################################
     # FP Rules
     ######################################
+    ts = datetime.datetime.now()
     fpClassifier = fp.mine_fp(train_set, 2, 0.8)
+    print '>>> Training Time:', (datetime.datetime.now() - ts).seconds
+    ts = datetime.datetime.now()
     rst = use_classifier(fpClassifier, test_set)
+    print '>>> Classifying Time:', (datetime.datetime.now() - ts).seconds
     #####################################
     #	Text Rules
     ######################################
