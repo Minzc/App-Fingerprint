@@ -1,5 +1,6 @@
 import sys
 import operator
+from sqldao import SqlDao
 from fp_growth import find_frequent_itemsets
 from utils import loadfile, rever_map
 from itertools import imap
@@ -20,6 +21,8 @@ class FNode:
         return [(self.feature, app, 1.0 * num, 1.0 * num / totalNum) for app, num in self.appCounter.iteritems()]
 
 
+Rule = namedtuple('Rule', 'rule, label, host, confidence, support')
+
 class FPRuler:
     def __init__(self):
         # feature, app, host
@@ -28,7 +31,7 @@ class FPRuler:
 
     def addRules(self, rules):
         tmprules = {}
-        for feature, app, host in rules:
+        for feature, app, host, _, _ in rules:
             tmprules.setdefault(host, {})
             tmprules[host][feature] = app
         self.rulesSet.append(tmprules)
@@ -140,35 +143,6 @@ def _encode_data(records=None, minimum_support = 2):
     # encodedRecords: ([Features, app])
     return encodedRecords, rever_map(appIndx), rever_map(itemIndx), recordHost
 
-
-def _rever_map(mapObj):
-    return {v: k for k, v in mapObj.items()}
-
-
-def _load_data(filepath):
-    records = []
-    loadfile(filepath, lambda x: records.append(x.split(' ')))
-    return records
-
-
-def _load_appindx(filepath):
-    apps = {}
-    loadfile(filepath, lambda x: apps.setdefault(x.split('\t')[1], x.split('\t')[0]))
-    return apps
-
-
-def _load_findx(filepath):
-    features = {}
-    loadfile(filepath, lambda x: features.setdefault(x.split('\t')[1], x.split('\t')[0]))
-    return features
-
-
-def _load_records_hst(filepath):
-    recordHost = []
-    loadfile(filepath, lambda x: recordHost.append(x))
-    return recordHost
-
-
 def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
     fNodes = {}
     ###########################
@@ -212,18 +186,28 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
 def _prune_rules(t_rules, records, min_cover = 3):
     import datetime
     ts = datetime.datetime.now()
+
+    # t_rules format is ( rules, confidence, support, class_label )
     # Sort generated rules according to its confidence, support and length
     t_rules.sort(key=lambda v: (v[1], v[2], len(v[0])), reverse=True)
+
     cover_num = [0] * len(records)
     records = [ set(record) for record in records ]
-    for rule, _, _, classlabel in t_rules:
-        for r_id, record in enumerate( records):
-            if cover_num[r_id] <= min_cover and rule.issubset(record):
-                cover_num[r_id] += 1
-                yield (rule, classlabel, r_id)
+    
+    for rule, confidence, support, classlabel in t_rules:
+        for record_id, record in enumerate( records):
+            if cover_num[record_id] <= min_cover and rule.issubset(record):
+                cover_num[record_id] += 1
+                yield Rule(rule, classlabel, record_id, confidence, support)
     print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
 
 
+def persist(rules):
+    sqldao = SqlDao()
+    QUERY = 'INSERT INTO pattens (label, pattens, confidence, support) VALUES (%s, %s, %s, %s)'
+    for rule in rules:
+        sqldao.execute(QUERY, (rule.label, ','.join(rule.rule), rule.confidence, rule.support))
+    sqldao.close()
 
 def mine_fp(records, tSupport, tConfidence):
     ################################################
@@ -232,7 +216,7 @@ def mine_fp(records, tSupport, tConfidence):
 
     encodedRecords, appIndx, featureIndx, recordHost = _encode_data(records)
     # (feature, app, host index)
-    rules = _gen_rules(encodedRecords, tSupport, tConfidence, _rever_map(featureIndx))
+    rules = _gen_rules(encodedRecords, tSupport, tConfidence, rever_map(featureIndx))
     # feature, app, host
     # rules : set()
     rules = _prune_rules(rules, encodedRecords)
@@ -241,10 +225,11 @@ def mine_fp(records, tSupport, tConfidence):
     for rule in rules:
         rule_str = {featureIndx[itemcode] for itemcode in rule[0]}
         rule_str = frozenset(rule_str)
-        decodedRules.add((rule_str, appIndx[rule[1]], recordHost[rule[2]]))
+        decodedRules.add(Rule(rule_str, appIndx[rule.label], recordHost[rule.host], rule.confidence, rule.support))
 
     classifier = FPRuler()
     classifier.addRules(decodedRules)
+    persist(decodedRules)
     ################################################
     # Mine Company Features
     ################################################
@@ -253,7 +238,7 @@ def mine_fp(records, tSupport, tConfidence):
             record.app = record.company
     encodedRecords, appIndx, featureIndx, recordHost = _encode_data(records)
     # (feature, app, host index)
-    rules = _gen_rules(encodedRecords, tSupport, tConfidence, _rever_map(featureIndx))
+    rules = _gen_rules(encodedRecords, tSupport, tConfidence, rever_map(featureIndx))
     # feature, app, host
     # rules : set()
     rules = _prune_rules(rules, encodedRecords)
@@ -262,43 +247,13 @@ def mine_fp(records, tSupport, tConfidence):
     for rule in rules:
         rule_str = {featureIndx[itemcode] for itemcode in rule[0]}
         rule_str = frozenset(rule_str)
-        decodedRules.add((rule_str, appIndx[rule[1]], recordHost[rule[2]]))
+        decodedRules.add(Rule(rule_str, appIndx[rule.label], recordHost[rule.host], rule.confidence, rule.support))
     classifier.addRules(decodedRules)
+    persist(decodedRules)
     
     return classifier
 
 
-def mining_fp_local(filepath, tSupport, tConfidence):
-    records = _load_data(filepath)
-    appIndx = _load_appindx('app_index.txt')
-    featureIndx = _load_findx('featureIndx.txt')
-    recordHost = _load_records_hst('records_host.txt')
-
-    # (feature, app, host index)
-    rules = _gen_rules(records, tSupport, tConfidence)
-
-    # feature, app, host
-    rules = _prune_rules(rules, records)
-
-    coverage = 0
-    totalApp = set()
-    for indx, record in enumerate(records):
-        totalApp.add(record[-1])
-        for feature in record[:-1]:
-            if feature in rules:
-                coverage += 1
-                break
-    coveredApp = set()
-    for rule in rules:
-        coveredApp.add(rule[1])
-        rule = (featureIndx[rule[0]], appIndx[rule[1]], recordHost[rule[2]])
-
-    print 'total:', len(records), 'coverage:', coverage, 'totalApp:', len(totalApp), 'coverApp:', len(coveredApp)
-
-
-def revers():
-    appIndx = load_appindx('app_index.txt')
-    featureIndx = load_findx('featureIndx.txt')
 
 
 class Apriori:
