@@ -187,6 +187,32 @@ def load_pkgs(limit = None):
 		records.append(package)
 	return records
 
+def get_record_f(record):
+    """Get package features"""
+    features = filter(None, record.path.split('/'))
+    # queries = record.querys
+    # for k, vs in filter(None, queries.items()):
+    #     if len(k) < 2:
+    #         continue
+    #     features.append(k)
+    #     for v in vs:
+    #         if len(v) < 2:
+    #             continue
+    #         features.append(v.replace(' ', '').replace('\n', ''))
+
+    for head_seg in filter(None, record.add_header.split('\n')):
+        if len(head_seg) > 2:
+            features.append(head_seg.replace(' ', '').strip())
+
+    for agent_seg in filter(None, record.agent.split(' ')):
+        if len(agent_seg) < 2:
+          features.append(agent_seg.replace(' ', ''))
+    host = record.host if record.host else record.dst
+    features.append(host)
+    features.append(record.app)
+
+    return features
+
 from nltk import FreqDist
 class Relation:	
 	def __init__(self):

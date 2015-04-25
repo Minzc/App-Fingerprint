@@ -45,8 +45,10 @@ def insert_rst(rst):
     QUERY = 'UPDATE packages SET classified = %s WHERE id = %s'
     sqldao = SqlDao()
     for k, v in rst.items():
+        print k
         sqldao.execute(QUERY, (3, k))
     sqldao.close()
+    print 'insert', len(rst),"items"
 
 
 records = load_pkgs(LIMIT)
@@ -71,7 +73,6 @@ for train, test in kf:
 
     for i in train:
         train_set.append(records[i])
-        rst[i] = 0
     for i in test:
         test_set[records[i].id] = records[i]
         test_apps.add(records[i].app)
@@ -104,6 +105,13 @@ for train, test in kf:
     discoveried_app += len(correct_app) * 1.0 / len(test_apps)
     precision += correct * 1.0 / len(rst)
     recall += len(rst) * 1.0 / len(test_set) * 1.0
+
+
+    for i in train:
+      rst[records[i].id] = 0
+
+    print len(rst), len(train)
+
     insert_rst(rst)
     break
 
