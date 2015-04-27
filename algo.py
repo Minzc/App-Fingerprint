@@ -280,8 +280,8 @@ def KVMiner(training_data=None, confidence=0.8, support=2):
   # app, value, token, host
   for appName, appCompany, valueName, tokenName, hostName, tokenConfidence, tokenSupport in rules:
       sqldao.execute(
-          'insert into features (host, company, token, app, value, confidence, support) values(%s,%s,%s,%s,%s,%s,%s)',
-          (hostName, appCompany, tokenName, appName, valueName, tokenConfidence, tokenSupport))
+          'INSERT INTO patterns (label, support, confidence, host, kvpattern) VALUES (%s, %s, %s, %s, %s)',
+          (appName, tokenSupport, tokenConfidence, hostName, tokenName+'='+valueName))
 
   sqldao.close()
 
