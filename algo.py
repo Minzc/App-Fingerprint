@@ -2,8 +2,9 @@ from nltk import FreqDist
 
 from sqldao import SqlDao
 
-from utils import Relation
-from utils import load_pkgs
+from utils import Relation, load_pkgs, loadfile
+from collections import defaultdict
+import operator
 
 
 class TreeNode:
@@ -118,26 +119,8 @@ class KVTree:
           treePath = (hst, key, package.app, value) 
           self._add_node(treePath, addInfo) 
 
-
-def _prune_forest(vnodes, appnodes): 
-  # Prune
-  for vnode in vnodes.values(): 
-    appvalues = set() 
-    for appnode in vnode.father: 
-      appvalues.add(appnode.value) 
-
-     # keep one app or one company
-      if len(appvalues) > 1:
-        for appnode in vnode.father: 
-          appnode.father[0].set_status(0)
-
-  for appnode in appnodes: 
-    if len(appnode.children) > 1: 
-      for tokennode in appnode.father: 
-        tokennode.set_status(-1)
-
-
-def _gen_rules(root, serviceKey, confidence, support):
+  def _gen_rules(self, serviceKey, confidence, support):
+    root = self._root
     hostnodes = root.children.values()
     rules = []
     for hostNode in hostnodes:
@@ -176,19 +159,40 @@ def _gen_rules(root, serviceKey, confidence, support):
                             (appName, appCompany, valueName, tokenName, hostName, tokenConfidence, tokenSupport))
     return rules
 
+  def _prune_forest(self): 
+    vnodes = self._vnodeIndex
+    appnodes = self._appnodes
+    # Prune
+    for vnode in vnodes.values(): 
+      appvalues = set() 
+      for appnode in vnode.father: 
+        appvalues.add(appnode.value) 
+
+       # keep one app or one company
+        if len(appvalues) > 1:
+          for appnode in vnode.father: 
+            appnode.father[0].set_status(0)
+
+    for appnode in appnodes: 
+      if len(appnode.children) > 1: 
+        for tokennode in appnode.father: 
+          tokennode.set_status(-1)
+
+
+
 class ParamRules:
   def __init__(self):
     def _dictvalue_factory():
       return defaultdict(int)
     self.results = defaultdict(_dictvalue_factory)
-    self._rules = set()
+    self._rules = []
     def load_rules(ln): 
       host, rule = ln.split(':')
       rule = [host] + filter(None, rule.split('$'))
       print rule
       self._rules.append(rule)
 
-    loadfile(load_rules,'ad_dict.txt')
+    loadfile('ad_dict.txt', load_rules)
   
   def mine(self, package):
     for rule in self._rules:
@@ -197,35 +201,64 @@ class ParamRules:
         pattern = []
         for key in rule[1:]:
           if key in package.querys:
-            pattern.append((key, package.querys[key]))
+            pattern.append((key, package.querys[key][0]))
           else:
             match = False
         if match:
-          pattern.append(package.secdomain)
+          host = package.secdomain if rule[0] != '' else ''
+          pattern.append(host)
           pattern.append(package.company)
           pattern.append(package.app)
           yield pattern
   
-  def stat(patterns):
+  def stat(self, patterns):
     company_rules = {}
     app_rules = {}
     for pattern in patterns:
-      host, company, app = pattern[-3], pattenr[-2], pattern[-1]
-      pattern = pattern[:-3]
+      host, company, app = pattern[-3], pattern[-2], pattern[-1]
+      pattern = tuple(pattern[:-2])
+      print ">>> Pattern : ", pattern
       company_rules[pattern] = defaultdict(int)
       company_rules[pattern][company] += 1
       app_rules[pattern] = defaultdict(int)
       app_rules[pattern][app] += 1
-    for k,company_dist in company_rules.iteritems():
-      
+    for k, company_dist in company_rules.iteritems():
+      company = max(company_dist.iteritems(), key=operator.itemgetter(1))[0]
+      support = company_dist[company]
+      confidence = support * 1.0 / sum(company_dist.values())
+      print k[:-1], k[-1], 'confidence:', confidence
+      yield (k[:-1], company, k[-1], confidence, support)
+    for k, app_dist in app_rules.iteritems():
+      app = max(app_dist.iteritems(), key=operator.itemgetter(1))[0]
+      support = app_dist[app]
+      confidence = support * 1.0 / sum(app_dist.values())
+      print k[:-1], k[-1], 'confidence:', confidence
+      yield (k[:-1], app, k[-1], confidence, support)
 
+  def load_rules(self):
+    sqldao = SqlDao()
+    self.rules = defaultdict(dict)
+    QUERY = 'SELECT kvpattern, host, label FROM patterns WHERE kvpattern IS NOT NULL'
+    for kv, host, label in sqldao.execute(QUERY):
+      self.rules[host][frozenset(kv.split('&'))] = label
+
+  def classify(self, package):
+    kv = { k+'='+v[0] for k, v in package.querys.iteritems()}
+    host = package.secdomain
+    rst = set()
+    for k, v in self.rules[host].iteritems():
+      if k.issubset(kv):
+        rst.add(v)
+    for k,v in self.rules[''].iteritems():
+      if k.issubset(kv):
+        rst.add(v)
+    return rst
 
 def KVMiner(training_data=None, confidence=0.8, support=2): 
   sqldao = SqlDao()
-  sqldao.execute('TRUNCATE TABLE features')
+  sqldao.execute('DELETE FROM patterns WHERE kvpattern IS NOT NULL')
 
-  if not training_data: 
-    training_data = load_pkgs()
+  training_data = load_pkgs() if not training_data else training_data
 
   tree = KVTree()
   serviceKey = Relation()
@@ -238,11 +271,9 @@ def KVMiner(training_data=None, confidence=0.8, support=2):
         serviceKey.add(package.secdomain, k)
   print 'DEBUG', serviceKey
   
-  vnodes = tree._vnodeIndex
-  appnodes = tree._appnodes
-  _prune_forest(vnodes, appnodes)
+  tree._prune_forest()
 
-  rules = _gen_rules(tree._root, serviceKey, confidence, support)
+  rules = tree._gen_rules(serviceKey, confidence, support)
 
   # Persist
   sqldao = SqlDao()
@@ -281,7 +312,7 @@ def _test(package, root):
         for key, values in package.querys.items():
             for value in filter(None, values):
                 treePath = (hst, key, value)
-                print treePath
+                print ">>> [DEBUG] treePath is", treePath
                 treeNode = root
                 while len(treePath) > 0 and treeNode != None:
                     treeNode = treeNode.search(treePath[0])
@@ -352,10 +383,42 @@ def test_algo(test_set=None):
     sqldao = SqlDao()
     for pid in correct_ids:
         sqldao.execute(upquery, (10, pid))
-    sqldao.close()
+    _sqldao.close()
 
     print 'Total:%s\tCorrect:%s\tWrong:%s' % (len(test_set), correct, wrong)
     return rst
+
+
+def test_rule_miner_train():
+  def tuples2str(tuples):
+    return '&'.join([k+'='+v for k, v in tuples ])
+  paraminer = ParamRules()
+  patterns = []
+  print ">>> Starting processing packages"
+  counter = 0
+  for record in load_pkgs():
+    subpatterns = list(paraminer.mine(record))
+    patterns += subpatterns
+    if len(subpatterns) > 0:
+      counter += 1
+  sqldao = SqlDao()
+  sqldao.execute('DELETE FROM patterns WHERE kvpattern IS NOT NULL')
+  QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern) VALUES (%s, %s, %s, %s, %s)'
+  for recog_rule in paraminer.stat(patterns):
+    k, app, host, confidence, support = recog_rule
+    k = tuples2str(k)
+    sqldao.execute(QUERY, (app, support, confidence, host, k))
+    print k, app, host, confidence, support
+  print counter
+
+def test_rule_miner_test():
+  paraminer = ParamRules()
+  paraminer.load_rules()
+  count = 0
+  for record in load_pkgs():
+    if len(paraminer.classify(record)) > 0:
+      count += 1
+  print count
 
 
 import sys
@@ -367,3 +430,7 @@ if __name__ == '__main__':
         test_algo()
     elif sys.argv[1] == 'train':
         KVMiner()
+    elif sys.argv[1] == 'train_rules':
+      test_rule_miner_train()
+    elif sys.argv[1] == 'test_rules':
+      test_rule_miner_test()
