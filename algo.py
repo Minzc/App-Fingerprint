@@ -7,7 +7,7 @@ from collections import defaultdict
 import operator
 
 
-DEBUG = True
+DEBUG = False
 
 class TreeNode:
   def __init__(self, father, value):
@@ -128,6 +128,9 @@ class KVTree:
         hostName = hostNode.value
         for tokenNode in hostNode.children.values():
             tokenName = tokenNode.value
+            if tokenName == 'oursecret':
+              print '>>> [DEBUG key]', tokenNode.status
+
             validToken = False
             # number of app's using this token
             tokenSupport = len(tokenNode.children)
@@ -138,8 +141,8 @@ class KVTree:
 
             if tokenNode.status == 1:
                 # check if the pattern can satify the support and confidence requirement
-                if tokenConfidence >= confidence and tokenSupport >= support:
-                  validToken = True
+                # if tokenConfidence >= confidence and tokenSupport >= support:
+                validToken = True
 
             if hostName in goodCandidates and tokenName in goodCandidates[
                 hostName] and tokenNode.status != -1:
@@ -171,10 +174,14 @@ class KVTree:
         if len(appvalues) > 1:
           for appnode in vnode.father: 
             appnode.father[0].set_status(0)
+            if appnode.father[0].value == 'oursecret':
+              print '>>> [DEBUG key]', vnode.value
 
     for appnode in appnodes: 
       if len(appnode.children) > 1: 
         for tokennode in appnode.father: 
+          if tokennode.value== 'oursecret':
+            print 'ERROR!!!!!!!!!'
           tokennode.set_status(-1)
 
 
@@ -215,7 +222,7 @@ class ParamRules:
     for pattern in patterns:
       host, company, app = pattern[-3], pattern[-2], pattern[-1]
       pattern = tuple(pattern[:-2])
-      print ">>> Pattern : ", pattern
+      if DEBUG : print ">>> Pattern : ", pattern
       company_rules[pattern] = defaultdict(int)
       company_rules[pattern][company] += 1
       app_rules[pattern] = defaultdict(int)
@@ -224,13 +231,13 @@ class ParamRules:
       company = max(company_dist.iteritems(), key=operator.itemgetter(1))[0]
       support = company_dist[company]
       confidence = support * 1.0 / sum(company_dist.values())
-      print k[:-1], k[-1], 'confidence:', confidence
+      if DEBUG : print '>>> [DEBUG:stat]', k[:-1], k[-1], 'confidence:', confidence
       yield (k[:-1], company, k[-1], confidence, support)
     for k, app_dist in app_rules.iteritems():
       app = max(app_dist.iteritems(), key=operator.itemgetter(1))[0]
       support = app_dist[app]
       confidence = support * 1.0 / sum(app_dist.values())
-      print k[:-1], k[-1], 'confidence:', confidence
+      if DEBUG: print k[:-1], k[-1], 'confidence:', confidence
       yield (k[:-1], app, k[-1], confidence, support)
 
   def load_rules(self):
@@ -283,88 +290,63 @@ def KVMiner(training_data=None, confidence=0.8, support=2):
 
   sqldao = SqlDao()
   sqldao.execute('DELETE FROM patterns WHERE kvpattern IS NOT NULL')
-  training_data = load_pkgs(1000) if not training_data else training_data
+  sqldao.close()
+  training_data = load_pkgs() if not training_data else training_data
 
   paraminer = ParamRules()
   patterns = []
 
   tree = KVTree()
   goodCandidates = defaultdict(lambda : defaultdict(int))
-
-  # Build the forest
+  
+  #############
+  # Mining
+  #############
   for package in training_data:
     subpatterns = list(paraminer.mine(package))
     patterns += subpatterns
-
+    # Build the forest
     tree._build_tree(package, package.querys.items())
     for k, v in package.querys.items():
       if package.app in v or package.name in v:
         goodCandidates[package.secdomain][k] += 1
-  if DEBUG : print '>>> [DEBUG:kvminer]', goodCandidates
+  if DEBUG : print '>>> [DEBUG:kvminer:goodCandidate]', goodCandidates
   
   tree._prune_forest()
 
-
+  ###############
   # Persist
+  ###############
   QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern) VALUES (%s, %s, %s, %s, %s)'
+  # Param rules
+  sqldao = SqlDao()
   for recog_rule in paraminer.stat(patterns):
     k, app, host, confidence, support = recog_rule
     k = tuples2str(k)
     sqldao.execute(QUERY, (app, support, confidence, host, k))
-  # app, value, token, host
+  # Tree rules
   for appName, appCompany, valueName, tokenName, hostName, tokenConfidence, tokenSupport in tree._gen_rules(goodCandidates, confidence, support):
     sqldao.execute(QUERY , (appName, tokenSupport, tokenConfidence, hostName, tokenName+'='+valueName))
   sqldao.close()
 
 
-def test_algo(test_set=None):
-    import urlparse
 
-    root = _buildTestTree()
-    correct = 0
-    wrong = 0
-    correct_ids = []
-
-    if not test_set:
-        test_set = load_pkgs()
-
-    rst = {}
-    for package in test_set:
-        predictRst = _test(package, root)
-        if not predictRst and package.refer:
-            tmpHost = urlparse.urlparse(package.refer).netloc
-            package.set_host(tmpHost)
-            tmpQuery = urlparse.urlparse(package.refer).query
-            tmpPath = urlparse.urlparse(package.refer).path
-            package.set_path(tmpPath + '?' + tmpQuery)
-            predictRst = _test(package, root)
-
-        if predictRst:
-            predict_app, predict_company = predictRst
-            rst[package.id] = predictRst
-            if predict_app == package.app or predict_company == package.company:
-                correct += 1
-                correct_ids.append(package.id)
-            else:
-                wrong += 1
-
-    upquery = "update packages set classified = %s where id = %s"
-    sqldao = SqlDao()
-    for pid in correct_ids:
-        sqldao.execute(upquery, (10, pid))
-    _sqldao.close()
-
-    print 'Total:%s\tCorrect:%s\tWrong:%s' % (len(test_set), correct, wrong)
-    return rst
-
-def test_rule_miner_test():
+def KVPredictor(test_records=None):
   paraminer = ParamRules()
   paraminer.load_rules()
   count = 0
-  for record in load_pkgs():
-    if len(paraminer.classify(record)) > 0:
+  correct = 0
+  if not test_records: test_records = load_pkgs()
+  rst = {}
+  for record in test_records.values():
+    predictRst = paraminer.classify(record)
+    if len(predictRst) > 0:
       count += 1
-  print count
+      if (record.app in predictRst):
+        correct += 1
+      rst[record.id] = predictRst.pop()
+  print ">>> Correct:", correct, "Total:", count, "Precision:", correct * 1.0 / count
+  return rst
 
 
 import sys
@@ -373,13 +355,9 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print 'Number of args is wrong'
     elif sys.argv[1] == 'test':
-        test_algo()
+      KVPredictor()
     elif sys.argv[1] == 'train':
-        KVMiner()
-    elif sys.argv[1] == 'train_rules':
-      test_rule_miner_train()
-    elif sys.argv[1] == 'test_rules':
-      test_rule_miner_test()
+      KVMiner()
 
 
 
@@ -442,3 +420,43 @@ if __name__ == '__main__':
 
 #     sqldao.close()
 #     return tree._root
+
+# def test_algo(test_set=None):
+#     import urlparse
+
+#     root = _buildTestTree()
+#     correct = 0
+#     wrong = 0
+#     correct_ids = []
+
+#     if not test_set:
+#         test_set = load_pkgs()
+
+#     rst = {}
+#     for package in test_set:
+#         predictRst = _test(package, root)
+#         if not predictRst and package.refer:
+#             tmpHost = urlparse.urlparse(package.refer).netloc
+#             package.set_host(tmpHost)
+#             tmpQuery = urlparse.urlparse(package.refer).query
+#             tmpPath = urlparse.urlparse(package.refer).path
+#             package.set_path(tmpPath + '?' + tmpQuery)
+#             predictRst = _test(package, root)
+
+#         if predictRst:
+#             predict_app, predict_company = predictRst
+#             rst[package.id] = predictRst
+#             if predict_app == package.app or predict_company == package.company:
+#                 correct += 1
+#                 correct_ids.append(package.id)
+#             else:
+#                 wrong += 1
+
+#     upquery = "update packages set classified = %s where id = %s"
+#     sqldao = SqlDao()
+#     for pid in correct_ids:
+#         sqldao.execute(upquery, (10, pid))
+#     _sqldao.close()
+
+#     print 'Total:%s\tCorrect:%s\tWrong:%s' % (len(test_set), correct, wrong)
+#     return rst

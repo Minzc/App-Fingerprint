@@ -204,12 +204,15 @@ def _prune_rules(t_rules, records, min_cover = 3):
 
 def persist(rules):
     sqldao = SqlDao()
-    QUERY = 'INSERT INTO pattens (label, pattens, confidence, support) VALUES (%s, %s, %s, %s)'
+    QUERY = 'INSERT INTO patterns (label, pattens, confidence, support) VALUES (%s, %s, %s, %s)'
     for rule in rules:
         sqldao.execute(QUERY, (rule.label, ','.join(rule.rule), rule.confidence, rule.support))
     sqldao.close()
 
 def mine_fp(records, tSupport, tConfidence):
+    sqldao = SqlDao()
+    sqldao.execute('DELETE FROM patterns WHERE kvpattern IS NULL')
+    sqldao.close()
     ################################################
     # Mine App Features
     ################################################

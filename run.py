@@ -3,6 +3,8 @@ import datetime
 from sqldao import SqlDao
 import fp
 from utils import load_pkgs
+import algo
+import classifier
 
 
 LIMIT = None
@@ -45,7 +47,6 @@ def insert_rst(rst):
     QUERY = 'UPDATE packages SET classified = %s WHERE id = %s'
     sqldao = SqlDao()
     for k, v in rst.items():
-        print k
         sqldao.execute(QUERY, (3, k))
     sqldao.close()
     print 'insert', len(rst),"items"
@@ -79,23 +80,43 @@ for train, test in kf:
 
     # train_set = reservoir_sample(len(train_set)*0.1, train_set)
     #####################################
+    # Header Rules
+    #####################################
+    print ">>> [Classifier] Header Rule Classify"
+    rst = classifier.classify(True, test_set.values())
+    print ">>> Recognized:", len(rst)
+    #####################################
     # FP Rules
-    ######################################
+    #####################################
+    print ">>> [Classifier] CMAR"
     ts = datetime.datetime.now()
     fpClassifier = fp.mine_fp(train_set, 2, 0.8)
     print '>>> Training Time:', (datetime.datetime.now() - ts).seconds
     ts = datetime.datetime.now()
-    rst = use_classifier(fpClassifier, test_set)
+    tmprst = use_classifier(fpClassifier, test_set)
+    rst = merge_rst(rst, tmprst)
     print '>>> Classifying Time:', (datetime.datetime.now() - ts).seconds
+    print ">>> Recognized:", len(rst)
+    #####################################
+    #	KV Rules
+    #####################################
+    print ">>> [Classifier] KV Rules"
+    ts = datetime.datetime.now()
+    algo.KVMiner(train_set)
+    print '>>> Training Time:', (datetime.datetime.now() - ts).seconds
+    ts = datetime.datetime.now()
+    tmprst = algo.KVPredictor(test_set)
+    print '>>> Classifying Time:', (datetime.datetime.now() - ts).seconds
+    rst = merge_rst(rst, tmprst)
+    print ">>> Recognized:", len(rst)
     #####################################
     #	Text Rules
-    ######################################
+    #####################################
     #txtClassifier = app_txt_f.mine_txt(train_set)
     #rst = use_classifier(txtClassifier, test_set)
     #####################################
     # tf_idf(train_set)
     # path_algo.host_tree(train_set)
-    # rst = classifier.classify(True, test_set.values())
     # correct = evaluate(rst, test_set)
     # algo.train(train_set)
     # tmprst = algo.test_algo(test_set.values())

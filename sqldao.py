@@ -9,7 +9,7 @@ class SqlDao:
 			self.cursor.execute(query)
 		else:
 			self.cursor.execute(query, param)
-			self.cnx.commit()
+		self.cnx.commit()
 		return self.cursor
 
 	def close(self):

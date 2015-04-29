@@ -6,7 +6,7 @@ def header_classifier(package):
     identifier = ['x-umeng-sdk', 'x-vungle-bundle-id', 'x-requested-with']
     for id in identifier:
         for head_seg in package.add_header.split('\n'):
-            if id in head_seg:
+            if id in head_seg and '.' in head_seg:
                 return (head_seg.replace(id + ':', '').strip(), 1)
     return None
 
