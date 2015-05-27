@@ -2,7 +2,7 @@
 
 import sys
 from sqldao import SqlDao
-from utils import Relation
+from utils import Relation, loadfile
 import math
 from utils import load_pkgs
 from package import Package
@@ -13,19 +13,15 @@ def inst_cat(file_path):
 	Insert app's category into db
 	"""
 	appNcats = {}
-	def parser(ln):
-		pkgname, _, category = ln.split('\t')
-		category = category.replace(' ', '').lower()
-		appNcats[pkgname] = category
-
-	loadfile(file_path, parser)
 	import mysql.connector	
 	cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
 	cursor = cnx.cursor()
-	query = 'update packages set category=%s where appname=%s'
-	for k,v in appNcats.items():
-		print v, k
-		cursor.execute(query, (v, k))
+        query = 'INSERT INTO apps (app, name, category, company) VALUES (%s, %s, %s, %s)'
+	def parser(ln):
+		pkgname, name, category, company = ln.split('\t')
+		cursor.execute(query, (pkgname, name, category, company))
+
+	loadfile(file_path, parser)
 	cnx.commit()
 	cursor.close()
 	cnx.close()
@@ -246,6 +242,8 @@ if __name__ == '__main__':
 			gen_cmar_data(sys.argv[2])
 		else:
 			gen_cmar_data()
+        elif sys.argv[1] == 'insertapp':
+            inst_cat(sys.argv[2])
 
 
 

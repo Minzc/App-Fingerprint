@@ -1,5 +1,5 @@
 from nltk import FreqDist
-
+import consts
 from sqldao import SqlDao
 
 from utils import Relation, load_pkgs, loadfile
@@ -126,10 +126,9 @@ class KVTree:
     rules = []
     for hostNode in hostnodes:
         hostName = hostNode.value
+
         for tokenNode in hostNode.children.values():
             tokenName = tokenNode.value
-            if tokenName == 'oursecret':
-              print '>>> [DEBUG key]', tokenNode.status
 
             validToken = False
             # number of app's using this token
@@ -174,14 +173,10 @@ class KVTree:
         if len(appvalues) > 1:
           for appnode in vnode.father: 
             appnode.father[0].set_status(0)
-            if appnode.father[0].value == 'oursecret':
-              print '>>> [DEBUG key]', vnode.value
 
     for appnode in appnodes: 
       if len(appnode.children) > 1: 
-        for tokennode in appnode.father: 
-          if tokennode.value== 'oursecret':
-            print 'ERROR!!!!!!!!!'
+        for tokennode in appnode.father:
           tokennode.set_status(-1)
 
 
@@ -207,6 +202,8 @@ class ParamRules:
         for key in rule[1:]:
           if key in package.querys:
             pattern.append((key, package.querys[key][0]))
+          elif package.form and key in package.form:
+            pattern.append((key, package.form[key]))
           else:
             match = False
         if match:
@@ -232,102 +229,119 @@ class ParamRules:
       support = company_dist[company]
       confidence = support * 1.0 / sum(company_dist.values())
       if DEBUG : print '>>> [DEBUG:stat]', k[:-1], k[-1], 'confidence:', confidence
-      yield (k[:-1], company, k[-1], confidence, support)
+      yield (k[:-1], company, k[-1], confidence, support, consts.COMPANY_RULE)
     for k, app_dist in app_rules.iteritems():
       app = max(app_dist.iteritems(), key=operator.itemgetter(1))[0]
       support = app_dist[app]
       confidence = support * 1.0 / sum(app_dist.values())
       if DEBUG: print k[:-1], k[-1], 'confidence:', confidence
-      yield (k[:-1], app, k[-1], confidence, support)
+      yield (k[:-1], app, k[-1], confidence, support, consts.APP_RULE)
 
   def load_rules(self):
     sqldao = SqlDao()
-    self.rules = defaultdict(dict)
-    QUERY = 'SELECT kvpattern, host, label FROM patterns WHERE kvpattern IS NOT NULL'
-    for kv, host, label in sqldao.execute(QUERY):
-      self.rules[host][frozenset(kv.split('&'))] = label
+    self.rules = {}
+    self.rules[consts.APP_RULE] = defaultdict(dict)
+    self.rules[consts.COMPANY_RULE] = defaultdict(dict)
+    QUERY = 'SELECT kvpattern, host, label, confidence,rule_type FROM patterns WHERE kvpattern IS NOT NULL'
+    for kv, host, label, confidence, rule_type in sqldao.execute(QUERY):
+      self.rules[rule_type][host][frozenset(kv.split('&'))] = (label, confidence)
 
   def classify(self, package):
     kv = { k+'='+v[0] for k, v in package.querys.iteritems()}
+    if package.form:
+      for k,v in package.form.iteritems():
+        kv.add(k + '=' + v)
+
+    # Format testing data
     host = package.secdomain
-    rst = set()
-    for k, v in self.rules[host].iteritems():
-      if k.issubset(kv):
-        rst.add(v)
-    for k,v in self.rules[''].iteritems():
-      if k.issubset(kv):
-        rst.add(v)
+    rst = defaultdict(list)
+    for rulesID, rules in self.rules.iteritems():
+      for k, v in rules[host].iteritems():
+        if k.issubset(kv):
+          rst[rulesID].append(v)
+      for k,v in rules[''].iteritems():
+        if k.issubset(kv):
+          rst[rulesID].append(v)
+
+    if len(rst) == 0:
+      # use predefined rules to classify
+      patterns = list(self.mine(package))
+      for pattern in patterns:
+        for k,v in pattern[:-3]:
+          if ' ' not in v and '.' in v:
+            rst[consts.APP_RULE].append((v, 1.0))
     return rst
 
 
-def test_rule_miner_train():
-  def tuples2str(tuples):
-    return '&'.join([k+'='+v for k, v in tuples ])
-  paraminer = ParamRules()
-  patterns = []
-  print ">>> Starting processing packages"
-  counter = 0
-  for record in load_pkgs():
-    subpatterns = list(paraminer.mine(record))
-    patterns += subpatterns
-    if len(subpatterns) > 0:
-      counter += 1
-  sqldao = SqlDao()
-  sqldao.execute('DELETE FROM patterns WHERE kvpattern IS NOT NULL')
-  QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern) VALUES (%s, %s, %s, %s, %s)'
-  for recog_rule in paraminer.stat(patterns):
-    k, app, host, confidence, support = recog_rule
-    k = tuples2str(k)
-    sqldao.execute(QUERY, (app, support, confidence, host, k))
-    if DEBUG : print ">>> [DEBUG]", k, app, host, confidence, support
-  print counter
+
+def _persist(patterns, paraminer, tree, goodCandidates):
+    def tuples2str(tuples):
+      return '&'.join([k+'='+v for k, v in tuples ])
+    QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
+    sqldao = SqlDao()
+    # Param rules
+    for recog_rule in paraminer.stat(patterns):
+      k, app, host, confidence, support, rule_type = recog_rule
+      k = tuples2str(k)
+      sqldao.execute(QUERY, (app, support, confidence, host, k, rule_type))
+    # Tree rules
+    for appName, appCompany, valueName, tokenName, hostName, tokenConfidence, tokenSupport in tree._gen_rules(goodCandidates, confidence, support):
+      sqldao.execute(QUERY , (appName, tokenSupport, 1.0, hostName, tokenName+'='+valueName, consts.APP_RULE))
+    sqldao.close()
 
 
+class KVClassifier:
+  def __init__(self):
+    self.paraminer = ParamRules()
+    
+  def _clean_db(self):
+    sqldao = SqlDao()
+    sqldao.execute('DELETE FROM patterns WHERE kvpattern IS NOT NULL')
+    sqldao.commit()
+    sqldao.close()
 
-def KVMiner(training_data=None, confidence=0.8, support=2): 
-  def tuples2str(tuples):
-    return '&'.join([k+'='+v for k, v in tuples ])
+  def train(self, training_data=None, confidence=0.8, support=2): 
 
-  sqldao = SqlDao()
-  sqldao.execute('DELETE FROM patterns WHERE kvpattern IS NOT NULL')
-  sqldao.close()
-  training_data = load_pkgs() if not training_data else training_data
+    self._clean_db()
+    training_data = load_pkgs() if not training_data else training_data
 
-  paraminer = ParamRules()
-  patterns = []
+    patterns = []
 
-  tree = KVTree()
-  goodCandidates = defaultdict(lambda : defaultdict(int))
+    tree = KVTree()
+    goodCandidates = defaultdict(lambda : defaultdict(int))
+    
+    #############
+    # Mining
+    #############
+    for package in training_data:
+      subpatterns = list(self.paraminer.mine(package))
+      patterns += subpatterns
+      # Build the forest
+      kvs = package.querys.copy()
+      if package.form : 
+        for k,v in package.form.iteritems():
+          kvs[k] = [v]
+
+      tree._build_tree(package, kvs.items())
+
+      for k, v in kvs.items():
+        if package.app in v or package.name in v:
+          goodCandidates[package.secdomain][k] += 1
+
+
+    if DEBUG : print '>>> [DEBUG:kvminer:goodCandidate]', goodCandidates
+    
+    tree._prune_forest()
+
+    ###############
+    # Persist
+    ###############
+    _persist(patterns, self.paraminer, tree, goodCandidates)
+    self.paraminer.load_rules()
+    return self.paraminer
   
-  #############
-  # Mining
-  #############
-  for package in training_data:
-    subpatterns = list(paraminer.mine(package))
-    patterns += subpatterns
-    # Build the forest
-    tree._build_tree(package, package.querys.items())
-    for k, v in package.querys.items():
-      if package.app in v or package.name in v:
-        goodCandidates[package.secdomain][k] += 1
-  if DEBUG : print '>>> [DEBUG:kvminer:goodCandidate]', goodCandidates
-  
-  tree._prune_forest()
-
-  ###############
-  # Persist
-  ###############
-  QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern) VALUES (%s, %s, %s, %s, %s)'
-  # Param rules
-  sqldao = SqlDao()
-  for recog_rule in paraminer.stat(patterns):
-    k, app, host, confidence, support = recog_rule
-    k = tuples2str(k)
-    sqldao.execute(QUERY, (app, support, confidence, host, k))
-  # Tree rules
-  for appName, appCompany, valueName, tokenName, hostName, tokenConfidence, tokenSupport in tree._gen_rules(goodCandidates, confidence, support):
-    sqldao.execute(QUERY , (appName, tokenSupport, tokenConfidence, hostName, tokenName+'='+valueName))
-  sqldao.close()
+  def classify(self, record):
+    return self.paraminer.classify(record)
 
 
 
@@ -337,8 +351,9 @@ def KVPredictor(test_records=None):
   count = 0
   correct = 0
   if not test_records: test_records = load_pkgs()
+  else: test_records = test_records.values()
   rst = {}
-  for record in test_records.values():
+  for record in test_records:
     predictRst = paraminer.classify(record)
     if len(predictRst) > 0:
       count += 1
@@ -460,3 +475,26 @@ if __name__ == '__main__':
 
 #     print 'Total:%s\tCorrect:%s\tWrong:%s' % (len(test_set), correct, wrong)
 #     return rst
+# def test_rule_miner_train():
+#   def tuples2str(tuples):
+#     return '&'.join([k+'='+v for k, v in tuples ])
+#   paraminer = ParamRules()
+#   patterns = []
+#   print ">>> Starting processing packages"
+#   counter = 0
+#   for record in load_pkgs():
+#     subpatterns = list(paraminer.mine(record))
+#     patterns += subpatterns
+#     if len(subpatterns) > 0:
+#       counter += 1
+#   sqldao = SqlDao()
+#   sqldao.execute('DELETE FROM patterns WHERE kvpattern IS NOT NULL')
+#   sqldao.commit()
+#   QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern) VALUES (%s, %s, %s, %s, %s)'
+#   for recog_rule in paraminer.stat(patterns):
+#     k, app, host, confidence, support = recog_rule
+#     k = tuples2str(k)
+#     sqldao.execute(QUERY, (app, support, confidence, host, k))
+#     if DEBUG : print ">>> [DEBUG]", k, app, host, confidence, support
+#   sqldao.close()
+#   print counter

@@ -650,13 +650,38 @@ def test_sdk_id():
   records = load_pkgs()
   relations = defaultdict(set)
   for record in records:
-    if 'sdk_key' in record.querys:
-      sdk_key = record.querys['sdk_key'][0]
-      relations[sdk_key].add(record.app)
+    if 'id' in record.querys and 'ads.mopub.com' == record.host:
+      appid = record.querys['id'][0]
+      relations[appid].add(record.app)
 
   print len(relations)
   for k, v in relations.iteritems():
     if len(v) > 1:
       print k, v
+
+def stat_post_content():
+  QUERY = 'select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from packages where httptype=0 and method=\'POST\''
+  records = []
+  sqldao = SqlDao()
+  for id, app, add_header, path, refer, host, agent, company,name, dst,raw  in sqldao.execute(QUERY):
+    package = Package()
+    package.set_app(app)
+    package.set_path(path)
+    package.set_id(id)
+    package.set_add_header(add_header)
+    package.set_refer(refer)
+    package.set_host(host)
+    package.set_agent(agent)
+    package.set_company(company)
+    package.set_name(name)
+    package.set_dst(dst)
+    package.set_content(raw)
+    records.append(package)
+  count = 0
+  for r in records:
+    s = r.content.split('\n')
+    if r.app in r.content:
+      count += 1
+  print "contain app", count, "total", len(records)
 
 test_sdk_id()

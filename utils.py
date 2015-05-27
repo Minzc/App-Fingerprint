@@ -164,15 +164,15 @@ def load_tfidf():
 		relation[word][app] = tfidf
 	return relation
 
-def load_pkgs(limit = None):
+def load_pkgs(limit = None, DB="packages"):
 	records = []
 	sqldao = SqlDao()
 	QUERY = None
 	if not limit:
-		QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst from packages where httptype=0"
+		QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from %s where httptype=0" % DB
 	else:
-		QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst from packages where httptype=0 limit " + str(limit)
-	for id, app, add_header, path, refer, host, agent, company,name, dst in sqldao.execute(QUERY):
+		QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from %s where httptype=0 limit %s" % (DB, limit)
+	for id, app, add_header, path, refer, host, agent, company,name, dst, raw in sqldao.execute(QUERY):
 		package = Package()
 		package.set_app(app)
 		package.set_path(path)
@@ -184,6 +184,7 @@ def load_pkgs(limit = None):
 		package.set_company(company)
 		package.set_name(name)
 		package.set_dst(dst)
+                package.set_content(raw)
 		records.append(package)
 	return records
 
@@ -212,6 +213,7 @@ def get_record_f(record):
     features.append(record.app)
 
     return features
+
 
 from nltk import FreqDist
 class Relation:	

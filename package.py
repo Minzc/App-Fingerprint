@@ -1,4 +1,8 @@
 class Package:
+    def __init__(self):
+      self.json = None
+      self.form = None
+
     def set_id(self, id):
         self.id = id
 
@@ -57,3 +61,30 @@ class Package:
 
     def set_agent(self, agent):
         self.agent = agent.lower()
+
+    def set_content(self, content):
+      content = content.lower()
+      if 'layer json' in content:
+        self.json = self._process_json(content)
+      if 'layer urlencoded-form' in content:
+        self.form = self._process_form(content)
+      self.content = content
+
+    def _process_form(self, content):
+      """change urlencoded forms to maps"""
+      key_values = {}
+      for line in filter(None, content.strip().split('\n')):
+        if 'form item' in line:
+          line = line.replace("\"", '').replace('form item:', '').replace(' ', '')
+          if '=' in line: 
+            key, value = line.split('=')[:2]
+            key_values[key.strip()] = value.strip()
+      return key_values
+
+    def _process_json(self, content):
+      """change json content to string items"""
+      items = []
+      for line in filter(None, content.split('\n')):
+        if 'value' in line and ':' in line:
+          items.append(':'.join(map(lambda seg: seg.strip(), line.split(':')[1:])))
+      return items

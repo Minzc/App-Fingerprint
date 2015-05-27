@@ -1,6 +1,9 @@
 from package import Package
 from sqldao import SqlDao
 from utils import load_pkgs
+import consts
+
+DEBUG = True
 
 def header_classifier(package):
     identifier = ['x-umeng-sdk', 'x-vungle-bundle-id', 'x-requested-with']
@@ -10,115 +13,23 @@ def header_classifier(package):
                 return (head_seg.replace(id + ':', '').strip(), 1)
     return None
 
+class HeaderClassifier:
+  def train(self, train_set):
+    pass
 
-def agent_classifier(package):
-    if package.app in package.agent:
-        return (package.app, 2)
-    return None
+  def classify(self,package):
+    classifiers = [header_classifier]
 
-
-# class Ruler:
-# def __init__(self):
-# 		import mysql.connector
-# 		cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
-# 		cursor = cnx.cursor()
-# 		query = 'select app, hst, company, agent, path from rules'
-# 		cursor.execute(query)
-# 		self.hst_rules = {}
-# 		self.agent_rules = {}
-# 		self.company_rules = {}
-# 		self.path_rules = {}
-
-# 		for app, hst, company, agent, path in cursor:
-# 			hst = hst.split(':')[0].replace('www.','')
-# 			app, hst, company, agent, path = lower_all((app, hst, company, agent, path))
-# 			if path and len(path) > 0:
-# 				self.path_rules.setdefault(hst, {})
-# 				if app:
-# 					self.path_rules[hst][path] = app
-# 				else:
-# 					self.path_rules[hst][path] = company
-# 				self.company_rules[hst] = company
-# 			elif app and len(app) > 0:
-# 				self.hst_rules[hst.lower()] = app
-# 			elif company and len(company) > 0:
-# 				self.company_rules[hst] = company
-
-
-# 	def classify(self, package):
-# 		"""
-# 		6 means over fitting
-# 		"""
-# 		# print package.host in self.hst_rules, package.host
-
-
-# 		if package.host in self.hst_rules:
-# 			return (self.hst_rules[package.host], 5)
-
-# 		# elif package.agent in self.agent_rules:
-# 		# 	return (self.agent_rules[package.agent], 6)
-# 		elif package.host in self.path_rules:
-# 			pathsegs = package.path.split('/')
-# 			for pathseg in pathsegs:
-# 				if pathseg in self.path_rules[package.host]:
-# 					return (self.path_rules[package.host][pathseg], 8)
-
-# 		if package.host in self.company_rules:
-# 			return (self.company_rules[package.host], 9)
-
-# 		return None
-
-def classify(writedb, test_set=None):
-
-  classifiers = [header_classifier]
-
-  clsf_rst = {}
-  regapps = set()
-  # rule = Ruler()
-  wrong = 0
-  sqldao = SqlDao()
-
-  if not test_set:
-    test_set = load_pkgs()
-
-  rst = {}
-  for package in test_set:
-    app = package.app
-    company = package.company
-    id = package.id
+    rst = {}
+    app, company, id = package.app, package.company, package.id
 
     for classifier in classifiers:
       identifier = classifier(package)
-      if identifier != None and identifier != '':
-        regapps.add(app)
-        rst[id] = app
-        if writedb:
-          clsf_rst[id] = identifier[1]
+      if identifier:
+        rst[consts.APP_RULE] = [(app,1.0)]
         if identifier[0] != package.app:
-          wrong += 1
-
-    # if id not in clsf_rst:
-    #   clsrst = rule.classify(package)
-    #   if clsrst: 
-    #     clsf_rst[id] = clsrst[1]
-    #     rst[id] = clsrst[0]
-
-    #     companies = set(clsrst[0].split('$'))
-    #     if not company:
-    #       company = ''
-
-    #     if clsrst[0] != app.lower() and company.lower() not in companies:
-    #       wrong += 1
-
-
-  print 'Finish'
-  print "Number of recognized packages:", len(rst), "Wrong:", wrong, 'Total:', len(test_set)
-  if writedb:
-    upquery = "update packages set classified = %s where id = %s"
-    for k, v in clsf_rst.items():
-      sqldao.execute(upquery, (v, k))
-  sqldao.close()
-  return rst
+          if DEBUG : print identifier, package.app
+    return rst
 
 if __name__ == '__main__':
   classify(True)
