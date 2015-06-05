@@ -34,24 +34,33 @@ class ETL:
         self._get_app_category()
         self._get_app_company()
 
-
-    def _get_app_company(self):
+    def _get_app_info(self):
         sqldao = SqlDao()
-        QUERY = 'SELECT app, company FROM apps'
+        QUERY = 'SELECT app, company, category FROM apps'
         self.app_company = {}
-        for app, company in sqldao.execute(QUERY):
+        self.app_category = {}
+        for app, company, category in sqldao.execute(QUERY):
             self.app_company[app] = company
+            self.app_category[app] = category
         sqldao.close()
 
-    def _get_app_category(self):
-        self.app_category = {}
-        file_path = './statinfo/app.txt'
+    # def _get_app_company(self):
+    #     sqldao = SqlDao()
+    #     QUERY = 'SELECT app, company FROM apps'
+    #     self.app_company = {}
+    #     for app, company in sqldao.execute(QUERY):
+    #         self.app_company[app] = company
+    #     sqldao.close()
 
-        def parser(ln):
-            pkg, name, category = ln.split('\t')
-            self.app_category[pkg] = (name, category)
+    # def _get_app_category(self):
+    #     self.app_category = {}
+    #     file_path = './statinfo/app.txt'
 
-        loadfile(file_path, parser)
+    #     def parser(ln):
+    #         pkg, name, category = ln.split('\t')
+    #         self.app_category[pkg] = (name, category)
+
+    #     loadfile(file_path, parser)
 
     def upload_packages(self, folder):
         """
