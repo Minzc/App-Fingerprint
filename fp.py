@@ -44,6 +44,8 @@ class FPRuler:
       labelRsts = {}
       for rulesID, rules in self.rulesSet.iteritems():
           rst = []
+          tmpapp = record.app
+          record.app = ''
           features = _get_record_f(record)
           if record.host in rules.keys():
               for rule, label_confidence in rules[record.host].iteritems():
@@ -54,6 +56,7 @@ class FPRuler:
               labelRsts[rulesID] = rst
           else:
               labelRsts[rulesID] = None
+          record.app = tmpapp
       return labelRsts
 
 
@@ -225,11 +228,11 @@ def _prune_rules(t_rules, records, min_cover = 3):
     print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
 
 
-def _persist(rules):
+def _persist(rules, rule_type):
     sqldao = SqlDao()
-    QUERY = 'INSERT INTO patterns (label, pattens, confidence, support, host) VALUES (%s, %s, %s, %s, %s)'
+    QUERY = 'INSERT INTO patterns (label, pattens, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
     for rule in rules:
-        sqldao.execute(QUERY, (rule.label, ','.join(rule.rule), rule.confidence, rule.support, rule.host))
+        sqldao.execute(QUERY, (rule.label, ','.join(rule.rule), rule.confidence, rule.support, rule.host, rule_type))
     sqldao.close()
 
 class CMAR:
@@ -261,7 +264,7 @@ class CMAR:
           decodedRules.add(Rule(rule_str, appIndx[rule.label], recordHost[rule.host], rule.confidence, rule.support))
 
       self.classifier._addRules(decodedRules, ruleType)
-      _persist(decodedRules)
+      _persist(decodedRules, ruleType)
 
   def train(self, records, tSupport=2, tConfidence=0.8):
       self._clean_db()

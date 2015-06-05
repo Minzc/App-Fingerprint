@@ -79,9 +79,9 @@ def execute(train_set, test_set, inforTrack):
         test_apps.add(record.app)
 
     classifiers = {
-            "Header Rule" : HeaderClassifier(),
-            "CMAR Rule" : CMAR(),
-            "KV RUle" : KVClassifier()
+             "Header Rule" : HeaderClassifier(),
+             "CMAR Rule" : CMAR(),
+             "KV RUle" : KVClassifier()
             }
 
     for name, classifier in classifiers.items():
@@ -95,9 +95,10 @@ def execute(train_set, test_set, inforTrack):
 
     c, correct_app = evaluate(rst, test_set)
     correct += c
-    inforTrack.discoveried_app += len(correct_app) * 1.0 / len(test_apps)
-    inforTrack.precision += correct * 1.0 / len(rst)
-    inforTrack.recall += len(rst) * 1.0 / len(test_set) * 1.0
+    print "Discoered App Number:", len(correct_app), "Total Number of App", len(test_apps)
+    inforTrack['discoveried_app'] += len(correct_app) * 1.0 / len(test_apps)
+    inforTrack['precision'] += correct * 1.0 / len(rst)
+    inforTrack['recall'] += len(rst) * 1.0 / len(test_set) * 1.0
     #####################################
     #	Text Rules
     #####################################
@@ -147,8 +148,7 @@ else:
     test_set = {record.id:record for record in load_pkgs(LIMIT, DB = "packages_2000")}
     set_pair.append((records, test_set))
 
-InfoTrack = namedtuple('InfoTrack', 'discoveried_app, precision, recall')
-inforTrack = InfoTrack(0.0,0.0,0.0)
+inforTrack = { 'discoveried_app':0.0, 'precision':0.0, 'recall':0.0}
 
 for train_set, test_set in set_pair:
     rnd += 1
@@ -174,4 +174,4 @@ for train_set, test_set in set_pair:
     if DEBUG: break
 
 
-print 'Precision:', inforTrack.precision / (1.0 * FOLD), 'Recall:', inforTrack.recall / (1.0 * FOLD), 'App:', inforTrack.discoveried_app / (1.0 * FOLD)
+print 'Precision:', inforTrack['precision'] / (1.0 * FOLD), 'Recall:', inforTrack['recall'] / (1.0 * FOLD), 'App:', inforTrack['discoveried_app'] / (1.0 * FOLD)

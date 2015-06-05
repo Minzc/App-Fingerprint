@@ -26,7 +26,7 @@ class HeaderClassifier:
     for classifier in classifiers:
       identifier = classifier(package)
       if identifier:
-        rst[consts.APP_RULE] = [(app,1.0)]
+        rst[consts.APP_RULE] = [(identifier[0],1.0)]
         if identifier[0] != package.app:
           if DEBUG : print identifier, package.app
     return rst
