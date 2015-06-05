@@ -63,8 +63,10 @@ def insert_rst(rst, DB = 'packages'):
     QUERY = 'UPDATE ' + DB + ' SET classified = %s WHERE id = %s'
     print QUERY
     sqldao = SqlDao()
+    params = []
     for k, v in rst.items():
-        sqldao.execute(QUERY,  (3, k))
+      params.append((3,k));
+    sqldao.executeBatch(QUERY,  params)
     sqldao.close()
     print 'insert', len(rst),"items"
 
