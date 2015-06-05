@@ -231,8 +231,10 @@ def _prune_rules(t_rules, records, min_cover = 3):
 def _persist(rules, rule_type):
     sqldao = SqlDao()
     QUERY = 'INSERT INTO patterns (label, pattens, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
+    params = []
     for rule in rules:
-        sqldao.execute(QUERY, (rule.label, ','.join(rule.rule), rule.confidence, rule.support, rule.host, rule_type))
+        params.append((rule.label, ','.join(rule.rule), rule.confidence, rule.support, rule.host, rule_type))
+    sqldao.executeBatch(QUERY, params)
     sqldao.close()
 
 class CMAR:
