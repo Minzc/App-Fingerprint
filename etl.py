@@ -1,4 +1,5 @@
 import pyshark
+import sys
 
 from sqldao import SqlDao
 
@@ -26,8 +27,8 @@ class ETLConsts:
 
 
 class ETL:
-    def __init__(self):
-        self.INSERT_PACKAGES = ("INSERT INTO packages "
+    def __init__(self, tablename):
+        self.INSERT_PACKAGES = ("INSERT INTO " + tablename + " "
                                 "(app,src,dst,time,add_header,hst, path, accpt, agent, refer, author, cntlength, cnttype, method, size, httptype, name, category, company, raw)"
                                 "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)")
         self.INSERT_HOST = 'INSERT INTO host (app, host) VALUES(%s, %s)'
@@ -74,7 +75,7 @@ class ETL:
             file_path = join(folder, f)
             if isfile(file_path):
                 app_name = f[0:-5]
-                self._insert_msql(join(folder, f), app_name)
+                self._insert_msql(join(folder, f), app_name, tablename)
 
 
     def _insert_msql(self, file_path, app_package):
@@ -236,5 +237,7 @@ class ETL:
 
 
 if __name__ == '__main__':
-    etl = ETL()
-    etl.upload_packages('/Users/congzicun/Yunio/fortinet/test_pcap/dir_005')
+    path = sys.argv[1]
+    tablename = sys.argv[2]
+    etl = ETL(tablename)
+    etl.upload_packages(path)
