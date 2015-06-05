@@ -280,13 +280,17 @@ def _persist(patterns, paraminer, tree, goodCandidates):
     QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
     sqldao = SqlDao()
     # Param rules
+    params = []
     for recog_rule in paraminer.stat(patterns):
       k, app, host, confidence, support, rule_type = recog_rule
       k = tuples2str(k)
-      sqldao.execute(QUERY, (app, support, confidence, host, k, rule_type))
+      params.append((app, support, confidence, host, k, rule_type))
+    sqldao.executeBatch(QUERY, params)
     # Tree rules
+    params = []
     for appName, appCompany, valueName, tokenName, hostName, tokenConfidence, tokenSupport in tree._gen_rules(goodCandidates, confidence, support):
-      sqldao.execute(QUERY , (appName, tokenSupport, 1.0, hostName, tokenName+'='+valueName, consts.APP_RULE))
+        params.append((appName, tokenSupport, 1.0, hostName, tokenName+'='+valueName, consts.APP_RULE))
+    sqldao.executeBatch(QUERY , params)
     sqldao.close()
 
 
