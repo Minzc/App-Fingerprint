@@ -9,8 +9,7 @@ Before installing pyshark, you need to install a bunch of libraries needed by py
 	sudo apt-get install libxml2-dev libxslt1-dev python-dev
 	
 To install pyshark
-
-	wget https://github.com/KimiNewt/pyshark/zipball/master -O pyshark.zip
+wget https://github.com/KimiNewt/pyshark/zipball/master -O pyshark.zip
 	unzip pyshark.zip
 	cd KimiNewt-pyshark-26f21f5/src
 	python setup.py install
@@ -21,3 +20,17 @@ To install pyshark
 To install mysql connector
 
 Please Visit http://dev.mysql.com/downloads/connector/python/ and download the package for your platform
+
+### scikit-learn
+We need scikit-learn library to do cross-validation
+
+```
+sudo apt-get install python-sklearn
+```
+
+### tldextract
+tldextract is used to do domain extraction
+
+```
+sudo pip install tldextract
+```
