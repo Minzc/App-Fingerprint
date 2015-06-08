@@ -122,6 +122,7 @@ class ETL:
                 app_company, 
                 pkgInfo[ETLConsts.RAW]))
             comunicate_host.add(pkgInfo[ETLConsts.HOST])
+        print self.INSERT_PACKAGES
         dbdao.executeBatch(self.INSERT_PACKAGES,params)
           #  except Exception:
           #     pass 
@@ -154,7 +155,6 @@ class ETL:
                         'Cache-Control',
                         'Pragma',
                         'Accept-Ranges'}
-        print "okay", package
         pkgInfo = {}
         #src = package.ip.src
         #dst = package.ip.dst
