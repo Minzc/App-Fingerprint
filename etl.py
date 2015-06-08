@@ -32,8 +32,7 @@ class ETL:
                                 "(app,src,dst,time,add_header,hst, path, accpt, agent, refer, author, cntlength, cnttype, method, size, httptype, name, category, company, raw)"
                                 "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)")
         self.INSERT_HOST = 'INSERT INTO host (app, host) VALUES(%s, %s)'
-        self._get_app_category()
-        self._get_app_company()
+        self._get_app_info()
 
     def _get_app_info(self):
         sqldao = SqlDao()
@@ -75,7 +74,7 @@ class ETL:
             file_path = join(folder, f)
             if isfile(file_path):
                 app_name = f[0:-5]
-                self._insert_msql(join(folder, f), app_name, tablename)
+                self._insert_msql(join(folder, f), app_name)
 
 
     def _insert_msql(self, file_path, app_package):

@@ -97,10 +97,13 @@ def execute(train_set, test_set, inforTrack):
 
     c, correct_app = evaluate(rst, test_set)
     correct += c
+    not_cover_app = test_apps - correct_app
     print "Discoered App Number:", len(correct_app), "Total Number of App", len(test_apps)
     inforTrack['discoveried_app'] += len(correct_app) * 1.0 / len(test_apps)
     inforTrack['precision'] += correct * 1.0 / len(rst)
     inforTrack['recall'] += len(rst) * 1.0 / len(test_set) * 1.0
+    for app in not_cover_app:
+      print app
     #####################################
     #	Text Rules
     #####################################

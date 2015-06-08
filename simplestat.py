@@ -684,4 +684,19 @@ def stat_post_content():
       count += 1
   print "contain app", count, "total", len(records)
 
-test_sdk_id()
+def query_length():
+  QUERY = 'SELECT count(*) FROM packages WHERE app = \'%s\' and method = \'GET\''
+  sqldao = SqlDao()
+  rst = defaultdict(list)
+  for ln in open('tmp'):
+    ln = ln.strip()
+    for i in sqldao.execute(QUERY % ln):
+      rst[ln].append(i[0])
+  QUERY = 'SELECT count(*) FROM packages_2000 WHERE app = \'%s\' and method = \'GET\''
+  for ln in open('tmp'):
+    ln = ln.strip()
+    for i in sqldao.execute(QUERY % ln):
+      rst[ln].append(i[0])
+  for k,v in rst.items():
+      print v[0],',' ,v[1]
+query_length()
