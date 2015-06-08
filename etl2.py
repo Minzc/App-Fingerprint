@@ -121,8 +121,8 @@ class ETL:
                 app_category, 
                 app_company, 
                 pkgInfo[ETLConsts.RAW]))
+            comunicate_host.add(pkgInfo[ETLConsts.HOST])
         dbdao.executeBatch(self.INSERT_PACKAGES,params)
-        comunicate_host.add(pkgInfo[ETLConsts.HOST])
           #  except Exception:
           #     pass 
         dbdao.close()
