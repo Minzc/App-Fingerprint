@@ -277,6 +277,7 @@ class CMAR:
       ################################################
       # Mine Company Features
       ################################################
+      '''
       app_backup = {}
       for record in records:
           app_backup[record.id] = record.app
@@ -285,6 +286,7 @@ class CMAR:
       self._train(records, tSupport, tConfidence, consts.COMPANY_RULE)
       for record in records:
         record.app = app_backup[record.id]
+      '''
       return self.classifier
 
   def classify(self, record):

@@ -69,8 +69,8 @@ class ETL:
         dns_info = {}
         comunicate_host = set()
         
+        pkgInfos = []
         while True:
-            pkgInfos = []
             try:
                 p = packages.next()
                 if hasattr(p, 'http'):
@@ -96,6 +96,8 @@ class ETL:
 
             except StopIteration:
                 break
+            except:
+                print 'ERROR'
         params = []
         for pkgInfo in pkgInfos:
             app_name = pkgInfo['app_name'] 
@@ -123,11 +125,11 @@ class ETL:
                 pkgInfo[ETLConsts.RAW]))
             comunicate_host.add(pkgInfo[ETLConsts.HOST])
         print self.INSERT_PACKAGES
-        dbdao.executeBatch(self.INSERT_PACKAGES,params)
+        #dbdao.executeBatch(self.INSERT_PACKAGES,params)
           #  except Exception:
           #     pass 
-        dbdao.close()
-        print "Finish", app_package, "Package:", len(params)
+        #dbdao.close()
+        print "Finish", app_package, "Package:", len(params), len(pkgInfos)
 
     def _parse_dns_package(self, package, dns_info):
         amount = package[DNS].ancount
@@ -167,6 +169,7 @@ class ETL:
                                     for i in package.http.response_line.alternate_fields
                                     if i.showname.split(':')[0].strip() not in known_fileds])
         elif hasattr(package.http, 'request_line'):
+            print add_header
             add_header = '\n'.join([i.showname.replace('\\r\\n', '')
                                     for i in package.http.request_line.alternate_fields
                                     if i.showname.split(':')[0].strip() not in known_fileds])
@@ -194,7 +197,7 @@ class ETL:
         pkgInfo[ETLConsts.ACCEPT] = str(accpt)
         pkgInfo[ETLConsts.AGENT] = str(agent)
         pkgInfo[ETLConsts.REFER] = str(refer)
-        pkgInfo[ETLConsts.AUTHOR] = author
+        pkgInfo[ETLConsts.AUTHOR] = str(author).replace('\\"', '')
         pkgInfo[ETLConsts.CONTENT_LENGTH] = str(cntlength)
         pkgInfo[ETLConsts.CONTENT_TYPE] = str(cnttpe)
         pkgInfo[ETLConsts.METHOD] = str(method)
@@ -212,6 +215,7 @@ class ETL:
         for k, v in pkgInfo.items():
             if v == None:
                 pkgInfo[k] = ""
+	    raw = None
         return pkgInfo
 
 

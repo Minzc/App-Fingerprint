@@ -64,13 +64,6 @@ def multi_replace(ln, chars, new):
 		ln = ln.replace(char, new)
 	return ln
 
-def load_dict():
-    sqldao = SqlDao()
-    dic = set()
-    for feature in sqldao.execute('SELECT feature FROM appfeatures'):
-    	dic.add(feature[0].lower())
-    return dic
-
 
 def backward_maxmatch( s, dict, maxWordLen, minWordLen ):
 	postLst = []
@@ -164,29 +157,34 @@ def load_tfidf():
 		relation[word][app] = tfidf
 	return relation
 
-def load_pkgs(limit = None, DB="packages"):
-	records = []
-	sqldao = SqlDao()
-	QUERY = None
-	if not limit:
-		QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from %s where httptype=0" % DB
-	else:
-		QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from %s where httptype=0 limit %s" % (DB, limit)
-	for id, app, add_header, path, refer, host, agent, company,name, dst, raw in sqldao.execute(QUERY):
-		package = Package()
-		package.set_app(app)
-		package.set_path(path)
-		package.set_id(id)
-		package.set_add_header(add_header)
-		package.set_refer(refer)
-		package.set_host(host)
-		package.set_agent(agent)
-		package.set_company(company)
-		package.set_name(name)
-		package.set_dst(dst)
-                package.set_content(raw)
-		records.append(package)
-	return records
+def load_pkgs(limit = None, filterFunc=lambda x : True, DB="packages"):
+    records = []
+    sqldao = SqlDao()
+    QUERY = None
+    if not limit:
+        QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from %s where httptype=0" % DB
+    else:
+        QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from %s where httptype=0 limit %s" % (DB, limit)
+    print QUERY
+
+    for id, app, add_header, path, refer, host, agent, company,name, dst, raw in sqldao.execute(QUERY):
+        
+        package = Package()
+        package.set_app(app)
+        package.set_path(path)
+        package.set_id(id)
+        package.set_add_header(add_header)
+        package.set_refer(refer)
+        package.set_host(host)
+        package.set_agent(agent)
+        package.set_company(company)
+        package.set_name(name)
+        package.set_dst(dst)
+        package.set_content(raw)
+       
+        if filterFunc(package):
+            records.append(package)
+    return records
 
 def get_record_f(record):
     """Get package features"""
