@@ -704,20 +704,19 @@ def findExpApps():
     QUERY = "SELECT DISTINCT(app) FROM %s"
     tbls = ["packages_20150210", "packages_20150429", "packages_20150509", "packages_20150526"]
     sqldao = SqlDao()
-    commonApp = set()
-    tmpApp = set()
-    for app in sqldao.execute(QUERY % tbls[0]):
-        tmpApp.add(app[0])
+    apps = [set()]
     for tbl in tbls:
-        for app in sqldao.execute(QUERY % tbl):
-            if app[0] in tmpApp:
-                commonApp.add(app[0])
-        tmpApp = commonApp
-        commonApp = set()
-    
-    print "Number of App is ", len(tmpApp)
+      apps.append(set())
+      for app in sqldao.execute(QUERY % tbl):
+          apps[0].add(app[0])
+          apps[-1].add(app[0])
 
-    for app in tmpApp:
+    rst = apps[0]
+    for i in range(1, len(apps)):
+      rst = rst & apps[i]
+
+    print "len of app is", len(rst)
+    for app in rst:
         print app
 
 findExpApps()

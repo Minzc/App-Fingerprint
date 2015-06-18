@@ -162,9 +162,9 @@ def load_pkgs(limit = None, filterFunc=lambda x : True, DB="packages"):
     sqldao = SqlDao()
     QUERY = None
     if not limit:
-        QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from %s where httptype=0" % DB
+        QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from %s where method=\'GET\'" % DB
     else:
-        QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from %s where httptype=0 limit %s" % (DB, limit)
+        QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from %s where method=\'GET\' limit %s" % (DB, limit)
     print QUERY
 
     for id, app, add_header, path, refer, host, agent, company,name, dst, raw in sqldao.execute(QUERY):
