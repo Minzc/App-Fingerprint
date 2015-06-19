@@ -236,10 +236,12 @@ def _persist(rules, rule_type):
         params.append((rule.label, ','.join(rule.rule), rule.confidence, rule.support, rule.host, rule_type))
     sqldao.executeBatch(QUERY, params)
     sqldao.close()
+    print "Total Number of Rules is", len(rules)
 
 class CMAR:
-  def __init__(self):
+  def __init__(self, min_cover):
     self.classifier = FPRuler()
+    self.min_cover = min_cover
 
   def _clean_db(self):
       sqldao = SqlDao()
@@ -253,7 +255,7 @@ class CMAR:
       # Rules format : (feature, confidence, support, label)
       rules = _gen_rules(encodedRecords, tSupport, tConfidence, rever_map(featureIndx))
       # feature, app, host
-      rules = _prune_rules(rules, encodedRecords)
+      rules = _prune_rules(rules, encodedRecords, self.min_cover)
       # change encoded features back to string
       decodedRules = set()
       tmp = set()

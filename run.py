@@ -84,7 +84,7 @@ def execute(train_set, test_set, inforTrack):
 
     classifiers = {
              "Header Rule" : HeaderClassifier(),
-             "CMAR Rule" : CMAR(),
+             "CMAR Rule" : CMAR(3),
              "KV RUle" : KVClassifier()
             }
 
@@ -206,7 +206,8 @@ if __name__ == '__main__':
 
         # print len(rst), len(train)
 
-        #insert_rst(rst, 'packages_2000')
+        print "INSERTING"
+        insert_rst(rst, test_tbl)
         if fw : fw.close()
         if DEBUG: break
 

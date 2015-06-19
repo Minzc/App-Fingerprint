@@ -701,7 +701,7 @@ def query_length():
       print v[0],',' ,v[1]
 
 def findExpApps():
-    QUERY = "SELECT DISTINCT(app) FROM %s"
+    QUERY = "SELECT DISTINCT(app) FROM %s WHERE method = \'GET\'"
     tbls = ["packages_20150210", "packages_20150429", "packages_20150509", "packages_20150526"]
     sqldao = SqlDao()
     apps = [set()]
@@ -718,5 +718,23 @@ def findExpApps():
     print "len of app is", len(rst)
     for app in rst:
         print app
+
+def rmOtherApp():
+    QUERY = "DELETE FROM packages_20150429 WHERE app=\'%s\'"
+    def loadExpApp():
+        expApp=set()
+        for app in open("resource/exp_app.txt"):
+            expApp.add(app.strip().lower())
+        return expApp
+    expApp = loadExpApp()
+    apps = set()
+    sqldao = SqlDao()
+    for app in sqldao.execute("SELECT distinct app FROM packages_20150429"):
+        apps.add(app[0])
+    for app in apps:
+        if app not in expApp:
+            sqldao.execute(QUERY % (app))
+            sqldao.commit()
+    sqldao.close()
 
 findExpApps()
