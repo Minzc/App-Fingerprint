@@ -719,8 +719,8 @@ def findExpApps():
     for app in rst:
         print app
 
-def rmOtherApp():
-    QUERY = "DELETE FROM packages_20150429 WHERE app=\'%s\'"
+def rmOtherApp(tbl):
+    QUERY = "DELETE FROM " + tbl + " WHERE app=\'%s\'"
     def loadExpApp():
         expApp=set()
         for app in open("resource/exp_app.txt"):
@@ -729,7 +729,7 @@ def rmOtherApp():
     expApp = loadExpApp()
     apps = set()
     sqldao = SqlDao()
-    for app in sqldao.execute("SELECT distinct app FROM packages_20150429"):
+    for app in sqldao.execute("SELECT distinct app FROM %s" % tbl):
         apps.add(app[0])
     for app in apps:
         if app not in expApp:
@@ -737,4 +737,4 @@ def rmOtherApp():
             sqldao.commit()
     sqldao.close()
 
-findExpApps()
+rmOtherApp("packages_20150526")
