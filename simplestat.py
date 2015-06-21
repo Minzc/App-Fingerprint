@@ -770,7 +770,7 @@ def batchTest(outputfile):
   fw.close()
   fw = open(outputfile+".score", 'w')
   Rule = namedtuple('Rule', 'secdomain,key,score,app')
-  rules = defaultdict([])
+  rules = defaultdict(list)
   for secdomain in score:
     for key in score[secdomain]:
       rules[secdomain].append(Rule(secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
