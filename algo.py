@@ -173,11 +173,17 @@ class KVTree:
         if len(appvalues) > 1:
           for appnode in vnode.father: 
             appnode.father[0].set_status(0)
+            if appnode.father[0].value == 'client':
+              print "1", vnode.value
 
     for appnode in appnodes: 
       if len(appnode.children) > 1: 
         for tokennode in appnode.father:
           tokennode.set_status(-1)
+          if tokennode.value == 'client':
+            print "2", appnode.value
+            for vnode in appnode.children:
+                print vnode
 
 
 

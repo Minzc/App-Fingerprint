@@ -737,4 +737,16 @@ def rmOtherApp(tbl):
             sqldao.commit()
     sqldao.close()
 
-rmOtherApp("packages_20150526")
+def batchTest():
+  tbls = ["packages_20150210", "packages_20150429", "packages_20150509", "packages_20150526"]
+  counter = defaultdict(lambda : defaultdict(set))
+  for tbl in tbls:
+    print tbl
+    pkgs = load_pkgs(None, DB = tbl)
+    for pkg in pkgs:
+      for k,v in pkg.querys.items():
+        map(lambda x : counter[pkg.app][x].add(tbl), v)
+  for app in counter:
+    for k in counter[app]:
+      print "%s\t%s\t%d" % (app, k.encode("utf-8").replace('\n',''), len(counter[app][k]))
+batchTest()
