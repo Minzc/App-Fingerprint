@@ -770,15 +770,32 @@ def batchTest(outputfile):
   fw.close()
   fw = open(outputfile+".score", 'w')
   Rule = namedtuple('Rule', 'secdomain,key,score,app')
-  rules = []
+  rules = defaultdict([])
   for secdomain in score:
     for key in score[secdomain]:
-      rules.append(Rule(secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
+      rules[secdomain].append(Rule(secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
       fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
   fw.close()
-  rules = sorted(rules, key=lambda rule: rule.score, reverse = True)
-  for rule in rules:
-    print rule.score
+  for secdomain in rules:
+    rules[secdomain] = sorted(rules[secdomain], key=lambda rule: rule.score, reverse = True)
+
+  ruleCover = defaultdict(int)
+  covered_app = set()
+  for tbl in totalPkgs:
+    for pkg in totalPkgs[tbl]:
+      if pkg.secdomain in rules:
+        for rule in rules[pkg.secdomain]:
+          if rule.key in pkg.querys:
+            ruleCover[rule] += 1
+            covered_app.add(pkg.app)
+            continue
+  fw = open(outputfile+'.rst', 'w')
+  for rule in ruleCover:
+    fw.write("%s\t%s\t%s\t%s\n" % ( rule.secdomain, rule.key, rule.score, rule.app))
+  fw.write("Covered App:" + str(len(covered_app)) + "\n")
+  fw.close()
+  
+
 
 if __name__ == '__main__':
   print sys.argv[1]
