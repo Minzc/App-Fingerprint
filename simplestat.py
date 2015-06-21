@@ -721,8 +721,6 @@ def findExpApps():
         print app
 
 def rmOtherApp(tbls=["packages_20150210", "packages_20150429", "packages_20150509", "packages_20150526"]):
-    print tbls
-    return
     QUERY = "DELETE FROM " + tbl + " WHERE app=\'%s\'"
     def loadExpApp():
         expApp=set()
