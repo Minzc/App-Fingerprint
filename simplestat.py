@@ -777,7 +777,8 @@ def batchTest(outputfile):
       fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
   fw.close()
   sorted(rules, key=lambda rule: rule.score, reverse = True)
-  print rules[0].score
+  for rule in rules:
+    print rule.score
 
 if __name__ == '__main__':
   print sys.argv[1]
