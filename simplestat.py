@@ -776,7 +776,7 @@ def batchTest(outputfile):
       rules.append(Rule(secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
       fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
   fw.close()
-  sorted(rules, key=lambda rule: rule.score, reverse = True)
+  rules = sorted(rules, key=lambda rule: rule.score, reverse = True)
   for rule in rules:
     print rule.score
 
