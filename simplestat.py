@@ -764,6 +764,11 @@ def batchTest(outputfile):
             except:
               pass
   fw.close()
+  fw = open(outputfile+".score", 'w')
+  for secdomain in score:
+    for key in score[secdomain]:
+      fw.write("%s %s %s\n", secdomain, key, score[secdomain][key])
+  fw.close()
 
 if __name__ == '__main__':
   print sys.argv[1]
