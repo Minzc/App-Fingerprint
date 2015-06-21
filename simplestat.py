@@ -755,11 +755,16 @@ def batchTest(outputfile):
         map(lambda x : valueCounter[x].add(pkg.app), v)
   fw = open(outputfile, 'w')
   score = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
+  violate = defaultdict(lambda : defaultdict(set))
+  covered = defaultdict(lambda : defaultdict(set))
   for secdomain in counter:
     for app in counter[secdomain]:
       for k in counter[secdomain][app]:
         for v in counter[secdomain][app][k]:
-          if len(valueCounter[v]) == 1 and len(counter[secdomain][app][k]) == 1:
+          covered[secdomain][k].add(app)
+          if len(counter[secdomain][app][k]) > 1:
+            violate[secdomain][k].add(app)
+          if len(valueCounter[v]) == 1:
             k = k.replace("\t", "")
             score[secdomain][k]['score'] += len(counter[secdomain][app][k][v])
             score[secdomain][k]['app'].add(app)
@@ -773,6 +778,8 @@ def batchTest(outputfile):
   rules = defaultdict(list)
   for secdomain in score:
     for key in score[secdomain]:
+      if float(len(violate[secdomain][key])) / float(len(covered[secdomain][key])) > 0.1:
+        continue
       rules[secdomain].append(Rule(secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
       fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
   fw.close()
@@ -786,7 +793,6 @@ def batchTest(outputfile):
       if pkg.secdomain in rules:
         print secdomain
         for rule in rules[pkg.secdomain]:
-          print rule.score
           if rule.key in pkg.querys:
             ruleCover[rule] += 1
             covered_app.add(pkg.app)
