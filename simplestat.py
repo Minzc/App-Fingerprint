@@ -784,7 +784,9 @@ def batchTest(outputfile):
   for tbl in totalPkgs:
     for pkg in totalPkgs[tbl]:
       if pkg.secdomain in rules:
+        print secdomain
         for rule in rules[pkg.secdomain]:
+          print rule.score
           if rule.key in pkg.querys:
             ruleCover[rule] += 1
             covered_app.add(pkg.app)
