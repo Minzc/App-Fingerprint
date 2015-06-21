@@ -791,7 +791,7 @@ def batchTest(outputfile):
             ruleCover[rule] += 1
             covered_app.add(pkg.app)
             print 'match'
-            continue
+            break
   fw = open(outputfile+'.rst', 'w')
   for rule in ruleCover:
     fw.write("%s\t%s\t%s\t%s\t%s\n" % ( rule.secdomain, rule.key, rule.score, rule.app, ruleCover[rule]))
