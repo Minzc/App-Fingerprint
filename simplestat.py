@@ -754,7 +754,7 @@ def batchTest(outputfile):
   for app in counter:
     for k in counter[app]:
       if len(valueCounter[k]) == 1:
-        fw.write("%s %s %s\n" % (app, k.encode("utf-8").replace('\n','').replace(' ', ''), len(counter[app][k])))
+        fw.write("%s %s %s\n" % (app, k.replace('\n','').replace(' ', ''), len(counter[app][k])))
   fw.close()
 
 if __name__ == '__main__':
