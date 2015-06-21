@@ -737,7 +737,7 @@ def rmOtherApp(tbl):
             sqldao.commit()
     sqldao.close()
 
-def batchTest():
+def batchTest(outputfile):
   tbls = ["packages_20150210", "packages_20150429", "packages_20150509", "packages_20150526"]
   counter = defaultdict(lambda : defaultdict(set))
   valueCounter = defaultdict(set)
@@ -748,14 +748,16 @@ def batchTest():
       for k,v in pkg.querys.items():
         map(lambda x : counter[pkg.app][x].add(tbl), v)
         map(lambda x : valueCounter[x].add(pkg.app), v)
+  fw = open(outfile, 'w')
   for app in counter:
     for k in counter[app]:
       if len(valueCounter[k]) == 1:
-        print app, k.encode("utf-8").replace('\n','').replace(' ', ''), len(counter[app][k])
+        fw.write("%s %s %s\n" % app, k.encode("utf-8").replace('\n','').replace(' ', ''), len(counter[app][k]))
+  fw.close()
 
 if __name__ == '__main__':
   print sys.argv[1]
   if sys.argv[1] == 'rmOtherApp':
     rmOtherApp(sys.argv[2])
   elif sys.argv[1] == 'batchTest':
-    batchTest()
+    batchTest(sys.argv[2])
