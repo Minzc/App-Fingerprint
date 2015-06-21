@@ -748,5 +748,5 @@ def batchTest():
         map(lambda x : counter[pkg.app][x].add(tbl), v)
   for app in counter:
     for k in counter[app]:
-      print "%s\t%s\t%d" % (app, k.encode("utf-8").replace('\n',''), len(counter[app][k]))
+      print app, k.encode("utf-8").replace('\n',''), len(counter[app][k])
 batchTest()
