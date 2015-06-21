@@ -745,6 +745,9 @@ def batchTest(outputfile):
   valueCounter = defaultdict(set)
   hostTokenCounter = defaultdict(int)
   totalPkgs = {}
+  ##################
+  # Load Data
+  ##################
   for tbl in tbls:
     print tbl
     pkgs = load_pkgs(None, DB = tbl)
@@ -753,6 +756,7 @@ def batchTest(outputfile):
       for k,v in pkg.querys.items():
         map(lambda x : counter[pkg.secdomain][pkg.app][k][x].add(tbl), v)
         map(lambda x : valueCounter[x].add(pkg.app), v)
+
   fw = open(outputfile, 'w')
   score = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
   violate = defaultdict(lambda : defaultdict(set))
@@ -778,8 +782,8 @@ def batchTest(outputfile):
   rules = defaultdict(list)
   for secdomain in score:
     for key in score[secdomain]:
-      if float(len(violate[secdomain][key])) / float(len(covered[secdomain][key])) > 0.1:
-        continue
+      #if float(len(violate[secdomain][key])) / float(len(covered[secdomain][key])) > 0.1:
+      #  continue
       rules[secdomain].append(Rule(secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
       fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
   fw.close()
