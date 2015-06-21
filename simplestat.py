@@ -747,7 +747,7 @@ def batchTest():
     for pkg in pkgs:
       for k,v in pkg.querys.items():
         map(lambda x : counter[pkg.app][x].add(tbl), v)
-        map(lambda x : valueCounter[x].add(pkg.app))
+        map(lambda x : valueCounter[x].add(pkg.app), v)
   for app in counter:
     for k in counter[app]:
       if len(valueCounter[k]) == 1:
