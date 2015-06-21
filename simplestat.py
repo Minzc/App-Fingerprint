@@ -753,7 +753,7 @@ def batchTest(outputfile):
         map(lambda x : valueCounter[x].add(pkg.app), v)
   fw = open(outputfile, 'w')
   Record = namedtuple('Record','app, score')
-  score = defaultdict(lambda : defaultdict(Record(set(), 0)))
+  score = defaultdict(lambda : defaultdict(lambda : Record(set(), 0)))
   for secdomain in counter:
     for app in counter[secdomain]:
       for k in counter[secdomain][app]:
