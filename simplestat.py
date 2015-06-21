@@ -757,7 +757,7 @@ def batchTest(outputfile):
     for app in counter[secdomain]:
       for k in counter[secdomain][app]:
         for v in counter[secdomain][app][k]:
-          if len(valueCounter[v]) == 1:
+          if len(valueCounter[v]) == 1 and len(counter[secdomain][app][k]) == 1:
             k = k.replace("\t", "")
             score[secdomain][k]['score'] += len(counter[secdomain][app][k][v])
             score[secdomain][k]['app'].add(app)
