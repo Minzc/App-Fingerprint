@@ -741,23 +741,28 @@ def rmOtherApp(tbls=["packages_20150210", "packages_20150429", "packages_2015050
 
 def batchTest(outputfile):
   tbls = ["packages_20150210", "packages_20150429", "packages_20150509", "packages_20150526"]
-  counter = defaultdict(lambda : defaultdict(set))
+  counter = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
   valueCounter = defaultdict(set)
+  hostTokenCounter = defaultdict(int)
   for tbl in tbls:
     print tbl
     pkgs = load_pkgs(None, DB = tbl)
     for pkg in pkgs:
       for k,v in pkg.querys.items():
-        map(lambda x : counter[pkg.app][x].add(tbl), v)
+        map(lambda x : counter[pkg.secdomain][pkg.app][k][x].add(tbl), v)
         map(lambda x : valueCounter[x].add(pkg.app), v)
   fw = open(outputfile, 'w')
-  for app in counter:
-    for k in counter[app]:
-      if len(valueCounter[k]) == 1:
-        try:
-          fw.write("%s %s %s\n" % (app, k.replace('\n','').replace(' ', ''), len(counter[app][k])))
-        except:
-          pass
+  score = defaultdict(lambda : defaultdict(int))
+  for secdomain in counter:
+    for app in counter[secdomain]:
+      for k in counter[secdomain][app]:
+        for v in counter[secdomain][app][k]:
+          if len(valueCounter[v]) == 1:
+            score[secdomain][k] += len(counter[secdomain][app][k])
+            try:
+              fw.write("%s %s %s %s\n" % (secdomain, app, k, v.replace('\n','').replace(' ', ''), len(counter[secdomain][app][k])))
+            except:
+              pass
   fw.close()
 
 if __name__ == '__main__':
