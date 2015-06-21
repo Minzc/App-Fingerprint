@@ -767,7 +767,7 @@ def batchTest(outputfile):
   fw = open(outputfile+".score", 'w')
   for secdomain in score:
     for key in score[secdomain]:
-      fw.write("%s %s %s\n", (secdomain, key, score[secdomain][key]))
+      fw.write("%s %s %s\n" % (secdomain, key, score[secdomain][key]))
   fw.close()
 
 if __name__ == '__main__':
