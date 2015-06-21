@@ -790,6 +790,7 @@ def batchTest(outputfile):
           if rule.key in pkg.querys:
             ruleCover[rule] += 1
             covered_app.add(pkg.app)
+            print 'match'
             continue
   fw = open(outputfile+'.rst', 'w')
   for rule in ruleCover:
