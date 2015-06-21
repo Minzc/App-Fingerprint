@@ -744,9 +744,11 @@ def batchTest(outputfile):
   counter = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
   valueCounter = defaultdict(set)
   hostTokenCounter = defaultdict(int)
+  totalPkgs = {}
   for tbl in tbls:
     print tbl
     pkgs = load_pkgs(None, DB = tbl)
+    totalPkgs[tbl] = pkgs
     for pkg in pkgs:
       for k,v in pkg.querys.items():
         map(lambda x : counter[pkg.secdomain][pkg.app][k][x].add(tbl), v)
@@ -767,10 +769,15 @@ def batchTest(outputfile):
               pass
   fw.close()
   fw = open(outputfile+".score", 'w')
+  Rule = namedtuple('Rule', 'secdomain,key,score,app')
+  rules = []
   for secdomain in score:
     for key in score[secdomain]:
+      rules.append(Rule(secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
       fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
   fw.close()
+  sorted(rules, key=lambda rule: rule.score, reverse = True)
+  print rules[0].score
 
 if __name__ == '__main__':
   print sys.argv[1]
