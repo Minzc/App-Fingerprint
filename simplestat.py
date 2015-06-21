@@ -719,7 +719,7 @@ def findExpApps():
     for app in rst:
         print app
 
-def rmOtherApp(tbl):
+def rmOtherApp(tbls=["packages_20150210", "packages_20150429", "packages_20150509", "packages_20150526"]):
     QUERY = "DELETE FROM " + tbl + " WHERE app=\'%s\'"
     def loadExpApp():
         expApp=set()
@@ -729,12 +729,13 @@ def rmOtherApp(tbl):
     expApp = loadExpApp()
     apps = set()
     sqldao = SqlDao()
-    for app in sqldao.execute("SELECT distinct app FROM %s" % tbl):
-        apps.add(app[0])
-    for app in apps:
-        if app not in expApp:
-            sqldao.execute(QUERY % (app))
-            sqldao.commit()
+    for tbl in tbls:
+      for app in sqldao.execute("SELECT distinct app FROM %s" % tbl):
+          apps.add(app[0])
+      for app in apps:
+          if app not in expApp:
+              sqldao.execute(QUERY % (app))
+              sqldao.commit()
     sqldao.close()
 
 def batchTest(outputfile):
@@ -758,6 +759,9 @@ def batchTest(outputfile):
 if __name__ == '__main__':
   print sys.argv[1]
   if sys.argv[1] == 'rmOtherApp':
-    rmOtherApp(sys.argv[2])
+    if len(sys.argv) > 2:
+      rmOtherApp(sys.argv[2:])
+    else:
+      rmOtherApp()
   elif sys.argv[1] == 'batchTest':
     batchTest(sys.argv[2])
