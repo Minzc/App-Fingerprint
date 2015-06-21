@@ -752,4 +752,10 @@ def batchTest():
     for k in counter[app]:
       if len(valueCounter[k]) == 1:
         print app, k.encode("utf-8").replace('\n','').replace(' ', ''), len(counter[app][k])
-batchTest()
+
+if __name__ == '__main__':
+  print sys.argv[1]
+  if sys.argv[1] == 'rmOtherApp':
+    rmOtherApp(sys.argv[2])
+  elif sys.argv[1] == 'batchTest':
+    batchTest()
