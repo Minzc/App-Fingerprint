@@ -758,7 +758,7 @@ def batchTest(outputfile):
       for k in counter[secdomain][app]:
         for v in counter[secdomain][app][k]:
           if len(valueCounter[v]) == 1:
-            score[secdomain][k]['score'] += len(counter[secdomain][app][k])
+            score[secdomain][k]['score'] += len(counter[secdomain][app][k][v])
             score[secdomain][k]['app'].add(app)
             try:
               fw.write("%s %s %s %s\n" % (secdomain, app, k, v.replace('\n','').replace(' ', ''), len(counter[secdomain][app][k])))
