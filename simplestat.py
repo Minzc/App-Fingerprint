@@ -721,7 +721,6 @@ def findExpApps():
         print app
 
 def rmOtherApp(tbls=["packages_20150210", "packages_20150429", "packages_20150509", "packages_20150526"]):
-    QUERY = "DELETE FROM " + tbl + " WHERE app=\'%s\'"
     def loadExpApp():
         expApp=set()
         for app in open("resource/exp_app.txt"):
@@ -731,6 +730,7 @@ def rmOtherApp(tbls=["packages_20150210", "packages_20150429", "packages_2015050
     apps = set()
     sqldao = SqlDao()
     for tbl in tbls:
+      QUERY = "DELETE FROM " + tbl + " WHERE app=\'%s\'"
       for app in sqldao.execute("SELECT distinct app FROM %s" % tbl):
           apps.add(app[0])
       for app in apps:
