@@ -6,7 +6,7 @@ from nltk import FreqDist
 from utils import loadfile, Relation, top_domain, lower_all, app_clean, load_pkgs
 from sqldao import SqlDao
 from package import Package
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 
 def stat_path():
     sqldao = SqlDao()
