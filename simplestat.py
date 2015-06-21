@@ -740,13 +740,16 @@ def rmOtherApp(tbl):
 def batchTest():
   tbls = ["packages_20150210", "packages_20150429", "packages_20150509", "packages_20150526"]
   counter = defaultdict(lambda : defaultdict(set))
+  valueCounter = defaultdict(set)
   for tbl in tbls:
     print tbl
     pkgs = load_pkgs(None, DB = tbl)
     for pkg in pkgs:
       for k,v in pkg.querys.items():
         map(lambda x : counter[pkg.app][x].add(tbl), v)
+        map(lambda x : valueCounter[x].add(pkg.app))
   for app in counter:
     for k in counter[app]:
-      print app, k.encode("utf-8").replace('\n','').replace(' ', ''), len(counter[app][k])
+      if len(valueCounter[k]) == 1:
+        print app, k.encode("utf-8").replace('\n','').replace(' ', ''), len(counter[app][k])
 batchTest()
