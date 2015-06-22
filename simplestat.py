@@ -801,7 +801,7 @@ def batchTest(outputfile):
           if rule.key in pkg.querys:
             ruleCover[rule] += 1
             covered_app.add(pkg.app)
-            specific_rules[pkg.secdomain][rule.key][pkg.query[rule.key]][rule.app]=rule.score
+            specific_rules[pkg.secdomain][rule.key][pkg.queries[rule.key]][rule.app]=rule.score
             if rule.app != pkg.app:
               print 'ERROR==='
 
