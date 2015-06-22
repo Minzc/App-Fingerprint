@@ -783,7 +783,10 @@ def batchTest(outputfile):
       if len(score[secdomain][key]['app']) == 1 or score[secdomain][key]['score'] == 0:
         continue
       general_rules[secdomain].append(Rule(secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
-      fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
+      try:
+        fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
+      except:
+        pass
   fw.close()
   for secdomain in rules:
     rules[secdomain] = sorted(rules[secdomain], key=lambda rule: rule.score, reverse = True)
@@ -804,7 +807,10 @@ def batchTest(outputfile):
 
   fw = open(outputfile+'.rule_cover', 'w')
   for rule in ruleCover:
-    fw.write("%s\t%s\t%s\t%s\t%s\n" % ( rule.secdomain, rule.key, rule.score, rule.app, ruleCover[rule]))
+    try:
+      fw.write("%s\t%s\t%s\t%s\t%s\n" % ( rule.secdomain, rule.key, rule.score, rule.app, ruleCover[rule]))
+    except:
+      pass
   fw.write("Covered App:" + str(len(covered_app)) + "\n")
   fw.close()
   
@@ -813,7 +819,10 @@ def batchTest(outputfile):
     for key in specific_rules[secdomain]:
       for app in specific_rules[secdomain][key]:
         for value in specific_rules[secdomain][key][app]:
-          fw.write("%s\t%s\t%s\t%s\t%s\n" % ( secdomain, key, app, value, specific_rules[secdomain][key][app]))
+          try:
+            fw.write("%s\t%s\t%s\t%s\t%s\n" % ( secdomain, key, app, value, specific_rules[secdomain][key][app]))
+          except:
+            pass
   fw.close()
 
 
