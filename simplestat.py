@@ -757,7 +757,6 @@ def batchTest(outputfile):
         map(lambda x : counter[pkg.secdomain][pkg.app][k][x].add(tbl), v)
         map(lambda x : valueCounter[x].add(pkg.app), v)
 
-  fw = open(outputfile, 'w')
   score = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
   violate = defaultdict(lambda : defaultdict(set))
   covered = defaultdict(lambda : defaultdict(set))
@@ -770,7 +769,7 @@ def batchTest(outputfile):
             violate[secdomain][k].add(app)
           if len(valueCounter[v]) == 1:
             k = k.replace("\t", "")
-            score[secdomain][k]['score'] += len(counter[secdomain][app][k][v])
+            score[secdomain][k]['score'] += (len(counter[secdomain][app][k][v]) - 1)
             score[secdomain][k]['app'].add(app)
             try:
               fw.write("%s %s %s %s\n" % (secdomain, app, k, v.replace('\n','').replace(' ', ''), len(counter[secdomain][app][k])))
