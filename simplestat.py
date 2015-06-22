@@ -768,9 +768,9 @@ def batchTest(outputfile):
           if len(counter[secdomain][app][k]) > 1:
             violate[secdomain][k].add(app)
           if len(valueCounter[v]) == 1:
-            k = k.replace("\t", "")
-            score[secdomain][k]['score'] += (len(counter[secdomain][app][k][v]) - 1) / float(len(counter[secdomain][app][k]))
-            score[secdomain][k]['app'].add(app)
+            cleaned_k = k.replace("\t", "")
+            score[secdomain][cleaned_k]['score'] += (len(counter[secdomain][app][k][v]) - 1) / float(len(counter[secdomain][app][k]))
+            score[secdomain][cleaned_k]['app'].add(app)
             try:
               fw.write("%s %s %s %s\n" % (secdomain, app, k, v.replace('\n','').replace(' ', ''), len(counter[secdomain][app][k])))
             except:
