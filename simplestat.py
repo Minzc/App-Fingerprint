@@ -740,7 +740,7 @@ def rmOtherApp(tbls=["packages_20150210", "packages_20150429", "packages_2015050
     sqldao.close()
 
 def batchTest(outputfile):
-  tbls = ["packages_20150210", "packages_20150429", "packages_20150509", "packages_20150526"]
+  tbls = ["packages_20150210", "packages_20150615", "packages_20150509", "packages_20150526"]
   counter = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
   valueCounter = defaultdict(set)
   hostTokenCounter = defaultdict(int)
@@ -789,7 +789,7 @@ def batchTest(outputfile):
         pass
   fw.close()
   for secdomain in general_rules:
-    general_rules[secdomain] = sorted(rules[secdomain], key=lambda rule: rule.score, reverse = True)
+    general_rules[secdomain] = sorted(general_rules[secdomain], key=lambda rule: rule.score, reverse = True)
 
   specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
   ruleCover = defaultdict(int)
