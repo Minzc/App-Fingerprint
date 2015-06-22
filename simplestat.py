@@ -788,8 +788,8 @@ def batchTest(outputfile):
       except:
         pass
   fw.close()
-  for secdomain in rules:
-    rules[secdomain] = sorted(rules[secdomain], key=lambda rule: rule.score, reverse = True)
+  for secdomain in general_rules:
+    general_rules[secdomain] = sorted(rules[secdomain], key=lambda rule: rule.score, reverse = True)
 
   specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
   ruleCover = defaultdict(int)
@@ -797,7 +797,7 @@ def batchTest(outputfile):
   for tbl in totalPkgs:
     for pkg in totalPkgs[tbl]:
       if pkg.secdomain in rules:
-        for rule in rules[pkg.secdomain]:
+        for rule in general_rules[pkg.secdomain]:
           if rule.key in pkg.querys:
             ruleCover[rule] += 1
             covered_app.add(pkg.app)
