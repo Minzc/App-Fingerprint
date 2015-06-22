@@ -740,7 +740,7 @@ def rmOtherApp(tbls=["packages_20150210", "packages_20150429", "packages_2015050
     sqldao.close()
 
 def batchTest(outputfile):
-  tbls = ["packages_20150210", "packages_20150615", "packages_20150509", "packages_20150526"]
+  tbls = ["packages_20150210", "packages_20150616", "packages_20150509", "packages_20150526"]
   counter = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
   valueCounter = defaultdict(set)
   hostTokenCounter = defaultdict(int)
@@ -796,12 +796,12 @@ def batchTest(outputfile):
   covered_app = set()
   for tbl in totalPkgs:
     for pkg in totalPkgs[tbl]:
-      if pkg.secdomain in rules:
+      if pkg.secdomain in general_rules:
         for rule in general_rules[pkg.secdomain]:
           if rule.key in pkg.querys:
             ruleCover[rule] += 1
             covered_app.add(pkg.app)
-            specific_rules[pkg.secdomain][rule.key][pkg.query[rule.key]][rule.app][rule.score]
+            specific_rules[pkg.secdomain][rule.key][pkg.query[rule.key]][rule.app]=rule.score
             if rule.app != pkg.app:
               print 'ERROR==='
 
@@ -820,10 +820,44 @@ def batchTest(outputfile):
       for app in specific_rules[secdomain][key]:
         for value in specific_rules[secdomain][key][app]:
           try:
-            fw.write("%s\t%s\t%s\t%s\t%s\n" % ( secdomain, key, app, value, specific_rules[secdomain][key][app]))
+            fw.write("%s\t%s\t%s\t%s\t%s\n" % ( secdomain, key, value, app, specific_rules[secdomain][key][app]))
           except:
             pass
   fw.close()
+
+
+  ###################
+  # Test
+  ###################
+  pkgs = load_pkgs(None, DB = 'packages_20150429')
+  predict_rst = {}
+  for pkg in pkgs:
+    max_score = -1
+    predict_app = None
+    if pkg.secdomain in specific_rules:
+      for k in specific_rules[pkg.secdomain]:
+        if k in pkg.queries and specific_rules[pkg.secdomain][k] == pkg.queries[k]:
+          v = pkg.queries[k]
+          for app, score in specific_rules[pkg.secdomain][k][v].iteritems():
+            if score > max_score:
+              predict_app = app
+    predict_rst[pkg.id] = (predict_app, pkg.app)
+
+    #################
+    # Evaluate
+    #################
+    covered_app = set()
+    precision = 0
+    recall = 0
+    total = len(predict_rst)
+    for value in predict_rst.values():
+      if value[0] != None:
+        recall += 1
+        if value[0] == value[1]:
+          precision += 1
+          covered_app.add(value[1])
+    print "Precision: %s Recall: %s App: %s" % (float(precision)/total, float(recall).total, len(covered_app))
+
 
 
 if __name__ == '__main__':
