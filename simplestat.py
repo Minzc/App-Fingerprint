@@ -775,7 +775,6 @@ def batchTest(outputfile):
               fw.write("%s %s %s %s\n" % (secdomain, app, k, v.replace('\n','').replace(' ', ''), len(counter[secdomain][app][k])))
             except:
               pass
-  fw.close()
   fw = open(outputfile+".score", 'w')
   Rule = namedtuple('Rule', 'secdomain,key,score,app')
   rules = defaultdict(list)
