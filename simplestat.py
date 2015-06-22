@@ -777,35 +777,44 @@ def batchTest(outputfile):
               pass
   fw = open(outputfile+".score", 'w')
   Rule = namedtuple('Rule', 'secdomain,key,score,app')
-  rules = defaultdict(list)
+  general_rules = defaultdict(list)
   for secdomain in score:
     for key in score[secdomain]:
-      #if float(len(violate[secdomain][key])) / float(len(covered[secdomain][key])) > 0.1:
-      #  continue
-      rules[secdomain].append(Rule(secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
+      if len(score[secdomain][key]['app']) == 1 or score[secdomain][key]['score'] == 0:
+        continue
+      general_rules[secdomain].append(Rule(secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
       fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
   fw.close()
   for secdomain in rules:
     rules[secdomain] = sorted(rules[secdomain], key=lambda rule: rule.score, reverse = True)
 
+  specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
   ruleCover = defaultdict(int)
   covered_app = set()
   for tbl in totalPkgs:
     for pkg in totalPkgs[tbl]:
       if pkg.secdomain in rules:
-        print secdomain
         for rule in rules[pkg.secdomain]:
           if rule.key in pkg.querys:
             ruleCover[rule] += 1
             covered_app.add(pkg.app)
-            print 'match'
-            break
-  fw = open(outputfile+'.rst', 'w')
+            specific_rules[pkg.secdomain][rule.key][pkg.query[rule.key]][rule.app][rule.score]
+            if rule.app != pkg.app:
+              print 'ERROR==='
+
+  fw = open(outputfile+'.rule_cover', 'w')
   for rule in ruleCover:
     fw.write("%s\t%s\t%s\t%s\t%s\n" % ( rule.secdomain, rule.key, rule.score, rule.app, ruleCover[rule]))
   fw.write("Covered App:" + str(len(covered_app)) + "\n")
   fw.close()
   
+  fw = open(outputfile+'.total_rules', 'w')
+  for secdomain in specific_rules:
+    for key in specific_rules[secdomain]:
+      for app in specific_rules[secdomain][key]:
+        for value in specific_rules[secdomain][key][app]:
+          fw.write("%s\t%s\t%s\t%s\t%s\n" % ( secdomain, key, app, value, specific_rules[secdomain][key][app]))
+  fw.close()
 
 
 if __name__ == '__main__':
