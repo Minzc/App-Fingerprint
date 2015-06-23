@@ -816,7 +816,7 @@ def batchTest(outputfile):
   for secdomain in debug:
     for token in debug[secdomain]:
       for value in debug[secdomain][token]:
-        fw.write("%s\t%s\t%s\t%s\n", % (secdomain, token, value, debug[secdomain][token][value]))
+        fw.write("%s\t%s\t%s\t%s\n" % ( secdomain, token, value, debug[secdomain][token][value] ))
   fw.close()
 
 
