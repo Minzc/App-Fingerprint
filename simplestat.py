@@ -8,69 +8,8 @@ from sqldao import SqlDao
 from package import Package
 from collections import defaultdict, namedtuple
 
-def stat_path():
-    sqldao = SqlDao()
-    counter = FreqDist()
-    records = load_pkgs()
-
-    count = 0
-    l_max = 0
-    total = 0
-    for pk in records:
-        counter.inc(pk.app)
-    # l = set()
-    # pathsegs = filter(None,pk.path.split('/'))
-    # for i in pathsegs:
-    # if len(i) < 2:
-    # 		continue
-    # 	l.add(i.replace(' ',''))
-    # 	counter.inc(i.replace(' ',''))
-
-    # queries = pk.querys
-    # for k, vs in filter(None,queries.items()):
-    # 	if len(k) < 2:
-    # 		continue
-    # 	counter.inc(k.replace(' ',''))
-    # 	l.add(k.replace(' ',''))
-    # 	for v in vs:
-    # 		if len(v) < 2:
-    # 			continue
-    # 		l.add(v.replace(' ',''))
-    # 		counter.inc(v.replace(' ','').replace('\n',''))
-
-    # for head_seg in filter(None,pk.add_header.split('\n')):
-    # 	if len(head_seg) < 2:
-    # 		continue
-    # 	l.add(head_seg.replace(' ','').replace(' ','').strip())
-    # 	counter.inc(head_seg.replace(' ','').replace(' ','').strip())
-
-    # for agent_seg in filter(None,pk.agent.split(' ')):
-    # 	if len(agent_seg) < 2:
-    # 		continue
-    # 	l.add(agent_seg.replace(' ','').replace(' ',''))
-    # 	counter.inc(agent_seg.replace(' ',''))
-    # l_max = max(l_max, len(l))
-    # total += len(l)
-
-    for k, v in counter.items():
-        print v
 
 
-def stat_add_header():
-    sqldao = SqlDao()
-    counter = Relation()
-    for app, header in sqldao.execute('select app, add_header from packages where httptype = \'0\' '):
-        headers = {h.split(':')[0] for h in header.split('\n')}
-        for h in headers:
-            counter.add(h, app)
-    sort = FreqDist()
-    for k, v in counter.get().items():
-        sort.inc(k, len(v))
-    for k, v in sort.items():
-        print k, v
-
-
-# stat_add_header()
 
 def stat_hstNapp(filepath):
     counter = FreqDist()
@@ -873,7 +812,7 @@ def batchTest(outputfile):
       else:
         print value[0], value[1]
   print "Precision: %s Recall: %s App: %s" % (float(precision)/total, float(recall) / total, len(covered_app))
-  fw = open(outputfile+'.debug')
+  fw = open(outputfile+'.debug', 'w')
   for secdomain in debug:
     for token in debug[secdomain]:
       for value in debug[secdomain][token]:
