@@ -791,7 +791,7 @@ def batchTest(outputfile):
   for secdomain in general_rules:
     general_rules[secdomain] = sorted(general_rules[secdomain], key=lambda rule: rule.score, reverse = True)
 
-  specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
+  specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
   ruleCover = defaultdict(int)
   covered_app = set()
   for tbl in totalPkgs:
@@ -801,9 +801,11 @@ def batchTest(outputfile):
           if rule.key in pkg.querys:
             ruleCover[rule] += 1
             covered_app.add(pkg.app)
-            specific_rules[pkg.secdomain][rule.key][pkg.querys[rule.key]][rule.app]=rule.score
-            if rule.app != pkg.app:
-              print 'ERROR==='
+            for value in pkg.querys[rule.key]:
+              specific_rules[pkg.secdomain][rule.key][value][rule.app]['score'] = rule.score
+              specific_rules[pkg.secdomain][rule.key][value][rule.app]['count'] += 1
+              if rule.app != pkg.app:
+                print 'ERROR==='
 
   fw = open(outputfile+'.rule_cover', 'w')
   for rule in ruleCover:
@@ -833,14 +835,21 @@ def batchTest(outputfile):
   predict_rst = {}
   for pkg in pkgs:
     max_score = -1
+    occur_count = -1
     predict_app = None
     if pkg.secdomain in specific_rules:
       for k in specific_rules[pkg.secdomain]:
         if k in pkg.queries and specific_rules[pkg.secdomain][k] == pkg.queries[k]:
           v = pkg.queries[k]
-          for app, score in specific_rules[pkg.secdomain][k][v].iteritems():
+          for app, score_count in specific_rules[pkg.secdomain][k][v].iteritems():
+            score,count = score_count['score'], score_count['count']
             if score > max_score:
               predict_app = app
+              max_score = score
+              occur_count = count
+            elif score == max_score and count > occur_count:
+              predict_app = app
+              occur_count = count
     predict_rst[pkg.id] = (predict_app, pkg.app)
 
     #################
