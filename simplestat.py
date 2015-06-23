@@ -805,7 +805,7 @@ def batchTest(outputfile):
               specific_rules[pkg.secdomain][rule.key][value][rule.app]['score'] = rule.score
               specific_rules[pkg.secdomain][rule.key][value][rule.app]['count'] += 1
               if rule.app != pkg.app:
-                print 'ERROR==='
+                print 'ERROR===', rule.app, pkg.app
 
   fw = open(outputfile+'.rule_cover', 'w')
   for rule in ruleCover:
@@ -843,6 +843,7 @@ def batchTest(outputfile):
           for v in pkg.querys[k]:
             if v in specific_rules[pkg.secdomain][k]:
               for app, score_count in specific_rules[pkg.secdomain][k][v].iteritems():
+                print app
                 score,count = score_count['score'], score_count['count']
                 if score > max_score:
                   predict_app = app
@@ -863,7 +864,6 @@ def batchTest(outputfile):
   for value in predict_rst.values():
     if value[0] != None:
       recall += 1
-      print value[0], value[1]
       if value[0] == value[1]:
         precision += 1
         covered_app.add(value[1])
