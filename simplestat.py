@@ -144,10 +144,6 @@ def statUrlToken(filepath):
     loadfile(filepath, parser)
 
 
-def stat_relation(filepath, col1, col2, outfile):
-    """
-    Number of times col1 and col2 co-occure
-    """
 
 
 from nltk import FreqDist
@@ -877,7 +873,7 @@ def batchTest(outputfile):
       else:
         print value[0], value[1]
   print "Precision: %s Recall: %s App: %s" % (float(precision)/total, float(recall) / total, len(covered_app))
-  fw = open(outfile+'.debug')
+  fw = open(outputfile+'.debug')
   for secdomain in debug:
     for token in debug[secdomain]:
       for value in debug[secdomain][token]:
