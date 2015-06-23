@@ -839,17 +839,18 @@ def batchTest(outputfile):
     predict_app = None
     if pkg.secdomain in specific_rules:
       for k in specific_rules[pkg.secdomain]:
-        if k in pkg.queries and specific_rules[pkg.secdomain][k] == pkg.queries[k]:
-          v = pkg.queries[k]
-          for app, score_count in specific_rules[pkg.secdomain][k][v].iteritems():
-            score,count = score_count['score'], score_count['count']
-            if score > max_score:
-              predict_app = app
-              max_score = score
-              occur_count = count
-            elif score == max_score and count > occur_count:
-              predict_app = app
-              occur_count = count
+        if k in pkg.querys:
+          for v in pkg.querys[k]:
+            if v in specific_rules[pkg.secdomain][k]:
+              for app, score_count in specific_rules[pkg.secdomain][k][v].iteritems():
+                score,count = score_count['score'], score_count['count']
+                if score > max_score:
+                  predict_app = app
+                  max_score = score
+                  occur_count = count
+                elif score == max_score and count > occur_count:
+                  predict_app = app
+                  occur_count = count
     predict_rst[pkg.id] = (predict_app, pkg.app)
 
     #################
