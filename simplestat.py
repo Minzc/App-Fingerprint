@@ -830,7 +830,7 @@ def batchTest(outputfile):
   ###################
   pkgs = load_pkgs(None, DB = 'packages_20150429_small')
   predict_rst = {}
-  debug = defaultdict(lambda : defaultdict(lambda defaultdict(int)))
+  debug = defaultdict(lambda : defaultdict(lambda : defaultdict(int)))
   for pkg in pkgs:
     max_score = -1
     occur_count = -1
