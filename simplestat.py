@@ -863,6 +863,7 @@ def batchTest(outputfile):
     for value in predict_rst.values():
       if value[0] != None:
         recall += 1
+        print value[0], value[1]
         if value[0] == value[1]:
           precision += 1
           covered_app.add(value[1])
