@@ -763,17 +763,17 @@ def batchTest(outputfile):
   for secdomain in featureTbl:
     for app in featureTbl[secdomain]:
       for k in featureTbl[secdomain][app]:
-        for v in counter[secdomain][app][k]:
+        for v in featureTbl[secdomain][app][k]:
           covered[secdomain][k].add(app)
-          if len(counter[secdomain][app][k]) > 1:
+          if len(featureTbl[secdomain][app][k]) > 1:
             violate[secdomain][k].add(app)
           if len(valueCounter[v]) == 1:
             print app
             cleaned_k = k.replace("\t", "")
-            keyScore[secdomain][cleaned_k]['score'] += (len(counter[secdomain][app][k][v]) - 1) / float(len(counter[secdomain][app][k]))
+            keyScore[secdomain][cleaned_k]['score'] += (len(featureTbl[secdomain][app][k][v]) - 1) / float(len(featureTbl[secdomain][app][k]))
             keyScore[secdomain][cleaned_k]['app'].add(app)
             try:
-              fw.write("%s %s %s %s\n" % (secdomain, app, k, v.replace('\n','').replace(' ', ''), len(counter[secdomain][app][k])))
+              fw.write("%s %s %s %s\n" % (secdomain, app, k, v.replace('\n','').replace(' ', ''), len(featureTbl[secdomain][app][k])))
             except:
               pass
   fw = open(outputfile+".score", 'w')
