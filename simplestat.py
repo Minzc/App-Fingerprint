@@ -863,6 +863,8 @@ def batchTest(outputfile):
       if value[0] == value[1]:
         precision += 1
         covered_app.add(value[1])
+      else:
+        print value[0], value[1]
   print "Precision: %s Recall: %s App: %s" % (float(precision)/total, float(recall) / total, len(covered_app))
 
 
