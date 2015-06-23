@@ -830,10 +830,12 @@ def batchTest(outputfile):
   ###################
   pkgs = load_pkgs(None, DB = 'packages_20150429_small')
   predict_rst = {}
+  debug = defaultdict(lambda : defaultdict(lambda defaultdict(int)))
   for pkg in pkgs:
     max_score = -1
     occur_count = -1
     predict_app = None
+    token, value, secdomain = None, None, None
     if pkg.secdomain in specific_rules:
       for k in specific_rules[pkg.secdomain]:
         if k in pkg.querys:
@@ -841,14 +843,23 @@ def batchTest(outputfile):
             if v in specific_rules[pkg.secdomain][k]:
               for app, score_count in specific_rules[pkg.secdomain][k][v].iteritems():
                 score,count = score_count['score'], score_count['count']
+                update = False
                 if score > max_score:
                   predict_app = app
                   max_score = score
                   occur_count = count
+                  update = True
                 elif score == max_score and count > occur_count:
                   predict_app = app
                   occur_count = count
+                  update = True
+                if update:
+                  token = k
+                  value = v
+                  secdomain = pkg.secdomain
     predict_rst[pkg.id] = (predict_app, pkg.app)
+    if predict_app != pkg.app:
+      debug[secdomain][token][value] += 1
 
   #################
   # Evaluate
@@ -866,6 +877,12 @@ def batchTest(outputfile):
       else:
         print value[0], value[1]
   print "Precision: %s Recall: %s App: %s" % (float(precision)/total, float(recall) / total, len(covered_app))
+  fw = open(outfile+'.debug')
+  for secdomain in debug:
+    for token in debug[secdomain]:
+      for value in debug[secdomain][token]:
+        fw.write("%s\t%s\t%s\t%s\n", secdomain, token, value, debug[secdomain][token][value])
+  fw.close()
 
 
 
