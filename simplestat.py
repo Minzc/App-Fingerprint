@@ -741,7 +741,7 @@ def rmOtherApp(tbls=["packages_20150210", "packages_20150429", "packages_2015050
 
 def batchTest(outputfile):
   tbls = ["packages_20150210", "packages_20150616", "packages_20150509", "packages_20150526"]
-  counter = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
+  featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
   valueCounter = defaultdict(set)
   hostTokenCounter = defaultdict(int)
   totalPkgs = {}
@@ -754,15 +754,16 @@ def batchTest(outputfile):
     totalPkgs[tbl] = pkgs
     for pkg in pkgs:
       for k,v in pkg.querys.items():
-        map(lambda x : counter[pkg.secdomain][pkg.app][k][x].add(tbl), v)
+        print pkg.app
+        map(lambda x : featureTbl[pkg.secdomain][pkg.app][k][x].add(tbl), v)
         map(lambda x : valueCounter[x].add(pkg.app), v)
 
   score = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
   violate = defaultdict(lambda : defaultdict(set))
   covered = defaultdict(lambda : defaultdict(set))
-  for secdomain in counter:
-    for app in counter[secdomain]:
-      for k in counter[secdomain][app]:
+  for secdomain in featureTbl:
+    for app in featureTbl[secdomain]:
+      for k in featureTbl[secdomain][app]:
         for v in counter[secdomain][app][k]:
           covered[secdomain][k].add(app)
           if len(counter[secdomain][app][k]) > 1:
@@ -843,7 +844,6 @@ def batchTest(outputfile):
           for v in pkg.querys[k]:
             if v in specific_rules[pkg.secdomain][k]:
               for app, score_count in specific_rules[pkg.secdomain][k][v].iteritems():
-                print app
                 score,count = score_count['score'], score_count['count']
                 if score > max_score:
                   predict_app = app
