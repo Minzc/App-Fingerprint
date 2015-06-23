@@ -828,7 +828,7 @@ def batchTest(outputfile):
   ###################
   # Test
   ###################
-  pkgs = load_pkgs(None, DB = 'packages_20150429')
+  pkgs = load_pkgs(None, DB = 'packages_20150429_small')
   predict_rst = {}
   for pkg in pkgs:
     max_score = -1
