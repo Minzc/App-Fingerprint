@@ -749,7 +749,6 @@ def batchTest(outputfile):
   # Load Data
   ##################
   for tbl in tbls:
-    print tbl
     pkgs = load_pkgs(None, DB = tbl)
     totalPkgs[tbl] = pkgs
     for pkg in pkgs:
@@ -768,7 +767,6 @@ def batchTest(outputfile):
           if len(featureTbl[secdomain][app][k]) > 1:
             violate[secdomain][k].add(app)
           if len(valueCounter[v]) == 1:
-            print app
             cleaned_k = k.replace("\t", "")
             keyScore[secdomain][cleaned_k]['score'] += (len(featureTbl[secdomain][app][k][v]) - 1) / float(len(featureTbl[secdomain][app][k]))
             keyScore[secdomain][cleaned_k]['app'].add(app)
@@ -781,11 +779,11 @@ def batchTest(outputfile):
   general_rules = defaultdict(list)
   for secdomain in keyScore:
     for key in keyScore[secdomain]:
-      if len(score[secdomain][key]['app']) == 1 or score[secdomain][key]['score'] == 0:
+      if len(keyScore[secdomain][key]['app']) == 1 or keyScore[secdomain][key]['score'] == 0:
         continue
-      general_rules[secdomain].append(Rule(secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
+      general_rules[secdomain].append(Rule(secdomain, key, keyScore[secdomain][key]['score'], len(keyScore[secdomain][key]['app'])))
       try:
-        fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
+        fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, keyScore[secdomain][key]['score'], len(keyScore[secdomain][key]['app'])))
       except:
         pass
   fw.close()
