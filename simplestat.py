@@ -777,10 +777,10 @@ def batchTest(outputfile):
             except:
               pass
   fw = open(outputfile+".score", 'w')
-  Rule = namedtuple('Rule', 'secdomain,key,score,app')
+  Rule = namedtuple('Rule', 'secdomain,key,score,appNum')
   general_rules = defaultdict(list)
-  for secdomain in score:
-    for key in score[secdomain]:
+  for secdomain in keyScore:
+    for key in keyScore[secdomain]:
       if len(score[secdomain][key]['app']) == 1 or score[secdomain][key]['score'] == 0:
         continue
       general_rules[secdomain].append(Rule(secdomain, key, score[secdomain][key]['score'], len(score[secdomain][key]['app'])))
@@ -803,10 +803,8 @@ def batchTest(outputfile):
             ruleCover[rule] += 1
             covered_app.add(pkg.app)
             for value in pkg.querys[rule.key]:
-              specific_rules[pkg.secdomain][rule.key][value][rule.app]['score'] = rule.score
-              specific_rules[pkg.secdomain][rule.key][value][rule.app]['count'] += 1
-              if rule.app != pkg.app:
-                print 'ERROR===', rule.app, pkg.app
+              specific_rules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
+              specific_rules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
 
   fw = open(outputfile+'.rule_cover', 'w')
   for rule in ruleCover:
