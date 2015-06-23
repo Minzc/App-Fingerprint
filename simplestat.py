@@ -853,21 +853,21 @@ def batchTest(outputfile):
                   occur_count = count
     predict_rst[pkg.id] = (predict_app, pkg.app)
 
-    #################
-    # Evaluate
-    #################
-    covered_app = set()
-    precision = 0
-    recall = 0
-    total = len(predict_rst)
-    for value in predict_rst.values():
-      if value[0] != None:
-        recall += 1
-        print value[0], value[1]
-        if value[0] == value[1]:
-          precision += 1
-          covered_app.add(value[1])
-    print "Precision: %s Recall: %s App: %s" % (float(precision)/total, float(recall) / total, len(covered_app))
+  #################
+  # Evaluate
+  #################
+  covered_app = set()
+  precision = 0
+  recall = 0
+  total = len(predict_rst)
+  for value in predict_rst.values():
+    if value[0] != None:
+      recall += 1
+      print value[0], value[1]
+      if value[0] == value[1]:
+        precision += 1
+        covered_app.add(value[1])
+  print "Precision: %s Recall: %s App: %s" % (float(precision)/total, float(recall) / total, len(covered_app))
 
 
 
