@@ -754,11 +754,10 @@ def batchTest(outputfile):
     totalPkgs[tbl] = pkgs
     for pkg in pkgs:
       for k,v in pkg.querys.items():
-        print pkg.app
         map(lambda x : featureTbl[pkg.secdomain][pkg.app][k][x].add(tbl), v)
         map(lambda x : valueCounter[x].add(pkg.app), v)
 
-  score = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
+  keyScore = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
   violate = defaultdict(lambda : defaultdict(set))
   covered = defaultdict(lambda : defaultdict(set))
   for secdomain in featureTbl:
@@ -769,9 +768,10 @@ def batchTest(outputfile):
           if len(counter[secdomain][app][k]) > 1:
             violate[secdomain][k].add(app)
           if len(valueCounter[v]) == 1:
+            print app
             cleaned_k = k.replace("\t", "")
-            score[secdomain][cleaned_k]['score'] += (len(counter[secdomain][app][k][v]) - 1) / float(len(counter[secdomain][app][k]))
-            score[secdomain][cleaned_k]['app'].add(app)
+            keyScore[secdomain][cleaned_k]['score'] += (len(counter[secdomain][app][k][v]) - 1) / float(len(counter[secdomain][app][k]))
+            keyScore[secdomain][cleaned_k]['app'].add(app)
             try:
               fw.write("%s %s %s %s\n" % (secdomain, app, k, v.replace('\n','').replace(' ', ''), len(counter[secdomain][app][k])))
             except:
