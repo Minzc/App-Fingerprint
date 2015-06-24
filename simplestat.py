@@ -767,11 +767,15 @@ def batchTest(outputfile):
   pkgs = load_pkgs(None, DB = 'packages_20150429_small')
   predict_rst = {}
   debug = defaultdict(lambda : defaultdict(lambda : defaultdict(int)))
+  total = 0
   for pkg in pkgs:
     max_score = -1
     occur_count = -1
     predict_app = None
     token, value, secdomain = None, None, None
+    if len(pkg.querys) > 0:
+      total += 1
+
     if pkg.secdomain in specific_rules:
       for k in specific_rules[pkg.secdomain]:
         if k in pkg.querys:
@@ -803,7 +807,6 @@ def batchTest(outputfile):
   covered_app = set()
   precision = 0
   recall = 0
-  total = len(predict_rst)
   for value in predict_rst.values():
     if value[0] != None:
       recall += 1
