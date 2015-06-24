@@ -812,7 +812,7 @@ def batchTest(outputfile):
         covered_app.add(value[1])
       else:
         print value[0], value[1]
-  print "Precision: %s Recall: %s App: %s" % (float(precision)/len(predict_rst), float(recall) / total, len(covered_app))
+  print "Precision: %s Recall: %s App: %s" % (float(precision)/recall, float(recall) / total, len(covered_app))
   fw = open(outputfile+'.debug', 'w')
   for secdomain in debug:
     for token in debug[secdomain]:
