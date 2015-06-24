@@ -735,9 +735,10 @@ def batchTest(outputfile):
           if rule.key in pkg.querys:
             ruleCover[rule] += 1
             covered_app.add(pkg.app)
-            for value in pkg.querys[rule.key] and valueCounter[value] == 1:
-              specific_rules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
-              specific_rules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
+            for value in pkg.querys[rule.key]:
+              if len(valueCounter[value]) == 1:
+                specific_rules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
+                specific_rules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
 
   fw = open(outputfile+'.rule_cover', 'w')
   for rule in ruleCover:
