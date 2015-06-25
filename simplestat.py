@@ -198,7 +198,7 @@ def adserverNkey():
         package = Package()
         package.set_host(hst)
         package.set_path(path)
-        for k, v in package.querys.items():
+        for k, v in package.queries.items():
             id = app + '##' + hst
             id2 = id + '##' + v[0]
             if len(v[0]) > 1:
@@ -507,17 +507,17 @@ def stat_refer():
     parameters = set()
     for record in records:
         if record.app in record.origPath:
-            for k in record.querys:
-                if record.app in record.querys[k]:
+            for k in record.queries:
+                if record.app in record.queries[k]:
                     parameters.add(k)
     apps = set()
     pkgNum = 0
     for record in records:
         for parameter in parameters:
-            if parameter in record.querys:
-                print '1', record.querys[parameter]
-                if record.app not in record.querys[parameter]:
-                    print '2', record.app, record.querys[parameter], parameter, record.origPath
+            if parameter in record.queries:
+                print '1', record.queries[parameter]
+                if record.app not in record.queries[parameter]:
+                    print '2', record.app, record.queries[parameter], parameter, record.origPath
                 else:
                     pkgNum += 1
                     apps.add(record.app)
@@ -565,16 +565,16 @@ def output_kv():
       package.set_path(path)
       print '-' * 20
       print app, host
-      for k, v in package.querys.items():
+      for k, v in package.queries.items():
         print k, v
 
 def test_client_slot():
   records = load_pkgs()
   relations = defaultdict(set)
   for record in records:
-    if 'client' in record.querys and 'slotname' in record.querys:
-      client = record.querys['client'][0]
-      slotname = record.querys['slotname'][0]
+    if 'client' in record.queries and 'slotname' in record.queries:
+      client = record.queries['client'][0]
+      slotname = record.queries['slotname'][0]
       relations[client + '$' + slotname].add(record.app)
 
   print len(relations)
@@ -586,8 +586,8 @@ def test_sdk_id():
   records = load_pkgs()
   relations = defaultdict(set)
   for record in records:
-    if 'id' in record.querys and 'ads.mopub.com' == record.host:
-      appid = record.querys['id'][0]
+    if 'id' in record.queries and 'ads.mopub.com' == record.host:
+      appid = record.queries['id'][0]
       relations[appid].add(record.app)
 
   print len(relations)
@@ -676,10 +676,6 @@ def rmOtherApp(tbls=["packages_20150210", "packages_20150429", "packages_2015050
 
 def batchTest(outputfile):
   tbls = ["packages_20150210", "packages_20150616", "packages_20150509", "packages_20150526"]
-  featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
-  valueCounter = defaultdict(set)
-  hostTokenCounter = defaultdict(int)
-  totalPkgs = {}
   ##################
   # Load Data
   ##################
@@ -687,10 +683,18 @@ def batchTest(outputfile):
     pkgs = load_pkgs(None, DB = tbl)
     totalPkgs[tbl] = pkgs
     for pkg in pkgs:
-      for k,v in pkg.querys.items():
+      for k,v in pkg.queries.items():
         map(lambda x : featureTbl[pkg.secdomain][pkg.app][k][x].add(tbl), v)
-        map(lambda x : valueCounter[x].add(pkg.app), v)
-
+        map(lambda x : valueAppCounter[x].add(pkg.app), v)
+  
+  ##################
+  # Count
+  ##################
+  featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
+  valueAppCounter = defaultdict(set)
+  valueCompanyCounter = defaultdict(set)
+  totalPkgs = {}
+  # secdomain -> key -> (app, score)
   keyScore = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
   violate = defaultdict(lambda : defaultdict(set))
   covered = defaultdict(lambda : defaultdict(set))
@@ -701,7 +705,7 @@ def batchTest(outputfile):
           covered[secdomain][k].add(app)
           if len(featureTbl[secdomain][app][k]) > 1:
             violate[secdomain][k].add(app)
-          if len(valueCounter[v]) == 1:
+          if len(valueAppCounter[v]) == 1:
             cleaned_k = k.replace("\t", "")
             keyScore[secdomain][cleaned_k]['score'] += (len(featureTbl[secdomain][app][k][v]) - 1) / float(len(featureTbl[secdomain][app][k]))
             keyScore[secdomain][cleaned_k]['app'].add(app)
@@ -732,11 +736,11 @@ def batchTest(outputfile):
     for pkg in totalPkgs[tbl]:
       if pkg.secdomain in general_rules:
         for rule in general_rules[pkg.secdomain]:
-          if rule.key in pkg.querys:
+          if rule.key in pkg.queries:
             ruleCover[rule] += 1
             covered_app.add(pkg.app)
-            for value in pkg.querys[rule.key]:
-              #if len(valueCounter[value]) == 1:
+            for value in pkg.queries[rule.key]:
+              if len(valueAppCounter[value]) == 1:
                 specific_rules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
                 specific_rules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
 
@@ -773,13 +777,13 @@ def batchTest(outputfile):
     occur_count = -1
     predict_app = None
     token, value, secdomain = None, None, None
-    if len(pkg.querys) > 0:
+    if len(pkg.queries) > 0:
       total += 1
 
     if pkg.secdomain in specific_rules:
       for k in specific_rules[pkg.secdomain]:
-        if k in pkg.querys:
-          for v in pkg.querys[k]:
+        if k in pkg.queries:
+          for v in pkg.queries[k]:
             if v in specific_rules[pkg.secdomain][k]:
               for app, score_count in specific_rules[pkg.secdomain][k][v].iteritems():
                 score,count = score_count['score'], score_count['count']

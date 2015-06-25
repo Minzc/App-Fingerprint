@@ -173,17 +173,11 @@ class KVTree:
         if len(appvalues) > 1:
           for appnode in vnode.father: 
             appnode.father[0].set_status(0)
-            if appnode.father[0].value == 'client':
-              print "1", vnode.value
 
     for appnode in appnodes: 
       if len(appnode.children) > 1: 
         for tokennode in appnode.father:
           tokennode.set_status(-1)
-          if tokennode.value == 'client':
-            print "2", appnode.value
-            for vnode in appnode.children:
-                print vnode
 
 
 
@@ -206,8 +200,8 @@ class ParamRules:
         match = True
         pattern = []
         for key in rule[1:]:
-          if key in package.querys:
-            pattern.append((key, package.querys[key][0]))
+          if key in package.queries:
+            pattern.append((key, package.queries[key][0]))
           elif package.form and key in package.form:
             pattern.append((key, package.form[key]))
           else:
@@ -253,7 +247,7 @@ class ParamRules:
       self.rules[rule_type][host][frozenset(kv.split('&'))] = (label, confidence)
 
   def classify(self, package):
-    kv = { k+'='+v[0] for k, v in package.querys.iteritems()}
+    kv = { k+'='+v[0] for k, v in package.queries.iteritems()}
     if package.form:
       for k,v in package.form.iteritems():
         kv.add(k + '=' + v)
@@ -327,7 +321,7 @@ class KVClassifier:
       subpatterns = list(self.paraminer.mine(package))
       patterns += subpatterns
       # Build the forest
-      kvs = package.querys.copy()
+      kvs = package.queries.copy()
       if package.form : 
         for k,v in package.form.iteritems():
           kvs[k] = [v]
@@ -373,6 +367,126 @@ def KVPredictor(test_records=None):
   print ">>> Correct:", correct, "Total:", count, "Precision:", correct * 1.0 / count
   return rst
 
+
+def batchTest(outputfile):
+  tbls = ["packages_20150210", "packages_20150616", "packages_20150509", "packages_20150526"]
+  ##################
+  # Load Data
+  ##################
+  for tbl in tbls:
+    pkgs = load_pkgs(None, DB = tbl)
+    totalPkgs[tbl] = pkgs
+    for pkg in pkgs:
+      for k,v in pkg.queries.items():
+        map(lambda x : featureTbl[pkg.secdomain][pkg.app][k][x].add(tbl), v)
+        map(lambda x : valueAppCounter[x].add(pkg.app), v)
+        map(lambda x : valueCompanyCounter[x].add(pkg.company), v)
+  
+  ##################
+  # Count
+  ##################
+  # secdomain -> app -> key -> value -> tbls
+  featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
+  valueAppCounter = defaultdict(set)
+  valueCompanyCounter = defaultdict(set)
+  totalPkgs = {}
+  # secdomain -> key -> (app, score)
+  keyScore = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
+  for secdomain in featureTbl:
+    for app in featureTbl[secdomain]:
+      for k in featureTbl[secdomain][app]:
+        for v, tbls in featureTbl[secdomain][app][k].iteritems():
+          if len(valueAppCounter[v]) == 1:
+            cleaned_k = k.replace("\t", "")
+            keyScore[secdomain][cleaned_k]['score'] += (len(tbls) - 1) / float(len(tbls))
+            keyScore[secdomain][cleaned_k]['app'].add(app)
+
+  
+  #############################
+  # Generate interesting keys
+  #############################
+  Rule = namedtuple('Rule', 'secdomain, key, score, appNum')
+  generalRules = defaultdict(list)
+  for secdomain in keyScore:
+    for key in keyScore[secdomain]:
+      appNum = len(keyScore[secdomain][key]['app']) 
+      score = keyScore[secdomain][key]['score']
+      if appNum == 1 or score == 0:
+        continue
+      general_rules[secdomain].append(Rule(secdomain, key, score, appNum))
+  for secdomain in general_rules:
+    general_rules[secdomain] = sorted(general_rules[secdomain], key=lambda rule: rule.score, reverse = True)
+
+
+  #############################
+  # Generate specific rules
+  #############################
+  specifiRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
+  ruleCover = defaultdict(int)
+  for tbl, pkgs in totalPkgs.iteritems():
+    for pkg in filter(lambda pkg : pkg.secdomain in general_rules,pkgs):
+      for rule in filter(lambda rule : rule.key in pkg.queries, general_rules[pkg.secdomain]):
+        ruleCover[rule] += 1
+        for value in filter(lambda apps : len(app) == 1, pkg.queries[rule.key]):
+          specifiRules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
+          specifiRules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
+
+  ###################
+  # Test
+  ###################
+  pkgs = load_pkgs(None, DB = 'packages_20150429_small')
+  predictRst = {}
+  total = 0
+  for pkg in pkgs:
+    max_score = -1
+    occur_count = -1
+    predict_app = None
+    token, value, secdomain = None, None, None
+
+    for k, v in pkg.queries.iteritems():
+      total += 1
+      for app, scoreCount in specifiRules[pkg.secdomain][k][v].iteritems():
+        score,count = scoreCount['score'], scoreCount['count']
+        update = False
+        if score > max_score:
+          predict_app = app
+          max_score = score
+          occur_count = count
+          update = True
+        elif score == max_score and count > occur_count:
+          predict_app = app
+          occur_count = count
+          update = True
+        if update:
+          token = k
+          value = v
+          secdomain = pkg.secdomain
+    
+    predictRst[pkg.id] = (predict_app, pkg.app)
+    if predict_app != pkg.app:
+      debug[secdomain][token][value] += 1
+
+  #################
+  # Evaluate
+  #################
+  covered_app = set()
+  precision = 0
+  recall = 0
+  for value in predictRst.values():
+    if value[0] != None:
+      recall += 1
+      if value[0] == value[1]:
+        precision += 1
+        covered_app.add(value[1])
+      else:
+        print value[0], value[1]
+  print "Precision: %s Recall: %s App: %s" % (float(precision)/recall, float(recall) / total, len(covered_app))
+  fw = open(outputfile+'.debug', 'w')
+  for secdomain in debug:
+    for token in debug[secdomain]:
+      for value in debug[secdomain][token]:
+        fw.write("%s\t%s\t%s\t%s\n" % ( secdomain, token, value, debug[secdomain][token][value] ))
+  fw.close()
 
 import sys
 

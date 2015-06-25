@@ -39,7 +39,7 @@ class Package:
 
         path = urllib.unquote(path).lower().replace(';', '?', 1).replace(';', '&')
         self.origPath = path
-        self.querys = urlparse.parse_qs(urlparse.urlparse(path).query, True)
+        self.queries = urlparse.parse_qs(urlparse.urlparse(path).query, True)
         self.path = urlparse.urlparse(path).path
 
     def set_add_header(self, add_header):

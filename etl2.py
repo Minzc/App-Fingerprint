@@ -57,7 +57,9 @@ class ETL:
             file_path = join(folder, f)
             if isfile(file_path):
                 app_name = f[0:-5]
-                self._insert_msql(join(folder, f), app_name)
+                #self._insert_msql(join(folder, f), app_name)
+                self._insert_msql('/Users/congzicun/Yunio/fortinet/air.au.com.metro.DumbWaysToDie.pcap', app_name)
+                break
 
 
     def _insert_msql(self, file_path, app_package):
@@ -168,6 +170,7 @@ class ETL:
             add_header = '\n'.join([i.showname.replace('\\r\\n', '')
                                     for i in package.http.response_line.alternate_fields
                                     if i.showname.split(':')[0].strip() not in known_fileds])
+            print add_header
         elif hasattr(package.http, 'request_line'):
             print add_header
             add_header = '\n'.join([i.showname.replace('\\r\\n', '')
