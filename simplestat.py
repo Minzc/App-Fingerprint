@@ -853,10 +853,10 @@ def statUrlPcap(outputfile):
     fw.close()
 
 def statUrlPcapCoverage(tbl):
-    pkgs = load_pkgs(limit=1000,DB=tbl)
+    pkgs = load_pkgs(DB=tbl)
     sqldao = SqlDao()
     urls = set()
-    for app, url,_ in sqldao.execute('SELECT * FROM url_apk LIMIT 10'):
+    for app, url,_ in sqldao.execute('SELECT * FROM url_apk'):
         urls.add(url.replace('http://', '').replace('www.', ''))
     total = 0
     contain = 0
