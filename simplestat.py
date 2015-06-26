@@ -828,7 +828,7 @@ def batchTest(outputfile):
   fw.close()
 
 
-def statUrlPcap():
+def statUrlPcap(outputfile):
     import urlparse
     import urllib
     import tldextract
@@ -843,10 +843,14 @@ def statUrlPcap():
         # appUrl[url].add(app)
         extracted = tldextract.extract(url)
         secdomain = None
-
         if len(extracted.domain) > 0:
             secdomain = "{}.{}".format(extracted.domain, extracted.suffix)
-        print secdomain
+        appUrl[url].add(app)
+    fw = open(outputfile, 'w')
+    for k,v in appUril.iteritems():
+        if len(v) == 1:
+            fw.write("%s\t%s\n", k, v)
+    fw.close()
 
 if __name__ == '__main__':
   print sys.argv[1]
