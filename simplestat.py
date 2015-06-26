@@ -835,7 +835,7 @@ def statUrlPcap(outputfile):
 
     appUrl = defaultdict(set)
     sqldao = SqlDao()
-    for app, url, fileName in sqldao.execute('SELECT * FROM url_apk LIMIT 100'):
+    for app, url, fileName in sqldao.execute('SELECT * FROM url_apk'):
         # path = urllib.unquote(path).lower().replace(';', '?', 1).replace(';', '&')
         # origPath = path
         # querys = urlparse.parse_qs(urlparse.urlparse(path).query, True)
@@ -845,7 +845,6 @@ def statUrlPcap(outputfile):
         secdomain = None
         if len(extracted.domain) > 0:
             secdomain = "{}.{}".format(extracted.domain, extracted.suffix)
-        
         appUrl[secdomain].add(app)
     fw = open(outputfile, 'w')
     for k,v in appUrl.iteritems():
