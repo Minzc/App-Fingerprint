@@ -845,7 +845,8 @@ def statUrlPcap(outputfile):
         secdomain = None
         if len(extracted.domain) > 0:
             secdomain = "{}.{}".format(extracted.domain, extracted.suffix)
-        appUrl[url].add(app)
+        
+        appUrl[secdomain].add(app)
     fw = open(outputfile, 'w')
     for k,v in appUrl.iteritems():
         if len(v) == 1:
