@@ -849,7 +849,7 @@ def statUrlPcap(outputfile):
     fw = open(outputfile, 'w')
     for k,v in appUrl.iteritems():
         if len(v) == 1:
-            fw.write("%s\t%s\n", k, v)
+            fw.write("%s\t%s\n" % (k, v))
     fw.close()
 
 if __name__ == '__main__':
