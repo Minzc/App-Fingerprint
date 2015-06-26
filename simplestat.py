@@ -828,6 +828,25 @@ def batchTest(outputfile):
   fw.close()
 
 
+def statUrlPcap():
+    import urlparse
+    import urllib
+    import tldextract
+
+    appUrl = defaultdict(set)
+    sqldao = SqlDao()
+    for app, url, fileName in sqldao.execute('SELECT * FROM url_apk LIMIT 100'):
+        # path = urllib.unquote(path).lower().replace(';', '?', 1).replace(';', '&')
+        # origPath = path
+        # querys = urlparse.parse_qs(urlparse.urlparse(path).query, True)
+        # path = urlparse.urlparse(path).path
+        # appUrl[url].add(app)
+        extracted = tldextract.extract(url)
+        secdomain = None
+
+        if len(extracted.domain) > 0:
+            secdomain = "{}.{}".format(extracted.domain, extracted.suffix)
+        print secdomain
 
 if __name__ == '__main__':
   print sys.argv[1]
@@ -838,3 +857,5 @@ if __name__ == '__main__':
       rmOtherApp()
   elif sys.argv[1] == 'batchTest':
     batchTest(sys.argv[2])
+  elif sys.argv[1] == 'stat':
+      statUrlPcap()
