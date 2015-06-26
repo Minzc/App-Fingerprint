@@ -867,7 +867,7 @@ def statUrlPcapCoverage(tbl):
         if len(pkg.queries) == 0 and url in urls:
             contain += 1
         else:
-            print url
+            print url.encode('utf-8')
     print "Tbl: %s\tTotal: %s\t Contain: %s" % (tbl, total, contain)
 if __name__ == '__main__':
   print sys.argv[1]
