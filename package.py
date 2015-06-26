@@ -52,7 +52,7 @@ class Package:
         import tldextract
 
         host = host.lower()
-        self.host = host.split(':')[0].replace('www.', '')
+        self.host = host.split(':')[0].replace('www.', '').replace('http://','')
         extracted = tldextract.extract(host)
         self.secdomain = None
 

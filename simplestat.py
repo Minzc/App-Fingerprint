@@ -844,7 +844,7 @@ def statUrlPcap(outputfile):
         extracted = tldextract.extract(url)
         secdomain = None
         if len(extracted.domain) > 0:
-            secdomain = "{}.{}".format(extracted.domain, extracted.suffix)
+            secdomain = "{}.{}".format(extracted.domain.encode('utf-8'), extracted.suffix.encode('utf-8'))
         appUrl[secdomain].add(app)
     fw = open(outputfile, 'w')
     for k,v in appUrl.iteritems():
@@ -852,6 +852,21 @@ def statUrlPcap(outputfile):
             fw.write("%s\t%s\n" % (k, v))
     fw.close()
 
+def statUrlPcapCoverage(tbl):
+    pkgs = load_pkgs(limit=1000,DB=tbl)
+    sqldao = SqlDao()
+    urls = set()
+    for app, url,_ in sqldao.execute('SELECT * FROM url_apk LIMIT 10'):
+        urls.add(url.replace('http://', '').replace('www.', ''))
+    total = 0
+    contain = 0
+    for pkg in pkgs:
+        url = pkg.host + '/' + pkg.path
+        url = url.replace('//','/')
+        print url
+        if len(pkg.queries) == 0 and url in urls:
+            contain += 1
+    print "Tbl: %s\tTotal: %s\t Contain: %s" % (tbl, total, contain)
 if __name__ == '__main__':
   print sys.argv[1]
   if sys.argv[1] == 'rmOtherApp':
@@ -863,3 +878,5 @@ if __name__ == '__main__':
     batchTest(sys.argv[2])
   elif sys.argv[1] == 'stat':
       statUrlPcap(sys.argv[2])
+  else:
+      statUrlPcapCoverage(sys.argv[1])
