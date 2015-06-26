@@ -862,4 +862,4 @@ if __name__ == '__main__':
   elif sys.argv[1] == 'batchTest':
     batchTest(sys.argv[2])
   elif sys.argv[1] == 'stat':
-      statUrlPcap()
+      statUrlPcap(sys.argv[2])
