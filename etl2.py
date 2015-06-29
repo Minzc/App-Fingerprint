@@ -165,17 +165,20 @@ class ETL:
         src = ''
         dst = ''
         time = package.sniff_timestamp
-        add_header = ''
-        if hasattr(package.http, 'response_line'):
-            add_header = '\n'.join([i.showname.replace('\\r\\n', '')
-                                    for i in package.http.response_line.alternate_fields
-                                    if i.showname.split(':')[0].strip() not in known_fileds])
-            print add_header
-        elif hasattr(package.http, 'request_line'):
-            print add_header
-            add_header = '\n'.join([i.showname.replace('\\r\\n', '')
-                                    for i in package.http.request_line.alternate_fields
-                                    if i.showname.split(':')[0].strip() not in known_fileds])
+        add_header = '\n'.join([i.strip().replace('\\r\\n', '')
+                                for i in package.http._get_all_field_lines()
+                                if i.split(':')[0].strip() not in known_fileds])
+        
+        # if hasattr(package.http, 'response_line'):
+        #     add_header = '\n'.join([i.showname.replace('\\r\\n', '')
+        #                             for i in package.http.response_line.alternate_fields
+        #                             if i.showname.split(':')[0].strip() not in known_fileds])
+        #     print add_header
+        # elif hasattr(package.http, 'request_line'):
+        #     print add_header
+        #     add_header = '\n'.join([i.showname.replace('\\r\\n', '')
+        #                             for i in package.http.request_line.alternate_fields
+        #                             if i.showname.split(':')[0].strip() not in known_fileds])
         add_header = add_header.replace('[truncated]', '')
 
         hst = getattr(package.http, "host", None)

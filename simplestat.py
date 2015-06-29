@@ -545,11 +545,11 @@ def stat_host_app():
 
     records = load_pkgs()
     relation = Relation()
-    appComponay = {}
+    appCompany = {}
     appName = {}
     for record in records:
         relation.add(record.host, record.app + '$' + none2str(record.company) + '$' + none2str(record.name))
-        appComponay[record.app] = record.company
+        appCompany[record.app] = record.company
     apps = set()
     for k, v in relation.get().items():
         if len(v) == 1:
@@ -853,9 +853,10 @@ def statUrlPcap(outputfile):
     fw.close()
 
 def statUrlPcapCoverage(tbl):
+    print 'start'
     pkgs = load_pkgs(DB=tbl)
-    sqldao = SqlDao()
     urls = set()
+    sqldao = SqlDao()
     for app, url,_ in sqldao.execute('SELECT * FROM url_apk'):
         urls.add(url.replace('http://', '').replace('www.', ''))
     total = 0
@@ -870,8 +871,81 @@ def statUrlPcapCoverage(tbl):
             else:
                 print url.encode('utf-8')
     print "Tbl: %s\tTotal: %s\t Contain: %s" % (tbl, total, contain)
+
+def statFile():
+    from utils import load_appinfo
+    from utils import longest_common_substring
+    def loadExpApp():
+        expApp=set()
+        for app in open("resource/exp_app.txt"):
+            expApp.add(app.strip().lower())
+        return expApp
+    expApp = loadExpApp()
+    sqldao = SqlDao()
+    fileApp = defaultdict(set)
+    fileUrl = defaultdict(set)
+    urlApp = defaultdict(set)
+    substrCompany = defaultdict(set)
+    appCompany = load_appinfo()
+    for app, url,fileName in sqldao.execute('SELECT * FROM url_apk'):
+        url = url.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0]
+        fileApp[fileName].add(appCompany[app])
+        fileUrl[fileName].add(url)
+        urlApp[url].add(app)
+        common_str = longest_common_substring(url.lower(), app.lower())
+        substrCompany[common_str].add(appCompany[app])
+    for tbl in ['packages_20150429', 'packages_20150509', 'packages_20150526']:
+        for pkg in load_pkgs(DB = tbl):
+            url = pkg.host.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0]
+            app = pkg.app
+            urlApp[url].add(app)
+            common_str = longest_common_substring(url.lower(), pkg.app.lower())
+            substrCompany[common_str].add(appCompany[app])
+
+    rmdUrls = set()
+
+    for fileName,urls in fileApp.iteritems():
+        if len(urls) > 1:
+            for url in fileUrl[fileName]:
+                rmdUrls.add(url)
+    
+    covered = set()
+    rules = {}
+    for url, apps in urlApp.iteritems():
+        if url == 'fonts.gstatic.com':
+            print 'length is ', len(apps), apps
+        if url not in rmdUrls and len(apps) == 1:
+            app = apps.pop()
+            common_str = longest_common_substring(url.lower(), app.lower())
+            if len(substrCompany[common_str]) == 1 and app in expApp and '.' in common_str:
+                covered.add(app)
+                rules[url] = app
+
+    pkgs = load_pkgs(DB='packages_20150210')
+    correct = 0
+    total = 0
+    apps = set()
+    uncovered_urls = defaultdict(set)
+    url_counter = defaultdict(int)
+    for pkg in pkgs:
+        if len(pkg.queries) > 0:
+            continue
+        if pkg.host in rules:
+            total += 1
+            apps.add(pkg.app)
+            if rules[pkg.host] == pkg.app:
+                correct += 1
+            else:
+                print pkg.host, pkg.app, rules[pkg.host]
+        else:
+            uncovered_urls[pkg.host].add(pkg.app)
+            url_counter[pkg.host] += 1
+    print 'Total: %s Correct: %s' % (total, correct)
+    for url in filter(lambda url: len(uncovered_urls[url]) == 1, url_counter):
+        print '%s\t%s\t%s' % (url, url_counter[url], uncovered_urls[url])
+    
+
 if __name__ == '__main__':
-  print sys.argv[1]
   if sys.argv[1] == 'rmOtherApp':
     if len(sys.argv) > 2:
       rmOtherApp(sys.argv[2:])
@@ -882,4 +956,5 @@ if __name__ == '__main__':
   elif sys.argv[1] == 'stat':
       statUrlPcap(sys.argv[2])
   else:
-      statUrlPcapCoverage(sys.argv[1])
+      #statUrlPcapCoverage(sys.argv[1])
+      statFile()
