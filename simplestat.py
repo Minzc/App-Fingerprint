@@ -888,7 +888,7 @@ def statFile():
     substrCompany = defaultdict(set)
     appCompany = load_appinfo()
     for app, url,fileName in sqldao.execute('SELECT * FROM url_apk'):
-        url = url.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0]
+        url = url.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
         fileApp[fileName].add(appCompany[app])
         fileUrl[fileName].add(url)
         urlApp[url].add(app)
@@ -896,7 +896,7 @@ def statFile():
         substrCompany[common_str].add(appCompany[app])
     for tbl in ['packages_20150429', 'packages_20150509', 'packages_20150526']:
         for pkg in load_pkgs(DB = tbl):
-            url = pkg.host.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0]
+            url = pkg.host.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
             app = pkg.app
             urlApp[url].add(app)
             common_str = longest_common_substring(url.lower(), pkg.app.lower())
