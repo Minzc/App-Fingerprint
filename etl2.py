@@ -158,7 +158,10 @@ class ETL:
                         'Transfer-Encoding',
                         'Cache-Control',
                         'Pragma',
-                        'Accept-Ranges'}
+                        'Accept-Ranges',
+                        'Full request URI',
+                        'Message',
+                        'Request Method'}
         pkgInfo = {}
         #src = package.ip.src
         #dst = package.ip.dst
