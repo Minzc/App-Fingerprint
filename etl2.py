@@ -57,8 +57,8 @@ class ETL:
             file_path = join(folder, f)
             if isfile(file_path):
                 app_name = f[0:-5]
-                #self._insert_msql(join(folder, f), app_name)
-                self._insert_msql('/Users/congzicun/Yunio/fortinet/air.au.com.metro.DumbWaysToDie.pcap', app_name)
+                self._insert_msql(join(folder, f), app_name)
+                #self._insert_msql('/Users/congzicun/Yunio/fortinet/air.au.com.metro.DumbWaysToDie.pcap', app_name)
                 break
 
 
@@ -126,11 +126,10 @@ class ETL:
                 app_company, 
                 pkgInfo[ETLConsts.RAW]))
             comunicate_host.add(pkgInfo[ETLConsts.HOST])
-        print self.INSERT_PACKAGES
-        #dbdao.executeBatch(self.INSERT_PACKAGES,params)
+        dbdao.executeBatch(self.INSERT_PACKAGES,params)
           #  except Exception:
           #     pass 
-        #dbdao.close()
+        dbdao.close()
         print "Finish", app_package, "Package:", len(params), len(pkgInfos)
 
     def _parse_dns_package(self, package, dns_info):
@@ -163,10 +162,10 @@ class ETL:
                         'Message',
                         'Request Method'}
         pkgInfo = {}
-        #src = package.ip.src
-        #dst = package.ip.dst
-        src = ''
-        dst = ''
+        src = package.ip.src
+        dst = package.ip.dst
+        # src = ''
+        # dst = ''
         time = package.sniff_timestamp
         add_header = '\n'.join([i.strip().replace('\\r\\n', '')
                                 for i in package.http._get_all_field_lines()
