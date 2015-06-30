@@ -161,10 +161,10 @@ class ETL:
                         'Message',
                         'Request Method'}
         pkgInfo = {}
-        src = package.ip.src
-        dst = package.ip.dst
-        # src = ''
-        # dst = ''
+        #src = package.ip.src
+        #dst = package.ip.dst
+        src = ''
+        dst = ''
         time = package.sniff_timestamp
         add_header = '\n'.join([i.strip().replace('\\r\\n', '')
                                 for i in package.http._get_all_field_lines()
