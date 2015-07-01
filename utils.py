@@ -222,6 +222,15 @@ def load_appinfo():
       app_category[app] = (name, category)
   return app_company
 
+def get_top_domain(host):
+  import tldextract
+  host = host.lower()
+  host = host.split(':')[0].replace('www.', '').replace('http://','')
+  extracted = tldextract.extract(host)
+
+  if len(extracted.domain) > 0:
+    return "{}.{}".format(extracted.domain, extracted.suffix)
+  return None
 
 def longest_common_substring(s1, s2):
     m = [[0] * (1 + len(s2)) for i in xrange(1 + len(s1))]

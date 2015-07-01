@@ -873,8 +873,7 @@ def statUrlPcapCoverage(tbl):
     print "Tbl: %s\tTotal: %s\t Contain: %s" % (tbl, total, contain)
 
 def statFile():
-    from utils import load_appinfo
-    from utils import longest_common_substring
+    from utils import load_appinfo, longest_common_substring, get_top_domain
     def loadExpApp():
         expApp=set()
         for app in open("resource/exp_app.txt"):
@@ -892,12 +891,17 @@ def statFile():
         fileApp[fileName].add(appCompany[app])
         fileUrl[fileName].add(url)
         urlApp[url].add(app)
+        topDomain = get_top_domain(url)
+        urlApp[topDomain].add(app)
         common_str = longest_common_substring(url.lower(), app.lower())
         substrCompany[common_str].add(appCompany[app])
+
     for tbl in ['packages_20150429', 'packages_20150509', 'packages_20150526']:
         for pkg in load_pkgs(DB = tbl):
             url = pkg.host.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
             app = pkg.app
+            topDomain = get_top_domain(url)
+            urlApp[topDomain].add(app)
             urlApp[url].add(app)
             common_str = longest_common_substring(url.lower(), pkg.app.lower())
             substrCompany[common_str].add(appCompany[app])
@@ -908,18 +912,26 @@ def statFile():
         if len(urls) > 1:
             for url in fileUrl[fileName]:
                 rmdUrls.add(url)
-    
+    ########################
+    # Generate Rules
+    ########################
     covered = set()
     rules = {}
     for url, apps in urlApp.iteritems():
-        if url == 'fonts.gstatic.com':
-            print 'length is ', len(apps), apps
+        if url == 'zcdn.zulilyinc.com':
+            print '#', url in rmdUrls
+            print '#', len(apps)
         if url not in rmdUrls and len(apps) == 1:
             app = apps.pop()
             common_str = longest_common_substring(url.lower(), app.lower())
-            if len(substrCompany[common_str]) == 1 and app in expApp and '.' in common_str:
+            if url == 'unboundmedicine.com':
+                print common_str
+                print substrCompany[common_str]
+            if len(substrCompany[common_str]) < 5 and app in expApp:
                 covered.add(app)
                 rules[url] = app
+                if url == 'unboundmedicine.com':
+                    print 'INNNNNNNNNNNN'
 
     pkgs = load_pkgs(DB='packages_20150210')
     correct = 0
@@ -927,20 +939,29 @@ def statFile():
     apps = set()
     uncovered_urls = defaultdict(set)
     url_counter = defaultdict(int)
+    def classify(url):
+        if url in rules:
+            return rules[url]
+        return None
+    noQuery = 0
     for pkg in pkgs:
-        if len(pkg.queries) > 0:
+        if len(pkg.queries) > 0 or pkg.app not in expApp:
             continue
-        if pkg.host in rules:
+        noQuery += 1
+        host = pkg.host.replace('-','.')
+        secdomain = pkg.secdomain.replace('-', '.')
+        app = classify(host)
+        app = classify(secdomain) if app == None else app
+        if app:
             total += 1
-            apps.add(pkg.app)
-            if rules[pkg.host] == pkg.app:
+            if app == pkg.app:
                 correct += 1
             else:
-                print pkg.host, pkg.app, rules[pkg.host]
+                print pkg.host, pkg.app, rules[host] if host in rules else rules[secdomain]
         else:
             uncovered_urls[pkg.host].add(pkg.app)
             url_counter[pkg.host] += 1
-    print 'Total: %s Correct: %s' % (total, correct)
+    print 'Total: %s Correct: %s No Query: %s' % (total, correct, noQuery)
     for url in filter(lambda url: len(uncovered_urls[url]) == 1, url_counter):
         print '%s\t%s\t%s' % (url, url_counter[url], uncovered_urls[url])
     
