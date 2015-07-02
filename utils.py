@@ -218,8 +218,8 @@ def load_appinfo():
   app_name = {}
   sqldao = SqlDao()
   for app, name, company, category in sqldao.execute(QUERY):
-      app_company[app] = company
-      app_name[app] = name
+      app_company[app.lower()] = company
+      app_name[app.lower()] = name
   return app_company, app_name
 
 def get_top_domain(host):
