@@ -874,7 +874,7 @@ def statUrlPcapCoverage(tbl):
 
 def statFile():
     from utils import load_appinfo, longest_common_substring, get_top_domain
-    from classify import header_classifier
+    from classifier import header_classifier
     def loadExpApp():
         expApp=set()
         for app in open("resource/exp_app.txt"):
