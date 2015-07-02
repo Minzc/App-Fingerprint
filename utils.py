@@ -215,12 +215,12 @@ def get_record_f(record):
 def load_appinfo():
   QUERY = 'SELECT app, name, company, category FROM apps'
   app_company = {}
-  app_category = {}
+  app_name = {}
   sqldao = SqlDao()
   for app, name, company, category in sqldao.execute(QUERY):
       app_company[app] = company
-      app_category[app] = (name, category)
-  return app_company
+      app_name[app] = name
+  return app_company, app_name
 
 def get_top_domain(host):
   import tldextract

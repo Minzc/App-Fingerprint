@@ -885,16 +885,21 @@ def statFile():
     fileUrl = defaultdict(set)
     urlApp = defaultdict(set)
     substrCompany = defaultdict(set)
-    appCompany = load_appinfo()
+    appCompany, appName = load_appinfo()
     for app, url,fileName in sqldao.execute('SELECT * FROM url_apk'):
         url = url.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
+        topDomain = get_top_domain(url)
         fileApp[fileName].add(appCompany[app])
         fileUrl[fileName].add(url)
         urlApp[url].add(app)
         topDomain = get_top_domain(url)
         urlApp[topDomain].add(app)
-        common_str = longest_common_substring(url.lower(), app.lower())
-        substrCompany[common_str].add(appCompany[app])
+        common_str_pkg = longest_common_substring(url.lower(), app.lower())
+        substrCompany[common_str_pkg].add(appCompany[app])
+        common_str_company = longest_common_substring(url.lower(), appCompany[app].lower())
+        substrCompany[common_str_company].add(appCompany[app])
+        common_str_name = longest_common_substring(url.lower(), appName[app].lower())
+        substrCompany[common_str_name].add(appCompany[app])
 
     for tbl in ['packages_20150429', 'packages_20150509', 'packages_20150526']:
         for pkg in load_pkgs(DB = tbl):
@@ -905,6 +910,13 @@ def statFile():
             urlApp[url].add(app)
             common_str = longest_common_substring(url.lower(), pkg.app.lower())
             substrCompany[common_str].add(appCompany[app])
+            common_str = longest_common_substring(url.lower(), appCompany[app])
+            common_str_company = longest_common_substring(url.lower(), appCompany[app].lower())
+            substrCompany[common_str_company].add(appCompany[app])
+            common_str_name = longest_common_substring(url.lower(), appName[app].lower())
+            substrCompany[common_str_name].add(appCompany[app])
+            if topDomain == 'maps.moovitapp.com':
+                print '#TOPDOMAIN'
 
     rmdUrls = set()
 
@@ -918,20 +930,22 @@ def statFile():
     covered = set()
     rules = {}
     for url, apps in urlApp.iteritems():
-        if url == 'zcdn.zulilyinc.com':
+        if url == 'maps.moovitapp.com':
             print '#', url in rmdUrls
             print '#', len(apps)
+            print apps
         if url not in rmdUrls and len(apps) == 1:
             app = apps.pop()
-            common_str = longest_common_substring(url.lower(), app.lower())
-            if url == 'unboundmedicine.com':
-                print common_str
-                print substrCompany[common_str]
-            if len(substrCompany[common_str]) < 5 and app in expApp:
-                covered.add(app)
-                rules[url] = app
-                if url == 'unboundmedicine.com':
-                    print 'INNNNNNNNNNNN'
+            for astr in [app, appCompany[app], appName[app]]:
+                common_str = longest_common_substring(url.lower(), astr.lower())
+                if url == 'maps.moovitapp.com':
+                    print common_str
+                    print substrCompany[common_str]
+                if len(substrCompany[common_str]) < 5 and app in expApp:
+                    covered.add(app)
+                    rules[url] = app
+                    if url == 'maps.moovitapp.com':
+                        print 'INNNNNNNNNNNN'
 
     pkgs = load_pkgs(DB='packages_20150210')
     correct = 0
