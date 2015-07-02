@@ -934,7 +934,7 @@ def statFile():
     covered = set()
     rules = {}
     for url, apps in urlApp.iteritems():
-        if url == 'maps.moovitapp.com':
+        if url == 'flixster.com':
             print '#', url in rmdUrls
             print '#', len(apps)
             print apps
@@ -942,13 +942,13 @@ def statFile():
             app = apps.pop()
             for astr in [app, appCompany[app], appName[app]]:
                 common_str = longest_common_substring(url.lower(), astr.lower())
-                if url == 'maps.moovitapp.com':
+                if url == 'flixster.com':
                     print common_str
                     print substrCompany[common_str]
                 if len(substrCompany[common_str]) < 5 and app in expApp:
                     covered.add(app)
                     rules[url] = app
-                    if url == 'maps.moovitapp.com':
+                    if url == 'flixster.com':
                         print 'INNNNNNNNNNNN'
 
     pkgs = load_pkgs(DB='packages_20150210')
