@@ -887,7 +887,7 @@ def statFile():
     urlApp = defaultdict(set)
     substrCompany = defaultdict(set)
     appCompany, appName = load_appinfo()
-    for app, url,fileName in sqldao.execute('SELECT * FROM url_apk'):
+    for app, url, fileName in sqldao.execute('SELECT * FROM url_apk'):
         app = app.lower()
         url = url.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
         topDomain = get_top_domain(url)
@@ -896,7 +896,7 @@ def statFile():
         urlApp[url].add(app)
         topDomain = get_top_domain(url)
         urlApp[topDomain].add(app)
-        common_str_pkg = longest_common_substring(url.lower(), app.lower())
+        common_str_pkg = longest_common_substring(url.lower(), app)
         substrCompany[common_str_pkg].add(appCompany[app])
         common_str_company = longest_common_substring(url.lower(), appCompany[app].lower())
         substrCompany[common_str_company].add(appCompany[app])
@@ -905,14 +905,16 @@ def statFile():
 
     for tbl in ['packages_20150429', 'packages_20150509', 'packages_20150526']:
         for pkg in load_pkgs(DB = tbl):
-            url = pkg.host.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
             app = pkg.app
+            if app not in appCompany:
+                continue
+            
+            url = pkg.host.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
             topDomain = get_top_domain(url)
             urlApp[topDomain].add(app)
             urlApp[url].add(app)
             common_str = longest_common_substring(url.lower(), app)
             substrCompany[common_str].add(appCompany[app])
-            common_str = longest_common_substring(url.lower(), appCompany[app])
             common_str_company = longest_common_substring(url.lower(), appCompany[app].lower())
             substrCompany[common_str_company].add(appCompany[app])
             common_str_name = longest_common_substring(url.lower(), appName[app].lower())
