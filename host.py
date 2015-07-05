@@ -83,12 +83,12 @@ class HostApp:
       return self
 
     def classify(self, pkg):
-      print 'start'
+      import consts
       host = pkg.host.replace('-','.')
       secdomain = pkg.secdomain.replace('-', '.')
       app = self.rules[host] if host in self.rules else None
       app = self.rules[secdomain] if (app == None and secdomain in self.rules) else app
-      return {pkg.id : [(app, 1.0)]}
+      return {consts.APP_RULE : [(app, 1.0)]}
 
 
 if __name__ == '__main__':
