@@ -88,7 +88,10 @@ class HostApp:
       secdomain = pkg.secdomain.replace('-', '.')
       app = self.rules[host] if host in self.rules else None
       app = self.rules[secdomain] if (app == None and secdomain in self.rules) else app
-      return {consts.APP_RULE : [(app, 1.0)]}
+      rst = {}
+      if app:
+        rst = {consts.APP_RULE : [(app, 1.0)]}
+      return rst
 
 
 if __name__ == '__main__':
