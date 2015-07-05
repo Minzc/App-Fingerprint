@@ -96,8 +96,8 @@ def execute(train_set, test_set, inforTrack):
     classifiers = {
              #"Header Rule" : HeaderClassifier(),
              #"CMAR Rule" : CMAR(3),
-             "Host Rule" : HostApp(),
-             #"KV RUle" : KVClassifier()
+             #"Host Rule" : HostApp(),
+             "KV RUle" : KVClassifier()
             }
 
     for name, classifier in classifiers.items():
