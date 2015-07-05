@@ -80,13 +80,14 @@ class HostApp:
                       self.rules[url] = app
                       if url == 'flixster.com':
                           print 'INNNNNNNNNNNN'
+      return self
 
     def classify(self, pkg):
+      print 'start'
       host = pkg.host.replace('-','.')
       secdomain = pkg.secdomain.replace('-', '.')
       app = self.rules[host] if host in self.rules else None
       app = self.rules[secdomain] if (app == None and secdomain in self.rules) else app
-      print pkg.id
       return {pkg.id : [(app, 1.0)]}
 
 

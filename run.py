@@ -13,7 +13,7 @@ import argparse
 from host import HostApp
 
 
-LIMIT = None
+LIMIT = 10
 FOLD = 1
 DEBUG = False
 DEBUG_CMAR = False
