@@ -371,56 +371,6 @@ class ParamRules:
     sqldao.close()
 
 
-
-# def _persist(patterns, paraminer, tree, goodCandidates):
-#     def tuples2str(tuples):
-#       return '&'.join([k+'='+v for k, v in tuples ])
-#     QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
-#     sqldao = SqlDao()
-#     # Param rules
-#     params = []
-#     for recog_rule in paraminer.stat(patterns):
-#       k, app, host, confidence, support, rule_type = recog_rule
-#       k = tuples2str(k)
-#       params.append((app, support, confidence, host, k, rule_type))
-#     sqldao.executeBatch(QUERY, params)
-#     # Tree rules
-#     params = []
-#     for appName, appCompany, valueName, tokenName, hostName, tokenConfidence, tokenSupport in tree._gen_rules(goodCandidates, confidence, support):
-#         params.append((appName, tokenSupport, 1.0, hostName, tokenName+'='+valueName, consts.APP_RULE))
-#     sqldao.executeBatch(QUERY , params)
-#     sqldao.close()
-
-# def _persist2(patterns):
-    
-#     def tuples2str(tuples):
-#       return '&'.join([k+'='+v for k, v in tuples ])
-#     QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
-#     sqldao = SqlDao()
-#     # Param rules
-#     params = []
-#     for host in patterns:
-#       for key in patterns[host]:
-#         for value in patterns[host][key]:
-#           max_confidence = -1
-#           max_support = -1
-#           max_app = None
-#           for app in patterns[host][key][value]:
-#             confidence = patterns[host][key][value][app]['score']
-#             support = patterns[host][key][value][app]['count']
-#             # params.append((app, support, confidence, host, key+'='+value, consts.APP_RULE))
-#             if confidence > max_confidence:
-#               max_confidence = confidence
-#               max_support = support
-#               max_app = app
-#             elif confidence == max_confidence and support > max_support:
-#               max_support = support
-#               max_app = app
-#           params.append((max_app, max_support, max_confidence, host, key+'='+value, consts.APP_RULE))
-#     sqldao.executeBatch(QUERY, params)
-#     sqldao.close()
-#     print 'FINISH PERSIST', len(params)
-
 class KVClassifier:
   def __init__(self):
     self.paraminer = ParamRules()
@@ -441,17 +391,20 @@ class KVClassifier:
     for tbl in tbls:
       pkgs = load_pkgs(None, DB = tbl)
       totalPkgs[tbl] = pkgs
-      for pkg in pkgs:
-        for k,v in pkg.queries.items():
-          map(lambda x : self.featureTbl[pkg.secdomain][pkg.app][k][x].add(tbl), v)
-          map(lambda x : self.valueAppCounter[x].add(pkg.app), v)
-          map(lambda x : self.valueCompanyCounter[x].add(pkg.company), v)
+      
     return totalPkgs
 
   def train2(self, training_data=None, confidence=0.8, support=2):
     self.paraminer = ParamRules2()
     self._clean_db()
-    #training_data = self._load_train_data() if not training_data else training_data
+    training_data = self._load_train_data() if not training_data else training_data
+    
+    for tbl in training_data.keys():
+      for pkg in training_data[tbl]:
+        for k,v in pkg.queries.items():
+          map(lambda x : self.featureTbl[pkg.secdomain][pkg.app][k][x].add(tbl), v)
+          map(lambda x : self.valueAppCounter[x].add(pkg.app), v)
+          map(lambda x : self.valueCompanyCounter[x].add(pkg.company), v)
     
     ##################
     # Count
