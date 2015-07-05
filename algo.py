@@ -1,9 +1,7 @@
-from nltk import FreqDist
 import consts
 from sqldao import SqlDao
-
 from utils import Relation, load_pkgs, loadfile
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 import operator
 
 
@@ -179,6 +177,86 @@ class KVTree:
         for tokennode in appnode.father:
           tokennode.set_status(-1)
 
+class ParamRules2:
+  def __init__(self):
+    def _dictvalue_factory():
+      return defaultdict(int)
+    self.results = defaultdict(_dictvalue_factory)
+    self._rules = []
+    def load_rules(ln): 
+      host, rule = ln.split(':')
+      rule = [host] + filter(None, rule.split('$'))
+      self._rules.append(rule)
+
+    loadfile('ad_dict.txt', load_rules)
+
+  def load_rules(self):
+    print 'load rules'
+    sqldao = SqlDao()
+    self.rules = {}
+    # self.rules[consts.APP_RULE] = defaultdict(dict)
+    self.rules[consts.APP_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
+    self.rules[consts.COMPANY_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
+    QUERY = 'SELECT kvpattern, host, label, confidence, rule_type, support FROM patterns WHERE kvpattern IS NOT NULL'
+    for kv, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
+      key, value = kv.split('=', 1)
+      self.rules[rule_type][host][key][value][label]['score'] = confidence
+      self.rules[rule_type][host][key][value][label]['support'] = support
+
+  def classify(self, pkg):
+    max_score = -1
+    occur_count = -1
+    predict_app = None
+
+    if pkg.secdomain in self.rules[consts.APP_RULE]:
+      for k in self.rules[consts.APP_RULE][pkg.secdomain]:
+        if k in pkg.queries:
+          for v in pkg.queries[k]:
+            if v in self.rules[consts.APP_RULE][pkg.secdomain][k]:
+              for app, score_count in self.rules[consts.APP_RULE][pkg.secdomain][k][v].iteritems():
+                score,count = score_count['score'], score_count['support']
+                
+                if score > max_score:
+                  predict_app = app
+                  max_score = score
+                  occur_count = count
+                  
+                elif score == max_score and count > occur_count:
+                  predict_app = app
+                  occur_count = count
+    predict_rst = {}
+    predict_rst[consts.APP_RULE] = [(predict_app, max_score)]
+    return predict_rst
+
+  def _persist(self, patterns):
+    
+    def tuples2str(tuples):
+      return '&'.join([k+'='+v for k, v in tuples ])
+    QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
+    sqldao = SqlDao()
+    # Param rules
+    params = []
+    for host in patterns:
+      for key in patterns[host]:
+        for value in patterns[host][key]:
+          max_confidence = -1
+          max_support = -1
+          max_app = None
+          for app in patterns[host][key][value]:
+            confidence = patterns[host][key][value][app]['score']
+            support = patterns[host][key][value][app]['count']
+            # params.append((app, support, confidence, host, key+'='+value, consts.APP_RULE))
+            if confidence > max_confidence:
+              max_confidence = confidence
+              max_support = support
+              max_app = app
+            elif confidence == max_confidence and support > max_support:
+              max_support = support
+              max_app = app
+          params.append((max_app, max_support, max_confidence, host, key+'='+value, consts.APP_RULE))
+    sqldao.executeBatch(QUERY, params)
+    sqldao.close()
+    print 'FINISH PERSIST', len(params)
 
 
 class ParamRules:
@@ -238,13 +316,14 @@ class ParamRules:
       yield (k[:-1], app, k[-1], confidence, support, consts.APP_RULE)
 
   def load_rules(self):
+    print 'load rules'
     sqldao = SqlDao()
     self.rules = {}
     self.rules[consts.APP_RULE] = defaultdict(dict)
     self.rules[consts.COMPANY_RULE] = defaultdict(dict)
     QUERY = 'SELECT kvpattern, host, label, confidence,rule_type FROM patterns WHERE kvpattern IS NOT NULL'
     for kv, host, label, confidence, rule_type in sqldao.execute(QUERY):
-      self.rules[rule_type][host][frozenset(kv.split('&'))] = (label, confidence)
+      self.rules[rule_type][host][frozenset(kv.split('&'))] = (label, confidence)  
 
   def classify(self, package):
     kv = { k+'='+v[0] for k, v in package.queries.iteritems()}
@@ -263,18 +342,16 @@ class ParamRules:
         if k.issubset(kv):
           rst[rulesID].append(v)
 
-    if len(rst) == 0:
-      # use predefined rules to classify
-      patterns = list(self.mine(package))
-      for pattern in patterns:
-        for k,v in pattern[:-3]:
-          if ' ' not in v and '.' in v:
-            rst[consts.APP_RULE].append((v, 1.0))
+    # if len(rst) == 0:
+    #   # use predefined rules to classify
+    #   patterns = list(self.mine(package))
+    #   for pattern in patterns:
+    #     for k,v in pattern[:-3]:
+    #       if ' ' not in v and '.' in v:
+    #         rst[consts.APP_RULE].append((v, 1.0))
     return rst
 
-
-
-def _persist(patterns, paraminer, tree, goodCandidates):
+  def _persist(self, patterns, paraminer, tree, goodCandidates):
     def tuples2str(tuples):
       return '&'.join([k+'='+v for k, v in tuples ])
     QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
@@ -294,6 +371,56 @@ def _persist(patterns, paraminer, tree, goodCandidates):
     sqldao.close()
 
 
+
+# def _persist(patterns, paraminer, tree, goodCandidates):
+#     def tuples2str(tuples):
+#       return '&'.join([k+'='+v for k, v in tuples ])
+#     QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
+#     sqldao = SqlDao()
+#     # Param rules
+#     params = []
+#     for recog_rule in paraminer.stat(patterns):
+#       k, app, host, confidence, support, rule_type = recog_rule
+#       k = tuples2str(k)
+#       params.append((app, support, confidence, host, k, rule_type))
+#     sqldao.executeBatch(QUERY, params)
+#     # Tree rules
+#     params = []
+#     for appName, appCompany, valueName, tokenName, hostName, tokenConfidence, tokenSupport in tree._gen_rules(goodCandidates, confidence, support):
+#         params.append((appName, tokenSupport, 1.0, hostName, tokenName+'='+valueName, consts.APP_RULE))
+#     sqldao.executeBatch(QUERY , params)
+#     sqldao.close()
+
+# def _persist2(patterns):
+    
+#     def tuples2str(tuples):
+#       return '&'.join([k+'='+v for k, v in tuples ])
+#     QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
+#     sqldao = SqlDao()
+#     # Param rules
+#     params = []
+#     for host in patterns:
+#       for key in patterns[host]:
+#         for value in patterns[host][key]:
+#           max_confidence = -1
+#           max_support = -1
+#           max_app = None
+#           for app in patterns[host][key][value]:
+#             confidence = patterns[host][key][value][app]['score']
+#             support = patterns[host][key][value][app]['count']
+#             # params.append((app, support, confidence, host, key+'='+value, consts.APP_RULE))
+#             if confidence > max_confidence:
+#               max_confidence = confidence
+#               max_support = support
+#               max_app = app
+#             elif confidence == max_confidence and support > max_support:
+#               max_support = support
+#               max_app = app
+#           params.append((max_app, max_support, max_confidence, host, key+'='+value, consts.APP_RULE))
+#     sqldao.executeBatch(QUERY, params)
+#     sqldao.close()
+#     print 'FINISH PERSIST', len(params)
+
 class KVClassifier:
   def __init__(self):
     self.paraminer = ParamRules()
@@ -303,6 +430,88 @@ class KVClassifier:
     sqldao.execute('DELETE FROM patterns WHERE kvpattern IS NOT NULL')
     sqldao.commit()
     sqldao.close()
+  
+  def _load_train_data(self):
+    # "packages_20150615",
+    tbls = ["packages_20150210",  "packages_20150509", "packages_20150526"]
+    totalPkgs = {}
+    ##################
+    # Load Data
+    ##################
+    for tbl in tbls:
+      pkgs = load_pkgs(None, DB = tbl)
+      totalPkgs[tbl] = pkgs
+      for pkg in pkgs:
+        for k,v in pkg.queries.items():
+          map(lambda x : self.featureTbl[pkg.secdomain][pkg.app][k][x].add(tbl), v)
+          map(lambda x : self.valueAppCounter[x].add(pkg.app), v)
+          map(lambda x : self.valueCompanyCounter[x].add(pkg.company), v)
+    return totalPkgs
+
+  def train2(self, training_data=None, confidence=0.8, support=2):
+    self.paraminer = ParamRules2()
+    self._clean_db()
+    #training_data = self._load_train_data() if not training_data else training_data
+    
+    ##################
+    # Count
+    ##################
+    # secdomain -> app -> key -> value -> tbls
+    self.featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
+    self.valueAppCounter = defaultdict(set)
+    self.valueCompanyCounter = defaultdict(set)
+    totalPkgs = self._load_train_data()
+    # secdomain -> key -> (app, score)
+    keyScore = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
+    for secdomain in self.featureTbl:
+      for app in self.featureTbl[secdomain]:
+        for k in self.featureTbl[secdomain][app]:
+          for v, tbls in self.featureTbl[secdomain][app][k].iteritems():
+            if len(self.valueAppCounter[v]) == 1:
+              cleaned_k = k.replace("\t", "")
+              keyScore[secdomain][cleaned_k]['score'] += (len(tbls) - 1) / float(len(tbls))
+              keyScore[secdomain][cleaned_k]['app'].add(app)
+    print 'keyScore:', len(keyScore)
+    #############################
+    # Generate interesting keys
+    #############################
+    Rule = namedtuple('Rule', 'secdomain, key, score, appNum')
+    general_rules = defaultdict(list)
+    for secdomain in keyScore:
+      for key in keyScore[secdomain]:
+        appNum = len(keyScore[secdomain][key]['app']) 
+        score = keyScore[secdomain][key]['score']
+        print appNum, score
+        if appNum == 1 or score == 0:
+          continue
+        general_rules[secdomain].append(Rule(secdomain, key, score, appNum))
+    for secdomain in general_rules:
+      general_rules[secdomain] = sorted(general_rules[secdomain], key=lambda rule: rule.score, reverse = True)
+
+    print "general_rules", len(general_rules)
+    #############################
+    # Generate specific rules
+    #############################
+    specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
+    ruleCover = defaultdict(int)
+    
+    for tbl, pkgs in totalPkgs.iteritems():
+      for pkg in filter(lambda pkg : pkg.secdomain in general_rules,pkgs):
+        for rule in filter(lambda rule : rule.key in pkg.queries, general_rules[pkg.secdomain]):
+          ruleCover[rule] += 1
+          # for value in filter(lambda value : len(valueAppCounter[value]) == 1, pkg.queries[rule.key]):
+          #   specific_rules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
+          #   specific_rules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
+          for value in pkg.queries[rule.key]:
+            if len(self.valueAppCounter[value]) == 1:
+                specific_rules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
+                specific_rules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
+    print 'specific_rules:', len(specific_rules)
+    
+    self.paraminer._persist(specific_rules)
+    self.paraminer.load_rules()
+    return self.paraminer
+
 
   def train(self, training_data=None, confidence=0.8, support=2): 
 
@@ -340,7 +549,7 @@ class KVClassifier:
     ###############
     # Persist
     ###############
-    _persist(patterns, self.paraminer, tree, goodCandidates)
+    self.paraminer._persist(patterns, self.paraminer, tree, goodCandidates)
     self.paraminer.load_rules()
     return self.paraminer
   
@@ -367,126 +576,138 @@ def KVPredictor(test_records=None):
   print ">>> Correct:", correct, "Total:", count, "Precision:", correct * 1.0 / count
   return rst
 
+# class ParamRules2:
+#   def __init__(self):
+#     def _dictvalue_factory():
+#       return defaultdict(int)
+#     self.results = defaultdict(_dictvalue_factory)
+#     self._rules = []
+#     def load_rules(ln): 
+#       host, rule = ln.split(':')
+#       rule = [host] + filter(None, rule.split('$'))
+#       self._rules.append(rule)
 
-def batchTest(outputfile):
-  tbls = ["packages_20150210", "packages_20150616", "packages_20150509", "packages_20150526"]
-  ##################
-  # Load Data
-  ##################
-  for tbl in tbls:
-    pkgs = load_pkgs(None, DB = tbl)
-    totalPkgs[tbl] = pkgs
-    for pkg in pkgs:
-      for k,v in pkg.queries.items():
-        map(lambda x : featureTbl[pkg.secdomain][pkg.app][k][x].add(tbl), v)
-        map(lambda x : valueAppCounter[x].add(pkg.app), v)
-        map(lambda x : valueCompanyCounter[x].add(pkg.company), v)
-  
-  ##################
-  # Count
-  ##################
-  # secdomain -> app -> key -> value -> tbls
-  featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
-  valueAppCounter = defaultdict(set)
-  valueCompanyCounter = defaultdict(set)
-  totalPkgs = {}
-  # secdomain -> key -> (app, score)
-  keyScore = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
-  for secdomain in featureTbl:
-    for app in featureTbl[secdomain]:
-      for k in featureTbl[secdomain][app]:
-        for v, tbls in featureTbl[secdomain][app][k].iteritems():
-          if len(valueAppCounter[v]) == 1:
-            cleaned_k = k.replace("\t", "")
-            keyScore[secdomain][cleaned_k]['score'] += (len(tbls) - 1) / float(len(tbls))
-            keyScore[secdomain][cleaned_k]['app'].add(app)
+#     loadfile('ad_dict.txt', load_rules)
 
-  
-  #############################
-  # Generate interesting keys
-  #############################
-  Rule = namedtuple('Rule', 'secdomain, key, score, appNum')
-  generalRules = defaultdict(list)
-  for secdomain in keyScore:
-    for key in keyScore[secdomain]:
-      appNum = len(keyScore[secdomain][key]['app']) 
-      score = keyScore[secdomain][key]['score']
-      if appNum == 1 or score == 0:
-        continue
-      general_rules[secdomain].append(Rule(secdomain, key, score, appNum))
-  for secdomain in general_rules:
-    general_rules[secdomain] = sorted(general_rules[secdomain], key=lambda rule: rule.score, reverse = True)
-
-
-  #############################
-  # Generate specific rules
-  #############################
-  specifiRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
-  ruleCover = defaultdict(int)
-  for tbl, pkgs in totalPkgs.iteritems():
-    for pkg in filter(lambda pkg : pkg.secdomain in general_rules,pkgs):
-      for rule in filter(lambda rule : rule.key in pkg.queries, general_rules[pkg.secdomain]):
-        ruleCover[rule] += 1
-        for value in filter(lambda apps : len(app) == 1, pkg.queries[rule.key]):
-          specifiRules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
-          specifiRules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
-
-  ###################
-  # Test
-  ###################
-  pkgs = load_pkgs(None, DB = 'packages_20150429_small')
-  predictRst = {}
-  total = 0
-  for pkg in pkgs:
-    max_score = -1
-    occur_count = -1
-    predict_app = None
-    token, value, secdomain = None, None, None
-
-    for k, v in pkg.queries.iteritems():
-      total += 1
-      for app, scoreCount in specifiRules[pkg.secdomain][k][v].iteritems():
-        score,count = scoreCount['score'], scoreCount['count']
-        update = False
-        if score > max_score:
-          predict_app = app
-          max_score = score
-          occur_count = count
-          update = True
-        elif score == max_score and count > occur_count:
-          predict_app = app
-          occur_count = count
-          update = True
-        if update:
-          token = k
-          value = v
-          secdomain = pkg.secdomain
+#   def train(self, outputfile):
+#     tbls = ["packages_20150210", "packages_20150616", "packages_20150509", "packages_20150526"]
+#     ##################
+#     # Load Data
+#     ##################
+#     for tbl in tbls:
+#       pkgs = load_pkgs(None, DB = tbl)
+#       totalPkgs[tbl] = pkgs
+#       for pkg in pkgs:
+#         for k,v in pkg.queries.items():
+#           map(lambda x : featureTbl[pkg.secdomain][pkg.app][k][x].add(tbl), v)
+#           map(lambda x : self.valueAppCounter[x].add(pkg.app), v)
+#           map(lambda x : valueCompanyCounter[x].add(pkg.company), v)
     
-    predictRst[pkg.id] = (predict_app, pkg.app)
-    if predict_app != pkg.app:
-      debug[secdomain][token][value] += 1
+#     ##################
+#     # Count
+#     ##################
+#     # secdomain -> app -> key -> value -> tbls
+#     featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
+#     valueAppCounter = defaultdict(set)
+#     valueCompanyCounter = defaultdict(set)
+#     totalPkgs = {}
+#     # secdomain -> key -> (app, score)
+#     keyScore = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
+#     for secdomain in featureTbl:
+#       for app in featureTbl[secdomain]:
+#         for k in featureTbl[secdomain][app]:
+#           for v, tbls in featureTbl[secdomain][app][k].iteritems():
+#             if len(valueAppCounter[v]) == 1:
+#               cleaned_k = k.replace("\t", "")
+#               keyScore[secdomain][cleaned_k]['score'] += (len(tbls) - 1) / float(len(tbls))
+#               keyScore[secdomain][cleaned_k]['app'].add(app)
 
-  #################
-  # Evaluate
-  #################
-  covered_app = set()
-  precision = 0
-  recall = 0
-  for value in predictRst.values():
-    if value[0] != None:
-      recall += 1
-      if value[0] == value[1]:
-        precision += 1
-        covered_app.add(value[1])
-      else:
-        print value[0], value[1]
-  print "Precision: %s Recall: %s App: %s" % (float(precision)/recall, float(recall) / total, len(covered_app))
-  fw = open(outputfile+'.debug', 'w')
-  for secdomain in debug:
-    for token in debug[secdomain]:
-      for value in debug[secdomain][token]:
-        fw.write("%s\t%s\t%s\t%s\n" % ( secdomain, token, value, debug[secdomain][token][value] ))
-  fw.close()
+    
+#     #############################
+#     # Generate interesting keys
+#     #############################
+#     Rule = namedtuple('Rule', 'secdomain, key, score, appNum')
+#     generalRules = defaultdict(list)
+#     for secdomain in keyScore:
+#       for key in keyScore[secdomain]:
+#         appNum = len(keyScore[secdomain][key]['app']) 
+#         score = keyScore[secdomain][key]['score']
+#         if appNum == 1 or score == 0:
+#           continue
+#         general_rules[secdomain].append(Rule(secdomain, key, score, appNum))
+#     for secdomain in general_rules:
+#       general_rules[secdomain] = sorted(general_rules[secdomain], key=lambda rule: rule.score, reverse = True)
+
+
+#     #############################
+#     # Generate specific rules
+#     #############################
+#     specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
+#     ruleCover = defaultdict(int)
+#     for tbl, pkgs in totalPkgs.iteritems():
+#       for pkg in filter(lambda pkg : pkg.secdomain in general_rules,pkgs):
+#         for rule in filter(lambda rule : rule.key in pkg.queries, general_rules[pkg.secdomain]):
+#           ruleCover[rule] += 1
+#           for value in filter(lambda apps : len(app) == 1, pkg.queries[rule.key]):
+#             specific_rules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
+#             specific_rules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
+
+#     ###################
+#     # Test
+#     ###################
+#     pkgs = load_pkgs(None, DB = 'packages_20150429_small')
+#     predictRst = {}
+#     total = 0
+#     for pkg in pkgs:
+#       max_score = -1
+#       occur_count = -1
+#       predict_app = None
+#       token, value, secdomain = None, None, None
+
+#       for k, v in pkg.queries.iteritems():
+#         total += 1
+#         for app, scoreCount in specific_rules[pkg.secdomain][k][v].iteritems():
+#           score,count = scoreCount['score'], scoreCount['count']
+#           update = False
+#           if score > max_score:
+#             predict_app = app
+#             max_score = score
+#             occur_count = count
+#             update = True
+#           elif score == max_score and count > occur_count:
+#             predict_app = app
+#             occur_count = count
+#             update = True
+#           if update:
+#             token = k
+#             value = v
+#             secdomain = pkg.secdomain
+      
+#       predictRst[pkg.id] = (predict_app, pkg.app)
+#       if predict_app != pkg.app:
+#         debug[secdomain][token][value] += 1
+
+#     #################
+#     # Evaluate
+#     #################
+#     covered_app = set()
+#     precision = 0
+#     recall = 0
+#     for value in predictRst.values():
+#       if value[0] != None:
+#         recall += 1
+#         if value[0] == value[1]:
+#           precision += 1
+#           covered_app.add(value[1])
+#         else:
+#           print value[0], value[1]
+#     print "Precision: %s Recall: %s App: %s" % (float(precision)/recall, float(recall) / total, len(covered_app))
+#     fw = open(outputfile+'.debug', 'w')
+#     for secdomain in debug:
+#       for token in debug[secdomain]:
+#         for value in debug[secdomain][token]:
+#           fw.write("%s\t%s\t%s\t%s\n" % ( secdomain, token, value, debug[secdomain][token][value] ))
+#     fw.close()
 
 import sys
 

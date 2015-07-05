@@ -675,7 +675,12 @@ def rmOtherApp(tbls=["packages_20150210", "packages_20150429", "packages_2015050
     sqldao.close()
 
 def batchTest(outputfile):
-  tbls = ["packages_20150210", "packages_20150616", "packages_20150509", "packages_20150526"]
+  #tbls = ["packages_20150210", "packages_20150616", "packages_20150509", "packages_20150526"]
+  tbls = ["packages_20150210",  "packages_20150509", "packages_20150526"]
+  featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
+  valueAppCounter = defaultdict(set)
+  valueCompanyCounter = defaultdict(set)
+  totalPkgs = {}
   ##################
   # Load Data
   ##################
@@ -690,10 +695,6 @@ def batchTest(outputfile):
   ##################
   # Count
   ##################
-  featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
-  valueAppCounter = defaultdict(set)
-  valueCompanyCounter = defaultdict(set)
-  totalPkgs = {}
   # secdomain -> key -> (app, score)
   keyScore = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
   violate = defaultdict(lambda : defaultdict(set))
@@ -743,6 +744,8 @@ def batchTest(outputfile):
               if len(valueAppCounter[value]) == 1:
                 specific_rules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
                 specific_rules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
+  
+  print "specific_rules", len(specific_rules)
 
   fw = open(outputfile+'.rule_cover', 'w')
   for rule in ruleCover:
@@ -768,7 +771,7 @@ def batchTest(outputfile):
   ###################
   # Test
   ###################
-  pkgs = load_pkgs(None, DB = 'packages_20150429_small')
+  pkgs = load_pkgs(None, DB = 'packages_20150429')
   predict_rst = {}
   debug = defaultdict(lambda : defaultdict(lambda : defaultdict(int)))
   total = 0
@@ -819,7 +822,7 @@ def batchTest(outputfile):
         covered_app.add(value[1])
       else:
         print value[0], value[1]
-  print "Precision: %s Recall: %s App: %s" % (float(precision)/recall, float(recall) / total, len(covered_app))
+  print "Precision: %s (%s / %s) Recall: %s (%s / %s) App: %s " % (float(precision)/recall, precision, recall, float(recall) / total, recall,total,len(covered_app))
   fw = open(outputfile+'.debug', 'w')
   for secdomain in debug:
     for token in debug[secdomain]:
@@ -951,6 +954,9 @@ def statFile():
                     if url == 'flixster.com':
                         print 'INNNNNNNNNNNN'
 
+    ##################
+    # Test
+    ##################
     pkgs = load_pkgs(DB='packages_20150210')
     correct = 0
     total = 0

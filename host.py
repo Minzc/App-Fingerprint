@@ -1,176 +1,94 @@
+from utils import load_appinfo, longest_common_substring, get_top_domain
+from sqldao import SqlDao
 from collections import defaultdict
-import tldextract
-from cluster import ClusterHost
-from utils import app_clean, load_pkgs
 
 
 class HostApp:
-    def __init__(self):
-        self.host_apps = {}
-        self.host_company = {}
-        self.app_hosts = {}
-        self.clusterhost = ClusterHost()
+    def loadExpApp(self):
+      expApp=set()
+      for app in open("resource/exp_app.txt"):
+          expApp.add(app.strip().lower())
+      return expApp
+        
     
     def train(self, records):
-      for record in records:
-        self._process(record)
-      self.host_apps, self.host_company = self._result()
+      expApp = self.loadExpApp()
+      sqldao = SqlDao()
+      fileApp = defaultdict(set)
+      fileUrl = defaultdict(set)
+      urlApp = defaultdict(set)
+      substrCompany = defaultdict(set)
+      appCompany, appName = load_appinfo()
+      for app, url, fileName in sqldao.execute('SELECT * FROM url_apk'):
+          app = app.lower()
+          url = url.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
+          topDomain = get_top_domain(url)
+          fileApp[fileName].add(appCompany[app])
+          fileUrl[fileName].add(url)
+          urlApp[url].add(app)
+          topDomain = get_top_domain(url)
+          urlApp[topDomain].add(app)
+          common_str_pkg = longest_common_substring(url.lower(), app)
+          substrCompany[common_str_pkg].add(appCompany[app])
+          common_str_company = longest_common_substring(url.lower(), appCompany[app].lower())
+          substrCompany[common_str_company].add(appCompany[app])
+          common_str_name = longest_common_substring(url.lower(), appName[app].lower())
+          substrCompany[common_str_name].add(appCompany[app])
 
-    def classify(self, record):
-      label_dist = {}
-      if record.host in self.host_apps:
-        return {self.host_apps[record.host]:1.0}
-      return {}
+      for pkgs in records.values():
+        for pkg in pkgs:
+          app = pkg.app
+          if app not in appCompany:
+              continue
+          url = pkg.host.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
+          topDomain = get_top_domain(url)
+          urlApp[topDomain].add(app)
+          urlApp[url].add(app)
+          common_str = longest_common_substring(url.lower(), app)
+          substrCompany[common_str].add(appCompany[app])
+          common_str_company = longest_common_substring(url.lower(), appCompany[app].lower())
+          substrCompany[common_str_company].add(appCompany[app])
+          common_str_name = longest_common_substring(url.lower(), appName[app].lower())
+          substrCompany[common_str_name].add(appCompany[app])
+          if topDomain == 'maps.moovitapp.com':
+              print '#TOPDOMAIN'
+      rmdUrls = set()
 
-    def _process(self, package):
-        topdom = package.secdomain
-        app = package.app
-        host = package.host
-        name = package.name
+      for fileName,urls in fileApp.iteritems():
+          if len(urls) > 1:
+              for url in fileUrl[fileName]:
+                  rmdUrls.add(url)
+      ########################
+      # Generate Rules
+      ########################
+      covered = set()
+      self.rules = {}
+      for url, apps in urlApp.iteritems():
+          if url == 'flixster.com':
+              print '#', url in rmdUrls
+              print '#', len(apps)
+              print apps
+          if url not in rmdUrls and len(apps) == 1:
+              app = apps.pop()
+              for astr in [app, appCompany[app], appName[app]]:
+                  common_str = longest_common_substring(url.lower(), astr.lower())
+                  if url == 'flixster.com':
+                      print common_str
+                      print substrCompany[common_str]
+                  if len(substrCompany[common_str]) < 5 and app in expApp:
+                      covered.add(app)
+                      self.rules[url] = app
+                      if url == 'flixster.com':
+                          print 'INNNNNNNNNNNN'
 
-        self.clusterhost.process(package)
+    def classify(self, pkg):
+      host = pkg.host.replace('-','.')
+      secdomain = pkg.secdomain.replace('-', '.')
+      app = self.rules[host] if host in self.rules else None
+      app = self.rules[secdomain] if (app == None and secdomain in self.rules) else app
+      print pkg.id
+      return {pkg.id : [(app, 1.0)]}
 
-        self.host_apps.setdefault(host, set())
-        self.host_company.setdefault(host, set())
-        self.app_hosts.setdefault(app, set())
-
-        appsegs = app_clean(app.lower()).split('.')
-        self.host_apps[host].add(app)
-        self.host_company[host].add(appsegs[-1])
-
-        hstsegs = set(package.host.lower().replace('.', ' ').replace('-', ' ').split(' '))
-
-        # they contain common part
-        for appseg in appsegs:
-            for hstseg in hstsegs:
-                appseg = appseg.strip()
-                hstseg = hstseg.strip()
-                if appseg == hstseg and len(appseg) > 0:
-                    self.app_hosts[app].add(host)
-                if (appseg in hstseg or hstseg in appseg) and len(appseg) > 2 and len(hstseg) > 2:
-                    self.app_hosts[app].add(host)
-
-        for nameseg in name.split(','):
-            nameseg = nameseg.replace(' ', '')
-            if nameseg in host:
-                self.app_hosts[app].add(host)
-
-    def _result(self):
-        """
-        rst_hst_app: host -> app
-        rst_hst_company: host -> {app:company, app:company}
-        """
-        rst_hst_app = {}
-        rst_hst_company = {}
-        for app, hosts in self.app_hosts.items():
-            for host in hosts:
-                if len(self.host_apps[host]) == 1:
-                    rst_hst_app[host] = app
-                elif len(self.host_company[host]) < 2:
-                    rst_hst_company.setdefault(host, set())
-                    company = self.host_company[host].pop()
-                    rst_hst_company[host].add((app, company))
-                    self.host_company[host].add(company)
-        return rst_hst_app, rst_hst_company
-
-    # def clustr_analyz(self):
-    # rst = self.clusterhost.result()
-    # 	hst_clstid = {}
-    # 	clsters = []
-
-    # 	clstid = 0
-    # 	for apps, hosts in rst.items():
-    # 		for host in hosts.split(','):
-    # 			hst_clstid.setdefault(host, set())
-    # 			hst_clstid[host].add(clstid)
-    # 		clsters.append(apps)
-    # 		clstid += 1
-
-    # 	# find hosts that occured in only one cluster
-    # 	clstid_host = {}
-    # 	for host, clstids in hst_clstid.items():
-    # 		if len(clstids) == 1:
-    # 			clstid = clstids.pop()
-    # 			clstid_host.setdefault(clstid, set())
-    # 			clstid_host[clstid].add(host)
-
-    # 	host_app = {}
-    # 	host_company = {}
-    # 	for clstid,hosts in clstid_host.items():
-    # 		if len(hosts) == 1:
-    # 			print "$$$", hosts
-    # 			host = hosts.pop()
-    # 			if len(clsters[clstid]) == 1:
-    # 				host_app[host] = clsters[clstid]
-    # 			else:
-    # 				clstname = self.get_cluster_name(clsters[clstid])
-    # 				host_company[host] = set()
-    # 				for app in clsters[clstid]:
-    # 					host_company[host].add((app,clstname))
-    # 	return host_app, host_company
-
-
-
-    def get_cluster_name(self, apps):
-        """
-        input : a set of app names
-        """
-        names = set()
-        for app in apps:
-            cmpname = app_clean(app).split('.')[0]
-            names.add(cmpname)
-        if len(names) == 1:
-            return names.pop()
-        else:
-            # TODO get company name from url
-            return apps.pop()
-
-        # def app_clean(self, appname):
-        # 	return appname.replace('air.','')\
-        # 	.replace('com.','')\
-        # 	.replace('br.','')\
-        # 	.replace('net.','')\
-        # 	.replace('au.','')\
-        # 	.replace('ca.','')\
-        # 	.replace('cn.','')\
-        # 	.replace('co.','')\
-        # 	.replace('org','')
-
-
-class HostAnalyz:
-    def analyz_clst(self, clusters):
-        """
-        remove general hosts
-        Input: app1, app2 \t host1, host2
-        """
-        counter = defaultdict(int)
-        for apps, hosts in clusters.items():
-            secdomains = set()
-            for host in hosts.split(','):
-                # counter.inc(host)
-                extracted = tldextract.extract(host)
-                secdomain = None
-
-                if len(extracted.domain) > 0:
-                    secdomain = "{}.{}".format(extracted.domain, extracted.suffix)
-                    secdomains.add(secdomain)
-            for secdomain in secdomains:
-                counter.inc(secdomain)
-
-        rst = {}
-        for apps, hosts in clusters.items():
-            hosts = hosts.split(',')
-            rst[apps] = set()
-            for host in hosts:
-                extracted = tldextract.extract(host)
-                secdomain = None
-                if len(extracted.domain) > 0:
-                    secdomain = "{}.{}".format(extracted.domain, extracted.suffix)
-                    if counter[secdomain] == 1:
-                        rst[apps].add(host)
-                    # if counter[host] == 1:
-                    # rst[apps].add(host)
-        return rst
 
 if __name__ == '__main__':
   records = load_pkgs()

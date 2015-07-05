@@ -10,6 +10,7 @@ from collections import namedtuple
 import consts
 import sys
 import argparse
+from host import HostApp
 
 
 LIMIT = None
@@ -49,15 +50,21 @@ def filter_label_type(label_type):
 
 def use_classifier(classifier, test_set):
     rst = {}
+    total = 0
+    recall = 0
     for id, record in test_set.items():
+        total += 1
         # predict
         labelDists = classifier.classify(record)
         max_confidence = -1
         for labelType, labelDist in labelDists.iteritems():
+            recall += 1
             if labelDist and filter_label_type(labelType):
                 labelDist.sort(key=lambda v: v[1], reverse=True)
                 if labelDist[0][1] > max_confidence:
                   rst[id] = labelDist[0][0]
+    
+    print total, recall
     return rst
 
 
@@ -85,12 +92,14 @@ def execute(train_set, test_set, inforTrack):
     classifiers = {
              #"Header Rule" : HeaderClassifier(),
              #"CMAR Rule" : CMAR(3),
-             "KV RUle" : KVClassifier()
+             "Host Rule" : HostApp(),
+             #"KV RUle" : KVClassifier()
             }
 
     for name, classifier in classifiers.items():
         print ">>> [%s] " % (name)
         classifier.train(train_set)
+        print 'train finish'
         tmprst = use_classifier(classifier, test_set)
         rst = merge_rst(rst, tmprst)
 
@@ -105,7 +114,7 @@ def execute(train_set, test_set, inforTrack):
     inforTrack['precision'] += correct * 1.0 / len(rst)
     inforTrack['recall'] += len(rst) * 1.0 / len(test_set) * 1.0
     #####################################
-    #	Text Rules
+    # Text Rules
     #####################################
     # print ">>> [Classifier] Text Rules"
     # hostRuler = HostApp()
@@ -139,12 +148,13 @@ if __name__ == '__main__':
         FOLD = 5
 
     expApp = loadExpApp()
-    records = []
+    records = {}
     for tbl in args.train:
-        records += load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp ,DB = tbl)
+        records[tbl] = load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp ,DB = tbl)
     apps = set()
-    for r in records:
-        apps.add(r.app)
+    for pkgs in records.values():
+        for pkg in pkgs:
+            apps.add(pkg.app)
     print "len of app", len(apps), "len of train set", len(records)
 
 
@@ -195,7 +205,8 @@ if __name__ == '__main__':
         rst = {}
 
         if not DEBUG : 
-            for i in train_set:
+            for ies in train_set.values():
+              for i in ies:
                 fw.write(str(i.id)+'\n')
         rst = execute(train_set, test_set, inforTrack)
 

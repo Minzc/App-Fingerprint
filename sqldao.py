@@ -15,7 +15,7 @@ class SqlDao:
             self.cursor.execute(query, param)
             if counter == 30:
                 self.cnx.commit()
-            counter = 0
+                counter = 0
         return self.cursor
     
     def execute(self, query, param = None):
