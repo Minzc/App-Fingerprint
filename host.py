@@ -88,7 +88,6 @@ class HostApp:
       secdomain = pkg.secdomain.replace('-', '.')
       app = self.rules[host] if host in self.rules else None
       app = self.rules[secdomain] if (app == None and secdomain in self.rules) else app
-      print app
       return {pkg.id : [(app, 1.0)]}
 
 

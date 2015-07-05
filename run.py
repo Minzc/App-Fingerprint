@@ -56,11 +56,15 @@ def use_classifier(classifier, test_set):
         total += 1
         # predict
         labelDists = classifier.classify(record)
+        print labelDists
         max_confidence = -1
         for labelType, labelDist in labelDists.iteritems():
             recall += 1
             if labelDist and filter_label_type(labelType):
                 labelDist.sort(key=lambda v: v[1], reverse=True)
+                
+                print 'labelDist', labelDist
+
                 if labelDist[0][1] > max_confidence:
                   rst[id] = labelDist[0][0]
     
