@@ -168,7 +168,6 @@ def load_pkgs(limit = None, filterFunc=lambda x : True, DB="packages"):
     print QUERY
 
     for id, app, add_header, path, refer, host, agent, company,name, dst, raw in sqldao.execute(QUERY):
-        
         package = Package()
         package.set_app(app)
         package.set_path(path)
@@ -211,6 +210,12 @@ def get_record_f(record):
     features.append(record.app)
 
     return features
+
+def loadExpApp():
+    expApp=set()
+    for app in open("resource/exp_app.txt"):
+        expApp.add(app.strip().lower())
+    return expApp
 
 def load_appinfo():
   QUERY = 'SELECT app, name, company, category FROM apps'

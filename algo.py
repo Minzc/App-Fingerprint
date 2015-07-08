@@ -1,6 +1,6 @@
 import consts
 from sqldao import SqlDao
-from utils import Relation, load_pkgs, loadfile
+from utils import Relation, load_pkgs, loadfile, load_appinfo, loadExpApp
 from collections import defaultdict, namedtuple
 import operator
 
@@ -179,41 +179,39 @@ class KVTree:
 
 class ParamRules2:
   def __init__(self):
-    def _dictvalue_factory():
-      return defaultdict(int)
-    self.results = defaultdict(_dictvalue_factory)
-    self._rules = []
-    def load_rules(ln): 
-      host, rule = ln.split(':')
-      rule = [host] + filter(None, rule.split('$'))
-      self._rules.append(rule)
-
-    loadfile('ad_dict.txt', load_rules)
+    self.rules = {}    
+    self.appCompany = loadExpApp()
 
   def load_rules(self):
     print 'load rules'
     sqldao = SqlDao()
-    self.rules = {}
-    # self.rules[consts.APP_RULE] = defaultdict(dict)
     self.rules[consts.APP_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
     self.rules[consts.COMPANY_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
-    QUERY = 'SELECT kvpattern, host, label, confidence, rule_type, support FROM patterns WHERE kvpattern IS NOT NULL'
-    for kv, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
-      key, value = kv.split('=', 1)
+    QUERY = 'SELECT paramkey, paramvalue, host, label, confidence, rule_type, support FROM patterns WHERE paramkey IS NOT NULL'
+    counter = 0
+    for key, value, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
+      counter += 1
+      # key, value = kv.split('=', 1)
+      host = ''
       self.rules[rule_type][host][key][value][label]['score'] = confidence
       self.rules[rule_type][host][key][value][label]['support'] = support
-
+    print counter
+  
   def classify(self, pkg):
     max_score = -1
     occur_count = -1
     predict_app = None
-
-    if pkg.secdomain in self.rules[consts.APP_RULE]:
-      for k in self.rules[consts.APP_RULE][pkg.secdomain]:
+    tmp_rst = None
+    secdomain = ''
+    if secdomain in self.rules[consts.APP_RULE]:
+      for k in self.rules[consts.APP_RULE][secdomain]:
         if k in pkg.queries:
           for v in pkg.queries[k]:
-            if v in self.rules[consts.APP_RULE][pkg.secdomain][k]:
-              for app, score_count in self.rules[consts.APP_RULE][pkg.secdomain][k][v].iteritems():
+            if v.lower() in self.appCompany:
+              tmp_rst = v.lower()
+
+            if v in self.rules[consts.APP_RULE][secdomain][k]:
+              for app, score_count in self.rules[consts.APP_RULE][secdomain][k][v].iteritems():
                 score,count = score_count['score'], score_count['support']
                 
                 if score > max_score:
@@ -225,14 +223,15 @@ class ParamRules2:
                   predict_app = app
                   occur_count = count
     predict_rst = {}
-    predict_rst[consts.APP_RULE] = [(predict_app, max_score)]
+    predict_app, max_score = (tmp_rst, 1) if not predict_app else (predict_app, max_score)
+    if predict_app:
+      predict_rst[consts.APP_RULE] = [(predict_app, max_score)]
     return predict_rst
 
   def _persist(self, patterns):
-    
     def tuples2str(tuples):
       return '&'.join([k+'='+v for k, v in tuples ])
-    QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
+    QUERY = 'INSERT INTO patterns (label, support, confidence, host, paramkey, paramvalue, rule_type) VALUES (%s, %s, %s, %s, %s, %s, %s)'
     sqldao = SqlDao()
     # Param rules
     params = []
@@ -244,8 +243,8 @@ class ParamRules2:
           max_app = None
           for app in patterns[host][key][value]:
             confidence = patterns[host][key][value][app]['score']
-            support = patterns[host][key][value][app]['count']
-            # params.append((app, support, confidence, host, key+'='+value, consts.APP_RULE))
+            support = patterns[host][key][value][app]['support']
+            params.append((app, support, confidence, host, key, value, consts.APP_RULE))
             if confidence > max_confidence:
               max_confidence = confidence
               max_support = support
@@ -253,127 +252,21 @@ class ParamRules2:
             elif confidence == max_confidence and support > max_support:
               max_support = support
               max_app = app
-          params.append((max_app, max_support, max_confidence, host, key+'='+value, consts.APP_RULE))
+          #params.append((max_app, max_support, max_confidence, host, key+'='+value, consts.APP_RULE))
     sqldao.executeBatch(QUERY, params)
     sqldao.close()
     print 'FINISH PERSIST', len(params)
 
 
-class ParamRules:
-  def __init__(self):
-    def _dictvalue_factory():
-      return defaultdict(int)
-    self.results = defaultdict(_dictvalue_factory)
-    self._rules = []
-    def load_rules(ln): 
-      host, rule = ln.split(':')
-      rule = [host] + filter(None, rule.split('$'))
-      self._rules.append(rule)
-
-    loadfile('ad_dict.txt', load_rules)
-  
-  def mine(self, package):
-    for rule in self._rules:
-      if rule[0] in package.host:
-        match = True
-        pattern = []
-        for key in rule[1:]:
-          if key in package.queries:
-            pattern.append((key, package.queries[key][0]))
-          elif package.form and key in package.form:
-            pattern.append((key, package.form[key]))
-          else:
-            match = False
-        if match:
-          host = package.secdomain if rule[0] != '' else ''
-          pattern.append(host)
-          pattern.append(package.company)
-          pattern.append(package.app)
-          yield pattern
-  
-  def stat(self, patterns):
-    company_rules = {}
-    app_rules = {}
-    for pattern in patterns:
-      host, company, app = pattern[-3], pattern[-2], pattern[-1]
-      pattern = tuple(pattern[:-2])
-      if DEBUG : print ">>> Pattern : ", pattern
-      company_rules[pattern] = defaultdict(int)
-      company_rules[pattern][company] += 1
-      app_rules[pattern] = defaultdict(int)
-      app_rules[pattern][app] += 1
-    for k, company_dist in company_rules.iteritems():
-      company = max(company_dist.iteritems(), key=operator.itemgetter(1))[0]
-      support = company_dist[company]
-      confidence = support * 1.0 / sum(company_dist.values())
-      if DEBUG : print '>>> [DEBUG:stat]', k[:-1], k[-1], 'confidence:', confidence
-      yield (k[:-1], company, k[-1], confidence, support, consts.COMPANY_RULE)
-    for k, app_dist in app_rules.iteritems():
-      app = max(app_dist.iteritems(), key=operator.itemgetter(1))[0]
-      support = app_dist[app]
-      confidence = support * 1.0 / sum(app_dist.values())
-      if DEBUG: print k[:-1], k[-1], 'confidence:', confidence
-      yield (k[:-1], app, k[-1], confidence, support, consts.APP_RULE)
-
-  def load_rules(self):
-    print 'load rules'
-    sqldao = SqlDao()
-    self.rules = {}
-    self.rules[consts.APP_RULE] = defaultdict(dict)
-    self.rules[consts.COMPANY_RULE] = defaultdict(dict)
-    QUERY = 'SELECT kvpattern, host, label, confidence,rule_type FROM patterns WHERE kvpattern IS NOT NULL'
-    for kv, host, label, confidence, rule_type in sqldao.execute(QUERY):
-      self.rules[rule_type][host][frozenset(kv.split('&'))] = (label, confidence)  
-
-  def classify(self, package):
-    kv = { k+'='+v[0] for k, v in package.queries.iteritems()}
-    if package.form:
-      for k,v in package.form.iteritems():
-        kv.add(k + '=' + v)
-
-    # Format testing data
-    host = package.secdomain
-    rst = defaultdict(list)
-    for rulesID, rules in self.rules.iteritems():
-      for k, v in rules[host].iteritems():
-        if k.issubset(kv):
-          rst[rulesID].append(v)
-      for k,v in rules[''].iteritems():
-        if k.issubset(kv):
-          rst[rulesID].append(v)
-
-    # if len(rst) == 0:
-    #   # use predefined rules to classify
-    #   patterns = list(self.mine(package))
-    #   for pattern in patterns:
-    #     for k,v in pattern[:-3]:
-    #       if ' ' not in v and '.' in v:
-    #         rst[consts.APP_RULE].append((v, 1.0))
-    return rst
-
-  def _persist(self, patterns, paraminer, tree, goodCandidates):
-    def tuples2str(tuples):
-      return '&'.join([k+'='+v for k, v in tuples ])
-    QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
-    sqldao = SqlDao()
-    # Param rules
-    params = []
-    for recog_rule in paraminer.stat(patterns):
-      k, app, host, confidence, support, rule_type = recog_rule
-      k = tuples2str(k)
-      params.append((app, support, confidence, host, k, rule_type))
-    sqldao.executeBatch(QUERY, params)
-    # Tree rules
-    params = []
-    for appName, appCompany, valueName, tokenName, hostName, tokenConfidence, tokenSupport in tree._gen_rules(goodCandidates, confidence, support):
-        params.append((appName, tokenSupport, 1.0, hostName, tokenName+'='+valueName, consts.APP_RULE))
-    sqldao.executeBatch(QUERY , params)
-    sqldao.close()
+# 
 
 
 class KVClassifier:
   def __init__(self):
-    self.paraminer = ParamRules()
+    self.paraminer = ParamRules2()
+    self.featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
+    self.valueAppCounter = defaultdict(set)
+    self.valueCompanyCounter = defaultdict(set)
     
   def _clean_db(self):
     sqldao = SqlDao()
@@ -394,14 +287,17 @@ class KVClassifier:
       
     return totalPkgs
 
-  def train2(self, training_data=None, confidence=0.8, support=2):
-    self.paraminer = ParamRules2()
+  def train(self, training_data=None, confidence=0.8, support=2):
     self._clean_db()
+    appDict = set()
     training_data = self._load_train_data() if not training_data else training_data
     
     for tbl in training_data.keys():
       for pkg in training_data[tbl]:
+        appDict.add(pkg.app)
         for k,v in pkg.queries.items():
+          if pkg.secdomain == 'bluecorner.es' or pkg.host == 'bluecorner.es' or pkg.app == 'com.bluecorner.totalgym':
+            print 'OK contains bluecorner', pkg.secdomain
           map(lambda x : self.featureTbl[pkg.secdomain][pkg.app][k][x].add(tbl), v)
           map(lambda x : self.valueAppCounter[x].add(pkg.app), v)
           map(lambda x : self.valueCompanyCounter[x].add(pkg.company), v)
@@ -410,16 +306,14 @@ class KVClassifier:
     # Count
     ##################
     # secdomain -> app -> key -> value -> tbls
-    self.featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
-    self.valueAppCounter = defaultdict(set)
-    self.valueCompanyCounter = defaultdict(set)
-    totalPkgs = self._load_train_data()
     # secdomain -> key -> (app, score)
     keyScore = defaultdict(lambda : defaultdict(lambda : {'app':set(), 'score':0}))
     for secdomain in self.featureTbl:
       for app in self.featureTbl[secdomain]:
         for k in self.featureTbl[secdomain][app]:
           for v, tbls in self.featureTbl[secdomain][app][k].iteritems():
+            if secdomain == 'bluecorner.es':
+              print k, v , len(self.valueAppCounter[v])
             if len(self.valueAppCounter[v]) == 1:
               cleaned_k = k.replace("\t", "")
               keyScore[secdomain][cleaned_k]['score'] += (len(tbls) - 1) / float(len(tbls))
@@ -434,7 +328,6 @@ class KVClassifier:
       for key in keyScore[secdomain]:
         appNum = len(keyScore[secdomain][key]['app']) 
         score = keyScore[secdomain][key]['score']
-        print appNum, score
         if appNum == 1 or score == 0:
           continue
         general_rules[secdomain].append(Rule(secdomain, key, score, appNum))
@@ -445,28 +338,33 @@ class KVClassifier:
     #############################
     # Generate specific rules
     #############################
-    specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
+    specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'support':0}))))
     ruleCover = defaultdict(int)
     
-    for tbl, pkgs in totalPkgs.iteritems():
-      for pkg in filter(lambda pkg : pkg.secdomain in general_rules,pkgs):
+    debug_counter = 0
+    for tbl, pkgs in training_data.iteritems():
+      for pkg in filter(lambda pkg : pkg.secdomain in general_rules, pkgs):
         for rule in filter(lambda rule : rule.key in pkg.queries, general_rules[pkg.secdomain]):
           ruleCover[rule] += 1
           # for value in filter(lambda value : len(valueAppCounter[value]) == 1, pkg.queries[rule.key]):
           #   specific_rules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
-          #   specific_rules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
+          #   specific_rules[pkg.secdomain][rule.key][value][pkg.app]['support'] += 1
           for value in pkg.queries[rule.key]:
             if len(self.valueAppCounter[value]) == 1:
-                specific_rules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
-                specific_rules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
-    print 'specific_rules:', len(specific_rules)
+                debug_counter += 1
+                # specific_rules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
+                # specific_rules[pkg.secdomain][rule.key][value][pkg.app]['support'] += 1
+                specific_rules[''][rule.key][value][pkg.app]['score'] = rule.score
+                specific_rules[''][rule.key][value][pkg.app]['support'] += 1
+    print 'specific_rules:', len(specific_rules), debug_counter
     
     self.paraminer._persist(specific_rules)
     self.paraminer.load_rules()
+
     return self.paraminer
 
 
-  def train(self, training_data=None, confidence=0.8, support=2): 
+  def train2(self, training_data=None, confidence=0.8, support=2): 
 
     self._clean_db()
     training_data = load_pkgs() if not training_data else training_data
@@ -595,7 +493,7 @@ def KVPredictor(test_records=None):
 #     #############################
 #     # Generate specific rules
 #     #############################
-#     specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
+#     specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'support':0}))))
 #     ruleCover = defaultdict(int)
 #     for tbl, pkgs in totalPkgs.iteritems():
 #       for pkg in filter(lambda pkg : pkg.secdomain in general_rules,pkgs):
@@ -662,6 +560,116 @@ def KVPredictor(test_records=None):
 #           fw.write("%s\t%s\t%s\t%s\n" % ( secdomain, token, value, debug[secdomain][token][value] ))
 #     fw.close()
 
+# class ParamRules:
+#   def __init__(self):
+#     def _dictvalue_factory():
+#       return defaultdict(int)
+#     self.results = defaultdict(_dictvalue_factory)
+#     self._rules = []
+#     def load_rules(ln): 
+#       host, rule = ln.split(':')
+#       rule = [host] + filter(None, rule.split('$'))
+#       self._rules.append(rule)
+
+#     loadfile('ad_dict.txt', load_rules)
+  
+#   def mine(self, package):
+#     for rule in self._rules:
+#       if rule[0] in package.host:
+#         match = True
+#         pattern = []
+#         for key in rule[1:]:
+#           if key in package.queries:
+#             pattern.append((key, package.queries[key][0]))
+#           elif package.form and key in package.form:
+#             pattern.append((key, package.form[key]))
+#           else:
+#             match = False
+#         if match:
+#           host = package.secdomain if rule[0] != '' else ''
+#           pattern.append(host)
+#           pattern.append(package.company)
+#           pattern.append(package.app)
+#           yield pattern
+  
+#   def stat(self, patterns):
+#     company_rules = {}
+#     app_rules = {}
+#     for pattern in patterns:
+#       host, company, app = pattern[-3], pattern[-2], pattern[-1]
+#       pattern = tuple(pattern[:-2])
+#       if DEBUG : print ">>> Pattern : ", pattern
+#       company_rules[pattern] = defaultdict(int)
+#       company_rules[pattern][company] += 1
+#       app_rules[pattern] = defaultdict(int)
+#       app_rules[pattern][app] += 1
+#     for k, company_dist in company_rules.iteritems():
+#       company = max(company_dist.iteritems(), key=operator.itemgetter(1))[0]
+#       support = company_dist[company]
+#       confidence = support * 1.0 / sum(company_dist.values())
+#       if DEBUG : print '>>> [DEBUG:stat]', k[:-1], k[-1], 'confidence:', confidence
+#       yield (k[:-1], company, k[-1], confidence, support, consts.COMPANY_RULE)
+#     for k, app_dist in app_rules.iteritems():
+#       app = max(app_dist.iteritems(), key=operator.itemgetter(1))[0]
+#       support = app_dist[app]
+#       confidence = support * 1.0 / sum(app_dist.values())
+#       if DEBUG: print k[:-1], k[-1], 'confidence:', confidence
+#       yield (k[:-1], app, k[-1], confidence, support, consts.APP_RULE)
+
+#   def load_rules(self):
+#     print 'load rules'
+#     sqldao = SqlDao()
+#     self.rules = {}
+#     self.rules[consts.APP_RULE] = defaultdict(dict)
+#     self.rules[consts.COMPANY_RULE] = defaultdict(dict)
+#     QUERY = 'SELECT kvpattern, host, label, confidence,rule_type FROM patterns WHERE kvpattern IS NOT NULL'
+#     for kv, host, label, confidence, rule_type in sqldao.execute(QUERY):
+#       self.rules[rule_type][host][frozenset(kv.split('&'))] = (label, confidence)  
+
+#   def classify(self, package):
+#     kv = { k+'='+v[0] for k, v in package.queries.iteritems()}
+#     if package.form:
+#       for k,v in package.form.iteritems():
+#         kv.add(k + '=' + v)
+
+#     # Format testing data
+#     host = package.secdomain
+#     rst = defaultdict(list)
+#     for rulesID, rules in self.rules.iteritems():
+#       for k, v in rules[host].iteritems():
+#         if k.issubset(kv):
+#           rst[rulesID].append(v)
+#       for k,v in rules[''].iteritems():
+#         if k.issubset(kv):
+#           rst[rulesID].append(v)
+
+#     # if len(rst) == 0:
+#     #   # use predefined rules to classify
+#     #   patterns = list(self.mine(package))
+#     #   for pattern in patterns:
+#     #     for k,v in pattern[:-3]:
+#     #       if ' ' not in v and '.' in v:
+#     #         rst[consts.APP_RULE].append((v, 1.0))
+#     return rst
+
+#   def _persist(self, patterns, paraminer, tree, goodCandidates):
+#     def tuples2str(tuples):
+#       return '&'.join([k+'='+v for k, v in tuples ])
+#     QUERY = 'INSERT INTO patterns (label, support, confidence, host, kvpattern, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
+#     sqldao = SqlDao()
+#     # Param rules
+#     params = []
+#     for recog_rule in paraminer.stat(patterns):
+#       k, app, host, confidence, support, rule_type = recog_rule
+#       k = tuples2str(k)
+#       params.append((app, support, confidence, host, k, rule_type))
+#     sqldao.executeBatch(QUERY, params)
+#     # Tree rules
+#     params = []
+#     for appName, appCompany, valueName, tokenName, hostName, tokenConfidence, tokenSupport in tree._gen_rules(goodCandidates, confidence, support):
+#         params.append((appName, tokenSupport, 1.0, hostName, tokenName+'='+valueName, consts.APP_RULE))
+#     sqldao.executeBatch(QUERY , params)
+#     sqldao.close()
 import sys
 
 if __name__ == '__main__':

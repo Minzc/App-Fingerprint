@@ -2,7 +2,7 @@ from sklearn.cross_validation import KFold
 import datetime
 from sqldao import SqlDao
 from fp import CMAR
-from utils import load_pkgs
+from utils import load_pkgs, load_appinfo
 from algo import KVClassifier
 from classifier import HeaderClassifier
 from host import HostApp
@@ -32,41 +32,44 @@ def merge_rst(rst, tmprst):
 
 def evaluate(rst, test_set):
     # app_rst, record_id
+    appCompany, appName = load_appinfo()
     correct, wrong = 0, 0
     correct_app = set()
     for k, v in rst.items():
         # if v == test_set[k].app or test_set[k].company in set(v.split('$')) or v in test_set[k].name:
         if v == test_set[k].app:
-            correct += 1
-            correct_app.add(test_set[k].app)
+          correct += 1
+          correct_app.add(test_set[k].app)
+        elif v == appCompany[test_set[k].app]:
+          correct += 1
+          correct_app.add(test_set[k].app)
         else:
-            wrong += 1
+          wrong += 1
     print 'Total:', len(test_set), 'Recognized:', len(rst), 'Correct:', correct, 'Wrong:', wrong
     return correct, correct_app
 
 
 def filter_label_type(label_type):
-  return label_type == consts.APP_RULE
+  return label_type == consts.APP_RULE or label_type == consts.COMPANY_RULE
 
 def use_classifier(classifier, test_set):
     rst = {}
     total = 0
     recall = 0
-    for id, record in test_set.items():
-        total += 1
+    for pkg_id, record in test_set.items():
+        if len(record.queries) > 0:
+          total += 1
         # predict
         labelDists = classifier.classify(record)
-        print labelDists
         max_confidence = -1
         for labelType, labelDist in labelDists.iteritems():
-            recall += 1
             if labelDist and filter_label_type(labelType):
+                recall += 1
                 labelDist.sort(key=lambda v: v[1], reverse=True)
-                
-                print 'labelDist', labelDist
+                #rst[id] = labelDist[0][0]
 
                 if labelDist[0][1] > max_confidence:
-                  rst[id] = labelDist[0][0]
+                  rst[pkg_id] = labelDist[0][0]
     
     print total, recall
     return rst
@@ -94,9 +97,9 @@ def execute(train_set, test_set, inforTrack):
         test_apps.add(record.app)
 
     classifiers = {
-             #"Header Rule" : HeaderClassifier(),
+             "Header Rule" : HeaderClassifier(),
              #"CMAR Rule" : CMAR(3),
-             #"Host Rule" : HostApp(),
+             "Host Rule" : HostApp(),
              "KV RUle" : KVClassifier()
             }
 
@@ -117,16 +120,6 @@ def execute(train_set, test_set, inforTrack):
     inforTrack['discoveried_app'] += len(correct_app) * 1.0 / len(test_apps)
     inforTrack['precision'] += correct * 1.0 / len(rst)
     inforTrack['recall'] += len(rst) * 1.0 / len(test_set) * 1.0
-    #####################################
-    # Text Rules
-    #####################################
-    # print ">>> [Classifier] Text Rules"
-    # hostRuler = HostApp()
-    # hostRuler.train(train_set)
-    # tmprst = use_classifier(hostRuler, test_set)
-    # merge_rst(rst, tmprst)
-    # print ">>> Recognized:", len(rst)
-    #####################################
     return rst
 
 def loadExpApp():
@@ -154,13 +147,13 @@ if __name__ == '__main__':
     expApp = loadExpApp()
     records = {}
     for tbl in args.train:
-        records[tbl] = load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp ,DB = tbl)
-    apps = set()
+       records[tbl] = load_pkgs(LIMIT, DB = tbl)
+    
+    apps = set()  
     for pkgs in records.values():
         for pkg in pkgs:
             apps.add(pkg.app)
     print "len of app", len(apps), "len of train set", len(records)
-
 
     rnd = 0
 
@@ -190,7 +183,6 @@ if __name__ == '__main__':
             sqldao.commit()
             sqldao.close()
             train, test = load_trian(len(records))
-
     else:
         test_set = {record.id:record for record in load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = args.test)}
         set_pair.append((records, test_set))
@@ -200,6 +192,7 @@ if __name__ == '__main__':
         print "len of apps", len(apps), "len of test set", len(test_set)
 
     inforTrack = { 'discoveried_app':0.0, 'precision':0.0, 'recall':0.0}
+
 
     for train_set, test_set in set_pair:
         rnd += 1

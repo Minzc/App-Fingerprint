@@ -3,12 +3,10 @@ import sys
 
 from nltk import FreqDist
 
-from utils import loadfile, Relation, top_domain, lower_all, app_clean, load_pkgs
+from utils import loadfile, Relation, top_domain, lower_all, app_clean, load_pkgs, loadExpApp
 from sqldao import SqlDao
 from package import Package
 from collections import defaultdict, namedtuple
-
-
 
 
 def stat_hstNapp(filepath):
@@ -676,18 +674,21 @@ def rmOtherApp(tbls=["packages_20150210", "packages_20150429", "packages_2015050
 
 def batchTest(outputfile):
   #tbls = ["packages_20150210", "packages_20150616", "packages_20150509", "packages_20150526"]
+  expApp = loadExpApp()
   tbls = ["packages_20150210",  "packages_20150509", "packages_20150526"]
   featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
   valueAppCounter = defaultdict(set)
   valueCompanyCounter = defaultdict(set)
   totalPkgs = {}
+  appDict = set()
   ##################
   # Load Data
   ##################
   for tbl in tbls:
-    pkgs = load_pkgs(None, DB = tbl)
+    pkgs = load_pkgs(None,  DB = tbl)    
     totalPkgs[tbl] = pkgs
     for pkg in pkgs:
+      appDict.add(pkg.app)
       for k,v in pkg.queries.items():
         map(lambda x : featureTbl[pkg.secdomain][pkg.app][k][x].add(tbl), v)
         map(lambda x : valueAppCounter[x].add(pkg.app), v)
@@ -710,29 +711,37 @@ def batchTest(outputfile):
             cleaned_k = k.replace("\t", "")
             keyScore[secdomain][cleaned_k]['score'] += (len(featureTbl[secdomain][app][k][v]) - 1) / float(len(featureTbl[secdomain][app][k]))
             keyScore[secdomain][cleaned_k]['app'].add(app)
-            try:
-              fw.write("%s %s %s %s\n" % (secdomain, app, k, v.replace('\n','').replace(' ', ''), len(featureTbl[secdomain][app][k])))
-            except:
-              pass
-  fw = open(outputfile+".score", 'w')
+            # try:
+            #   fw.write("%s %s %s %s\n" % (secdomain, app, k, v.replace('\n','').replace(' ', ''), len(featureTbl[secdomain][app][k])))
+            # except:
+            #   pass
+  #fw = open(outputfile+".score", 'w')
   Rule = namedtuple('Rule', 'secdomain,key,score,appNum')
   general_rules = defaultdict(list)
   for secdomain in keyScore:
     for key in keyScore[secdomain]:
-      if len(keyScore[secdomain][key]['app']) == 1 or keyScore[secdomain][key]['score'] == 0:
+      if secdomain == 'facebook.com' and key == 'app_id':
+        print 'Key=', key
+        print "keyScore[secdomain][key]['app']=", keyScore[secdomain][key]['app']
+        print "keyScore[secdomain][key]['score']=", keyScore[secdomain][key]['score']
+
+      if len(keyScore[secdomain][key]['app']) == 1 or (keyScore[secdomain][key]['score'] == 0 and 'id' not in key.lower()):
         continue
       general_rules[secdomain].append(Rule(secdomain, key, keyScore[secdomain][key]['score'], len(keyScore[secdomain][key]['app'])))
-      try:
-        fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, keyScore[secdomain][key]['score'], len(keyScore[secdomain][key]['app'])))
-      except:
-        pass
-  fw.close()
+      # try:
+      #   fw.write("%s\t%s\t%s\t%s\n" % (secdomain, key, keyScore[secdomain][key]['score'], len(keyScore[secdomain][key]['app'])))
+      # except:
+      #   pass
+  # fw.close()
   for secdomain in general_rules:
     general_rules[secdomain] = sorted(general_rules[secdomain], key=lambda rule: rule.score, reverse = True)
 
   specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
   ruleCover = defaultdict(int)
   covered_app = set()
+##############
+  debug_counter = 0
+##############
   for tbl in totalPkgs:
     for pkg in totalPkgs[tbl]:
       if pkg.secdomain in general_rules:
@@ -742,36 +751,39 @@ def batchTest(outputfile):
             covered_app.add(pkg.app)
             for value in pkg.queries[rule.key]:
               if len(valueAppCounter[value]) == 1:
+                # todo DEBUG
+                pkg.secdomain = ''
                 specific_rules[pkg.secdomain][rule.key][value][pkg.app]['score'] = rule.score
                 specific_rules[pkg.secdomain][rule.key][value][pkg.app]['count'] += 1
+                debug_counter += 1
   
-  print "specific_rules", len(specific_rules)
+  print "specific_rules", len(specific_rules), debug_counter
 
-  fw = open(outputfile+'.rule_cover', 'w')
-  for rule in ruleCover:
-    try:
-      fw.write("%s\t%s\t%s\t%s\t%s\n" % ( rule.secdomain, rule.key, rule.score, rule.app, ruleCover[rule]))
-    except:
-      pass
-  fw.write("Covered App:" + str(len(covered_app)) + "\n")
-  fw.close()
+  # fw = open(outputfile+'.rule_cover', 'w')
+  # for rule in ruleCover:
+  #   try:
+  #     fw.write("%s\t%s\t%s\t%s\t%s\n" % ( rule.secdomain, rule.key, rule.score, rule.app, ruleCover[rule]))
+  #   except:
+  #     pass
+  # fw.write("Covered App:" + str(len(covered_app)) + "\n")
+  # fw.close()
   
-  fw = open(outputfile+'.total_rules', 'w')
-  for secdomain in specific_rules:
-    for key in specific_rules[secdomain]:
-      for app in specific_rules[secdomain][key]:
-        for value in specific_rules[secdomain][key][app]:
-          try:
-            fw.write("%s\t%s\t%s\t%s\t%s\n" % ( secdomain, key, value, app, specific_rules[secdomain][key][app]))
-          except:
-            pass
-  fw.close()
+  # fw = open(outputfile+'.total_rules', 'w')
+  # for secdomain in specific_rules:
+  #   for key in specific_rules[secdomain]:
+  #     for app in specific_rules[secdomain][key]:
+  #       for value in specific_rules[secdomain][key][app]:
+  #         try:
+  #           fw.write("%s\t%s\t%s\t%s\t%s\n" % ( secdomain, key, value, app, specific_rules[secdomain][key][app]))
+  #         except:
+  #           pass
+  # fw.close()
 
 
   ###################
   # Test
   ###################
-  pkgs = load_pkgs(None, DB = 'packages_20150429')
+  pkgs = load_pkgs(DB = "packages_20150429")
   predict_rst = {}
   debug = defaultdict(lambda : defaultdict(lambda : defaultdict(int)))
   total = 0
@@ -779,14 +791,18 @@ def batchTest(outputfile):
     max_score = -1
     occur_count = -1
     predict_app = None
+    backup_rst = None
     token, value, secdomain = None, None, None
     if len(pkg.queries) > 0:
       total += 1
-
+    # todo DEBUG
+    pkg.secdomain = ''
     if pkg.secdomain in specific_rules:
       for k in specific_rules[pkg.secdomain]:
         if k in pkg.queries:
           for v in pkg.queries[k]:
+            if v in appDict:
+                backup_rst = v
             if v in specific_rules[pkg.secdomain][k]:
               for app, score_count in specific_rules[pkg.secdomain][k][v].iteritems():
                 score,count = score_count['score'], score_count['count']
@@ -804,6 +820,9 @@ def batchTest(outputfile):
                   token = k
                   value = v
                   secdomain = pkg.secdomain
+    
+    predict_app = backup_rst if not predict_app else predict_app
+
     predict_rst[pkg.id] = (predict_app, pkg.app)
     if predict_app != pkg.app:
       debug[secdomain][token][value] += 1
@@ -823,12 +842,12 @@ def batchTest(outputfile):
       else:
         print value[0], value[1]
   print "Precision: %s (%s / %s) Recall: %s (%s / %s) App: %s " % (float(precision)/recall, precision, recall, float(recall) / total, recall,total,len(covered_app))
-  fw = open(outputfile+'.debug', 'w')
-  for secdomain in debug:
-    for token in debug[secdomain]:
-      for value in debug[secdomain][token]:
-        fw.write("%s\t%s\t%s\t%s\n" % ( secdomain, token, value, debug[secdomain][token][value] ))
-  fw.close()
+  # fw = open(outputfile+'.debug', 'w')
+  # for secdomain in debug:
+  #   for token in debug[secdomain]:
+  #     for value in debug[secdomain][token]:
+  #       fw.write("%s\t%s\t%s\t%s\n" % ( secdomain, token, value, debug[secdomain][token][value] ))
+  # fw.close()
 
 
 def statUrlPcap(outputfile):
@@ -986,8 +1005,8 @@ def statFile():
             uncovered_urls[pkg.host].add(pkg.app)
             url_counter[pkg.host] += 1
     print 'Total: %s Correct: %s No Query: %s' % (total, correct, noQuery)
-    for url in filter(lambda url: len(uncovered_urls[url]) == 1, url_counter):
-        print '%s\t%s\t%s' % (url, url_counter[url], uncovered_urls[url])
+    #for url in filter(lambda url: len(uncovered_urls[url]) == 1, url_counter):
+    #    print '%s\t%s\t%s' % (url, url_counter[url], uncovered_urls[url])
     
 
 if __name__ == '__main__':
