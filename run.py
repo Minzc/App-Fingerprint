@@ -5,7 +5,7 @@ from fp import CMAR
 from utils import load_pkgs, load_appinfo
 from algo import KVClassifier
 from classifier import HeaderClassifier
-from host import HostApp
+from host import HostApp, PathApp
 from collections import namedtuple
 import consts
 import sys
@@ -50,7 +50,7 @@ def evaluate(rst, test_set):
 
 
 def filter_label_type(label_type):
-  return label_type == consts.APP_RULE or label_type == consts.COMPANY_RULE
+  return label_type == consts.APP_RULE #or label_type == consts.COMPANY_RULE
 
 def use_classifier(classifier, test_set):
     rst = {}
@@ -96,17 +96,17 @@ def execute(train_set, test_set, inforTrack):
     for record in test_set.values():
         test_apps.add(record.app)
 
-    classifiers = {
-             "Header Rule" : HeaderClassifier(),
-             #"CMAR Rule" : CMAR(3),
-             "Host Rule" : HostApp(),
-             "KV RUle" : KVClassifier()
-            }
+    classifiers = [
+             #("Header Rule", HeaderClassifier()),
+             #("CMAR Rule", CMAR(min_cover = 1)),
+             #("Host Rule", HostApp()),
+             #("Path Rule" , PathApp()),
+             ("KV RUle", KVClassifier())
+            ]
 
-    for name, classifier in classifiers.items():
+    for name, classifier in classifiers:
         print ">>> [%s] " % (name)
         classifier.train(train_set)
-        print 'train finish'
         tmprst = use_classifier(classifier, test_set)
         rst = merge_rst(rst, tmprst)
 

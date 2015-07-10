@@ -193,6 +193,21 @@ class ParamRules2:
       counter += 1
       # key, value = kv.split('=', 1)
       host = ''
+      self.rules[rule_type][host][value][key][label]['score'] = confidence
+      self.rules[rule_type][host][value][key][label]['support'] = support
+    print counter
+
+  def load_rules2(self):
+    print 'load rules'
+    sqldao = SqlDao()
+    self.rules[consts.APP_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
+    self.rules[consts.COMPANY_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'count':0}))))
+    QUERY = 'SELECT paramkey, paramvalue, host, label, confidence, rule_type, support FROM patterns WHERE paramkey IS NOT NULL'
+    counter = 0
+    for key, value, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
+      counter += 1
+      # key, value = kv.split('=', 1)
+      host = ''
       self.rules[rule_type][host][key][value][label]['score'] = confidence
       self.rules[rule_type][host][key][value][label]['support'] = support
     print counter
@@ -297,7 +312,8 @@ class KVClassifier:
         appDict.add(pkg.app)
         for k,v in pkg.queries.items():
           if pkg.secdomain == 'bluecorner.es' or pkg.host == 'bluecorner.es' or pkg.app == 'com.bluecorner.totalgym':
-            print 'OK contains bluecorner', pkg.secdomain
+            #print 'OK contains bluecorner', pkg.secdomain
+            pass
           map(lambda x : self.featureTbl[pkg.secdomain][pkg.app][k][x].add(tbl), v)
           map(lambda x : self.valueAppCounter[x].add(pkg.app), v)
           map(lambda x : self.valueCompanyCounter[x].add(pkg.company), v)
@@ -313,7 +329,8 @@ class KVClassifier:
         for k in self.featureTbl[secdomain][app]:
           for v, tbls in self.featureTbl[secdomain][app][k].iteritems():
             if secdomain == 'bluecorner.es':
-              print k, v , len(self.valueAppCounter[v])
+              #print k, v , len(self.valueAppCounter[v])
+              pass
             if len(self.valueAppCounter[v]) == 1:
               cleaned_k = k.replace("\t", "")
               keyScore[secdomain][cleaned_k]['score'] += (len(tbls) - 1) / float(len(tbls))

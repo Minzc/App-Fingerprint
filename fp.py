@@ -103,13 +103,14 @@ def _encode_data(records=None, minimum_support = 2):
           transaction = _get_record_f(record)
           processed_transactions.append(transaction)
           # Last item is app
-          for item in transaction[:-1]:
+          # Second from last is host. Do not use host as feature
+          for item in transaction[:-2]:
               f_counter[item] += 1
               f_company[item].add(record.company)
 
       # Get frequent 1-item
       items = {item for item, num in f_counter.iteritems() 
-          if num > minimum_support and len(f_company[item]) < 4}
+          if num > minimum_support and len(f_company[item]) < 2}
       return processed_transactions, items
     
 
@@ -124,7 +125,8 @@ def _encode_data(records=None, minimum_support = 2):
         app = transaction[-1]
         # Prune infrequent items
         # Host and app are not included in transaction now
-        encode_transaction = [ itemIndx[item] for item in set(transaction[:-1])
+        #print '##########', 'students.ubc.ca' in items
+        encode_transaction = [ itemIndx[item] for item in set(transaction[:-2])
                 if item in items]
 
         recordHost.append(host)
@@ -250,6 +252,10 @@ class CMAR:
       sqldao.close()
 
   def _train(self, records, tSupport, tConfidence, ruleType):
+      tmp_record = []
+      for i in records.values():
+        tmp_record += i
+      records = tmp_record
       print "#CMAR:", len(records)
       encodedRecords, appIndx, featureIndx, recordHost = _encode_data(records)
       # Rules format : (feature, confidence, support, label)
