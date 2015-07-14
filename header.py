@@ -12,6 +12,8 @@ class HeadRuler:
                     if '.' in pkgname:
                         return pkgname
         return None
+    def loadRules(self):
+        pass
 
 
 def test_header():

@@ -3,7 +3,7 @@ import datetime
 from sqldao import SqlDao
 from fp import CMAR
 from utils import load_pkgs, load_appinfo
-from algo import KVClassifier
+from algo import KVClassifier, ParamRules2
 from classifier import HeaderClassifier
 from host import HostApp, PathApp
 from collections import namedtuple
@@ -11,6 +11,7 @@ import consts
 import sys
 import argparse
 from host import HostApp
+from rule_manager import RuleManager
 
 
 LIMIT = None
@@ -25,7 +26,7 @@ def load_trian(size):
 
 def merge_rst(rst, tmprst):
     for r in tmprst.keys():
-        if r not in rst:
+        if r not in rst or ( rst[r] == None  and tmprst[r] != None ):
             rst[r] = tmprst[r]
     return rst
 
@@ -36,7 +37,6 @@ def evaluate(rst, test_set):
     correct, wrong = 0, 0
     correct_app = set()
     for k, v in rst.items():
-        # if v == test_set[k].app or test_set[k].company in set(v.split('$')) or v in test_set[k].name:
         if v == test_set[k].app:
           correct += 1
           correct_app.add(test_set[k].app)
@@ -50,7 +50,7 @@ def evaluate(rst, test_set):
 
 
 def filter_label_type(label_type):
-  return label_type == consts.APP_RULE #or label_type == consts.COMPANY_RULE
+  return label_type == consts.APP_RULE or label_type == consts.COMPANY_RULE
 
 def use_classifier(classifier, test_set):
     rst = {}
@@ -98,18 +98,58 @@ def execute(train_set, test_set, inforTrack):
 
     classifiers = [
              #("Header Rule", HeaderClassifier()),
-             #("CMAR Rule", CMAR(min_cover = 1)),
-             #("Host Rule", HostApp()),
+             ("Host Rule", HostApp()),
+             #("CMAR Rule", CMAR(min_cover = 3)),
              #("Path Rule" , PathApp()),
-             ("KV RUle", KVClassifier())
+             #("KV Rule", KVClassifier())
             ]
 
+    
+    # for name, classifier in classifiers:
+    #     # print ">>> [%s] " % (name)
+    #     classifier =  classifier.train(train_set)
+    #     classifier.loadRules()
+    #     tmprst = use_classifier(classifier, test_set)
+    #     rst = merge_rst(rst, tmprst)
+
+    #    print ">>> Recognized:", len(rst)
+    
+    trained_classifiers = []
+    ruleDict = {}
+    classifierDict = {}
     for name, classifier in classifiers:
         print ">>> [%s] " % (name)
-        classifier.train(train_set)
+        classifier =  classifier.train(train_set)
+        trained_classifiers.append((name, classifier))
+        classifier.loadRules()
+        ruleDict[name] = classifier.rules
+        classifierDict[name] = classifier
+    # hostClassifier = HostApp()
+    # hostClassifier.loadRules()
+    # paramClassifier = ParamRules2()
+    # paramClassifier.loadRules()
+    # ruleDict['Host Rule'] = hostClassifier.rules
+    # ruleDict['KV Rule'] = paramClassifier.rules
+    # trained_classifiers.append(('KV Rule', paramClassifier))
+    # classifierDict['KV Rule'] = paramClassifier
+
+    
+
+    ruleManager = RuleManager()
+    print '>>> Finish training all classifiers'
+    print '>>> Start rule pruning'
+
+    #classifierDict["CMAR Rule"].rules = ruleManager.pruneCMARRules(ruleDict['CMAR Rule'], ruleDict['Host Rule'])
+    #classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],ruleDict['Host Rule'] )
+    
+    #classifierDict["CMAR Rule"].persist()
+    #classifierDict["KV Rule"].persist()
+    
+    for name, classifier in trained_classifiers:
+        print ">>> [%s] " % (name)
+        classifier.loadRules()
         tmprst = use_classifier(classifier, test_set)
         rst = merge_rst(rst, tmprst)
-
         print ">>> Recognized:", len(rst)
 
 

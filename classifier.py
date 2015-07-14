@@ -14,9 +14,15 @@ def header_classifier(package):
     return None
 
 class HeaderClassifier:
-  def train(self, train_set):
-    pass
+  def __init__(self):
+    self.rules = None
 
+  def train(self, train_set):
+    return self
+    
+  def loadRules(self):
+    pass
+    
   def classify(self,package):
     classifiers = [header_classifier]
 

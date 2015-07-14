@@ -12,52 +12,73 @@ DEBUG_ITEM = 'Mrd/1.2.1 (Linux; U; Android 5.0.2; google Nexus 7) com.crossfield
 
 Rule = namedtuple('Rule', 'rule, label, host, confidence, support')
 
-
-
 class FPRuler:
-    def __init__(self):
-        # feature, app, host
-        self.rulesSet = {}
+  def __init__(self):
+      # feature, app, host
+      self.rules = defaultdict(lambda : defaultdict(lambda : defaultdict()))
 
 
-    def _addRules(self, rules, ruleType):
-        tmprules = {}
-        for feature, app, host, confidence, _ in rules:
-            tmprules.setdefault(host, {})
-            tmprules[host][feature] = (app, confidence)
-        self.rulesSet[ruleType] = tmprules
+  def _add_rules(self, rules, ruleType):
+      tmprules = {}
+      for feature, app, host, confidence, _ in rules:
+          tmprules.setdefault(host, {})
+          tmprules[host][feature] = (app, confidence)
+      self.rules[ruleType] = tmprules
 
-    def loadRules(self):
-      sqldao = SqlDao()
-      SQL = "SELECT label, pattens, host, rule_type, confidence FROM patterns where pattens is not NULL"
-      for label, patterns, host, rule_type, confidence in sqldao.execute(SQL):
-        self.rulesSet.setdefault(rule_type, {})
-        self.rulesSet[rule_type].setdefault(host, {})
-        patterns = frozenset(patterns.split("$"))
-        self.rulesSet[rule_type][host][patterns] = (label, confidence)
+  def loadRules(self):
+    self.rules = defaultdict(lambda : defaultdict(lambda : defaultdict()))
+    sqldao = SqlDao()
+    SQL = "SELECT label, pattens, host, rule_type, confidence FROM patterns where pattens is not NULL"
+    for label, patterns, host, rule_type, confidence in sqldao.execute(SQL):
+      patterns = frozenset(patterns.split(","))
+      #print self.rules[rule_type][host][patterns]
+      self.rules[rule_type][host][patterns] = (label, confidence)
+    
 
+  def _clean_db(self):
+    sqldao = SqlDao()
+    sqldao.execute('DELETE FROM patterns WHERE paramkey IS NULL and pattens IS NOT NULL')
+    sqldao.commit()
+    sqldao.close()
 
-    def classify(self, record):
-      '''
-      Return {type:[(label, confidence)]}
-      '''
-      labelRsts = {}
-      for rulesID, rules in self.rulesSet.iteritems():
-          rst = []
-          tmpapp = record.app
-          record.app = ''
-          features = _get_record_f(record)
-          if record.host in rules.keys():
-              for rule, label_confidence in rules[record.host].iteritems():
-                  label, confidence = label_confidence
-                  if rule.issubset(features):
-                      rst.append(label_confidence)
-          if len(rst) > 0:
-              labelRsts[rulesID] = rst
-          else:
-              labelRsts[rulesID] = None
-          record.app = tmpapp
-      return labelRsts
+  def classify(self, record):
+    '''
+    Return {type:[(label, confidence)]}
+    '''
+    labelRsts = {}
+    for rule_type, rules in self.rules.iteritems():
+        rst = []
+        tmpapp = record.app
+        record.app = ''
+        features = _get_record_f(record)
+        if record.host in rules.keys():
+            for rule, label_confidence in rules[record.host].iteritems():
+                label, confidence = label_confidence
+                if rule.issubset(features):
+                    rst.append(label_confidence)
+
+        labelRsts[rule_type] = rst if len(rst) > 0 else None
+        record.app = tmpapp
+    return labelRsts
+
+  def persist(self):
+    rules = self.rules
+    self._clean_db()
+    sqldao = SqlDao()
+    QUERY = 'INSERT INTO patterns (label, pattens, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
+    counter = 0
+    for rule_type in rules:
+      params = []
+      for host in rules[rule_type]:
+        for pattern in rules[rule_type][host]:
+          print rules[rule_type][host][pattern]
+          label, confidence = rules[rule_type][host][pattern]
+          counter += 1
+          params.append((label, ','.join(pattern), confidence, 0, host, rule_type))
+      
+      sqldao.executeBatch(QUERY, params)
+      sqldao.close()
+      print ">>> [CMAR] Total Number of Rules is %s Rule type is %s" % (counter, rule_type)
 
 
 def _get_record_f(record):
@@ -247,7 +268,7 @@ class CMAR:
 
   def _clean_db(self):
       sqldao = SqlDao()
-      sqldao.execute('DELETE FROM patterns WHERE kvpattern IS NULL')
+      sqldao.execute('DELETE FROM patterns WHERE kvpattern IS NULL and pattens IS NOT NULL')
       sqldao.commit()
       sqldao.close()
 
@@ -273,7 +294,7 @@ class CMAR:
           tmp.add(frozenset(charactor))
           decodedRules.add(Rule(rule_str, appIndx[rule.label], recordHost[rule.host], rule.confidence, rule.support))
 
-      self.classifier._addRules(decodedRules, ruleType)
+      self.classifier._add_rules(decodedRules, ruleType)
       _persist(decodedRules, ruleType)
 
   def train(self, records, tSupport=2, tConfidence=0.8):
@@ -297,8 +318,11 @@ class CMAR:
       '''
       return self.classifier
 
+
   def classify(self, record):
     return self.classifier.classify(record)
+  
+
 
 if __name__ == '__main__':
     if sys.argv[1] == 'mine':

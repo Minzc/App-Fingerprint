@@ -42,13 +42,13 @@ class HostApp:
       self.urlCompany[url].add(self.appCompany[app])
       self.urlCompany[topDomain].add(self.appCompany[app])
       def addCommonStr(url, app, string):
-        common_str = longest_common_substring(url.lower(), string)
+        common_str = longest_common_substring(url.lower(), string.lower())
         self.substrCompany[common_str].add(self.appCompany[app])
 
       addCommonStr(url, app, app)
       addCommonStr(url, app, self.appCompany[app].lower())
       addCommonStr(url, app, self.appName[app].lower())
-      if topDomain == '28tracks.com':
+      if topDomain == 'nflximg.net':
         print '#TOPDOMAIN'
       if url == 'citynews.rogersdigitalmedia.com.edgesuite.net':
         print 'citynews.rogersdigitalmedia.com.edgesuite.net'
@@ -56,25 +56,25 @@ class HostApp:
     def checkCommonStr(self, app, url, expApp):
       for astr in [app, self.appCompany[app], self.appName[app]]:
         common_str = longest_common_substring(url.lower(), astr.lower())
-        if url == 'ci.intuit.com':
+        if url == 'nflximg.net':
           print common_str
           print self.substrCompany[common_str]
         if len(self.substrCompany[common_str]) < 5 and app in expApp:
-          if url == 'ci.intuit.com':
+          if url == 'nflximg.net':
             print 'INNNNNNNNNNNN'
           return True
-        return False
+      return False
 
-    def _cleanDB(self):
-      QUERY = "DELETE FROM patterns WHERE paramkey is NULL and pattens is NULL"
+    def _clean_db(self):
+      QUERY = "DELETE FROM patterns WHERE paramkey IS NULL and pattens IS NULL"
       sqldao = SqlDao()
       sqldao.execute(QUERY)
       sqldao.close()
 
     def train(self, records):
-      self._cleanDB()
+      self._clean_db()
       expApp = self.loadExpApp()
-      self.usePcapUrl()
+      #self.usePcapUrl()
       for pkgs in records.values():
         for pkg in pkgs:
           self.count(pkg)
@@ -89,12 +89,10 @@ class HostApp:
       # Generate Rules
       ########################
       
-      
-      
       self.rules = defaultdict(dict)
       for url, apps in self.urlApp.iteritems():
         companySet = {self.appCompany[app] for app in apps}
-        if url == 'ci.intuit.com':
+        if url == 'nflximg.net':
           print '#', url in rmdUrls
           print '#', len(apps)
           print apps
@@ -116,7 +114,7 @@ class HostApp:
           if ifValidRule:
             self.rules[ruleType][url] = label
 
-          if url == 'ci.intuit.com':
+          if url == 'nflximg.net':
             print 'Rule Type is', ruleType, ifValidRule
 
       self.persist(self.rules)
@@ -137,9 +135,13 @@ class HostApp:
       self.rules = defaultdict(dict)
       QUERY = "SELECT host, label, rule_type FROM patterns WHERE paramkey is NULL and pattens is NULL"
       sqldao = SqlDao()
+      counter = 0
       for host, label, ruleType in sqldao.execute(QUERY):
+        counter += 1
         self.rules[ruleType][host] = label
+      print '>>> [Host Rules#loadRules] total number of rules is', counter
 
+    
     def classify(self, pkg):
       import consts
       host = pkg.host.replace('-','.')
@@ -175,7 +177,7 @@ class HostApp:
             if url == None or topDomain == None:
               continue
             self.fileApp[fileName].add(self.appCompany[app])
-            self.fileUrl[fileName].add(url)
+            self.fileUrl[fileName].add(s)
             self.urlApp[url].add(app)
             self.urlCompany[url].add(self.appCompany[app])
             topDomain = get_top_domain(url)
