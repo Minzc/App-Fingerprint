@@ -44,6 +44,7 @@ class ParamRules2:
       self.rules[rule_type][host][key][value][label]['score'] = confidence
       self.rules[rule_type][host][key][value][label]['support'] = support
     print '>>> [KV Rules#Load Rules] total number of rules is', counter
+    sqldao.close()
 
   def classify(self, pkg):
     max_score = -1

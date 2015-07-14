@@ -20,6 +20,7 @@ class HostApp:
       return expApp
     
     def persist(self, patterns):
+      self._clean_db()
       sqldao = SqlDao()
       QUERY = 'INSERT INTO patterns (label, support, confidence, host, rule_type) VALUES (%s, %s, %s, %s, %s)'
       params = []
@@ -73,7 +74,7 @@ class HostApp:
       sqldao.close()
 
     def train(self, records):
-      self._clean_db()
+      
       expApp = self.loadExpApp()
       #self.usePcapUrl()
       for pkgs in records.values():
@@ -141,6 +142,7 @@ class HostApp:
         counter += 1
         self.rules[ruleType][host] = label
       print '>>> [Host Rules#loadRules] total number of rules is', counter
+      sqldao.close()
 
     
     def classify(self, pkg):

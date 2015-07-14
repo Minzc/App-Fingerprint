@@ -33,6 +33,7 @@ class FPRuler:
       patterns = frozenset(patterns.split(","))
       #print self.rules[rule_type][host][patterns]
       self.rules[rule_type][host][patterns] = (label, confidence)
+    sqldao.close()
     
 
   def _clean_db(self):
