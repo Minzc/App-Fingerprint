@@ -48,6 +48,7 @@ class HostApp:
       addCommonStr(url, app, app)
       addCommonStr(url, app, self.appCompany[app].lower())
       addCommonStr(url, app, self.appName[app].lower())
+      
       if topDomain == 'nflximg.net':
         print '#TOPDOMAIN'
       if url == 'citynews.rogersdigitalmedia.com.edgesuite.net':
