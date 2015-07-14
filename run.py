@@ -188,7 +188,7 @@ if __name__ == '__main__':
     expApp = loadExpApp()
     records = {}
     for tbl in args.train:
-       records[tbl] = load_pkgs(LIMIT, DB = tbl)
+       records[tbl] = load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = tbl)
     
     apps = set()  
     for pkgs in records.values():
