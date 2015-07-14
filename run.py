@@ -124,6 +124,7 @@ def execute(train_set, test_set, inforTrack):
         classifier.loadRules()
         ruleDict[name] = classifier.rules
         classifierDict[name] = classifier
+    train_set = None # To release memory
     # hostClassifier = HostApp()
     # hostClassifier.loadRules()
     # paramClassifier = ParamRules2()
