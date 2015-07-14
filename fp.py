@@ -299,7 +299,6 @@ class CMAR:
       _persist(decodedRules, ruleType)
 
   def train(self, records, tSupport=2, tConfidence=0.8):
-      self._clean_db()
       ################################################
       # Mine App Features
       ################################################
