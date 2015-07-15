@@ -50,7 +50,7 @@ class HostApp:
       addCommonStr(url, app, self.appCompany[app].lower())
       addCommonStr(url, app, self.appName[app].lower())
       
-      if topDomain == 'nflximg.net':
+      if topDomain == '1nflximg.net':
         print '#TOPDOMAIN'
       if url == 'citynews.rogersdigitalmedia.com.edgesuite.net':
         print 'citynews.rogersdigitalmedia.com.edgesuite.net'
@@ -58,11 +58,11 @@ class HostApp:
     def checkCommonStr(self, app, url, expApp):
       for astr in [app, self.appCompany[app], self.appName[app]]:
         common_str = longest_common_substring(url.lower(), astr.lower())
-        if url == 'nflximg.net':
+        if url == '1nflximg.net':
           print common_str
           print self.substrCompany[common_str]
         if len(self.substrCompany[common_str]) < 5 and app in expApp:
-          if url == 'nflximg.net':
+          if url == '1nflximg.net':
             print 'INNNNNNNNNNNN'
           return True
       return False
@@ -94,7 +94,7 @@ class HostApp:
       self.rules = defaultdict(dict)
       for url, apps in self.urlApp.iteritems():
         companySet = {self.appCompany[app] for app in apps}
-        if url == 'nflximg.net':
+        if url == '1nflximg.net':
           print '#', url in rmdUrls
           print '#', len(apps)
           print apps
@@ -116,7 +116,7 @@ class HostApp:
           if ifValidRule:
             self.rules[ruleType][url] = label
 
-          if url == 'nflximg.net':
+          if url == '1nflximg.net':
             print 'Rule Type is', ruleType, ifValidRule
 
       self.persist(self.rules)
