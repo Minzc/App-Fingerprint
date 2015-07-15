@@ -168,26 +168,11 @@ def loadExpApp():
         expApp.add(app.strip().lower())
     return expApp
 
-######### START ###########
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('-t', metavar='cross/single', help='test type')
-    parser.add_argument('-train', metavar='tablename', nargs='+', help='train set')
-    parser.add_argument('-test', metavar='tablename', help='test set')
-    args = parser.parse_args()
-
-    test_tbl = args.train
-    if args.t == 'cross':
-        FOLD = 1
-        test_tbl = args.test
-    elif args.t == 'single':
-        FOLD = 5
-
+def single_batch_test(train_tbl, test_tbl):
+    FOLD = 5
     expApp = loadExpApp()
     records = {}
-    for tbl in args.train:
-       records[tbl] = load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = tbl)
+    records[tbl] = load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = train_tbl)
     
     apps = set()  
     for pkgs in records.values():
@@ -261,3 +246,56 @@ if __name__ == '__main__':
 
 
     print 'Precision:', inforTrack['precision'] / (1.0 * FOLD), 'Recall:', inforTrack['recall'] / (1.0 * FOLD), 'App:', inforTrack['discoveried_app'] / (1.0 * FOLD)
+
+def cross_batch_test(train_tbls, test_tbl):
+    expApp = loadExpApp()
+    records = {}
+    for tbl in train_tbls:
+       records[tbl] = load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = tbl)
+    
+    apps = set()  
+    for pkgs in records.values():
+        for pkg in pkgs:
+            apps.add(pkg.app)
+    print "len of app", len(apps), "len of train set", len(records)
+
+    precision = 0
+    recall = 0
+    discoveried_app = 0
+
+    set_pair = []
+    test_set = {record.id:record for record in load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = test_tbl)}
+    set_pair.append((records, test_set))
+
+    apps = set()
+    for k,v in test_set.iteritems():
+        apps.add(v.app)
+    print "len of apps", len(apps), "len of test set", len(test_set)
+
+    inforTrack = { 'discoveried_app':0.0, 'precision':0.0, 'recall':0.0}
+
+    for train_set, test_set in set_pair:
+        correct = 0
+        rst = execute(train_set, test_set, inforTrack)
+        print "INSERTING"
+        insert_rst(rst, test_tbl)
+
+    precision = inforTrack['precision'] / (1.0 * FOLD)
+    recall = inforTrack['recall'] / (1.0 * FOLD)
+    app_coverage = inforTrack['discoveried_app'] / (1.0 * FOLD)
+    f1_score = 2.0 * precision * recall / (precision + recall)
+    print 'Precision:', precision, 'Recall:', recall, 'App:', app_coverage, 'F1 Score:', f1_score
+######### START ###########
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('-t', metavar='cross/single', help='test type')
+    parser.add_argument('-train', metavar='tablename', nargs='+', help='train set')
+    parser.add_argument('-test', metavar='tablename', help='test set')
+    args = parser.parse_args()
+
+    test_tbl = None
+    if args.t == 'cross':
+      cross_batch_test(args.train, args.test)
+    elif args.t == 'single':
+      single_batch_test(args.train, args.train)
