@@ -50,7 +50,7 @@ def evaluate(rst, test_set):
 
 
 def filter_label_type(label_type):
-  return label_type == consts.APP_RULE or label_type == consts.COMPANY_RULE
+  return label_type == consts.APP_RULE # or label_type == consts.COMPANY_RULE
 
 def use_classifier(classifier, test_set):
     rst = {}
@@ -71,7 +71,6 @@ def use_classifier(classifier, test_set):
                 if labelDist[0][1] > max_confidence:
                   rst[pkg_id] = labelDist[0][0]
     
-    print total, recall
     return rst
 
 
