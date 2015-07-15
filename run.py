@@ -88,7 +88,7 @@ def insert_rst(rst, DB = 'packages'):
 
 
 def execute(train_set, test_set, inforTrack):
-    print "Train:", train_set.values(), "Test:", len(test_set)
+    print "Train:", train_set.keys(), "Test:", len(test_set)
     correct = 0
     test_apps = set()
     rst = {}
