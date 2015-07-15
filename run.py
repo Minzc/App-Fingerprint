@@ -117,7 +117,7 @@ def execute(train_set, test_set, inforTrack):
     ruleDict = {}
     classifierDict = {}
     for name, classifier in classifiers:
-        print ">>> [%s] " % (name)
+        print ">>> [train#%s] " % (name)
         classifier =  classifier.train(train_set)
         trained_classifiers.append((name, classifier))
         classifier.loadRules()
@@ -146,7 +146,7 @@ def execute(train_set, test_set, inforTrack):
     #classifierDict["KV Rule"].persist()
     
     for name, classifier in trained_classifiers:
-        print ">>> [%s] " % (name)
+        print ">>> [test#%s] " % (name)
         classifier.loadRules()
         tmprst = use_classifier(classifier, test_set)
         rst = merge_rst(rst, tmprst)

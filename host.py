@@ -52,7 +52,7 @@ class HostApp:
       
       if topDomain == '1nflximg.net':
         print '#TOPDOMAIN'
-      if url == 'citynews.rogersdigitalmedia.com.edgesuite.net':
+      if url == '1citynews.rogersdigitalmedia.com.edgesuite.net':
         print 'citynews.rogersdigitalmedia.com.edgesuite.net'
     
     def checkCommonStr(self, app, url, expApp):
