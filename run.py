@@ -285,6 +285,7 @@ def cross_batch_test(train_tbls, test_tbl):
     app_coverage = inforTrack['discoveried_app'] / (1.0 * FOLD)
     f1_score = 2.0 * precision * recall / (precision + recall)
     print 'Precision:', precision, 'Recall:', recall, 'App:', app_coverage, 'F1 Score:', f1_score
+    return 'Precision %s, Recall: %s, App: %s, F1 Score: %s' % (precision, recall, app_coverage, f1_score)
 ######### START ###########
 
 if __name__ == '__main__':
