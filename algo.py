@@ -150,7 +150,7 @@ class ParamRules2:
 #      pkgs = load_pkgs(None, DB = tbl)
 #      totalPkgs[tbl] = pkgs
       
-    return totalPkgs
+#   return totalPkgs
 
 class KVClassifier:
   def __init__(self):
