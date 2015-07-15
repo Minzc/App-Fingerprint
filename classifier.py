@@ -3,7 +3,7 @@ from sqldao import SqlDao
 from utils import load_pkgs
 import consts
 
-DEBUG = True
+DEBUG = False
 
 def header_classifier(package):
     identifier = ['x-umeng-sdk', 'x-vungle-bundle-id', 'x-requested-with']

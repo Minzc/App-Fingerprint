@@ -97,10 +97,10 @@ def execute(train_set, test_set, inforTrack):
 
     classifiers = [
              ("Header Rule", HeaderClassifier()),
-             ("Host Rule", HostApp()),
-             ("CMAR Rule", CMAR(min_cover = 3)),
+             #("Host Rule", HostApp()),
+             #("CMAR Rule", CMAR(min_cover = 3)),
              #("Path Rule" , PathApp()),
-             ("KV Rule", KVClassifier())
+             #("KV Rule", KVClassifier())
             ]
 
     
