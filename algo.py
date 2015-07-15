@@ -140,15 +140,15 @@ class ParamRules2:
     sqldao.close()
     print ">>> [KVRules] Total Number of Rules is %s Rule type is %s" % (len(params), consts.APP_RULE)
 
-def _load_train_data(self):
-    tbls = ["packages_20150210",  "packages_20150509", "packages_20150526"]
-    totalPkgs = {}
+#def _load_train_data(self):
+#    tbls = ["packages_20150210",  "packages_20150509", "packages_20150526"]
+#    totalPkgs = {}
     ##################
     # Load Data
     ##################
-    for tbl in tbls:
-      pkgs = load_pkgs(None, DB = tbl)
-      totalPkgs[tbl] = pkgs
+#    for tbl in tbls:
+#      pkgs = load_pkgs(None, DB = tbl)
+#      totalPkgs[tbl] = pkgs
       
     return totalPkgs
 
