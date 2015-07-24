@@ -4,6 +4,7 @@ import sys
 from sqldao import SqlDao
 
 from utils import loadfile
+from app_info import AppInfos
 
 
 class ETLConsts:
@@ -50,6 +51,7 @@ class ETL:
             self.ios_app_package[trackId] = bundleId
             self.ios_app_company[bundleId] = company
         sqldao.close()
+        self.apps = AppInfos()
 
 
     def upload_packages(self, folder):
@@ -73,8 +75,10 @@ class ETL:
         dbdao = SqlDao()
 
         packages = pyshark.FileCapture(file_path, display_filter='http')
-        if ios:
-          app_package = self.ios_app_package[app_package]
+        appInfo = self.apps.get(app_package)
+        if appInfo == None:
+          return 
+        app_package = appInfo.package
 
         totalIndexer = 0
         dns_info = {}
@@ -92,17 +96,16 @@ class ETL:
                             host = dns_info[ip].pop()
                             pkgInfo[ETLConsts.HOST] = host
                             dns_info[ip].add(host)
-                    app_name = 'UNK'
-                    app_category = 'UNK'
-                    app_company = 'UNK'
-                    if app_package in self.app_category:
-                        app_company = self.app_company[app_package]
-                        app_name, app_category = self.app_category[app_package]
-                    pkgInfo['app_name'] = app_name
-                    pkgInfo['app_category'] = app_category
-                    pkgInfo['app_company'] = app_company
+                    app_name = appInfo.name
+                    app_category = appInfo.category
+                    app_company = appInfo.company
+                    print app_name, app_category, app_company
+                    pkgInfo['app_name'] = appInfo.name
+                    pkgInfo['app_category'] = appInfo.category
+                    pkgInfo['app_company'] = appInfo.company
                     pkgInfos.append(pkgInfo)
                 else:
+                  print app_name, app_category, app_company
                     print 'ERROR WRONG PACKAGE TYPE'
 
             except StopIteration:
