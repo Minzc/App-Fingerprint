@@ -23,5 +23,5 @@ class AppInfos:
         self.apps[trackId] = appInfo
     sqldao.close()
 
-  def get_app(self, query):
+  def get(self, query):
     return self.apps.get(query, None)
