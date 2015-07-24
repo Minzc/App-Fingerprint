@@ -42,7 +42,6 @@ class ETL:
         for app, name, company, category in sqldao.execute(QUERY):
             self.app_company[app] = company
             self.app_category[app] = (name, category)
-        sqldao.close()
         self.ios_app_company = {}
         self.ios_app_package = {}
         QUERY = 'SELECT trackId, bundleId, artistName FROM ios_app_details'
