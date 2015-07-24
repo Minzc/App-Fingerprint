@@ -43,24 +43,14 @@ class ETL:
             self.app_company[app] = company
             self.app_category[app] = category
         sqldao.close()
+        self.ios_app_company = {}
+        self.ios_app_package = {}
+        QUERY = 'SELECT trackId, bundleId, artistName FROM ios_app_details'
+        for trackId, bundleId, company in sqldao.execute(QUERY):
+            self.ios_app_package[trackId] = bundleId
+            self.ios_app_company[bundleId] = company
+        sqldao.close()
 
-    # def _get_app_company(self):
-    #     sqldao = SqlDao()
-    #     QUERY = 'SELECT app, company FROM apps'
-    #     self.app_company = {}
-    #     for app, company in sqldao.execute(QUERY):
-    #         self.app_company[app] = company
-    #     sqldao.close()
-
-    # def _get_app_category(self):
-    #     self.app_category = {}
-    #     file_path = './statinfo/app.txt'
-
-    #     def parser(ln):
-    #         pkg, name, category = ln.split('\t')
-    #         self.app_category[pkg] = (name, category)
-
-    #     loadfile(file_path, parser)
 
     def upload_packages(self, folder):
         """
@@ -77,14 +67,17 @@ class ETL:
                 self._insert_msql(join(folder, f), app_name)
 
 
-    def _insert_msql(self, file_path, app_package):
+    def _insert_msql(self, file_path, app_package, IOS = False):
         print "Start inserting", app_package
         # caps = rdpcap(file_path)
         # cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
         # cursor = cnx.cursor()
         dbdao = SqlDao()
-
+        
         packages = pyshark.FileCapture(file_path, display_filter='http')
+        if IOS:
+            app_package = self.ios_app_package[app_package]
+
         totalIndexer = 0
         dns_info = {}
         comunicate_host = set()
@@ -107,7 +100,6 @@ class ETL:
                     app_company = 'UNK'
                     if app_package in self.app_category:
                         app_company = self.app_company[app_package]
-                        app_name, app_category = self.app_category[app_package]
 
                     dbdao.execute(self.INSERT_PACKAGES,
                                   (app_package,
