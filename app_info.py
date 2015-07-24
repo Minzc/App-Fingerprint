@@ -1,5 +1,5 @@
 import consts
-class APPInfos:
+class AppInfos:
   class App:
     def __init(self, package, name, company, trackId, website, app_type):
       self.package = package
