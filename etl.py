@@ -77,6 +77,7 @@ class ETL:
         packages = pyshark.FileCapture(file_path, display_filter='http')
         if IOS:
             app_package = self.ios_app_package[app_package]
+            print app_package
 
         totalIndexer = 0
         dns_info = {}
