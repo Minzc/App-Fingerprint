@@ -1,4 +1,5 @@
 import consts
+from sqldao import SqlDao
 class AppInfos:
   class App:
     def __init(self, package, name, company, trackId, website, app_type):
