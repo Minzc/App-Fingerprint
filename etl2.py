@@ -63,7 +63,7 @@ class ETL:
             file_path = join(folder, f)
             if isfile(file_path):
                 app_name = f[0:-5]
-                self._insert_msql(join(folder, f), app_name)
+                self._insert_msql(join(folder, f), app_name, True)
                 #self._insert_msql('/Users/congzicun/Yunio/fortinet/air.au.com.metro.DumbWaysToDie.pcap', app_name)
 
 
