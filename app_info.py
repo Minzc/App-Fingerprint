@@ -5,7 +5,7 @@ class App:
     self.package = package
     self.name = name if len(name) > 0 else 'UNK'
     self.company = company if len(company) > 0 else 'UNK'
-    self.trackId
+    self.trackId = trackId
     self.website = website if len(website) > 0 else 'UNK'
     self.app_type = app_type 
 class AppInfos:
