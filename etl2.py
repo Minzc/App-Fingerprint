@@ -110,8 +110,8 @@ class ETL:
 
             except StopIteration:
                 break
-            except:
-                print 'ERROR'
+            # except:
+            #     print 'ERROR'
         params = []
         for pkgInfo in pkgInfos:
             app_name = pkgInfo['app_name'] 
