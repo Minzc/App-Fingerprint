@@ -43,6 +43,13 @@ class ETL:
             self.app_company[app] = company
             self.app_category[app] = (name, category)
         sqldao.close()
+        self.ios_app_company = {}
+        self.ios_app_package = {}
+        QUERY = 'SELECT trackId, bundleId, artistName FROM ios_app_details'
+        for trackId, bundleId, company in sqldao.execute(QUERY):
+            self.ios_app_package[trackId] = bundleId
+            self.ios_app_company[bundleId] = company
+        sqldao.close()
 
 
     def upload_packages(self, folder):
@@ -61,11 +68,14 @@ class ETL:
                 #self._insert_msql('/Users/congzicun/Yunio/fortinet/air.au.com.metro.DumbWaysToDie.pcap', app_name)
 
 
-    def _insert_msql(self, file_path, app_package):
+    def _insert_msql(self, file_path, app_package, ios = False):
         print "Start inserting", app_package, file_path
         dbdao = SqlDao()
 
         packages = pyshark.FileCapture(file_path, display_filter='http')
+        if ios:
+          app_package = self.ios_app_package[app_package]
+
         totalIndexer = 0
         dns_info = {}
         comunicate_host = set()
