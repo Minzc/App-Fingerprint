@@ -106,7 +106,7 @@ class ETL:
                     pkgInfos.append(pkgInfo)
                 else:
                   print app_name, app_category, app_company
-                    print 'ERROR WRONG PACKAGE TYPE'
+                  print 'ERROR WRONG PACKAGE TYPE'
 
             except StopIteration:
                 break
