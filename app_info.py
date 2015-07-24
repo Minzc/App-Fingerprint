@@ -1,7 +1,7 @@
 import consts
 from sqldao import SqlDao
 class App:
-  def __init(self, package, name, company, trackId, website, app_type):
+  def __init__(self, package, name, company, trackId, website, app_type):
     self.package = package
     self.name = name if len(name) > 0 else 'UNK'
     self.company = company if len(company) > 0 else 'UNK'
