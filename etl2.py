@@ -46,6 +46,7 @@ class ETL:
         self.ios_app_package = {}
         QUERY = 'SELECT trackId, bundleId, artistName FROM ios_app_details'
         for trackId, bundleId, company in sqldao.execute(QUERY):
+            trackId = str(trackId)
             self.ios_app_package[trackId] = bundleId
             self.ios_app_company[bundleId] = company
         sqldao.close()
@@ -64,7 +65,7 @@ class ETL:
             if isfile(file_path):
                 app_name = f[0:-5]
                 self._insert_msql(join(folder, f), app_name, True)
-                #self._insert_msql('/Users/congzicun/Yunio/fortinet/air.au.com.metro.DumbWaysToDie.pcap', app_name)
+                return
 
 
     def _insert_msql(self, file_path, app_package, ios = False):
