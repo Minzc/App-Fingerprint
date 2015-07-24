@@ -3,10 +3,10 @@ from sqldao import SqlDao
 class App:
   def __init__(self, package, name, company, trackId, website, app_type):
     self.package = package
-    self.name = name if len(name) > 0 else 'UNK'
-    self.company = company if len(company) > 0 else 'UNK'
+    self.name = name if name else 'UNK'
+    self.company = company if company else 'UNK'
     self.trackId = trackId
-    self.website = website if len(website) > 0 else 'UNK'
+    self.website = website if website else 'UNK'
     self.app_type = app_type 
 class AppInfos:
   def __init__(self):
