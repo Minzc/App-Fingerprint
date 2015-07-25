@@ -3,7 +3,7 @@ import datetime
 from sqldao import SqlDao
 from fp import CMAR
 from utils import load_pkgs, load_appinfo
-from algo import KVClassifier, ParamRules2
+from algo import KVClassifier
 from classifier import HeaderClassifier
 from host import HostApp, PathApp
 from collections import namedtuple
@@ -97,10 +97,10 @@ def execute(train_set, test_set, inforTrack):
 
     classifiers = [
              #("Header Rule", HeaderClassifier()),
-             ("Host Rule", HostApp()),
-             #("CMAR Rule", CMAR(min_cover = 3)),
+             #("Host Rule", HostApp()),
+             ("CMAR Rule", CMAR(min_cover = 3)),
              #("Path Rule" , PathApp()),
-             #("KV Rule", KVClassifier())
+             ("KV Rule", KVClassifier())
             ]
 
     
@@ -120,7 +120,7 @@ def execute(train_set, test_set, inforTrack):
         print ">>> [train#%s] " % (name)
         classifier =  classifier.train(train_set)
         trained_classifiers.append((name, classifier))
-        classifier.loadRules()
+        classifier.load_rules()
         ruleDict[name] = classifier.rules
         classifierDict[name] = classifier
     train_set = None # To release memory
@@ -147,7 +147,7 @@ def execute(train_set, test_set, inforTrack):
     
     for name, classifier in trained_classifiers:
         print ">>> [test#%s] " % (name)
-        classifier.loadRules()
+        classifier.load_rules()
         tmprst = use_classifier(classifier, test_set)
         rst = merge_rst(rst, tmprst)
         print ">>> Recognized:", len(rst)

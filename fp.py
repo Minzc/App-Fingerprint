@@ -25,7 +25,7 @@ class FPRuler:
           tmprules[host][feature] = (app, confidence)
       self.rules[ruleType] = tmprules
 
-  def loadRules(self):
+  def load_rules(self):
     self.rules = defaultdict(lambda : defaultdict(lambda : defaultdict()))
     sqldao = SqlDao()
     SQL = "SELECT label, pattens, host, rule_type, confidence FROM patterns where pattens is not NULL"

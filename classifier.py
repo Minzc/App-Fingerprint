@@ -2,40 +2,50 @@ from package import Package
 from sqldao import SqlDao
 from utils import load_pkgs
 import consts
+from abc import ABCMeta, abstractmethod
 
 DEBUG = False
+class AbsClassifer:
+  __metaclass__ = ABCMeta
+  @abstractmethod
+  def classify(self, package): pass
+  
+  @abstractmethod
+  def train(self, train_set): pass
 
-def header_classifier(package):
-    identifier = ['x-umeng-sdk', 'x-vungle-bundle-id', 'x-requested-with']
-    for id in identifier:
-        for head_seg in package.add_header.split('\n'):
-            if id in head_seg and '.' in head_seg:
-                return (head_seg.replace(id + ':', '').strip(), 1)
-    return None
+  @abstractmethod
+  def load_rules(self): pass
 
-class HeaderClassifier:
+
+
+class HeaderClassifier(AbsClassifer):
   def __init__(self):
     self.rules = None
 
   def train(self, train_set):
     return self
     
-  def loadRules(self):
+  def load_rules(self):
     pass
     
   def classify(self,package):
-    classifiers = [header_classifier]
-
     rst = {}
     app, company, id = package.app, package.company, package.id
 
-    for classifier in classifiers:
-      identifier = classifier(package)
-      if identifier:
-        rst[consts.APP_RULE] = [(identifier[0],1.0)]
-        if identifier[0] != package.app:
-          if DEBUG : print identifier, package.app
+    identifier = _classify(package)
+    if identifier:
+      rst[consts.APP_RULE] = [(identifier[0],1.0)]
+      if identifier[0] != package.app:
+        if DEBUG : print identifier, package.app
     return rst
+
+  def _classify(package):
+      identifier = ['x-umeng-sdk', 'x-vungle-bundle-id', 'x-requested-with']
+      for id in identifier:
+          for head_seg in package.add_header.split('\n'):
+              if id in head_seg and '.' in head_seg:
+                  return (head_seg.replace(id + ':', '').strip(), 1)
+      return None
 
 if __name__ == '__main__':
   classify(True)

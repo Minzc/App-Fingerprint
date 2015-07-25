@@ -3,9 +3,10 @@ from sqldao import SqlDao
 from collections import defaultdict
 import consts
 from app_info import AppInfos
+from classifier import AbsClassifer
 
 
-class HostApp:
+class HostApp(AbsClassifer):
     def __init__(self):
       self.fileApp = defaultdict(set)
       self.fileUrl = defaultdict(set)
@@ -53,7 +54,6 @@ class HostApp:
       addCommonStr(url, app, appInfo.company.lower())
       addCommonStr(url, app, appInfo.name.lower())
       addCommonStr(url, app, appInfo.website)
-      
       if top_domain == '1nflximg.net':
         print '#TOPDOMAIN'
       if url == '1citynews.rogersdigitalmedia.com.edgesuite.net':
@@ -137,7 +137,7 @@ class HostApp:
       self.appCompany = None
       self.appName = None
 
-    def loadRules(self):
+    def load_rules(self):
       self.rules = defaultdict(dict)
       QUERY = "SELECT host, label, rule_type FROM patterns WHERE paramkey is NULL and pattens is NULL"
       sqldao = SqlDao()
