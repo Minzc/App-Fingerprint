@@ -2,7 +2,7 @@ import pyshark
 import sys
 
 from sqldao import SqlDao
-
+import consts
 from utils import loadfile
 from app_info import AppInfos
 
