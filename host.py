@@ -1,7 +1,8 @@
-from utils import load_appinfo, longest_common_substring, get_top_domain
+from utils import load_appinfo, longest_common_substring, get_top_domain, url_clean
 from sqldao import SqlDao
 from collections import defaultdict
 import consts
+from app_info import AppInfos
 
 
 class HostApp:
@@ -12,6 +13,7 @@ class HostApp:
       self.urlCompany = defaultdict(set)
       self.substrCompany = defaultdict(set)
       self.appCompany, self.appName = load_appinfo()
+      self.apps = AppInfos()
 
     def loadExpApp(self):
       expApp=set()
@@ -29,28 +31,30 @@ class HostApp:
           params.append((label, 1, 1, url, ruleType))
       sqldao.executeBatch(QUERY, params)
 
-    def count(self, pkg):
+    def count(self, pkg, app_type=consts.ANDROID):
       app = pkg.app
-      if app not in self.appCompany:
+      appInfo = self.apps.get(app_type, pkg.app)
+      if not appInfo:
         return
-      url = pkg.host.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
-      topDomain = get_top_domain(url)
-      if url == None or topDomain == None:
+      url = url_clean(pkg.host)
+      top_domain = get_top_domain(url)
+      if not url or not top_domain:
         return
       
-      self.urlApp[topDomain].add(app)
+      self.urlApp[top_domain].add(app)
       self.urlApp[url].add(app)
       self.urlCompany[url].add(self.appCompany[app])
-      self.urlCompany[topDomain].add(self.appCompany[app])
+      self.urlCompany[top_domain].add(self.appCompany[app])
       def addCommonStr(url, app, string):
         common_str = longest_common_substring(url.lower(), string.lower())
         self.substrCompany[common_str].add(self.appCompany[app])
 
-      addCommonStr(url, app, app)
-      addCommonStr(url, app, self.appCompany[app].lower())
-      addCommonStr(url, app, self.appName[app].lower())
+      addCommonStr(url, app, appInfo.package)
+      addCommonStr(url, app, appInfo.company.lower())
+      addCommonStr(url, app, appInfo.name.lower())
+      addCommonStr(url, app, appInfo.website)
       
-      if topDomain == '1nflximg.net':
+      if top_domain == '1nflximg.net':
         print '#TOPDOMAIN'
       if url == '1citynews.rogersdigitalmedia.com.edgesuite.net':
         print 'citynews.rogersdigitalmedia.com.edgesuite.net'
@@ -176,15 +180,15 @@ class HostApp:
         for app, url, fileName in sqldao.execute('SELECT * FROM url_apk'):
             app = app.lower()
             url = url.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
-            topDomain = get_top_domain(url)
-            if url == None or topDomain == None:
+            top_domain = get_top_domain(url)
+            if url == None or top_domain == None:
               continue
             self.fileApp[fileName].add(self.appCompany[app])
             self.fileUrl[fileName].add(s)
             self.urlApp[url].add(app)
             self.urlCompany[url].add(self.appCompany[app])
-            topDomain = get_top_domain(url)
-            self.urlApp[topDomain].add(app)
+            top_domain = get_top_domain(url)
+            self.urlApp[top_domain].add(app)
             common_str_pkg = longest_common_substring(url.lower(), app)
             self.substrCompany[common_str_pkg].add(self.appCompany[app])
             common_str_company = longest_common_substring(url.lower(), self.appCompany[app].lower())
@@ -316,25 +320,6 @@ class PathApp:
         rst[consts.COMPANY_RULE].append((company, 1.0))
     return rst
 
-#sqldao = SqlDao()
-# for app, url, fileName in sqldao.execute('SELECT * FROM url_apk'):
-#     app = app.lower()
-#     url = url.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
-#     topDomain = get_top_domain(url)
-#     if url == None or topDomain == None:
-#       continue
-#     self.fileApp[fileName].add(self.appCompany[app])
-#     self.fileUrl[fileName].add(url)
-#     self.urlApp[url].add(app)
-#     self.urlCompany[url].add(self.appCompany[app])
-#     topDomain = get_top_domain(url)
-#     self.urlApp[topDomain].add(app)
-#     common_str_pkg = longest_common_substring(url.lower(), app)
-#     self.substrCompany[common_str_pkg].add(self.appCompany[app])
-#     common_str_company = longest_common_substring(url.lower(), self.appCompany[app].lower())
-#     self.substrCompany[common_str_company].add(self.appCompany[app])
-#     common_str_name = longest_common_substring(url.lower(), self.appName[app].lower())
-#     self.substrCompany[common_str_name].add(self.appCompany[app])
 if __name__ == '__main__':
   records = load_pkgs()
   miner = HostApp()

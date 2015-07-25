@@ -96,8 +96,8 @@ def execute(train_set, test_set, inforTrack):
         test_apps.add(record.app)
 
     classifiers = [
-             ("Header Rule", HeaderClassifier()),
-             #("Host Rule", HostApp()),
+             #("Header Rule", HeaderClassifier()),
+             ("Host Rule", HostApp()),
              #("CMAR Rule", CMAR(min_cover = 3)),
              #("Path Rule" , PathApp()),
              #("KV Rule", KVClassifier())

@@ -1,6 +1,6 @@
 import consts
 from sqldao import SqlDao
-from utils import Relation, load_pkgs, loadfile, load_appinfo, loadExpApp
+from utils import load_pkgs, loadfile, load_appinfo, loadExpApp
 from collections import defaultdict, namedtuple
 import operator
 

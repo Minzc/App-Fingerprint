@@ -36,25 +36,25 @@ class ETL:
         self._get_app_info()
 
     def _get_app_info(self):
-        sqldao = SqlDao()
-        QUERY = 'SELECT app, name, company, category FROM apps'
-        self.app_company = {}
-        self.app_category = {}
-        for app, name, company, category in sqldao.execute(QUERY):
-            self.app_company[app] = company
-            self.app_category[app] = (name, category)
-        self.ios_app_company = {}
-        self.ios_app_package = {}
-        QUERY = 'SELECT trackId, bundleId, artistName FROM ios_app_details'
-        for trackId, bundleId, company in sqldao.execute(QUERY):
-            trackId = str(trackId)
-            self.ios_app_package[trackId] = bundleId
-            self.ios_app_company[bundleId] = company
-        sqldao.close()
+        # sqldao = SqlDao()
+        # QUERY = 'SELECT app, name, company, category FROM apps'
+        # self.app_company = {}
+        # self.app_category = {}
+        # for app, name, company, category in sqldao.execute(QUERY):
+        #     self.app_company[app] = company
+        #     self.app_category[app] = (name, category)
+        # self.ios_app_company = {}
+        # self.ios_app_package = {}
+        # QUERY = 'SELECT trackId, bundleId, artistName FROM ios_app_details'
+        # for trackId, bundleId, company in sqldao.execute(QUERY):
+        #     trackId = str(trackId)
+        #     self.ios_app_package[trackId] = bundleId
+        #     self.ios_app_company[bundleId] = company
+        # sqldao.close()
         self.apps = AppInfos()
 
 
-    def upload_packages(self, folder):
+    def upload_packages(self, folder, app_type):
         """
         Insert pcap information into db
         """
@@ -66,15 +66,15 @@ class ETL:
             file_path = join(folder, f)
             if isfile(file_path):
                 app_name = f[0:-5]
-                self._insert_msql(join(folder, f), app_name, True)
+                self._insert_msql(join(folder, f), app_name, app_type)
 
 
-    def _insert_msql(self, file_path, app_package, ios = False):
+    def _insert_msql(self, file_path, app_package, app_type):
         print "Start inserting", app_package, file_path
         dbdao = SqlDao()
 
         packages = pyshark.FileCapture(file_path, display_filter='http')
-        appInfo = self.apps.get(app_package)
+        appInfo = self.apps.get(app_type, app_package)
         if appInfo == None:
           return 
         app_package = appInfo.package
@@ -240,5 +240,10 @@ class ETL:
 if __name__ == '__main__':
     path = sys.argv[1]
     tablename = sys.argv[2]
+    app_type = sys.argv[3]
     etl = ETL(tablename)
-    etl.upload_packages(path)
+    if app_type == 'ios':
+      app_type = consts.IOS
+    else:
+      app_type = consts.ANDROID
+    etl.upload_packages(path, app_type)
