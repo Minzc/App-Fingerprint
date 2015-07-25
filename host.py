@@ -53,7 +53,6 @@ class HostApp:
       addCommonStr(url, app, appInfo.company.lower())
       addCommonStr(url, app, appInfo.name.lower())
       addCommonStr(url, app, appInfo.website)
-      print 'website is', appInfo.website
       
       if top_domain == '1nflximg.net':
         print '#TOPDOMAIN'
