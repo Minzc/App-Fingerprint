@@ -170,7 +170,8 @@ class ETL:
                         'Accept-Ranges',
                         'Full request URI',
                         'Message',
-                        'Request Method'}
+                        'Request Method',
+                        'Request URI'}
         pkgInfo = {}
         #src = package.ip.src
         #dst = package.ip.dst
