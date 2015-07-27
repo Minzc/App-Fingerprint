@@ -137,8 +137,6 @@ class ETL:
                 pkgInfo[ETLConsts.RAW]))
             comunicate_host.add(pkgInfo[ETLConsts.HOST])
         dbdao.executeBatch(self.INSERT_PACKAGES,params)
-          #  except Exception:
-          #     pass 
         dbdao.close()
         print "Finish", app_package, "Package:", len(params), len(pkgInfos)
 

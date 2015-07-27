@@ -100,7 +100,7 @@ def execute(train_set, test_set, inforTrack):
              ("Host Rule", HostApp()),
              #("CMAR Rule", CMAR(min_cover = 3)),
              #("Path Rule" , PathApp()),
-             ("KV Rule", KVClassifier())
+             #("KV Rule", KVClassifier())
             ]
 
     
@@ -138,12 +138,14 @@ def execute(train_set, test_set, inforTrack):
     ruleManager = RuleManager()
     print '>>> Finish training all classifiers'
     print '>>> Start rule pruning'
-
-    classifierDict["CMAR Rule"].rules = ruleManager.pruneCMARRules(ruleDict['CMAR Rule'], ruleDict['Host Rule'])
-    # classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],ruleDict['Host Rule'] )
     
-    #classifierDict["CMAR Rule"].persist()
-    classifierDict["KV Rule"].persist()
+    if 'CMAR Rule' in classifiers:
+        classifierDict["CMAR Rule"].rules = ruleManager.pruneCMARRules(ruleDict['CMAR Rule'], ruleDict['Host Rule'])
+        classifierDict["CMAR Rule"].persist()
+    if 'KV Rule' in classifiers:
+    # classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],{1:[],2:[]})
+        classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],ruleDict['Host Rule'] )
+        classifierDict["KV Rule"].persist()
     
     for name, classifier in trained_classifiers:
         print ">>> [test#%s] " % (name)
