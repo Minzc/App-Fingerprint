@@ -156,6 +156,7 @@ def update_ios():
   for app in apps.apps[consts.IOS].values():
     trackid = app.trackId
     package = app.package
+    print package
     name = app.name
     company = app.company
     category = app.category
