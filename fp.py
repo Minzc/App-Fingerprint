@@ -28,12 +28,15 @@ class FPRuler:
   def load_rules(self):
     self.rules = defaultdict(lambda : defaultdict(lambda : defaultdict()))
     sqldao = SqlDao()
+    counter = 0
     SQL = "SELECT label, pattens, host, rule_type, confidence FROM patterns where pattens is not NULL"
     for label, patterns, host, rule_type, confidence in sqldao.execute(SQL):
+      counter += 1
       patterns = frozenset(patterns.split(","))
       #print self.rules[rule_type][host][patterns]
       self.rules[rule_type][host][patterns] = (label, confidence)
     sqldao.close()
+    print '>>>[CMAR] Totaly number of rules is', counter
     
 
   def _clean_db(self):
@@ -72,7 +75,6 @@ class FPRuler:
       params = []
       for host in rules[rule_type]:
         for pattern in rules[rule_type][host]:
-          print rules[rule_type][host][pattern]
           label, confidence = rules[rule_type][host][pattern]
           counter += 1
           params.append((label, ','.join(pattern), confidence, 0, host, rule_type))

@@ -14,6 +14,7 @@ class KVClassifier(AbsClassifer):
     self.valueAppCounter = defaultdict(set)
     self.valueCompanyCounter = defaultdict(set)
     self.appCompany = loadExpApp()
+    self.rules = {}
 
   def train(self, training_data=None):
     appDict = set()
@@ -112,7 +113,6 @@ class KVClassifier(AbsClassifer):
     for key, value, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
       counter += 1
       # key, value = kv.split('=', 1)
-      host = ''
       self.rules[rule_type][host][key][value][label]['score'] = confidence
       self.rules[rule_type][host][key][value][label]['support'] = support
     print '>>> [KV Rules#Load Rules] total number of rules is', counter
@@ -179,7 +179,8 @@ class KVClassifier(AbsClassifer):
       predict_rst[consts.APP_RULE] = [(predict_app, max_score)]
     return predict_rst
 
-  def persist(self, patterns):
+  def persist(self, patterns=None):
+    if not patterns : patterns = self.rules[consts.APP_RULE]
     self._clean_db()
     QUERY = 'INSERT INTO patterns (label, support, confidence, host, paramkey, paramvalue, rule_type) VALUES (%s, %s, %s, %s, %s, %s, %s)'
     sqldao = SqlDao()

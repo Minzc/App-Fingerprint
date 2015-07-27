@@ -36,13 +36,12 @@ class RuleManager:
 
   def pruneCMARRules(self, cmarRules, hostRules):
     for ruleType in cmarRules:
-      print 'CMAR Rules, Rule Type %s Before pruning %s' % (ruleType, len(cmarRules[ruleType]))
       cmarRules[ruleType] = self._pruneCMARRules(cmarRules[ruleType], hostRules[ruleType])
     return cmarRules
 
   def _pruneCMARRules(self, cmarRules, hostRules):
     import tldextract
-    
+    counter = 0
     rulesAfterPruned = defaultdict( lambda : defaultdict())
     for host in cmarRules:
       extracted = tldextract.extract(host)
