@@ -97,10 +97,10 @@ def execute(train_set, test_set, inforTrack):
 
     classifiers = [
              #("Header Rule", HeaderClassifier()),
-             ("Host Rule", HostApp()),
+             #("Host Rule", HostApp()),
              #("CMAR Rule", CMAR(min_cover = 3)),
              #("Path Rule" , PathApp()),
-             #("KV Rule", KVClassifier())
+             ("KV Rule", KVClassifier())
             ]
 
     
@@ -116,13 +116,23 @@ def execute(train_set, test_set, inforTrack):
     trained_classifiers = []
     ruleDict = {}
     classifierDict = {}
-    for name, classifier in classifiers:
-        print ">>> [train#%s] " % (name)
-        classifier =  classifier.train(train_set)
-        trained_classifiers.append((name, classifier))
-        classifier.load_rules()
-        ruleDict[name] = classifier.rules
-        classifierDict[name] = classifier
+    for rule_type in [consts.APP_RULE]:
+        for tbl in train_set:
+            for pkg in train_set[tbl]:
+                if rule_type == consts.APP_RULE:
+                    pkg.set_label(pkg.app)
+                elif rule_type == consts.COMPANY_RULE:
+                    pkg.set_label(pkg.company)
+                elif rule_type == consts.CATEGORY_RULE:
+                    pkg.set_label(pkg.category)
+
+        for name, classifier in classifiers:
+            print ">>> [train#%s] " % (name)
+            classifier =  classifier.train(train_set, rule_type)
+            trained_classifiers.append((name, classifier))
+            classifier.load_rules()
+            ruleDict[name] = classifier.rules
+            classifierDict[name] = classifier
     train_set = None # To release memory
     # hostClassifier = HostApp()
     # hostClassifier.loadRules()
@@ -143,9 +153,9 @@ def execute(train_set, test_set, inforTrack):
         classifierDict["CMAR Rule"].rules = ruleManager.pruneCMARRules(ruleDict['CMAR Rule'], ruleDict['Host Rule'])
         classifierDict["CMAR Rule"].persist()
     if 'KV Rule' in classifiers:
-    # classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],{1:[],2:[]})
-        classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],ruleDict['Host Rule'] )
-        classifierDict["KV Rule"].persist()
+        classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],{1:[],2:[]})
+        #classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],ruleDict['Host Rule'] )
+        #classifierDict["KV Rule"].persist()
     
     for name, classifier in trained_classifiers:
         print ">>> [test#%s] " % (name)

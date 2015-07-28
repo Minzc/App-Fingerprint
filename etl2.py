@@ -36,21 +36,6 @@ class ETL:
         self._get_app_info()
 
     def _get_app_info(self):
-        # sqldao = SqlDao()
-        # QUERY = 'SELECT app, name, company, category FROM apps'
-        # self.app_company = {}
-        # self.app_category = {}
-        # for app, name, company, category in sqldao.execute(QUERY):
-        #     self.app_company[app] = company
-        #     self.app_category[app] = (name, category)
-        # self.ios_app_company = {}
-        # self.ios_app_package = {}
-        # QUERY = 'SELECT trackId, bundleId, artistName FROM ios_app_details'
-        # for trackId, bundleId, company in sqldao.execute(QUERY):
-        #     trackId = str(trackId)
-        #     self.ios_app_package[trackId] = bundleId
-        #     self.ios_app_company[bundleId] = company
-        # sqldao.close()
         self.apps = AppInfos()
 
 

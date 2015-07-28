@@ -23,14 +23,14 @@ class RuleManager:
       for key in kvRules[host]:
         for value in kvRules[host][key]:
           for label in kvRules[host][key][value]:
-            currenct_score = rulesAfterPruned[''][key][value][label]['score']
-            currenct_support = rulesAfterPruned[''][key][value][label]['support']
+            currenct_score = rulesAfterPruned[host][key][value][label]['score']
+            currenct_support = rulesAfterPruned[host][key][value][label]['support']
             new_score = kvRules[host][key][value][label]['score']
             new_support = kvRules[host][key][value][label]['support']
             if new_score > currenct_score:
-              rulesAfterPruned[''][key][value][label] = kvRules[host][key][value][label]
+              rulesAfterPruned[host][key][value][label] = kvRules[host][key][value][label]
             elif new_score == currenct_score and new_support > currenct_support:
-              rulesAfterPruned[''][key][value][label] = kvRules[host][key][value][label]              
+              rulesAfterPruned[host][key][value][label] = kvRules[host][key][value][label]              
 
     return rulesAfterPruned
 

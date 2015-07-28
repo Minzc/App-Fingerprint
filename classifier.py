@@ -11,7 +11,7 @@ class AbsClassifer:
   def classify(self, package): pass
   
   @abstractmethod
-  def train(self, train_set): pass
+  def train(self, train_set, rule_type): pass
 
   @abstractmethod
   def load_rules(self): pass
