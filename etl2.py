@@ -55,6 +55,8 @@ class ETL:
 
 
     def _insert_msql(self, file_path, app_package, app_type):
+        import datetime
+        startTime = datetime.datetime.now()
         print "Start inserting", app_package, file_path
         dbdao = SqlDao()
 
@@ -62,12 +64,20 @@ class ETL:
         appInfo = self.apps.get(app_type, app_package)
         if appInfo == None:
           return 
+
+        timeStampTwo = datetime.datetime.new()
+        print 'Get appInfo', timeStampTwo - startTime
+        
         app_package = appInfo.package
 
         totalIndexer = 0
         dns_info = {}
         comunicate_host = set()
         
+        app_name = appInfo.name
+        app_category = appInfo.category
+        app_company = appInfo.company
+
         pkgInfos = []
         while True:
             try:
@@ -80,12 +90,9 @@ class ETL:
                             host = dns_info[ip].pop()
                             pkgInfo[ETLConsts.HOST] = host
                             dns_info[ip].add(host)
-                    app_name = appInfo.name
-                    app_category = appInfo.category
-                    app_company = appInfo.company
-                    pkgInfo['app_name'] = appInfo.name
-                    pkgInfo['app_category'] = appInfo.category
-                    pkgInfo['app_company'] = appInfo.company
+                    pkgInfo['app_name'] = app_name
+                    pkgInfo['app_category'] = app_category
+                    pkgInfo['app_company'] = app_company
                     pkgInfos.append(pkgInfo)
                 else:
                   print app_name, app_category, app_company
@@ -95,6 +102,8 @@ class ETL:
                 break
             except:
                  print 'ERROR'
+        timeStampThree = datetime.datetime.new()
+        print 'Parsing pcaps', timeStampTwo - timeStampThree
         params = []
         for pkgInfo in pkgInfos:
             app_name = pkgInfo['app_name'] 
@@ -123,6 +132,7 @@ class ETL:
             comunicate_host.add(pkgInfo[ETLConsts.HOST])
         dbdao.executeBatch(self.INSERT_PACKAGES,params)
         dbdao.close()
+        print 'inserting', datetime.datetime.new() - timeStampThree
         print "Finish", app_package, "Package:", len(params), len(pkgInfos)
 
     def _parse_dns_package(self, package, dns_info):
