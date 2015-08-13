@@ -34,7 +34,7 @@ class HeaderClassifier(AbsClassifer):
 
     identifier = _classify(package)
     if identifier:
-      rst[consts.APP_RULE] = [(identifier[0],1.0)]
+      rst = {consts.APP_RULE: (identifier[0],1.0), consts.COMPANY_RULE: (None), consts.CATEGORY_RULE:(None)}
       if identifier[0] != package.app:
         if DEBUG : print identifier, package.app
     return rst

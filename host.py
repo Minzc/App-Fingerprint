@@ -106,14 +106,14 @@ class HostApp(AbsClassifer):
       return self
 
     def load_rules(self):
-      self.rules = defaultdict(dict)
+      self.rules = {consts.APP_RULE:{}, consts.COMPANY_RULE:{}, consts.CATEGORY_RULE:{}}
       QUERY = "SELECT host, label, rule_type FROM patterns WHERE paramkey is NULL and pattens is NULL"
       sqldao = SqlDao()
       counter = 0
       for host, label, ruleType in sqldao.execute(QUERY):
         counter += 1
         self.rules[ruleType][host] = label
-      print '>>> [Host Rules#loadRules] total number of rules is', counter
+      print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
       sqldao.close()
 
     def classify(self, pkg):

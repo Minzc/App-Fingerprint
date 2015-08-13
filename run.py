@@ -101,8 +101,8 @@ def execute(train_set, test_set, inforTrack):
 
     classifiers = [
              #("Header Rule", HeaderClassifier()),
-             #("Host Rule", HostApp()),
-             ("CMAR Rule", CMAR(min_cover = 3)),
+             ("Host Rule", HostApp()),
+             #("CMAR Rule", CMAR(min_cover = 3)),
              #("Path Rule" , PathApp()),
              #("KV Rule", KVClassifier())
             ]
@@ -110,7 +110,7 @@ def execute(train_set, test_set, inforTrack):
     
     
     ruleDict = {}
-    for rule_type in [ consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE]:
+    for rule_type in [ consts.APP_RULE]:
         for tbl in train_set:
             for pkg in train_set[tbl]:
                 if rule_type == consts.APP_RULE:
