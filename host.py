@@ -8,13 +8,14 @@ from classifier import AbsClassifer
 
 class HostApp(AbsClassifer):
     def __init__(self):
-      self.fileApp = defaultdict(set)
-      self.fileUrl = defaultdict(set)
-      self.urlApp = defaultdict(set)
+      # self.fileApp = defaultdict(set)
+      # self.fileUrl = defaultdict(set)
+      self.urlLabel = defaultdict(set)
       self.urlCompany = defaultdict(set)
       self.substrCompany = defaultdict(set)
-      self.appCompany, self.appName = load_appinfo()
       self.apps = AppInfos()
+      self.labelAppInfo = {}
+      self.rules = defaultdict(dict)
 
     def loadExpApp(self):
       expApp=set()
@@ -22,8 +23,8 @@ class HostApp(AbsClassifer):
           expApp.add(app.strip().lower())
       return expApp
     
-    def persist(self, patterns):
-      self._clean_db()
+    def persist(self, patterns, rule_type):
+      self._clean_db(rule_type)
       sqldao = SqlDao()
       QUERY = 'INSERT INTO patterns (label, support, confidence, host, rule_type) VALUES (%s, %s, %s, %s, %s)'
       params = []
@@ -31,111 +32,78 @@ class HostApp(AbsClassifer):
         for url, label in patterns[ruleType].iteritems():
           params.append((label, 1, 1, url, ruleType))
       sqldao.executeBatch(QUERY, params)
+      sqldao.close()
 
     def count(self, pkg, app_type=consts.ANDROID):
-      app = pkg.app
+      def addCommonStr(url, pkg, string):
+        common_str = longest_common_substring(url.lower(), string.lower())
+        self.substrCompany[common_str].add(pkg.label)
+
+      label = pkg.label
       appInfo = self.apps.get(app_type, pkg.app)
-      if not appInfo:
-        return
       url = url_clean(pkg.host)
       top_domain = get_top_domain(url)
-      if not url or not top_domain:
+      if not url or not top_domain or not appInfo:
         return
       
-      self.urlApp[top_domain].add(app)
-      self.urlApp[url].add(app)
-      self.urlCompany[url].add(self.appCompany[app])
-      self.urlCompany[top_domain].add(self.appCompany[app])
-      def addCommonStr(url, app, string):
-        common_str = longest_common_substring(url.lower(), string.lower())
-        self.substrCompany[common_str].add(self.appCompany[app])
-
-      addCommonStr(url, app, appInfo.package)
-      addCommonStr(url, app, appInfo.company.lower())
-      addCommonStr(url, app, appInfo.name.lower())
-      addCommonStr(url, app, appInfo.website)
+      self.labelAppInfo[label] = appInfo
+      map(lambda url : self.urlLabel[url].add(label), [top_domain, url])
+      map(lambda url : self.urlCompany[url].add(appInfo.company), [top_domain, url])
+      map(lambda string : addCommonStr(url, pkg, string), [appInfo.package, appInfo.company, appInfo.name, appInfo.website])
       if top_domain == '1nflximg.net':
         print '#TOPDOMAIN'
       if url == '1citynews.rogersdigitalmedia.com.edgesuite.net':
         print 'citynews.rogersdigitalmedia.com.edgesuite.net'
     
-    def checkCommonStr(self, app, url, expApp):
-      for astr in [app, self.appCompany[app], self.appName[app]]:
+    def checkCommonStr(self, label, url, expApp):
+      appInfo = self.labelAppInfo[label]
+      for astr in [appInfo.package, appInfo.company, appInfo.name]:
         common_str = longest_common_substring(url.lower(), astr.lower())
         if url == '1nflximg.net':
           print common_str
           print self.substrCompany[common_str]
-        if len(self.substrCompany[common_str]) < 5 and app in expApp:
+        if len(self.substrCompany[common_str]) < 5 and appInfo.package in expApp:
           if url == '1nflximg.net':
             print 'INNNNNNNNNNNN'
           return True
       return False
 
-    def _clean_db(self):
-      QUERY = "DELETE FROM patterns WHERE paramkey IS NULL and pattens IS NULL"
+    def _clean_db(self, rule_type):
+      QUERY = "DELETE FROM patterns WHERE paramkey IS NULL and pattens IS NULL and rule_type=%s"
       sqldao = SqlDao()
-      sqldao.execute(QUERY)
+      sqldao.execute(QUERY % (rule_type))
       sqldao.close()
 
-    def train(self, records):
-      
+    def train(self, records, rule_type):
       expApp = self.loadExpApp()
-      #self.usePcapUrl()
       for pkgs in records.values():
         for pkg in pkgs:
           self.count(pkg)
-      rmdUrls = set()
-
-      for fileName,urls in self.fileApp.iteritems():
-        if len(urls) > 1:
-          for url in self.fileUrl[fileName]:
-            rmdUrls.add(url)
-      print 'rmdUrls', len(rmdUrls)
       ########################
       # Generate Rules
       ########################
       
-      self.rules = defaultdict(dict)
-      for url, apps in self.urlApp.iteritems():
-        companySet = {self.appCompany[app] for app in apps}
+      for url, labels in self.urlLabel.iteritems():
         if url == '1nflximg.net':
           print '#', url in rmdUrls
           print '#', len(apps)
           print apps
           print companySet
 
-        if url not in rmdUrls and (len(apps) == 1 or len(companySet) == 1):
-          ruleType = consts.APP_RULE if len(apps) == 1 else consts.COMPANY_RULE
-
-          ifValidRule = False
-
-          for app in apps:
-            if self.checkCommonStr(app, url, expApp): 
-              ifValidRule = True
-
-          app = apps.pop()
-          
-          label = app if ruleType == consts.APP_RULE else companySet.pop()
+        if len(labels) == 1:
+          label = labels.pop()
+          ifValidRule = True if self.checkCommonStr(label, url, expApp) else False
 
           if ifValidRule:
-            self.rules[ruleType][url] = label
+            self.rules[rule_type][url] = label
 
           if url == '1nflximg.net':
-            print 'Rule Type is', ruleType, ifValidRule
+            print 'Rule Type is', rule_type, ifValidRule
 
-      self.persist(self.rules)
-      self._cleanup()
+      self.persist(self.rules, rule_type)
+      self.__init__()
       # fw.close()
       return self
-
-    def _cleanup(self):
-      self.fileApp = None
-      self.fileUrl = None
-      self.urlApp = None
-      self.urlCompany = None
-      self.substrCompany = None
-      self.appCompany = None
-      self.appName = None
 
     def load_rules(self):
       self.rules = defaultdict(dict)
@@ -148,7 +116,17 @@ class HostApp(AbsClassifer):
       print '>>> [Host Rules#loadRules] total number of rules is', counter
       sqldao.close()
 
-    
+    def classify(self, pkg):
+      rst = {}
+      for rule_type in self.rules:
+        host = pkg.host.replace('-','.')
+        secdomain = pkg.secdomain.replace('-', '.')
+        label = self.rules[rule_type].get(host, None)
+        label = self.rules[rule_type].get(secdomain, None) if not label else label
+        rst[rule_type] = (label, 1.0)
+      return rst
+
+    '''    
     def classify(self, pkg):
       import consts
       host = pkg.host.replace('-','.')
@@ -172,8 +150,9 @@ class HostApp(AbsClassifer):
           # print app, pkg.app, host, secdomain, hostRule, secdomainRule
         rst = {consts.APP_RULE : [(app, 1.0)]}
       elif company:
-        rst = {consts.COMPANY_RULE : [(company, 1.0)]}
+        rst = {consts.COMPANY_RULE : (company, 1.0)}
       return rst
+     '''
     
     def usePcapUrl(self):
         sqldao = SqlDao()
@@ -185,140 +164,134 @@ class HostApp(AbsClassifer):
               continue
             self.fileApp[fileName].add(self.appCompany[app])
             self.fileUrl[fileName].add(s)
-            self.urlApp[url].add(app)
+            self.urlLabel[url].add(app)
             self.urlCompany[url].add(self.appCompany[app])
             top_domain = get_top_domain(url)
-            self.urlApp[top_domain].add(app)
+            self.urlLabel[top_domain].add(app)
             common_str_pkg = longest_common_substring(url.lower(), app)
             self.substrCompany[common_str_pkg].add(self.appCompany[app])
             common_str_company = longest_common_substring(url.lower(), self.appCompany[app].lower())
             self.substrCompany[common_str_company].add(self.appCompany[app])
             common_str_name = longest_common_substring(url.lower(), self.appName[app].lower())
             self.substrCompany[common_str_name].add(self.appCompany[app])
-class PathApp:
+# class PathApp:
 
-  def __init__(self):
-    self.fileApp = defaultdict(set)
-    self.fileUrl = defaultdict(set)
-    self.pathApp = defaultdict(set)
-    self.pathCompany = defaultdict(set)
-    self.substrCompany = defaultdict(set)
-    self.appCompany, self.appName = load_appinfo()
+#   def __init__(self):
+#     self.fileApp = defaultdict(set)
+#     self.fileUrl = defaultdict(set)
+#     self.pathApp = defaultdict(set)
+#     self.pathCompany = defaultdict(set)
+#     self.substrCompany = defaultdict(set)
+#     self.appCompany, self.appName = load_appinfo()
 
-  def loadExpApp(self):
-    expApp=set()
-    for app in open("resource/exp_app.txt"):
-        expApp.add(app.strip().lower())
-    return expApp
+#   def loadExpApp(self):
+#     expApp=set()
+#     for app in open("resource/exp_app.txt"):
+#         expApp.add(app.strip().lower())
+#     return expApp
   
-  def count(self, pkg) :
-    app = pkg.app
-    if app not in self.appCompany:
-      return
-    path = pkg.path
-    if path == None:
-      return
-    for pathSeg in path.split('/'):
-      self.pathApp[pathSeg].add(app)
-      self.pathCompany[pathSeg].add(self.appCompany[app])
+#   def count(self, pkg) :
+#     app = pkg.app
+#     if app not in self.appCompany:
+#       return
+#     path = pkg.path
+#     if path == None:
+#       return
+#     for pathSeg in path.split('/'):
+#       self.pathApp[pathSeg].add(app)
+#       self.pathCompany[pathSeg].add(self.appCompany[app])
 
-      common_str = longest_common_substring(pathSeg.lower(), app)
-      self.substrCompany[common_str].add(self.appCompany[app])
-      common_str_company = longest_common_substring(pathSeg.lower(), self.appCompany[app].lower())
-      self.substrCompany[common_str_company].add(self.appCompany[app])
-      common_str_name = longest_common_substring(pathSeg.lower(), self.appName[app].lower())
-      self.substrCompany[common_str_name].add(self.appCompany[app])
-      if pathSeg == '28tracks.com':
-        print '#TOPDOMAIN'
-      if pathSeg == 'citynews.rogersdigitalmedia.com.edgesuite.net':
-        print 'citynews.rogersdigitalmedia.com.edgesuite.net'
+#       common_str = longest_common_substring(pathSeg.lower(), app)
+#       self.substrCompany[common_str].add(self.appCompany[app])
+#       common_str_company = longest_common_substring(pathSeg.lower(), self.appCompany[app].lower())
+#       self.substrCompany[common_str_company].add(self.appCompany[app])
+#       common_str_name = longest_common_substring(pathSeg.lower(), self.appName[app].lower())
+#       self.substrCompany[common_str_name].add(self.appCompany[app])
+#       if pathSeg == '28tracks.com':
+#         print '#TOPDOMAIN'
+#       if pathSeg == 'citynews.rogersdigitalmedia.com.edgesuite.net':
+#         print 'citynews.rogersdigitalmedia.com.edgesuite.net'
 
-  def checkCommonStr(self, app, pathSeg, expApp):
-    for astr in [app, self.appCompany[app], self.appName[app]]:
-      common_str = longest_common_substring(pathSeg.lower(), astr.lower())
-      if pathSeg == '12gigs.helpshift.com':
-          print common_str
-          print self.substrCompany[common_str]
-      if len(self.substrCompany[common_str]) < 5 and app in expApp:
-          if pathSeg == '12gigs.helpshift.com':
-              print 'INNNNNNNNNNNN'
+#   def checkCommonStr(self, app, pathSeg, expApp):
+#     for astr in [app, self.appCompany[app], self.appName[app]]:
+#       common_str = longest_common_substring(pathSeg.lower(), astr.lower())
+#       if pathSeg == '12gigs.helpshift.com':
+#           print common_str
+#           print self.substrCompany[common_str]
+#       if len(self.substrCompany[common_str]) < 5 and app in expApp:
+#           if pathSeg == '12gigs.helpshift.com':
+#               print 'INNNNNNNNNNNN'
 
-          return True
-    return False
-  def train(self, training_data):
-    expApp = self.loadExpApp()
-    for pkgs in training_data.values():
-      for pkg in pkgs:
-        self.count(pkg)
-    rmdUrls = set()
-
-    for fileName,urls in self.fileApp.iteritems():
-        if len(urls) > 1:
-            for url in self.fileUrl[fileName]:
-                rmdUrls.add(url)
-    ########################
-    # Generate Rules
-    ########################
+#           return True
+#     return False
+#   def train(self, training_data):
+#     expApp = self.loadExpApp()
+#     for pkgs in training_data.values():
+#       for pkg in pkgs:
+#         self.count(pkg)
+#     ########################
+#     # Generate Rules
+#     ########################
     
-    # fw = open('tmp', 'w')
+#     # fw = open('tmp', 'w')
     
 
 
     
-    self.rules = defaultdict(dict)
-    for pathSeg, apps in self.pathApp.iteritems():
-      companySet = {self.appCompany[app] for app in apps}
-      if pathSeg == '1citynews.ca':
-        print '#', pathSeg in rmdUrls
-        print '#', len(apps)
-        print apps
-        print companySet
+#     self.rules = defaultdict(dict)
+#     for pathSeg, apps in self.pathApp.iteritems():
+#       companySet = {self.appCompany[app] for app in apps}
+#       if pathSeg == '1citynews.ca':
+#         print '#', pathSeg in rmdUrls
+#         print '#', len(apps)
+#         print apps
+#         print companySet
 
-      if pathSeg not in rmdUrls and (len(apps) == 1 or len(companySet) == 1):
-        ruleType = consts.APP_RULE if len(apps) == 1 else consts.COMPANY_RULE
+#       if len(apps) == 1 or len(companySet) == 1:
+#         ruleType = consts.APP_RULE if len(apps) == 1 else consts.COMPANY_RULE
 
-        ifValidRule = False
+#         ifValidRule = False
 
-        for app in apps:
-          if self.checkCommonStr(app, pathSeg, expApp): 
-            ifValidRule = True
+#         for app in apps:
+#           if self.checkCommonStr(app, pathSeg, expApp): 
+#             ifValidRule = True
 
-        app = apps.pop()
+#         app = apps.pop()
         
-        label = app if ruleType == consts.APP_RULE else companySet.pop()
+#         label = app if ruleType == consts.APP_RULE else companySet.pop()
 
-        if ifValidRule:
-          self.rules[ruleType][pathSeg] = label
+#         if ifValidRule:
+#           self.rules[ruleType][pathSeg] = label
 
-        if pathSeg == '12gigs.helpshift.com':
-          print 'Rule Type is', ruleType, ifValidRule
+#         if pathSeg == '12gigs.helpshift.com':
+#           print 'Rule Type is', ruleType, ifValidRule
 
-    # fw.close()
-    return self
+#     # fw.close()
+#     return self
 
-  def classify(self, pkg):
-    import consts
-    path = pkg.path
-    appRules = self.rules[consts.APP_RULE]
-    companyRules = self.rules[consts.COMPANY_RULE]
-    app = None
-    for pathSeg in path.split('/'):
-      app = appRules[pathSeg] if pathSeg in appRules else None
-      company = companyRules[pathSeg] if pathSeg in companyRules else None
-      rst = defaultdict(list)
-      if app:
-        if app != pkg.app:
-          hostRule = ''
-          if pathSeg in appRules:
-            hostRule = appRules[pathSeg]
-          secdomainRule = ''
-          if pathSeg in appRules:
-            secdomainRule = appRules[pathSeg]
-          # print app, pkg.app, host, secdomain, hostRule, secdomainRule
-        rst[consts.APP_RULE].append((app, 1.0))
-      elif company:
-        rst[consts.COMPANY_RULE].append((company, 1.0))
-    return rst
+#   def classify(self, pkg):
+#     import consts
+#     path = pkg.path
+#     appRules = self.rules[consts.APP_RULE]
+#     companyRules = self.rules[consts.COMPANY_RULE]
+#     app = None
+#     for pathSeg in path.split('/'):
+#       app = appRules[pathSeg] if pathSeg in appRules else None
+#       company = companyRules[pathSeg] if pathSeg in companyRules else None
+#       rst = defaultdict(list)
+#       if app:
+#         if app != pkg.app:
+#           hostRule = ''
+#           if pathSeg in appRules:
+#             hostRule = appRules[pathSeg]
+#           secdomainRule = ''
+#           if pathSeg in appRules:
+#             secdomainRule = appRules[pathSeg]
+#           # print app, pkg.app, host, secdomain, hostRule, secdomainRule
+#         rst[consts.APP_RULE].append((app, 1.0))
+#       elif company:
+#         rst[consts.COMPANY_RULE].append((company, 1.0))
+#     return rst
 
 if __name__ == '__main__':
   records = load_pkgs()

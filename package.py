@@ -21,6 +21,9 @@ class Package:
     if company: company = company.lower()
     self.company = company
 
+  def set_category(self, category):
+    self.category = category
+
   def get_name(self):
       return self.name
 

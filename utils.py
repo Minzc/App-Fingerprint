@@ -157,12 +157,12 @@ def load_pkgs(limit = None, filterFunc=lambda x : True, DB="packages"):
     sqldao = SqlDao()
     QUERY = None
     if not limit:
-        QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from %s where method=\'GET\'" % DB
+        QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw, category from %s where method=\'GET\'" % DB
     else:
-        QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw from %s where method=\'GET\' limit %s" % (DB, limit)
+        QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw, category from %s where method=\'GET\' limit %s" % (DB, limit)
     print QUERY
 
-    for id, app, add_header, path, refer, host, agent, company,name, dst, raw in sqldao.execute(QUERY):
+    for id, app, add_header, path, refer, host, agent, company,name, dst, raw, category in sqldao.execute(QUERY):
         package = Package()
         package.set_app(app)
         package.set_path(path)
@@ -175,6 +175,7 @@ def load_pkgs(limit = None, filterFunc=lambda x : True, DB="packages"):
         package.set_name(name)
         package.set_dst(dst)
         package.set_content(raw)
+        package.set_category(category)
        
         if filterFunc(package):
             records.append(package)
@@ -183,15 +184,6 @@ def load_pkgs(limit = None, filterFunc=lambda x : True, DB="packages"):
 def get_record_f(record):
     """Get package features"""
     features = filter(None, record.path.split('/'))
-    # queries = record.querys
-    # for k, vs in filter(None, queries.items()):
-    #     if len(k) < 2:
-    #         continue
-    #     features.append(k)
-    #     for v in vs:
-    #         if len(v) < 2:
-    #             continue
-    #         features.append(v.replace(' ', '').replace('\n', ''))
 
     for head_seg in filter(None, record.add_header.split('\n')):
         if len(head_seg) > 2:
@@ -202,7 +194,6 @@ def get_record_f(record):
           features.append(agent_seg.replace(' ', ''))
     host = record.host if record.host else record.dst
     features.append(host)
-    features.append(record.app)
 
     return features
 
@@ -221,6 +212,25 @@ def load_appinfo():
       app_company[app.lower()] = company
       app_name[app.lower()] = name
   return app_company, app_name
+
+def suffix_tree(apps):
+  """
+  Build app pkg names' suffix tree
+  """
+  class node:
+    def __init__(self, value):
+      self.parents = {}
+      self.value = value
+      self.children = {}
+  root = node(None)
+  for app in apps:
+    nd = root
+    for seg in reversed(app.split('.')):
+      if seg not in nd.children:
+        new_node = node(seg)
+        nd.children[seg] = new_node
+      nd = nd.children[seg]
+  return root
 
 def get_top_domain(host):
   import tldextract

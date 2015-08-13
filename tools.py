@@ -238,7 +238,55 @@ def gen_cmar_data(limit = None):
   fwriter.close()
   print 'output files are app_index.txt, feature_index.txt, record_vec.txt'
   print 'number of classes:', len(app_index)
-        
+
+def statCompany():
+  from collections import defaultdict
+  tbls = ['packages_20150210', 'packages_20150429', 'packages_20150509', 'packages_20150526']
+  packages = []
+  for tbl in tbls:
+    packages += load_pkgs(DB = tbl)
+  value_label = defaultdict(lambda : defaultdict(set))
+  app_company = {}
+  for pkg in packages:
+    for k,v in pkg.queries.items():
+      if pkg.secdomain == 'bluecorner.es' or pkg.host == 'bluecorner.es' or pkg.app == 'com.bluecorner.totalgym':
+        #print 'OK contains bluecorner', pkg.secdomain
+        pass
+      map(lambda x : value_label[k][x].add(pkg.app), v)
+      app_company[pkg.app] = pkg.company
+
+  for key in value_label:
+    for value in value_label[key]:
+      output  = False
+      for app in value_label[key][value]:
+        if app in value:
+          output = True
+      if output and len(value_label[key][value]) > 1:
+        print "%s %s %s %s" % (key, value, value_label[key][value], ','.join(map(lambda app : app_company[app], value_label[key][value])))
+
+def test_suffix_tree():
+  from utils import suffix_tree, loadExpApp
+  def classify_suffix_app(app_suffix,value):
+    value = value.split('.')
+    node = app_suffix
+    meet_first = False
+    rst = []
+    for i in reversed(value):
+      if not meet_first and i in node.children:
+        meet_first = True
+      if meet_first:
+        if i in node.children:
+          rst.append(i)
+          node = node.children[i]
+        if len(node.children) == 0:
+          return '.'.join(reversed(rst))
+    return None
+  app_name = '1.android.com.usmann.whitagramforandroid'
+  exp_apps = loadExpApp()
+  app_suffix = suffix_tree(exp_apps)
+  label = classify_suffix_app(app_suffix, app_name)
+  print label
+
 
 if __name__ == '__main__':
   
@@ -261,6 +309,10 @@ if __name__ == '__main__':
     inst_cat(sys.argv[2])
   elif sys.argv[1] == 'update':
     update_ios()
+  elif sys.argv[1] == 'company':
+    statCompany()
+  elif sys.argv[1] == 'suffix':
+    test_suffix_tree()
 
 
 
