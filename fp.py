@@ -298,10 +298,11 @@ class CMAR:
     for label, patterns, host, rule_type, confidence in sqldao.execute(SQL):
       counter += 1
       patterns = frozenset(patterns.split(","))
-      #print self.rules[rule_type][host][patterns]
       self.rules[rule_type][host][patterns] = (label, confidence)
     sqldao.close()
     print '>>>[CMAR] Totaly number of rules is', counter
+    for rule_type in self.rules:
+      print '>>>[CMAR] Rule Type %s Number of Rules %s' % (rule_type, len(self.rules[rule_type]))
     
 
   def _clean_db(self, rule_type):

@@ -19,6 +19,8 @@ FOLD = 1
 DEBUG = False
 DEBUG_CMAR = False
 
+validLabel = {consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE}
+
 def load_trian(size):
     train_set = {int(item.strip()) for item in open('train_id')}
     test_set = {i for i in range(size) if i not in train_set}
@@ -36,13 +38,16 @@ def evaluate(rst, test_set):
     correct, wrong, total = 0, 0, 0
     correct_app = set()
     for pkg_id, predictions in rst.items():
-      if predictions[consts.APP_RULE][0] == test_set[pkg_id].app:
+      predict_app = predictions[consts.APP_RULE][0] 
+      predict_company = predictions[consts.COMPANY_RULE][0] 
+      predict_category = predictions[consts.CATEGORY_RULE][0] 
+      if predict_app == test_set[pkg_id].app:
           correct += 1
           correct_app.add(test_set[pkg_id].app)
-      elif predictions[consts.COMPANY_RULE][0] == test_set[pkg_id].company:
+      elif predict_app == None and predict_company == test_set[pkg_id].company:
           correct += 1
           correct_app.add(test_set[pkg_id].app)
-      elif predictions[consts.CATEGORY_RULE][0] == test_set[pkg_id].category:
+      elif predict_app == None and predict_company == None and predict_category == test_set[pkg_id].category:
           correct += 1
           correct_app.add(test_set[pkg_id].app)
       else:
@@ -54,7 +59,6 @@ def evaluate(rst, test_set):
     return correct, correct_app
 
 
-validLabel = {consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE}
 
 def use_classifier(classifier, test_set):
     rst = defaultdict(dict)
@@ -106,7 +110,7 @@ def execute(train_set, test_set, inforTrack):
     
     
     ruleDict = {}
-    for rule_type in [ consts.APP_RULE]:
+    for rule_type in [ consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE]:
         for tbl in train_set:
             for pkg in train_set[tbl]:
                 if rule_type == consts.APP_RULE:
