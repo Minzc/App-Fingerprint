@@ -92,6 +92,10 @@ def insert_rst(rst, DB = 'packages'):
 
 
 def execute(train_set, test_set, inforTrack):
+    sqldao = SqlDao()
+    sqldao.execute('DELETE FROM patterns')
+    sqldao.close()
+
     print "Train:", train_set.keys(), "Test:", len(test_set)
     correct = 0
     test_apps = set()
