@@ -99,6 +99,7 @@ def _get_package_f(package):
     return features
 
 
+test_str = 'com.fdgentertainment.bananakong/1.8.1 (Linux; U; Android 5.0.2; en_US; razor) Apache-HttpClient/UNAVAILABLE (java 1.4)'.lower()
 def _encode_data(packages=None, minimum_support = 2):
     def _get_transactions(packages):
       """Change package to transaction"""
@@ -113,12 +114,15 @@ def _encode_data(packages=None, minimum_support = 2):
           # Last item is app
           # Second from last is host. Do not use host as feature
           for item in transaction[:-2]:
-              f_counter[item] += 1
-              f_company[item].add(package.company)
-
+            f_counter[item] += 1
+            f_company[item].add(package.company)
+      print 'f_company', f_company[test_str]
+      print 'counter is', f_counter[test_str]
       # Get frequent 1-item
       items = {item for item, num in f_counter.iteritems() 
           if num > minimum_support and len(f_company[item]) < 2}
+      print 'f_company', f_company[test_str]
+      print 'label in it', test_str in items
       return processed_transactions, items
     
 
@@ -157,7 +161,8 @@ def _encode_data(packages=None, minimum_support = 2):
         # Append class lable at the end of a transaction
         encode_transaction.append(appIndx[app])
         encodedpackages.append(encode_transaction)
-    
+
+    print 'Item index is ', itemIndx[test_str]
     # encodedpackages: ([Features, app])
     return encodedpackages, rever_map(appIndx), rever_map(itemIndx), packageHost
 
@@ -174,9 +179,13 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
     ###########################
     # FP-tree Version
     ###########################
+    print '_gen_rules', featureIndx.keys()[:10]
     rules = []
     for frequent_pattern_info in find_frequent_itemsets(transactions, tSupport, True):
         itemset, support, tag_dist = frequent_pattern_info
+        for item in itemset:
+          if test_str == featureIndx[item]:
+            print itemset
         max_clss = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
         if tag_dist[max_clss] * 1.0 / support > tConfidence:
             confidence = max(tag_dist.values()) * 1.0 / support
@@ -260,8 +269,9 @@ class CMAR:
       packages = p
       print "#CMAR:", len(packages)
       encodedpackages, appIndx, featureIndx, packageHost = _encode_data(packages)
+      print featureIndx.keys()[:10]
       # Rules format : (feature, confidence, support, label)
-      rules = _gen_rules(encodedpackages, tSupport, tConfidence, rever_map(featureIndx))
+      rules = _gen_rules(encodedpackages, tSupport, tConfidence, featureIndx)
       # feature, app, host
       rules = _prune_rules(rules, encodedpackages, self.min_cover)
       # change encoded features back to string

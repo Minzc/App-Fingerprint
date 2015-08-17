@@ -27,9 +27,13 @@ def load_trian(size):
     return train_set, test_set
 
 def merge_rst(rst, tmprst):
-    for r in tmprst:
-        if r not in rst or ( rst[r] == None  and tmprst[r] != None ):
-            rst[r] = tmprst[r]
+    for pkg_id, predictions in tmprst.iteritems():
+      if pkg_id not in rst:
+        rst[pkg_id] = predictions
+      else:
+        for rule_type in validLabel:
+          if rst[pkg_id][rule_type][0] == None:
+            rst[pkg_id][rule_type] = tmprst[pkg_id][rule_type]
     return rst
 
 
@@ -71,7 +75,7 @@ def use_classifier(classifier, test_set):
         labelDists = classifier.classify(record)
         max_confidence = -1
         for labelType, prediction in labelDists.iteritems():
-          if prediction and labelType in validLabel:
+          if labelType in validLabel:
               recall += 1
               rst[pkg_id][labelType] = prediction
     
@@ -84,7 +88,10 @@ def insert_rst(rst, DB = 'packages'):
     sqldao = SqlDao()
     params = []
     for k, v in rst.items():
-      params.append((3,k));
+      for rule_type in validLabel:
+        if v[rule_type][0]:
+          params.append((3,k));
+          break
     sqldao.executeBatch(QUERY,  params)
     sqldao.close()
     print 'insert', len(rst),"items"
@@ -114,7 +121,7 @@ def execute(train_set, test_set, inforTrack):
     
     
     ruleDict = {}
-    for rule_type in [ consts.APP_RULE]:
+    for rule_type in validLabel:
         for tbl in train_set:
             for pkg in train_set[tbl]:
                 if rule_type == consts.APP_RULE:
@@ -147,7 +154,8 @@ def execute(train_set, test_set, inforTrack):
         classifier.load_rules()
         tmprst = use_classifier(classifier, test_set)
         rst = merge_rst(rst, tmprst)
-        print ">>> Recognized:", len(rst)
+        recall = sum([1 for i in rst.values() if i[consts.APP_RULE][0] or i[consts.COMPANY_RULE][0] or i[consts.CATEGORY_RULE][0]])
+        print ">>> Recognized:", recall
 
 
     c, correct_app = evaluate(rst, test_set)

@@ -8,6 +8,8 @@ import tldextract
 from sqldao import SqlDao
 from package import Package
 import random
+from app_info import AppInfos
+import consts
 
 regex_enpunc = re.compile("[" + string.punctuation + "]")
 
@@ -151,18 +153,26 @@ def none2str(astr):
     return astr
   return ''
 
+def add_appinfo(packages):
+  appInfos = AppInfos()
+  for package in packages:
+    appInfo = appInfos.get(consts.ANDROID, package.app)
+    if appInfo == None:
+      print 'Error', package.app
+    package.set_appinfo(appInfo)
+  return packages
 
 def load_pkgs(limit = None, filterFunc=lambda x : True, DB="packages"):
     records = []
     sqldao = SqlDao()
     QUERY = None
     if not limit:
-        QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw, category from %s where method=\'GET\'" % DB
+        QUERY = "select id, app, add_header, path, refer, hst, agent, dst, raw from %s where method=\'GET\'" % DB
     else:
-        QUERY = "select id, app, add_header, path, refer, hst, agent, company,name, dst, raw, category from %s where method=\'GET\' limit %s" % (DB, limit)
+        QUERY = "select id, app, add_header, path, refer, hst, agent, dst, raw from %s where method=\'GET\' limit %s" % (DB, limit)
     print QUERY
 
-    for id, app, add_header, path, refer, host, agent, company,name, dst, raw, category in sqldao.execute(QUERY):
+    for id, app, add_header, path, refer, host, agent, dst, raw in sqldao.execute(QUERY):
         package = Package()
         package.set_app(app)
         package.set_path(path)
@@ -171,14 +181,12 @@ def load_pkgs(limit = None, filterFunc=lambda x : True, DB="packages"):
         package.set_refer(refer)
         package.set_host(host)
         package.set_agent(agent)
-        package.set_company(company)
-        package.set_name(name)
         package.set_dst(dst)
         package.set_content(raw)
-        package.set_category(category)
        
         if filterFunc(package):
             records.append(package)
+    records = add_appinfo(records)
     return records
 
 def get_record_f(record):

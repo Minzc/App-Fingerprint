@@ -12,23 +12,31 @@ class Package:
   def set_dst(self, dst):
     self.dst = dst
 
-  def set_name(self, app_name):
-    if app_name:
-      packapp_name = app_name.lower().replace('-', ' ').replace('_', ' ').replace(',', ' ')
-    self.name = app_name
+  def set_appinfo(self, appInfo):
+    self.appInfo = appInfo
 
-  def set_company(self, company):
-    if company: company = company.lower()
-    self.company = company
+  @property
+  def name(self):
+    return self.appInfo.name
 
-  def set_category(self, category):
-    self.category = category
+  @property
+  def app(self):
+    return self.app
+  
+  @property
+  def category(self):
+    return self.appInfo.category
 
-  def get_name(self):
-      return self.name
+  @property
+  def company(self):
+    return self.appInfo.company
+
+  @property
+  def website(self):
+    return self.appInfo.website
 
   def set_app(self, app):
-      self.app = app.lower()
+    self.app = app.lower()
 
   def set_refer(self, refer):
     self.refer = refer

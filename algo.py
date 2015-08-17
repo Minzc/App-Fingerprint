@@ -73,8 +73,6 @@ class KVClassifier(AbsClassifer):
         for rule in filter(lambda rule : rule.key in pkg.queries, general_rules[pkg.secdomain]):
           ruleCover[rule] += 1
           for value in pkg.queries[rule.key]:
-            if value == 'ca-app-pub-9456426941744194':
-              print self.value_label_c[value]
             if len(self.value_label_c[value]) == 1:
                 debug_counter += 1
                 specific_rules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
@@ -126,11 +124,10 @@ class KVClassifier(AbsClassifer):
              #print 'value not in rules', k.encode('utf-8'), v.encode('utf-8'), pkg.app
       predict_rst[rule_type] = (prediction, max_score, evidence[0], evidence[1])
 
-      if not predict_rst[consts.APP_RULE]:
+      if not predict_rst[consts.APP_RULE][0]:
         for k, values in pkg.queries.iteritems():
           label = map(lambda v : self.classify_suffix_app(v), values)
-          print label
-          predict_rst[consts.APP_RULE] = (label, 1, k)
+          predict_rst[consts.APP_RULE] = (label[0], 1, k)
 
     return predict_rst
 

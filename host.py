@@ -5,6 +5,7 @@ import consts
 from app_info import AppInfos
 from classifier import AbsClassifer
 
+test_str = 'voyagesarabais.com'
 
 class HostApp(AbsClassifer):
     def __init__(self):
@@ -43,27 +44,26 @@ class HostApp(AbsClassifer):
       appInfo = self.apps.get(app_type, pkg.app)
       url = url_clean(pkg.host)
       top_domain = get_top_domain(url)
-      if not url or not top_domain or not appInfo:
+      if not url or not top_domain:
+        return
+
+      if not appInfo:
+        print 'ERROR'
         return
       
-      self.labelAppInfo[label] = appInfo
+      self.labelAppInfo[label] = (pkg.app, pkg.company, pkg.category)
       map(lambda url : self.urlLabel[url].add(label), [top_domain, url])
-      map(lambda url : self.urlCompany[url].add(appInfo.company), [top_domain, url])
-      map(lambda string : addCommonStr(url, pkg, string), [appInfo.package, appInfo.company, appInfo.name, appInfo.website])
-      if top_domain == '1nflximg.net':
-        print '#TOPDOMAIN'
-      if url == '1citynews.rogersdigitalmedia.com.edgesuite.net':
-        print 'citynews.rogersdigitalmedia.com.edgesuite.net'
+      map(lambda url : self.urlCompany[url].add(pkg.company), [top_domain, url])
+      map(lambda string : addCommonStr(url, pkg, string), [pkg.app, pkg.company, pkg.name, pkg.website])
     
     def checkCommonStr(self, label, url, expApp):
-      appInfo = self.labelAppInfo[label]
-      for astr in [appInfo.package, appInfo.company, appInfo.name]:
+      for astr in self.labelAppInfo[label]:
         common_str = longest_common_substring(url.lower(), astr.lower())
-        if url == '1nflximg.net':
+        if url == test_str:
           print common_str
           print self.substrCompany[common_str]
-        if len(self.substrCompany[common_str]) < 5 and appInfo.package in expApp:
-          if url == '1nflximg.net':
+        if len(self.substrCompany[common_str]) < 5 and self.labelAppInfo[label][0] in expApp:
+          if url == test_str:
             print 'INNNNNNNNNNNN'
           return True
       return False
@@ -83,12 +83,12 @@ class HostApp(AbsClassifer):
       # Generate Rules
       ########################
       
+      print test_str in self.urlLabel
+
       for url, labels in self.urlLabel.iteritems():
-        if url == '1nflximg.net':
-          print '#', url in rmdUrls
-          print '#', len(apps)
-          print apps
-          print companySet
+        if url == test_str:
+          print '#', len(labels)
+          print labels
 
         if len(labels) == 1:
           label = labels.pop()
@@ -97,7 +97,7 @@ class HostApp(AbsClassifer):
           if ifValidRule:
             self.rules[rule_type][url] = label
 
-          if url == '1nflximg.net':
+          if url == test_str:
             print 'Rule Type is', rule_type, ifValidRule
 
       self.persist(self.rules, rule_type)
@@ -123,6 +123,8 @@ class HostApp(AbsClassifer):
         secdomain = pkg.secdomain.replace('-', '.')
         label = self.rules[rule_type].get(host, None)
         label = self.rules[rule_type].get(secdomain, None) if not label else label
+        if host == 'sd9.radarnowandroid.com':
+          print label
         rst[rule_type] = (label, 1.0)
       return rst
 

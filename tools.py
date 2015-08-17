@@ -16,10 +16,13 @@ def inst_cat(file_path):
   import mysql.connector  
   cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
   cursor = cnx.cursor()
-  query = 'INSERT INTO apps (app, name, category, company) VALUES (%s, %s, %s, %s)'
+  query = 'INSERT INTO android_app_details (package_name, app_title, category_code, offered_by, website) VALUES (%s, %s, %s, %s, %s)'
   def parser(ln):
-    pkgname, name, category, company = ln.split('\t')
-    cursor.execute(query, (pkgname, name, category, company))
+    pkgname, name, category, company, website = ln.split('\t')
+    try:
+      cursor.execute(query, (pkgname, name, category, company, website))
+    except:
+      pass
 
   loadfile(file_path, parser)
   cnx.commit()
@@ -120,7 +123,6 @@ def get_app_token():
   cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
   cursor = cnx.cursor()
 
-
 def tf_idf(data_set = None):
   sqldao = SqlDao()
   if not data_set:
@@ -146,6 +148,7 @@ def tf_idf(data_set = None):
     for app, count in counter.items():
       sqldao.execute(INSERT, (pathseg, math.log(1.0 * totalDoc / doc) * count, app))
   sqldao.close()
+
 def update_ios():
   from app_info import AppInfos
   import consts
@@ -287,11 +290,23 @@ def test_suffix_tree():
   label = classify_suffix_app(app_suffix, app_name)
   print label
 
+def getExpAppList(folder):
+  trackIds = dict()
+  for date in listdir(folder):
+    file_path = join(folder, f)
+    print file_path
+    trackIds[file_path] = set()
+    for f in listdir(file_path):
+      trackId = f[0:-5]
+      trackIds[file_path].add(trackId)
+  expIds = reduce(lambda x, y : x & y, trackIds.values())
+  for expId in expIds:
+    print expId
+
 
 if __name__ == '__main__':
-  
   if len(sys.argv) < 2:
-    print 'error' 
+    print 'error'
   elif sys.argv[1] == 'geturl':
     queryUrlToken(True)
   elif sys.argv[1] == 'trans':
@@ -313,6 +328,8 @@ if __name__ == '__main__':
     statCompany()
   elif sys.argv[1] == 'suffix':
     test_suffix_tree()
+  elif sys.argv[1] == 'expids':
+    getExpAppList(sys.argv[2])
 
 
 
