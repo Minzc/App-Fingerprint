@@ -46,7 +46,6 @@ class ETL:
           appInfo = self.apps.get(app_type, exp_app)
           tmp_apps[exp_app] = appInfo
         self.apps = tmp_apps
-        print self.apps.keys()
 
 
     def upload_packages(self, folder, app_type):
@@ -76,7 +75,7 @@ class ETL:
           print 'Error!! Can not find', app_package
           return 
         packages = pyshark.FileCapture(file_path, display_filter='http')
-        timeStampTwo = datetime.datetime.new()
+        timeStampTwo = datetime.datetime.now()
         print 'Get appInfo', timeStampTwo - startTime
         
         app_package = appInfo.package
@@ -113,7 +112,7 @@ class ETL:
                 break
             except:
                  print 'ERROR'
-        timeStampThree = datetime.datetime.new()
+        timeStampThree = datetime.datetime.now()
         print 'Parsing pcaps', timeStampTwo - timeStampThree
         params = []
         for pkgInfo in pkgInfos:
@@ -143,7 +142,7 @@ class ETL:
             comunicate_host.add(pkgInfo[ETLConsts.HOST])
         dbdao.executeBatch(self.INSERT_PACKAGES,params)
         dbdao.close()
-        print 'inserting', datetime.datetime.new() - timeStampThree
+        print 'inserting', datetime.datetime.now() - timeStampThree
         print "Finish", app_package, "Package:", len(params), len(pkgInfos)
 
     def _parse_dns_package(self, package, dns_info):
