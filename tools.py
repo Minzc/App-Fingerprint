@@ -291,6 +291,8 @@ def test_suffix_tree():
   print label
 
 def getExpAppList(folder):
+  from os import listdir
+  from os.path import isfile, join
   trackIds = dict()
   for date in listdir(folder):
     file_path = join(folder, f)
