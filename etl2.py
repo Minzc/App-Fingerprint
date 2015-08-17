@@ -64,8 +64,8 @@ class ETL:
 
 
     def _insert_msql(self, file_path, app_package, app_type):
-        import datetime
-        startTime = datetime.datetime.now()
+        import time
+        startTime = time.time()
         print "Start inserting", app_package, file_path
         dbdao = SqlDao()
 
@@ -75,7 +75,7 @@ class ETL:
           print 'Error!! Can not find', app_package
           return 
         packages = pyshark.FileCapture(file_path, display_filter='http')
-        timeStampTwo = datetime.datetime.now()
+        timeStampTwo = time.time()
         print 'Get appInfo', timeStampTwo - startTime
         
         app_package = appInfo.package
@@ -112,7 +112,7 @@ class ETL:
                 break
             except:
                  print 'ERROR'
-        timeStampThree = datetime.datetime.now()
+        timeStampThree = time.time()
         print 'Parsing pcaps', timeStampTwo - timeStampThree
         params = []
         for pkgInfo in pkgInfos:
@@ -142,7 +142,7 @@ class ETL:
             comunicate_host.add(pkgInfo[ETLConsts.HOST])
         dbdao.executeBatch(self.INSERT_PACKAGES,params)
         dbdao.close()
-        print 'inserting', datetime.datetime.now() - timeStampThree
+        print 'inserting', time.time() - timeStampThree
         print "Finish", app_package, "Package:", len(params), len(pkgInfos)
 
     def _parse_dns_package(self, package, dns_info):
