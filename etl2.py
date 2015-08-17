@@ -239,6 +239,9 @@ class ETL:
 
 
 if __name__ == '__main__':
+    if len(sys.argv) < 4:
+      print 'python etl2.py <path> <tablename> [ios|android] [exp_app_file]'
+      return 
     path = sys.argv[1]
     tablename = sys.argv[2]
     app_type = sys.argv[3]
