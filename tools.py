@@ -295,7 +295,7 @@ def getExpAppList(folder):
   from os.path import isfile, join
   trackIds = dict()
   for date in listdir(folder):
-    file_path = join(folder, f)
+    file_path = join(folder, date)
     print file_path
     trackIds[file_path] = set()
     for f in listdir(file_path):
