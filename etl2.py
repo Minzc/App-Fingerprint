@@ -56,11 +56,14 @@ class ETL:
         from os.path import isfile, join
 
         startFlag = False
+        counter = 0
         for f in listdir(folder):
             file_path = join(folder, f)
             if isfile(file_path):
                 app_name = f[0:-5]
                 self._insert_msql(join(folder, f), app_name, app_type)
+                counter += 1
+                print 'Have instered', counter, 'pcaps'
 
 
     def _insert_msql(self, file_path, app_package, app_type):
