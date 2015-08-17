@@ -72,8 +72,7 @@ class ETL:
         print "Start inserting", app_package, file_path
         dbdao = SqlDao()
 
-        appInfo = self.apps[app_package]
-        print app_package in self.apps
+        appInfo = self.apps.get(app_package, None)
         if appInfo == None:
           print 'Error!! Can not find', app_package
           return 
