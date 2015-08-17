@@ -28,15 +28,21 @@ class ETLConsts:
 
 
 class ETL:
-    def __init__(self, tablename):
+    def __init__(self, tablename, app_type, exp_apps = None):
         self.INSERT_PACKAGES = ("INSERT INTO " + tablename + " "
                                 "(app,src,dst,time,add_header,hst, path, accpt, agent, refer, author, cntlength, cnttype, method, size, httptype, name, category, company, raw)"
                                 "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)")
         self.INSERT_HOST = 'INSERT INTO host (app, host) VALUES(%s, %s)'
-        self._get_app_info()
+        self._get_app_info(exp_apps)
+        self.app_type = app_type
 
-    def _get_app_info(self):
+    def _get_app_info(self, exp_apps):
         self.apps = AppInfos()
+        apps = {}
+        for exp_app in exp_apps:
+          appInfo = self.apps.get(app_type, exp_app)
+          apps[exp_app] = appInfo
+        self.apps = apps
 
 
     def upload_packages(self, folder, app_type):
@@ -61,8 +67,9 @@ class ETL:
         dbdao = SqlDao()
 
         packages = pyshark.FileCapture(file_path, display_filter='http')
-        appInfo = self.apps.get(app_type, app_package)
+        appInfo = self.apps[app_package]
         if appInfo == None:
+          print 'Error!! Can not find', app_package
           return 
 
         timeStampTwo = datetime.datetime.new()
@@ -235,9 +242,13 @@ if __name__ == '__main__':
     path = sys.argv[1]
     tablename = sys.argv[2]
     app_type = sys.argv[3]
-    etl = ETL(tablename)
     if app_type == 'ios':
       app_type = consts.IOS
     else:
       app_type = consts.ANDROID
+    exp_app_path = None
+    if len(sys.argv) == 5:
+      exp_app_path = sys.argv[4]
+
+    etl = ETL(tablename, app_type, exp_app_path)
     etl.upload_packages(path, app_type)
