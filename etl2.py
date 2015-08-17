@@ -70,12 +70,13 @@ class ETL:
         print "Start inserting", app_package, file_path
         dbdao = SqlDao()
 
-        packages = pyshark.FileCapture(file_path, display_filter='http')
+        print self.apps.keys()
         appInfo = self.apps[app_package]
+        print app_package in self.apps
         if appInfo == None:
           print 'Error!! Can not find', app_package
           return 
-
+        packages = pyshark.FileCapture(file_path, display_filter='http')
         timeStampTwo = datetime.datetime.new()
         print 'Get appInfo', timeStampTwo - startTime
         
