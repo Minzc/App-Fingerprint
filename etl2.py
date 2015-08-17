@@ -28,21 +28,25 @@ class ETLConsts:
 
 
 class ETL:
-    def __init__(self, tablename, app_type, exp_apps = None):
+    def __init__(self, tablename, app_type, exp_apps_path = None):
         self.INSERT_PACKAGES = ("INSERT INTO " + tablename + " "
                                 "(app,src,dst,time,add_header,hst, path, accpt, agent, refer, author, cntlength, cnttype, method, size, httptype, name, category, company, raw)"
                                 "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)")
         self.INSERT_HOST = 'INSERT INTO host (app, host) VALUES(%s, %s)'
+        exp_apps = []
+        for ln in open(exp_apps_path):
+          exp_apps.append(ln.strip())
         self._get_app_info(exp_apps)
         self.app_type = app_type
 
     def _get_app_info(self, exp_apps):
         self.apps = AppInfos()
-        apps = {}
+        tmp_apps = {}
         for exp_app in exp_apps:
           appInfo = self.apps.get(app_type, exp_app)
-          apps[exp_app] = appInfo
-        self.apps = apps
+          tmp_apps[exp_app] = appInfo
+        self.apps = tmp_apps
+        print self.apps.keys()
 
 
     def upload_packages(self, folder, app_type):
@@ -241,7 +245,7 @@ class ETL:
 if __name__ == '__main__':
     if len(sys.argv) < 4:
       print 'python etl2.py <path> <tablename> [ios|android] [exp_app_file]'
-      return 
+      sys.exit()
     path = sys.argv[1]
     tablename = sys.argv[2]
     app_type = sys.argv[3]
