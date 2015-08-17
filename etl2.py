@@ -70,7 +70,6 @@ class ETL:
         print "Start inserting", app_package, file_path
         dbdao = SqlDao()
 
-        print self.apps.keys()
         appInfo = self.apps[app_package]
         print app_package in self.apps
         if appInfo == None:
