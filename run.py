@@ -115,7 +115,6 @@ def execute(train_set, test_set, inforTrack):
              ("Header Rule", HeaderClassifier()),
              ("Host Rule", HostApp()),
              ("CMAR Rule", CMAR(min_cover = 3)),
-             ("Path Rule" , PathApp()),
              ("KV Rule", KVClassifier())
             ]
 
@@ -180,7 +179,8 @@ def cross_batch_test(train_tbls, test_tbl):
     expApp = loadExpApp()
     records = {}
     for tbl in train_tbls:
-       records[tbl] = load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = tbl)
+       # records[tbl] = load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = tbl)
+       records[tbl] = load_pkgs(LIMIT,  DB = tbl)
     
     apps = set()  
     for pkgs in records.values():
@@ -193,7 +193,8 @@ def cross_batch_test(train_tbls, test_tbl):
     discoveried_app = 0
 
     set_pair = []
-    test_set = {record.id:record for record in load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = test_tbl)}
+    # test_set = {record.id:record for record in load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = test_tbl)}
+    test_set = {record.id:record for record in load_pkgs(LIMIT, DB = test_tbl)}
     set_pair.append((records, test_set))
 
     apps = set()

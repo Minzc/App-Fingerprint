@@ -156,7 +156,7 @@ def none2str(astr):
 def add_appinfo(packages):
   appInfos = AppInfos()
   for package in packages:
-    appInfo = appInfos.get(consts.ANDROID, package.app)
+    appInfo = appInfos.get(consts.IOS, package.app)
     if appInfo == None:
       print 'Error', package.app
     package.set_appinfo(appInfo)
