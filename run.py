@@ -173,7 +173,7 @@ def execute(train_set, test_set, inforTrack, appType):
 
 def cross_batch_test(train_tbls, test_tbl, appType):
     def keep_exp_app(package):
-      return package.app in expApp[app_type]
+      return package.app in expApp[appType]
     expApp = load_exp_app()
     records = {}
     for tbl in train_tbls:
