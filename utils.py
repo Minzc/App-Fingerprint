@@ -156,11 +156,11 @@ def none2str(astr):
 def add_appinfo(packages):
   appInfos = AppInfos()
   for package in packages:
-    print package.app
     appInfo = appInfos.get(consts.IOS, package.app)
     if appInfo == None:
       print 'Error', package.app
-    package.set_appinfo(appInfo)
+    else:
+      package.set_appinfo(appInfo)
   return packages
 
 def load_pkgs(limit = None, filterFunc=lambda x : True, DB="packages"):

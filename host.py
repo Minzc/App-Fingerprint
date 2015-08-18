@@ -48,7 +48,7 @@ class HostApp(AbsClassifer):
         return
 
       if not appInfo:
-        print 'ERROR'
+        print '>>>[HOST] ERROR app type is', app_type, 'app is', pkg.app
         return
       
       self.labelAppInfo[label] = (pkg.app, pkg.company, pkg.category)
