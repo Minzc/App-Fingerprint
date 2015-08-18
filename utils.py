@@ -11,6 +11,7 @@ import random
 from app_info import AppInfos
 import consts
 
+
 regex_enpunc = re.compile("[" + string.punctuation + "]")
 
 extract = tldextract.TLDExtract(
@@ -206,11 +207,18 @@ def get_record_f(record):
 
     return features
 
-def loadExpApp():
-    expApp=set()
-    for app in open("resource/exp_app.txt"):
-        expApp.add(app.strip().lower())
-    return expApp
+def load_exp_app():
+  expApp={}
+  appInfos = AppInfos()
+  for line in open("resource/exp_app.txt"):
+    app_type, app = line.strip().split(':')
+    if app_type == 'IOS':
+      app_type = consts.IOS
+    elif app_type == 'ANDROID':
+      app_type = consts.ANDROID
+    package = appInfos[app_type].get(app.strip().lower()).package
+    expApp[app_type].add(package)
+  return expApp
 
 def load_appinfo():
   QUERY = 'SELECT app, name, company, category FROM apps'

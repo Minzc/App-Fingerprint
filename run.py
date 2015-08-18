@@ -175,12 +175,11 @@ def loadExpApp():
     return expApp
 
 
-def cross_batch_test(train_tbls, test_tbl):
-    expApp = loadExpApp()
+def cross_batch_test(train_tbls, test_tbl, app_type):
+    expApp = load_exp_app()
     records = {}
     for tbl in train_tbls:
-       # records[tbl] = load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = tbl)
-       records[tbl] = load_pkgs(LIMIT,  DB = tbl)
+       records[tbl] = load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp[app_type] , DB = tbl)
     
     apps = set()  
     for pkgs in records.values():
@@ -193,8 +192,7 @@ def cross_batch_test(train_tbls, test_tbl):
     discoveried_app = 0
 
     set_pair = []
-    # test_set = {record.id:record for record in load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = test_tbl)}
-    test_set = {record.id:record for record in load_pkgs(LIMIT, DB = test_tbl)}
+    test_set = {record.id:record for record in load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp[app_type] , DB = test_tbl)}
     set_pair.append((records, test_set))
 
     apps = set()
@@ -223,94 +221,13 @@ if __name__ == '__main__':
     parser.add_argument('-t', metavar='cross/single', help='test type')
     parser.add_argument('-train', metavar='tablename', nargs='+', help='train set')
     parser.add_argument('-test', metavar='tablename', help='test set')
+    parser.add_argument('-apptype', metavar='apptype', help='test apptype')
     args = parser.parse_args()
 
     test_tbl = None
     if args.t == 'cross':
-      cross_batch_test(args.train, args.test)
-    elif args.t == 'single':
-      single_batch_test(args.train, args.train)
-
-
-
-
-
-####################################################
-# def single_batch_test(train_tbl, test_tbl):
-#     FOLD = 5
-#     expApp = loadExpApp()
-#     records = {}
-#     records[tbl] = load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = train_tbl)
-    
-#     apps = set()  
-#     for pkgs in records.values():
-#         for pkg in pkgs:
-#             apps.add(pkg.app)
-#     print "len of app", len(apps), "len of train set", len(records)
-
-#     rnd = 0
-
-#     precision = 0
-#     recall = 0
-#     discoveried_app = 0
-#     fw = None
-#     if not DEBUG:
-#         fw = open("train_id", "w")
-
-#     set_pair = []
-#     if FOLD != 1:
-#         if not DEBUG:
-#             kf = KFold(len(records), n_folds=FOLD, shuffle=True)
-#             for train, test in kf:
-#                 train_set = []
-#                 test_set = {}
-#                 for i in train:
-#                     if not DEBUG : fw.write(str(i)+'\n')
-#                     train_set.append(records[i])
-#                 for i in test:
-#                     test_set[records[i].id] = records[i]
-#                 set_pair.append(train_set, test_set)
-#         else:
-#             sqldao = SqlDao()
-#             sqldao.execute('update packages set classified = NULL')
-#             sqldao.commit()
-#             sqldao.close()
-#             train, test = load_trian(len(records))
-#     else:
-#         test_set = {record.id:record for record in load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp , DB = args.test)}
-#         set_pair.append((records, test_set))
-#         apps = set()
-#         for k,v in test_set.iteritems():
-#             apps.add(v.app)
-#         print "len of apps", len(apps), "len of test set", len(test_set)
-
-#     inforTrack = { 'discoveried_app':0.0, 'precision':0.0, 'recall':0.0}
-
-
-#     for train_set, test_set in set_pair:
-#         rnd += 1
-#         correct = 0
-#         print 'ROUND', rnd
-
-#         rst = {}
-
-#         if not DEBUG : 
-#             for ies in train_set.values():
-#               for i in ies:
-#                 fw.write(str(i.id)+'\n')
-#         rst = execute(train_set, test_set, inforTrack)
-
-
-#         if DEBUG:
-#             for i in train:
-#               rst[records[i].id] = 0
-
-#         # print len(rst), len(train)
-
-#         print "INSERTING"
-#         insert_rst(rst, test_tbl)
-#         if fw : fw.close()
-#         if DEBUG: break
-
-
-#     print 'Precision:', inforTrack['precision'] / (1.0 * FOLD), 'Recall:', inforTrack['recall'] / (1.0 * FOLD), 'App:', inforTrack['discoveried_app'] / (1.0 * FOLD)
+      if args.apptype.lower() == 'ios':
+        app_type = consts.IOS
+      elif args.apptype.lower() == 'android':
+        app_type = consts.ANDROID
+      cross_batch_test(args.train, args.test, args.apptype, app_type)

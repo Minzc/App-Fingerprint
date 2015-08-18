@@ -14,7 +14,6 @@ class HostApp(AbsClassifer):
       self.urlLabel = defaultdict(set)
       self.urlCompany = defaultdict(set)
       self.substrCompany = defaultdict(set)
-      self.apps = AppInfos()
       self.labelAppInfo = {}
       self.rules = defaultdict(dict)
 
@@ -41,7 +40,7 @@ class HostApp(AbsClassifer):
         self.substrCompany[common_str].add(pkg.label)
 
       label = pkg.label
-      appInfo = self.apps.get(app_type, pkg.app)
+      appInfo = pkg.appInfo
       url = url_clean(pkg.host)
       top_domain = get_top_domain(url)
       if not url or not top_domain:
