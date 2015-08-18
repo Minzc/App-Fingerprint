@@ -40,7 +40,7 @@ class ETL:
         self.app_type = app_type
 
     def _get_app_info(self, exp_apps):
-        self.apps = AppInfos()
+        self.apps = AppInfos
         tmp_apps = {}
         for exp_app in exp_apps:
           appInfo = self.apps.get(app_type, exp_app)
@@ -176,7 +176,9 @@ class ETL:
                         'Full request URI',
                         'Message',
                         'Request Method',
-                        'Request URI'}
+                        'Request URI',
+                        'POST',
+                        'GET'}
         pkgInfo = {}
         #src = package.ip.src
         #dst = package.ip.dst

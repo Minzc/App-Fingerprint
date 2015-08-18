@@ -152,7 +152,7 @@ def tf_idf(data_set = None):
 def update_ios():
   from app_info import AppInfos
   import consts
-  apps = AppInfos()
+  apps = AppInfos
   sqldao = SqlDao()
   QUERY = 'UPDATE ios_packages_2015_05_04 SET app = %s, category = %s, company=%s, name = %s WHERE app = %s'
   print 'Start Updating'

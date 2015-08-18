@@ -155,7 +155,7 @@ def none2str(astr):
   return ''
 
 def add_appinfo(packages, app_type):
-  appInfos = AppInfos()
+  appInfos = AppInfos
   for package in packages:
     appInfo = appInfos.get(app_type, package.app)
     if appInfo == None:
@@ -209,7 +209,7 @@ def get_record_f(record):
 
 def load_exp_app():
   expApp={consts.IOS: set(), consts.ANDROID: set()}
-  appInfos = AppInfos()
+  appInfos = AppInfos
   for line in open("resource/exp_app.txt"):
     app_type, app = line.strip().split(':')
     if app_type == 'IOS':

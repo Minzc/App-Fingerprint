@@ -14,8 +14,9 @@ class App:
     url = url.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
     return url
 
-class AppInfos:
+class AppInformations:
   def __init__(self):
+    print 'CREATE APPINFO'
     sqldao = SqlDao()
     QUERY = 'SELECT package_name, app_title, offered_by, category_code, website FROM android_app_details'
     self.apps = defaultdict(dict)
@@ -34,4 +35,5 @@ class AppInfos:
 
   def get(self, app_type, query):
     return self.apps[app_type].get(query, None)
-  
+
+AppInfos = AppInformations()

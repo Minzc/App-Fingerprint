@@ -93,7 +93,7 @@ class HostApp(AbsClassifer):
           if url == test_str:
             print 'Rule Type is', rule_type, ifValidRule
 
-      print 'number of rule', len(self.rules)
+      print 'number of rule', len(self.rules[consts.APP_RULE])
       self.persist(self.rules, rule_type)
       self.__init__(self.appType)
       return self

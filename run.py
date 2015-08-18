@@ -20,7 +20,11 @@ DEBUG = False
 DEBUG_CMAR = False
 
 validLabel = {consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE}
-trainedLabel = validLabel
+trainedLabel = {
+    consts.APP_RULE, 
+    consts.COMPANY_RULE, 
+    consts.CATEGORY_RULE
+    }
 
 def load_trian(size):
     train_set = {int(item.strip()) for item in open('train_id')}
