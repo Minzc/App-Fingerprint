@@ -2,7 +2,7 @@ from sklearn.cross_validation import KFold
 import datetime
 from sqldao import SqlDao
 from fp import CMAR
-from utils import load_pkgs, load_appinfo
+from utils import load_pkgs, load_exp_app
 from algo import KVClassifier
 from classifier import HeaderClassifier
 from host import HostApp
@@ -20,6 +20,7 @@ DEBUG = False
 DEBUG_CMAR = False
 
 validLabel = {consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE}
+trainedLabel = validLabel
 
 def load_trian(size):
     train_set = {int(item.strip()) for item in open('train_id')}
@@ -98,7 +99,7 @@ def insert_rst(rst, DB = 'packages'):
 
 
 
-def execute(train_set, test_set, inforTrack):
+def execute(train_set, test_set, inforTrack, appType):
     sqldao = SqlDao()
     sqldao.execute('DELETE FROM patterns')
     sqldao.close()
@@ -113,15 +114,15 @@ def execute(train_set, test_set, inforTrack):
 
     classifiers = [
              ("Header Rule", HeaderClassifier()),
-             ("Host Rule", HostApp()),
+             ("Host Rule", HostApp(appType)),
              ("CMAR Rule", CMAR(min_cover = 3)),
-             ("KV Rule", KVClassifier())
+             ("KV Rule", KVClassifier(appType))
             ]
 
     
     
     ruleDict = {}
-    for rule_type in validLabel:
+    for rule_type in trainedLabel:
         for tbl in train_set:
             for pkg in train_set[tbl]:
                 if rule_type == consts.APP_RULE:
@@ -168,18 +169,15 @@ def execute(train_set, test_set, inforTrack):
     inforTrack['recall'] += recall * 1.0 / len(test_set) * 1.0
     return rst
 
-def loadExpApp():
-    expApp=set()
-    for app in open("resource/exp_app.txt"):
-        expApp.add(app.strip().lower())
-    return expApp
 
 
-def cross_batch_test(train_tbls, test_tbl, app_type):
+def cross_batch_test(train_tbls, test_tbl, appType):
+    def keep_exp_app(package):
+      return package.app in expApp[app_type]
     expApp = load_exp_app()
     records = {}
     for tbl in train_tbls:
-       records[tbl] = load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp[app_type] , DB = tbl)
+      records[tbl] = load_pkgs(limit = LIMIT, filterFunc = keep_exp_app, DB = tbl, appType = appType)
     
     apps = set()  
     for pkgs in records.values():
@@ -192,7 +190,7 @@ def cross_batch_test(train_tbls, test_tbl, app_type):
     discoveried_app = 0
 
     set_pair = []
-    test_set = {record.id:record for record in load_pkgs(LIMIT, filterFunc = lambda x: x.app in expApp[app_type] , DB = test_tbl)}
+    test_set = {record.id:record for record in load_pkgs(limit =LIMIT, filterFunc = keep_exp_app , DB = test_tbl, appType = app_type)}
     set_pair.append((records, test_set))
 
     apps = set()
@@ -204,7 +202,7 @@ def cross_batch_test(train_tbls, test_tbl, app_type):
 
     for train_set, test_set in set_pair:
         correct = 0
-        rst = execute(train_set, test_set, inforTrack)
+        rst = execute(train_set, test_set, inforTrack, app_type)
         print "INSERTING"
         insert_rst(rst, test_tbl)
 
@@ -230,4 +228,4 @@ if __name__ == '__main__':
         app_type = consts.IOS
       elif args.apptype.lower() == 'android':
         app_type = consts.ANDROID
-      cross_batch_test(args.train, args.test, args.apptype, app_type)
+      cross_batch_test(args.train, args.test, app_type)

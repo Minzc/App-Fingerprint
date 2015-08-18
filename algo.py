@@ -1,33 +1,31 @@
 import consts
 from sqldao import SqlDao
-from utils import load_pkgs, loadfile, load_appinfo, loadExpApp, suffix_tree
+from utils import load_exp_app, suffix_tree
 from collections import defaultdict, namedtuple
-import operator
 from classifier import AbsClassifer
 
 
 DEBUG = False
 
 class KVClassifier(AbsClassifer):
-  def __init__(self):
+  def __init__(self, appType):
     self.featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
-    self.value_label_c = defaultdict(set)
+    self.valueLabelCounter = defaultdict(set)
     self.rules = {}
-    exp_apps = loadExpApp()
-    self.app_suffix = suffix_tree(exp_apps)
+    exp_apps = load_exp_app()
+    self.appSuffix = suffix_tree(exp_apps[appType])
+    self.appType = appType
 
-  def train(self, training_data, rule_type):
-    label_dict = set()
+  def train(self, trainData, rule_type):
     
-    for tbl in training_data.keys():
-      for pkg in training_data[tbl]:
-        label_dict.add(pkg.label)
+    for tbl in trainData.keys():
+      for pkg in trainData[tbl]:
         for k,v in pkg.queries.items():
           if pkg.secdomain == 'bluecorner.es' or pkg.host == 'bluecorner.es' or pkg.label == 'com.bluecorner.totalgym':
             #print 'OK contains bluecorner', pkg.secdomain
             pass
           map(lambda x : self.featureTbl[pkg.secdomain][pkg.label][k][x].add(tbl), v)
-          map(lambda x : self.value_label_c[x].add(pkg.label), v)
+          map(lambda x : self.valueLabelCounter[x].add(pkg.label), v)
     ##################
     # Count
     ##################
@@ -40,45 +38,45 @@ class KVClassifier(AbsClassifer):
           for v, tbls in self.featureTbl[secdomain][label][k].iteritems():
             if secdomain == 'bluecorner.es':
               pass
-            if len(self.value_label_c[v]) == 1:
-              cleaned_k = k.replace("\t", "")
-              keyScore[secdomain][cleaned_k][consts.SCORE] += \
+            if len(self.valueLabelCounter[v]) == 1:
+              cleanedK = k.replace("\t", "")
+              keyScore[secdomain][cleanedK][consts.SCORE] += \
                 (len(tbls) - 1) / float(len(self.featureTbl[secdomain][label][k]))
-              keyScore[secdomain][cleaned_k][consts.LABEL].add(label)
+              keyScore[secdomain][cleanedK][consts.LABEL].add(label)
     #############################
     # Generate interesting keys
     #############################
     Rule = namedtuple('Rule', 'secdomain, key, score, labelNum')
-    general_rules = defaultdict(list)
+    generalRules = defaultdict(list)
     for secdomain in keyScore:
       for key in keyScore[secdomain]:
         labelNum = len(keyScore[secdomain][key][consts.LABEL]) 
         score = keyScore[secdomain][key][consts.SCORE]
         if labelNum == 1 or score == 0:
           continue
-        general_rules[secdomain].append(Rule(secdomain, key, score, labelNum))
-    for secdomain in general_rules:
-      general_rules[secdomain] = sorted(general_rules[secdomain], key=lambda rule: rule.score, reverse = True)
+        generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
+    for secdomain in generalRules:
+      generalRules[secdomain] = sorted(generalRules[secdomain], key=lambda rule: rule.score, reverse = True)
 
-    print "general_rules", len(general_rules)
+    print ">>>[HOST] generalRules", len(generalRules)
     #############################
     # Generate specific rules
     #############################
-    specific_rules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:0}))))
+    specificRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:0}))))
     ruleCover = defaultdict(int)
     
-    debug_counter = 0
-    for tbl, pkgs in training_data.iteritems():
-      for pkg in filter(lambda pkg : pkg.secdomain in general_rules, pkgs):
-        for rule in filter(lambda rule : rule.key in pkg.queries, general_rules[pkg.secdomain]):
+    debugCounter = 0
+    for tbl, pkgs in trainData.iteritems():
+      for pkg in filter(lambda pkg : pkg.secdomain in generalRules, pkgs):
+        for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.secdomain]):
           ruleCover[rule] += 1
           for value in pkg.queries[rule.key]:
-            if len(self.value_label_c[value]) == 1:
-                debug_counter += 1
-                specific_rules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
-                specific_rules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT] += 1
-    self.persist(specific_rules, rule_type)
-    self.__init__()
+            if len(self.valueLabelCounter[value]) == 1:
+                debugCounter += 1
+                specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
+                specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT] += 1
+    self.persist(specificRules, rule_type)
+    self.__init__(self.appType)
     return self
 
   def _clean_db(self, rule_type):
@@ -104,9 +102,9 @@ class KVClassifier(AbsClassifer):
     sqldao.close()
 
   def classify(self, pkg):
-    predict_rst = {}
+    predictRst = {}
     for rule_type in self.rules:
-      max_score, occur_count = -1, -1
+      maxScore, occurCount = -1, -1
       prediction = None
       evidence = (None, None)
 
@@ -115,25 +113,25 @@ class KVClassifier(AbsClassifer):
           for label, score_count in k_rules.get(v, {}).iteritems():
             score, count = score_count[consts.SCORE], score_count[consts.SUPPORT]
 
-            if score > max_score or (score == max_score and count > occur_count):
+            if score > maxScore or (score == maxScore and count > occurCount):
               prediction = label
-              max_score, occur_count = score, count
+              maxScore, occurCount = score, count
               evidence = (k, v)
             elif not prediction:
               pass
              #print 'value not in rules', k.encode('utf-8'), v.encode('utf-8'), pkg.app
-      predict_rst[rule_type] = (prediction, max_score, evidence[0], evidence[1])
+      predictRst[rule_type] = (prediction, maxScore, evidence[0], evidence[1])
 
-      if not predict_rst[consts.APP_RULE][0]:
+      if not predictRst[consts.APP_RULE][0]:
         for k, values in pkg.queries.iteritems():
           label = map(lambda v : self.classify_suffix_app(v), values)
-          predict_rst[consts.APP_RULE] = (label[0], 1, k)
+          predictRst[consts.APP_RULE] = (label[0], 1, k)
 
-    return predict_rst
+    return predictRst
 
   def classify_suffix_app(self, value):
     value = value.split('.')
-    node = self.app_suffix
+    node = self.appSuffix
     meet_first = False
     rst = []
     for i in reversed(value):
@@ -206,8 +204,8 @@ if __name__ == '__main__':
   #   
   #   
   # def classify_without_key(self, pkg):
-  #   max_score = -1
-  #   occur_count = -1
+  #   maxScore = -1
+  #   occurCount = -1
   #   predict_app = None
   #   tmp_rst = None
   #   secdomain = ''
@@ -221,16 +219,16 @@ if __name__ == '__main__':
   #           for app, score_count in self.rules[consts.APP_RULE][secdomain][v].iteritems():
   #             score,count = score_count['score'], score_count['support']
               
-  #             if score > max_score:
+  #             if score > maxScore:
   #               predict_app = app
-  #               max_score = score
-  #               occur_count = count
+  #               maxScore = score
+  #               occurCount = count
                 
-  #             elif score == max_score and count > occur_count:
+  #             elif score == maxScore and count > occurCount:
   #               predict_app = app
-  #               occur_count = count
-  #   predict_rst = {}
-  #   #predict_app, max_score = (tmp_rst, 1) if not predict_app else (predict_app, max_score)
+  #               occurCount = count
+  #   predictRst = {}
+  #   #predict_app, maxScore = (tmp_rst, 1) if not predict_app else (predict_app, maxScore)
   #   if predict_app:
-  #     predict_rst[consts.APP_RULE] = [(predict_app, max_score)]
-  #   return predict_rst
+  #     predictRst[consts.APP_RULE] = [(predict_app, maxScore)]
+  #   return predictRst

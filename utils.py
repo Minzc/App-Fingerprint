@@ -154,17 +154,17 @@ def none2str(astr):
     return astr
   return ''
 
-def add_appinfo(packages):
+def add_appinfo(packages, app_type):
   appInfos = AppInfos()
   for package in packages:
-    appInfo = appInfos.get(consts.IOS, package.app)
+    appInfo = appInfos.get(app_type, package.app)
     if appInfo == None:
       print 'Error', package.app
     else:
       package.set_appinfo(appInfo)
   return packages
 
-def load_pkgs(limit = None, filterFunc=lambda x : True, DB="packages"):
+def load_pkgs(DB, appType, limit, filterFunc=lambda x : True):
     records = []
     sqldao = SqlDao()
     QUERY = None
@@ -188,7 +188,7 @@ def load_pkgs(limit = None, filterFunc=lambda x : True, DB="packages"):
        
         if filterFunc(package):
             records.append(package)
-    records = add_appinfo(records)
+    records = add_appinfo(records, appType)
     return records
 
 def get_record_f(record):
@@ -208,7 +208,7 @@ def get_record_f(record):
     return features
 
 def load_exp_app():
-  expApp={}
+  expApp={consts.IOS: set(), consts.ANDROID: set()}
   appInfos = AppInfos()
   for line in open("resource/exp_app.txt"):
     app_type, app = line.strip().split(':')
@@ -216,19 +216,10 @@ def load_exp_app():
       app_type = consts.IOS
     elif app_type == 'ANDROID':
       app_type = consts.ANDROID
-    package = appInfos[app_type].get(app.strip().lower()).package
+    package = appInfos.get(app_type, app.strip().lower()).package
     expApp[app_type].add(package)
   return expApp
 
-def load_appinfo():
-  QUERY = 'SELECT app, name, company, category FROM apps'
-  app_company = {}
-  app_name = {}
-  sqldao = SqlDao()
-  for app, name, company, category in sqldao.execute(QUERY):
-      app_company[app.lower()] = company
-      app_name[app.lower()] = name
-  return app_company, app_name
 
 def suffix_tree(apps):
   """

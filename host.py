@@ -1,4 +1,4 @@
-from utils import load_appinfo, longest_common_substring, get_top_domain, url_clean
+from utils import longest_common_substring, get_top_domain, url_clean, load_exp_app
 from sqldao import SqlDao
 from collections import defaultdict
 import consts
@@ -8,20 +8,14 @@ from classifier import AbsClassifer
 test_str = 'voyagesarabais.com'
 
 class HostApp(AbsClassifer):
-    def __init__(self):
-      # self.fileApp = defaultdict(set)
-      # self.fileUrl = defaultdict(set)
+    def __init__(self, appType):
+      self.appType = appType
       self.urlLabel = defaultdict(set)
       self.urlCompany = defaultdict(set)
       self.substrCompany = defaultdict(set)
       self.labelAppInfo = {}
       self.rules = defaultdict(dict)
 
-    def loadExpApp(self):
-      expApp=set()
-      for app in open("resource/exp_app.txt"):
-          expApp.add(app.strip().lower())
-      return expApp
     
     def persist(self, patterns, rule_type):
       self._clean_db(rule_type)
@@ -34,7 +28,7 @@ class HostApp(AbsClassifer):
       sqldao.executeBatch(QUERY, params)
       sqldao.close()
 
-    def count(self, pkg, app_type=consts.ANDROID):
+    def count(self, pkg):
       def addCommonStr(url, pkg, string):
         common_str = longest_common_substring(url.lower(), string.lower())
         self.substrCompany[common_str].add(pkg.label)
@@ -47,7 +41,7 @@ class HostApp(AbsClassifer):
         return
 
       if not appInfo:
-        print '>>>[HOST] ERROR app type is', app_type, 'app is', pkg.app
+        print '>>>[HOST] ERROR app is', pkg.app
         return
       
       self.labelAppInfo[label] = (pkg.app, pkg.company, pkg.category)
@@ -74,7 +68,7 @@ class HostApp(AbsClassifer):
       sqldao.close()
 
     def train(self, records, rule_type):
-      expApp = self.loadExpApp()
+      expApp = load_exp_app()[self.appType]
       for pkgs in records.values():
         for pkg in pkgs:
           self.count(pkg)
@@ -99,9 +93,9 @@ class HostApp(AbsClassifer):
           if url == test_str:
             print 'Rule Type is', rule_type, ifValidRule
 
+      print 'number of rule', len(self.rules)
       self.persist(self.rules, rule_type)
-      self.__init__()
-      # fw.close()
+      self.__init__(self.appType)
       return self
 
     def load_rules(self):
@@ -117,14 +111,12 @@ class HostApp(AbsClassifer):
 
     def classify(self, pkg):
       rst = {}
-      for rule_type in self.rules:
+      for ruleType in self.rules:
         host = pkg.host.replace('-','.')
         secdomain = pkg.secdomain.replace('-', '.')
-        label = self.rules[rule_type].get(host, None)
-        label = self.rules[rule_type].get(secdomain, None) if not label else label
-        if host == 'sd9.radarnowandroid.com':
-          print label
-        rst[rule_type] = (label, 1.0)
+        label = self.rules[ruleType].get(host, None)
+        label = self.rules[ruleType].get(secdomain, None) if not label else label
+        rst[ruleType] = (label, 1.0)
       return rst
 
     '''    
