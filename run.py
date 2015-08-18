@@ -190,7 +190,7 @@ def cross_batch_test(train_tbls, test_tbl, appType):
     discoveried_app = 0
 
     set_pair = []
-    test_set = {record.id:record for record in load_pkgs(limit =LIMIT, filterFunc = keep_exp_app , DB = test_tbl, appType = app_type)}
+    test_set = {record.id:record for record in load_pkgs(limit =LIMIT, filterFunc = keep_exp_app , DB = test_tbl, appType =appType)}
     set_pair.append((records, test_set))
 
     apps = set()
@@ -202,7 +202,7 @@ def cross_batch_test(train_tbls, test_tbl, appType):
 
     for train_set, test_set in set_pair:
         correct = 0
-        rst = execute(train_set, test_set, inforTrack, app_type)
+        rst = execute(train_set, test_set, inforTrack,appType)
         print "INSERTING"
         insert_rst(rst, test_tbl)
 
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     test_tbl = None
     if args.t == 'cross':
       if args.apptype.lower() == 'ios':
-        app_type = consts.IOS
+        appType = consts.IOS
       elif args.apptype.lower() == 'android':
-        app_type = consts.ANDROID
-      cross_batch_test(args.train, args.test, app_type)
+        appType = consts.ANDROID
+      cross_batch_test(args.train, args.test, appType)
