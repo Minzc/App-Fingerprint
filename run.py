@@ -102,6 +102,7 @@ def execute(train_set, test_set, inforTrack):
     sqldao = SqlDao()
     sqldao.execute('DELETE FROM patterns')
     sqldao.close()
+    print 'DELETE PREVIOUS RULES'
 
     print "Train:", train_set.keys(), "Test:", len(test_set)
     correct = 0
@@ -111,11 +112,11 @@ def execute(train_set, test_set, inforTrack):
         test_apps.add(record.app)
 
     classifiers = [
-             #("Header Rule", HeaderClassifier()),
+             ("Header Rule", HeaderClassifier()),
              ("Host Rule", HostApp()),
-             #("CMAR Rule", CMAR(min_cover = 3)),
-             #("Path Rule" , PathApp()),
-             #("KV Rule", KVClassifier())
+             ("CMAR Rule", CMAR(min_cover = 3)),
+             ("Path Rule" , PathApp()),
+             ("KV Rule", KVClassifier())
             ]
 
     
