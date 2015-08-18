@@ -115,7 +115,7 @@ class ETL:
             except:
                  print 'ERROR'
         timeStampThree = time.time()
-        print 'Parsing pcaps', timeStampTwo - timeStampThree
+        print 'Parsing pcaps', timeStampThree - timeStampTwo
         params = []
         for pkgInfo in pkgInfos:
             app_name = pkgInfo['app_name'] 

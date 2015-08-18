@@ -250,13 +250,18 @@ def statCompany():
     packages += load_pkgs(DB = tbl)
   value_label = defaultdict(lambda : defaultdict(set))
   app_company = {}
+  app_category = {}
   for pkg in packages:
     for k,v in pkg.queries.items():
       if pkg.secdomain == 'bluecorner.es' or pkg.host == 'bluecorner.es' or pkg.app == 'com.bluecorner.totalgym':
         #print 'OK contains bluecorner', pkg.secdomain
         pass
       map(lambda x : value_label[k][x].add(pkg.app), v)
-      app_company[pkg.app] = pkg.company
+      try:
+        app_company[pkg.app] = pkg.company
+        app_category[pkg.app] = pkg.category
+      except:
+        pass
 
   for key in value_label:
     for value in value_label[key]:
@@ -265,7 +270,7 @@ def statCompany():
         if app in value:
           output = True
       if output and len(value_label[key][value]) > 1:
-        print "%s %s %s %s" % (key, value, value_label[key][value], ','.join(map(lambda app : app_company[app], value_label[key][value])))
+        print "%s; %s; %s; %s; %s" % (key, value, value_label[key][value], ';'.join(map(lambda app : app_company[app], value_label[key][value])), ','.join(map(lambda app : app_category[app], value_label[key][value])))
 
 def test_suffix_tree():
   from utils import suffix_tree, loadExpApp
@@ -327,6 +332,7 @@ if __name__ == '__main__':
   elif sys.argv[1] == 'update':
     update_ios()
   elif sys.argv[1] == 'company':
+    print 'stat'
     statCompany()
   elif sys.argv[1] == 'suffix':
     test_suffix_tree()

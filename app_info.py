@@ -27,7 +27,6 @@ class AppInfos:
     for trackId, bundleId, trackName, artistName, primaryGenreName, sellerUrl in sqldao.execute(QUERY):
         trackId = str(trackId)
         bundleId = bundleId.lower()
-        print trackId
         appInfo = App(bundleId, trackName, artistName, trackId, sellerUrl, primaryGenreName,consts.IOS)
         self.apps[consts.IOS][trackId] = appInfo
         self.apps[consts.IOS][bundleId] = appInfo
