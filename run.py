@@ -105,9 +105,9 @@ def insert_rst(rst, DB = 'packages'):
 
 def execute(train_set, test_set, inforTrack, appType):
     sqldao = SqlDao()
-    sqldao.execute('DELETE FROM patterns')
+    sqldao.execute(consts.SQL_CLEAN_ALL_RULES)
     sqldao.close()
-    print 'DELETE PREVIOUS RULES'
+    print consts.SQL_CLEAN_ALL_RULES
 
     print "Train:", train_set.keys(), "Test:", len(test_set)
     correct = 0
@@ -168,9 +168,9 @@ def execute(train_set, test_set, inforTrack, appType):
     not_cover_app = test_apps - correct_app
     recall = sum([1 for i in rst.values() if i[consts.APP_RULE][0] or i[consts.COMPANY_RULE][0] or i[consts.CATEGORY_RULE][0]])
     print "Discoered App Number:", len(correct_app), "Total Number of App", len(test_apps)
-    inforTrack['discoveried_app'] += len(correct_app) * 1.0 / len(test_apps)
-    inforTrack['precision'] += correct * 1.0 / recall
-    inforTrack['recall'] += recall * 1.0 / len(test_set) * 1.0
+    inforTrack[consts.DISCOVERED_APP] += len(correct_app) * 1.0 / len(test_apps)
+    inforTrack[consts.PRECISION] += correct * 1.0 / recall
+    inforTrack[consts.RECALL] += recall * 1.0 / len(test_set) * 1.0
     return rst
 
 
@@ -202,7 +202,7 @@ def cross_batch_test(train_tbls, test_tbl, appType):
         apps.add(v.app)
     print "len of apps", len(apps), "len of test set", len(test_set)
 
-    inforTrack = { 'discoveried_app':0.0, 'precision':0.0, 'recall':0.0}
+    inforTrack = { consts.DISCOVERED_APP : 0.0, consts.PRECISION : 0.0, consts.RECALL : 0.0}
 
     for train_set, test_set in set_pair:
         correct = 0
@@ -210,9 +210,9 @@ def cross_batch_test(train_tbls, test_tbl, appType):
         print "INSERTING"
         insert_rst(rst, test_tbl)
 
-    precision = inforTrack['precision']
-    recall = inforTrack['recall']
-    app_coverage = inforTrack['discoveried_app']
+    precision = inforTrack[consts.PRECISION]
+    recall = inforTrack[consts.RECALL]
+    app_coverage = inforTrack[consts.DISCOVERED_APP]
     f1_score = 2.0 * precision * recall / (precision + recall)
     print 'Precision:', precision, 'Recall:', recall, 'App:', app_coverage, 'F1 Score:', f1_score
     return 'Precision %s, Recall: %s, App: %s, F1 Score: %s' % (precision, recall, app_coverage, f1_score)

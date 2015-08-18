@@ -9,6 +9,7 @@ DEBUG = False
 
 class KVClassifier(AbsClassifer):
   def __init__(self, appType):
+    self.name = const.KV_CLASSIFIER
     self.featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
     self.valueLabelCounter = defaultdict(set)
     self.rules = {}
@@ -80,9 +81,9 @@ class KVClassifier(AbsClassifer):
     return self
 
   def _clean_db(self, rule_type):
-    print 'DELETE FROM patterns WHERE paramkey IS NOT NULL and pattens IS NULL and rule_type=%s' % rule_type
+    print consts.SQL_DELETE_KV_RULES % rule_type
     sqldao = SqlDao()
-    sqldao.execute('DELETE FROM patterns WHERE paramkey IS NOT NULL and pattens IS NULL and rule_type=%s' % rule_type)
+    sqldao.execute(consts.SQL_DELETE_KV_RULES % rule_type)
     sqldao.commit()
     sqldao.close()
 
@@ -92,7 +93,7 @@ class KVClassifier(AbsClassifer):
     self.rules[consts.APP_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'support':0}))))
     self.rules[consts.COMPANY_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'support':0}))))
     self.rules[consts.CATEGORY_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'support':0}))))
-    QUERY = 'SELECT paramkey, paramvalue, host, label, confidence, rule_type, support FROM patterns WHERE paramkey IS NOT NULL'
+    QUERY = consts.SQL_SELECT_KV_RULES
     counter = 0
     for key, value, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
       counter += 1
@@ -149,7 +150,7 @@ class KVClassifier(AbsClassifer):
 
   def persist(self, patterns, rule_type):
     self._clean_db(rule_type)
-    QUERY = 'INSERT INTO patterns (label, support, confidence, host, paramkey, paramvalue, rule_type) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+    QUERY = consts.SQL_INSERT_KV_RULES
     sqldao = SqlDao()
     # Param rules
     params = []

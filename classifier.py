@@ -20,6 +20,7 @@ class AbsClassifer:
 
 class HeaderClassifier(AbsClassifer):
   def __init__(self):
+    self.name = consts.HEAD_CLASSIFIER
     self.rules = None
 
   def train(self, train_set, rule_type):

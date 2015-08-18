@@ -20,7 +20,7 @@ class HostApp(AbsClassifer):
     def persist(self, patterns, rule_type):
       self._clean_db(rule_type)
       sqldao = SqlDao()
-      QUERY = 'INSERT INTO patterns (label, support, confidence, host, rule_type) VALUES (%s, %s, %s, %s, %s)'
+      QUERY = consts.SQL_INSERT_HOST_RULES
       params = []
       for ruleType in patterns:
         for url, label in patterns[ruleType].iteritems():
@@ -62,7 +62,7 @@ class HostApp(AbsClassifer):
       return False
 
     def _clean_db(self, rule_type):
-      QUERY = "DELETE FROM patterns WHERE paramkey IS NULL and pattens IS NULL and rule_type=%s"
+      QUERY = consts.SQL_DELETE_HOST_RULES
       sqldao = SqlDao()
       sqldao.execute(QUERY % (rule_type))
       sqldao.close()
@@ -100,7 +100,7 @@ class HostApp(AbsClassifer):
 
     def load_rules(self):
       self.rules = {consts.APP_RULE:{}, consts.COMPANY_RULE:{}, consts.CATEGORY_RULE:{}}
-      QUERY = "SELECT host, label, rule_type FROM patterns WHERE paramkey is NULL and pattens is NULL"
+      QUERY = consts.SQL_SELECT_HOST_RULES
       sqldao = SqlDao()
       counter = 0
       for host, label, ruleType in sqldao.execute(QUERY):

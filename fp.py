@@ -12,82 +12,6 @@ DEBUG_ITEM = 'Mrd/1.2.1 (Linux; U; Android 5.0.2; google Nexus 7) com.crossfield
 
 Rule = namedtuple('Rule', 'rule, label, host, confidence, support')
 
-# class FPRuler:
-#   def __init__(self):
-#       # feature, app, host
-#       self.rules = defaultdict(lambda : defaultdict(lambda : defaultdict()))
-
-
-#   def _add_rules(self, rules, ruleType):
-#       tmprules = {}
-#       for feature, app, host, confidence, _ in rules:
-#           tmprules.setdefault(host, {})
-#           tmprules[host][feature] = (app, confidence)
-#       self.rules[ruleType] = tmprules
-
-#   def load_rules(self):
-#     self.rules = {}
-#     self.rules[consts.APP_RULE] = defaultdict(lambda : defaultdict())
-#     self.rules[consts.COMPANY_RULE] = defaultdict(lambda : defaultdict())
-#     self.rules[consts.CATEGORY_RULE] = defaultdict(lambda : defaultdict())
-#     sqldao = SqlDao()
-#     counter = 0
-#     SQL = "SELECT label, pattens, host, rule_type, confidence FROM patterns where pattens is not NULL"
-#     for label, patterns, host, rule_type, confidence in sqldao.execute(SQL):
-#       counter += 1
-#       patterns = frozenset(patterns.split(","))
-#       #print self.rules[rule_type][host][patterns]
-#       self.rules[rule_type][host][patterns] = (label, confidence)
-#     sqldao.close()
-#     print '>>>[CMAR] Totaly number of rules is', counter
-#     print 'len of rules', len(self.rules)
-    
-
-#   def _clean_db(self, rule_type):
-#     sqldao = SqlDao()
-#     sqldao.execute('DELETE FROM patterns WHERE paramkey IS NULL and pattens IS NOT NULL and rule_type = %s' % (rule_type))
-#     sqldao.commit()
-#     sqldao.close()
-
-#   def classify(self, package):
-#     '''
-#     Return {type:[(label, confidence)]}
-#     '''
-#     labelRsts = {}
-#     features = _get_package_f(package)
-#     rst = (None, 0, None)
-#     for rule_type, rules in self.rules.iteritems():
-#       print rule_type
-#       max_confidence = 0
-#       if package.host in rules.keys():
-#           for rule, label_confidence in rules[package.host].iteritems():
-#               label, confidence = label_confidence
-#               if rule.issubset(features) and confidence > max_confidence:
-#                 max_confidence = confidence
-#                 rst = (label, confidence, rule)
-
-#       labelRsts[rule_type] = rst 
-#     return labelRsts
-
-#   def persist(self):
-#     rules = self.rules
-#     self._clean_db()
-#     sqldao = SqlDao()
-#     QUERY = 'INSERT INTO patterns (label, pattens, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
-#     counter = 0
-#     for rule_type in rules:
-#       params = []
-#       for host in rules[rule_type]:
-#         for pattern in rules[rule_type][host]:
-#           label, confidence = rules[rule_type][host][pattern]
-#           counter += 1
-#           params.append((label, ','.join(pattern), confidence, 0, host, rule_type))
-      
-#       sqldao.executeBatch(QUERY, params)
-#       sqldao.close()
-#       print ">>> [CMAR] Total Number of Rules is %s Rule type is %s" % (counter, rule_type)
-
-
 def _get_package_f(package):
     """Get package features"""
     features = filter(None, package.path.split('/'))
@@ -248,7 +172,7 @@ def _prune_rules(t_rules, packages, min_cover = 3):
 
 def _persist(rules, rule_type):
     sqldao = SqlDao()
-    QUERY = 'INSERT INTO patterns (label, pattens, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
+    QUERY = consts.SQL_INSERT_CMAR_RULES
     params = []
     for rule in rules:
         params.append((rule.label, ','.join(rule.rule), rule.confidence, rule.support, rule.host, rule_type))
@@ -304,7 +228,7 @@ class CMAR:
     self.rules[consts.CATEGORY_RULE] = defaultdict(lambda : defaultdict())
     sqldao = SqlDao()
     counter = 0
-    SQL = "SELECT label, pattens, host, rule_type, confidence FROM patterns where pattens is not NULL"
+    SQL = consts.SQL_SELECT_CMAR_RULES
     for label, patterns, host, rule_type, confidence in sqldao.execute(SQL):
       counter += 1
       patterns = frozenset(patterns.split(","))
@@ -317,7 +241,7 @@ class CMAR:
 
   def _clean_db(self, rule_type):
     sqldao = SqlDao()
-    sqldao.execute('DELETE FROM patterns WHERE paramkey IS NULL and pattens IS NOT NULL and rule_type = %s' % (rule_type))
+    sqldao.execute( consts.SQL_DELETE_CMAR_RULES % (rule_type))
     sqldao.commit()
     sqldao.close()
 
@@ -340,23 +264,23 @@ class CMAR:
       labelRsts[rule_type] = rst 
     return labelRsts
 
-  def persist(self):
-    rules = self.rules
-    self._clean_db()
-    sqldao = SqlDao()
-    QUERY = 'INSERT INTO patterns (label, pattens, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
-    counter = 0
-    for rule_type in rules:
-      params = []
-      for host in rules[rule_type]:
-        for pattern in rules[rule_type][host]:
-          label, confidence = rules[rule_type][host][pattern]
-          counter += 1
-          params.append((label, ','.join(pattern), confidence, 0, host, rule_type))
+  # def persist(self):
+  #   rules = self.rules
+  #   self._clean_db()
+  #   sqldao = SqlDao()
+  #   QUERY = 'INSERT INTO patterns (label, pattens, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
+  #   counter = 0
+  #   for rule_type in rules:
+  #     params = []
+  #     for host in rules[rule_type]:
+  #       for pattern in rules[rule_type][host]:
+  #         label, confidence = rules[rule_type][host][pattern]
+  #         counter += 1
+  #         params.append((label, ','.join(pattern), confidence, 0, host, rule_type))
       
-      sqldao.executeBatch(QUERY, params)
-      sqldao.close()
-      print ">>> [CMAR] Total Number of Rules is %s Rule type is %s" % (counter, rule_type)
+  #     sqldao.executeBatch(QUERY, params)
+  #     sqldao.close()
+  #     print ">>> [CMAR] Total Number of Rules is %s Rule type is %s" % (counter, rule_type)
   
 
 
