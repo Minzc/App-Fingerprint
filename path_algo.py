@@ -1,6 +1,6 @@
 from utils import load_tfidf
 from sqldao import SqlDao
-from utils import processPath
+from utils import process_path
 import math
 from utils import Relation
 from nltk import FreqDist

@@ -141,7 +141,7 @@ def lower_all(strs):
       rst.append(astr)
   return rst
 
-def processPath(path):
+def process_path(path):
   import urlparse
   import urllib
   path = urllib.unquote(path).lower().replace(';','?',1).replace(';','&')
@@ -169,9 +169,9 @@ def load_pkgs(DB, appType, limit, filterFunc=lambda x : True):
     sqldao = SqlDao()
     QUERY = None
     if not limit:
-        QUERY = "select id, app, add_header, path, refer, hst, agent, dst, raw from %s where method=\'GET\'" % DB
+        QUERY = consts.SQL_SELECT_HTTP_PKGS % DB
     else:
-        QUERY = "select id, app, add_header, path, refer, hst, agent, dst, raw from %s where method=\'GET\' limit %s" % (DB, limit)
+        QUERY = consts.SQL_SELECT_HTTP_PKGS_LIMIT % (DB, limit)
     print QUERY
 
     for id, app, add_header, path, refer, host, agent, dst, raw in sqldao.execute(QUERY):
@@ -211,10 +211,10 @@ def load_exp_app():
   expApp={consts.IOS: set(), consts.ANDROID: set()}
   appInfos = AppInfos
   for line in open("resource/exp_app.txt"):
-    app_type, app = line.strip().split(':')
-    if app_type == 'IOS':
+    app_type, app = line.lower().strip().split(':')
+    if app_type == consts.IOS_STR:
       app_type = consts.IOS
-    elif app_type == 'ANDROID':
+    elif app_type == consts.ANDROID_STR:
       app_type = consts.ANDROID
     package = appInfos.get(app_type, app.strip().lower()).package
     expApp[app_type].add(package)

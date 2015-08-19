@@ -9,7 +9,7 @@ class App:
     self.trackId = trackId
     self.website = self.url_clean(website.lower()) if website else 'UNK'
     self.app_type = app_type 
-    self.category = category
+    self.category = category.lower()
   def url_clean(self, url):
     url = url.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
     return url
@@ -23,7 +23,7 @@ class AppInformations:
     for package_name, app_title, offered_by, category_code, website in sqldao.execute(QUERY):
       package_name = package_name.lower()
       appInfo = App(package_name, app_title, offered_by, 'UNK', website, category_code,consts.ANDROID)
-      self.apps[consts.ANDROID][package_name.lower()] = appInfo
+      self.apps[consts.ANDROID][package_name] = appInfo
     QUERY = 'SELECT trackId, bundleId, trackName,artistName, primaryGenreName, sellerUrl FROM ios_app_details'
     for trackId, bundleId, trackName, artistName, primaryGenreName, sellerUrl in sqldao.execute(QUERY):
         trackId = str(trackId)

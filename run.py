@@ -7,6 +7,7 @@ from algo import KVClassifier
 from classifier import HeaderClassifier
 from host import HostApp
 from collections import namedtuple, defaultdict
+from agent_classifier import AgentClassifier
 import consts
 import sys
 import argparse
@@ -22,8 +23,8 @@ DEBUG_CMAR = False
 validLabel = {consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE}
 trainedLabel = {
     consts.APP_RULE, 
-    consts.COMPANY_RULE, 
-    consts.CATEGORY_RULE
+    #consts.COMPANY_RULE, 
+    #consts.CATEGORY_RULE
     }
 
 def load_trian(size):
@@ -117,10 +118,11 @@ def execute(train_set, test_set, inforTrack, appType):
         test_apps.add(record.app)
 
     classifiers = [
-             ("Header Rule", HeaderClassifier()),
-             ("Host Rule", HostApp(appType)),
-             ("CMAR Rule", CMAR(min_cover = 3)),
-             ("KV Rule", KVClassifier(appType))
+             #("Header Rule", HeaderClassifier()),
+             ("Agent Rule", AgentClassifier()),
+             #("Host Rule", HostApp(appType)),
+             #("CMAR Rule", CMAR(min_cover = 3)),
+             #("KV Rule", KVClassifier(appType))
             ]
 
     

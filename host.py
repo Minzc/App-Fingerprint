@@ -11,7 +11,6 @@ class HostApp(AbsClassifer):
     def __init__(self, appType):
       self.appType = appType
       self.urlLabel = defaultdict(set)
-      self.urlCompany = defaultdict(set)
       self.substrCompany = defaultdict(set)
       self.labelAppInfo = {}
       self.rules = defaultdict(dict)
@@ -46,7 +45,6 @@ class HostApp(AbsClassifer):
       
       self.labelAppInfo[label] = (pkg.app, pkg.company, pkg.category)
       map(lambda url : self.urlLabel[url].add(label), [top_domain, url])
-      map(lambda url : self.urlCompany[url].add(pkg.company), [top_domain, url])
       map(lambda string : addCommonStr(url, pkg, string), [pkg.app, pkg.company, pkg.name, pkg.website])
     
     def checkCommonStr(self, label, url, expApp):
