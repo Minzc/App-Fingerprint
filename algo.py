@@ -9,7 +9,7 @@ DEBUG = False
 
 class KVClassifier(AbsClassifer):
   def __init__(self, appType):
-    self.name = const.KV_CLASSIFIER
+    self.name = consts.KV_CLASSIFIER
     self.featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
     self.valueLabelCounter = defaultdict(set)
     self.rules = {}
