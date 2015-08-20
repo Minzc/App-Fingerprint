@@ -19,3 +19,4 @@ for test_tbl in tbls:
 	fw.write(output + '\n')
 	fw.write('=' * 20 + '\n')
 	fw.close()
+        break
