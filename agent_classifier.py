@@ -28,7 +28,7 @@ class AgentClassifier(AbsClassifer):
 
     def count(self, pkg):
       label = pkg.label
-      agent = pkg.agent
+      agent = self.clean_agent(pkg.agent)
       if not agent:
         return
       self.agentLabel[agent].add(label)
@@ -82,7 +82,7 @@ class AgentClassifier(AbsClassifer):
     def classify(self, pkg):
       rst = {}
       for ruleType in self.rules:
-        agent = pkg.agent
+        agent = self.clean_agent(pkg.agent)
         label = self.rules[ruleType].get(agent, None)
         rst[ruleType] = (label, 1.0)
         if label != None and label != pkg.app:
