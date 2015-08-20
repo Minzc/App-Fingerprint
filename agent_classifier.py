@@ -54,7 +54,7 @@ class AgentClassifier(AbsClassifer):
       sqldao.execute(QUERY % (ruleType))
       sqldao.close()
 
-    def train(self, records, rule_type):
+    def train(self, records, ruleType):
       for pkg in [pkg for pkgs in records.values() for pkg in pkgs]:
         self.count(pkg)
       ########################
@@ -70,18 +70,19 @@ class AgentClassifier(AbsClassifer):
         
         if len(labels) == 1:
           label = labels.pop()
+          print label
 
-          self.rules[rule_type][agent] = label
+          self.rules[ruleType][agent] = label
 
           if agent == test_str:
-            print 'Rule Type is', rule_type 
+            print 'Rule Type is', ruleType 
         else:
-          self.rules[rule_type][agent] = ''
+          self.rules[ruleType][agent] = ''
 
 
       print 'number of rule', len(self.rules[consts.APP_RULE])
       print 'persist'
-      self.persist(self.rules, rule_type)
+      self.persist(self.rules, ruleType)
       self.__init__()
       return self
 
@@ -100,10 +101,10 @@ class AgentClassifier(AbsClassifer):
       rst = {}
       for ruleType in self.rules:
         wordList = backward_maxmatch(pkg.agent, set(self.rules[ruleType].keys()), len(pkg.agent), 2)
-        wordList = filter(lambda word: len(self.rules[ruleType][word]) == 0, wordList)
-        print wordList
+        wordList = filter(lambda word: len(self.rules[ruleType][word]) >= 0, wordList)
         longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 1 else ''
         label = self.rules[ruleType].get(longestWord, None)
+        print wordList, longestWord, label
         if label == '':
             label = None
 
