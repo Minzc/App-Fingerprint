@@ -29,7 +29,8 @@ class AgentClassifier(AbsClassifer):
     def count(self, pkg):
       def addCommonStr(agent, label, feature_str):
         common_str = longest_common_substring(agent.lower(), feature_str.lower())
-        self.agentLabel[common_str].add(label)
+        if len(common_str) > 2:
+            self.agentLabel[common_str].add(label)
 
       label = pkg.label
       agent = pkg.agent
@@ -95,5 +96,5 @@ class AgentClassifier(AbsClassifer):
 
         rst[ruleType] = (label, 1.0)
         if label != None and label != pkg.app:
-            print pkg.agent, pkg.app, label
+            print pkg.agent, pkg.app, label, longestWord
       return rst
