@@ -9,7 +9,11 @@ test_str = 'Antler%20Insanity/1.75 CFNetwork/711.4.6 Darwin/14.0.0'.lower()
 
 class AgentClassifier(AbsClassifer):
     def clean_agent(self, agent):
-      return re.sub('[/].*', '', agent)
+      agent = re.sub('[/]?[0-9][0-9.]*', ' ', agent)
+      agent = re.sub('\\([^\\)][^\\)]*$', ' ', agent) 
+      agent = agent.replace(';',' ').replace('(',' ').replace(')',' ').replace('/',' ').replace('-',' ').replace('_',' ')
+      agent = re.sub('  *', ' ', agent)
+      return agent
 
     def __init__(self):
       self.agentLabel = defaultdict(set)
@@ -39,6 +43,8 @@ class AgentClassifier(AbsClassifer):
       name = pkg.appInfo.name
       map(lambda feature_str: addCommonStr(agent, label, feature_str), [package, company, name])
       agent = self.clean_agent(agent)
+      map(lambda feature_str: self.agentLabel[feature_str].add(label), filter(None, agent.split(' ')))
+      agent = re.sub('[/].*', '', pkg.agent)
       self.agentLabel[agent].add(label)
 
     def _clean_db(self, ruleType):
@@ -69,6 +75,9 @@ class AgentClassifier(AbsClassifer):
 
           if agent == test_str:
             print 'Rule Type is', rule_type 
+        else:
+          self.rules[rule_type][agent] = ''
+
 
       print 'number of rule', len(self.rules[consts.APP_RULE])
       print 'persist'
@@ -90,9 +99,12 @@ class AgentClassifier(AbsClassifer):
     def classify(self, pkg):
       rst = {}
       for ruleType in self.rules:
-        wordList = backward_maxmatch(pkg.agent, set(self.rules[ruleType].keys()), len(pkg.agent), 2)
+        wordList = backward_maxmatch(self.clean_agent(pkg.agent), set(self.rules[ruleType].keys()), len(pkg.agent), 2)
+        wordList = filter(lambda word: len(self.rules[ruleType][word]) == 0, wordList)
         longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 1 else ''
         label = self.rules[ruleType].get(longestWord, None)
+        if label == '':
+            label = None
 
         rst[ruleType] = (label, 1.0)
         if label != None and label != pkg.app:
