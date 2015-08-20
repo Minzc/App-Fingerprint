@@ -95,5 +95,5 @@ class AgentClassifier(AbsClassifer):
 
         rst[ruleType] = (label, 1.0)
         if label != None and label != pkg.app:
-            print agent, pkg.app, label
+            print pkg.agent, pkg.app, label
       return rst
