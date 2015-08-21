@@ -78,12 +78,13 @@ class AgentClassifier(AbsClassifer):
         
         if len(labels) == 1:
           label = labels.pop()
-          print label
 
           self.rules[ruleType][agent] = label
 
           if agent == test_str:
             print 'Rule Type is', ruleType 
+        else:
+          self.rules[ruleType][agent] = ''
 
 
       print 'number of rule', len(self.rules[consts.APP_RULE])
