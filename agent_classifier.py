@@ -9,7 +9,7 @@ test_str = 'Antler%20Insanity/1.75 CFNetwork/711.4.6 Darwin/14.0.0'.lower()
 
 class AgentClassifier(AbsClassifer):
     def clean_agent(self, agent):
-      return re.findall('[a-zA-Z]+', agent)
+      return re.findall('[a-zA-Z][a-zA-Z.]+', agent)
 
     def __init__(self):
       self.agentLabel = defaultdict(set)
@@ -33,7 +33,8 @@ class AgentClassifier(AbsClassifer):
       agent = re.sub('[/].*', '', pkg.agent)
       self.agentLabel[agent].add(label)
       self.agentLabel[label].add(label)
-      agent_segs = self.clean_agent()
+      agent_segs = self.clean_agent(pkg.agent)
+      map(lambda seg: self.agentLabel[seg].add(label), agent_segs)
 
     # def count(self, pkg):
     #   def addCommonStr(agent, label, feature_str):
