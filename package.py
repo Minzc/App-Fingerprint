@@ -41,12 +41,13 @@ class Package:
     self.app = app.lower()
 
   def set_refer(self, refer):
-    path = urllib.unquote(refer).lower().replace(';', '?', 1).replace(';', '&')
-    parsed_url = urlparse.urlparse(path)
+    url = urllib.unquote(refer).lower().replace(';', '?', 1).replace(';', '&')
+    parsed_url = urlparse.urlparse(url)
+    query = urlparse.parse_qs(urlparse.urlparse(url).query, True)
     host = parsed_url.netloc
     path = parsed_url.path
-    query = parsed_url.query
     self.refer_host = host
+    self.refer_queries = query
 
   def set_path(self, path):
 

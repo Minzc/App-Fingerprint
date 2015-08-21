@@ -5,7 +5,7 @@ import consts
 from app_info import AppInfos
 from classifier import AbsClassifer
 
-test_str = 'golfchannelacademy.com'
+test_str = 'fox2now.com'
 
 class HostApp(AbsClassifer):
     def __init__(self, appType):

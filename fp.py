@@ -44,7 +44,7 @@ def _encode_data(packages=None, minimum_support = 2):
       print 'counter is', f_counter[test_str]
       # Get frequent 1-item
       items = {item for item, num in f_counter.iteritems() 
-          if num > minimum_support and len(f_company[item]) < 2}
+          if num > minimum_support and len(f_company[item]) < 4}
       print 'f_company', f_company[test_str]
       print 'label in it', test_str in items
       return processed_transactions, items

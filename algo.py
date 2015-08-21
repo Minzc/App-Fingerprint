@@ -18,7 +18,6 @@ class KVClassifier(AbsClassifer):
     self.appType = appType
 
   def train(self, trainData, rule_type):
-    
     for tbl in trainData.keys():
       for pkg in trainData[tbl]:
         for k,v in pkg.queries.items():
@@ -64,18 +63,18 @@ class KVClassifier(AbsClassifer):
     # Generate specific rules
     #############################
     specificRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:0}))))
-    ruleCover = defaultdict(int)
     
-    debugCounter = 0
     for tbl, pkgs in trainData.iteritems():
       for pkg in filter(lambda pkg : pkg.secdomain in generalRules, pkgs):
         for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.secdomain]):
-          ruleCover[rule] += 1
           for value in pkg.queries[rule.key]:
             if len(self.valueLabelCounter[value]) == 1:
-                debugCounter += 1
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT] += 1
+
+    #############################
+    # Persist rules
+    #############################
     self.persist(specificRules, rule_type)
     self.__init__(self.appType)
     return self
@@ -104,29 +103,36 @@ class KVClassifier(AbsClassifer):
 
   def classify(self, pkg):
     predictRst = {}
-    for rule_type in self.rules:
-      maxScore, occurCount = -1, -1
-      prediction = None
-      evidence = (None, None)
+    for ruleType in self.rules:
+      for host, queries in [(pkg.host, pkg.queries), (pkg.refer_host, pkg.refer_queries)]:
+        maxScore, occurCount = -1, -1
+        prediction = None
+        evidence = (None, None)
 
-      for k, k_rules in self.rules[rule_type].get(pkg.host, {}).iteritems():
-        for v in pkg.queries.get(k, []):          
-          for label, score_count in k_rules.get(v, {}).iteritems():
-            score, count = score_count[consts.SCORE], score_count[consts.SUPPORT]
+        for k, kRules in self.rules[ruleType].get(host, {}).iteritems():
+          for v in queries.get(k, []):          
+            for label, scoreNcount in kRules.get(v, {}).iteritems():
+              score, count = scoreNcount[consts.SCORE], scoreNcount[consts.SUPPORT]
 
-            if score > maxScore or (score == maxScore and count > occurCount):
-              prediction = label
-              maxScore, occurCount = score, count
-              evidence = (k, v)
-            elif not prediction:
-              pass
-             #print 'value not in rules', k.encode('utf-8'), v.encode('utf-8'), pkg.app
-      predictRst[rule_type] = (prediction, maxScore, evidence[0], evidence[1])
+              if score > maxScore or (score == maxScore and count > occurCount):
+                prediction = label
+                maxScore, occurCount = score, count
+                evidence = (k, v)
+              elif not prediction:
+               #print 'value not in rules', k.encode('utf-8'), v.encode('utf-8'), pkg.app
+                pass
+        predictRst[ruleType] = (prediction, maxScore, evidence[0], evidence[1])
+        
+        # If we can not prediction based on kv in urls, use suffix tree to try again
+        if not predictRst[consts.APP_RULE][0]:
+          for k, values in queries.iteritems():
+            label = map(lambda v : self.classify_suffix_app(v), values)
+            predictRst[consts.APP_RULE] = (label[0], 1, k)
 
-      if not predictRst[consts.APP_RULE][0]:
-        for k, values in pkg.queries.iteritems():
-          label = map(lambda v : self.classify_suffix_app(v), values)
-          predictRst[consts.APP_RULE] = (label[0], 1, k)
+        # If we can predict based on original url, we do not need to use refer url to predict again
+        if predictRst[ruleType][0] != None:
+          break
+
 
     return predictRst
 
