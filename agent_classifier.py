@@ -31,6 +31,7 @@ class AgentClassifier(AbsClassifer):
       sqldao.close()
 
     def count(self, pkg):
+      label = pkg.label
       agent_segs = self.clean_agent(pkg.agent)
       map(lambda agent_seg: self.agentLabel[agent_seg].add(label), agent_segs)
       agent = re.sub('[/].*', '', pkg.agent)
