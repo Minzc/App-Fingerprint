@@ -118,5 +118,5 @@ class AgentClassifier(AbsClassifer):
 
         rst[ruleType] = (label, 1.0)
         if label != None and label != pkg.app:
-            print pkg.agent, pkg.app, label, longestWord
+            print '>>>[AGENT CLASSIFIER ERROR]', pkg.agent, pkg.app, label, longestWord
       return rst
