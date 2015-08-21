@@ -28,6 +28,13 @@ trainedLabel = {
     #consts.CATEGORY_RULE
     }
 
+classifiers = [
+   #("Header Rule", HeaderClassifier()),
+   ("Agent Rule", AgentClassifier()),
+   ("Host Rule", HostApp(appType)),
+   ("CMAR Rule", CMAR(min_cover = 3)),
+   ("KV Rule", KVClassifier(appType))
+]
 def load_trian(size):
     train_set = {int(item.strip()) for item in open('train_id')}
     test_set = {i for i in range(size) if i not in train_set}
@@ -118,13 +125,6 @@ def execute(train_set, test_set, inforTrack, appType):
     for record in test_set.values():
         test_apps.add(record.app)
 
-    classifiers = [
-             #("Header Rule", HeaderClassifier()),
-             ("Agent Rule", AgentClassifier()),
-             ("Host Rule", HostApp(appType)),
-             ("CMAR Rule", CMAR(min_cover = 3)),
-             ("KV Rule", KVClassifier(appType))
-            ]
 
     
     
