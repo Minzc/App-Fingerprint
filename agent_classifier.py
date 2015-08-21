@@ -113,10 +113,10 @@ class AgentClassifier(AbsClassifer):
           wordList = filter(lambda seg: len(self.rules[ruleType][seg]) > 1, wordList)
           longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 0 else ''
           label = self.rules[ruleType].get(longestWord)
-          if len(wordList) < 0:
-              print wordList, 'longestword:', longestWord, 'label:', label 
+          # if len(wordList) < 0:
+          #     print wordList, 'longestword:', longestWord, 'label:', label 
 
         rst[ruleType] = (label, 1.0)
-        if label != None and label != pkg.app:
-            print '>>>[AGENT CLASSIFIER ERROR] agent', pkg.agent, 'App:',pkg.app, 'Prediction',label, 'Longestword',longestWord
+        if label != None and label != pkg.app and ruleType == consts.APP_RULE:
+          print '>>>[AGENT CLASSIFIER ERROR] agent', pkg.agent, 'App:',pkg.app, 'Prediction',label, 'Longestword',longestWord
       return rst
