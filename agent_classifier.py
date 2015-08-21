@@ -5,7 +5,7 @@ import consts
 from classifier import AbsClassifer
 import re
 
-test_str = 'pugpignetwork'.lower()
+test_str = 'NBC'.lower()
 
 class AgentClassifier(AbsClassifer):
     def clean_agent(self, agent):
@@ -113,8 +113,8 @@ class AgentClassifier(AbsClassifer):
           wordList = filter(lambda seg: len(self.rules[ruleType][seg]) > 1, wordList)
           longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 0 else ''
           label = self.rules[ruleType].get(longestWord)
-          if len(wordList) > 0:
-              print wordList, 'longestword:', longestWord, 'label:', label, 
+          if len(wordList) < 0:
+              print wordList, 'longestword:', longestWord, 'label:', label 
 
         rst[ruleType] = (label, 1.0)
         if label != None and label != pkg.app:
