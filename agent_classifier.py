@@ -104,6 +104,7 @@ class AgentClassifier(AbsClassifer):
 
     def classify(self, pkg):
       rst = {}
+      longestWord = None
       for ruleType in self.rules:
         agent = re.sub('[/].*', '', pkg.agent)
         label = self.rules[ruleType].get(agent, None)
@@ -115,5 +116,5 @@ class AgentClassifier(AbsClassifer):
 
         rst[ruleType] = (label, 1.0)
         if label != None and label != pkg.app:
-            print pkg.agent, pkg.app, label
+            print pkg.agent, pkg.app, label, longestWord
       return rst
