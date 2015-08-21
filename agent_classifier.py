@@ -9,11 +9,11 @@ test_str = 'Antler%20Insanity/1.75 CFNetwork/711.4.6 Darwin/14.0.0'.lower()
 
 class AgentClassifier(AbsClassifer):
     def clean_agent(self, agent):
-      agent = re.sub('[/]?[0-9][0-9.]*', ' ', agent)
-      agent = re.sub('\\([^\\)][^\\)]*$', ' ', agent) 
-      agent = agent.replace(';',' ').replace('(',' ').replace(')',' ').replace('/',' ').replace('-',' ').replace('_',' ')
-      agent = re.sub('  *', ' ', agent)
-      return agent
+      agent = agent.replace(';',' ').replace('(',' ').replace(')',' ').replace(',',' ').replace('-',' ').replace('_',' ')
+      agent_segs = agent.split(' ')
+      agent_segs = map(lambda agent_seg: re.sub('[/]?[0-9][0-9.]*', ' ', agent_seg), agent_segs)
+      agent_segs = filter(None, map(lambda agent_seg: re.sub('  *', ' ', agent_seg), agent_segs))
+      return agent_segs
 
     def __init__(self):
       self.agentLabel = defaultdict(set)
@@ -31,21 +31,28 @@ class AgentClassifier(AbsClassifer):
       sqldao.close()
 
     def count(self, pkg):
-      def addCommonStr(agent, label, feature_str):
-        common_str = longest_common_substring(agent.lower(), feature_str.lower())
-        if len(common_str) > 2:
-            self.agentLabel[common_str].add(label)
-
-      label = pkg.label
-      agent = pkg.agent
-      package = pkg.appInfo.package
-      company = pkg.appInfo.company
-      name = pkg.appInfo.name
-      map(lambda feature_str: addCommonStr(agent, label, feature_str), [package, company, name])
-      agent = self.clean_agent(agent)
-      map(lambda feature_str: self.agentLabel[feature_str].add(label), filter(None, agent.split(' ')))
+      agent_segs = self.clean_agent(pkg.agent)
+      map(lambda agent_seg: self.agentLabel[agent_seg].add(label), agent_segs)
       agent = re.sub('[/].*', '', pkg.agent)
       self.agentLabel[agent].add(label)
+      self.agentLabel[label].add(label)
+
+    # def count(self, pkg):
+    #   def addCommonStr(agent, label, feature_str):
+    #     common_str = longest_common_substring(agent.lower(), feature_str.lower())
+    #     if len(common_str) > 2:
+    #         self.agentLabel[common_str].add(label)
+
+    #   label = pkg.label
+    #   agent = pkg.agent
+    #   package = pkg.appInfo.package
+    #   company = pkg.appInfo.company
+    #   name = pkg.appInfo.name
+    #   map(lambda feature_str: addCommonStr(agent, label, feature_str), [package, company, name])
+    #   agent = self.clean_agent(agent)
+    #   map(lambda feature_str: self.agentLabel[feature_str].add(label), filter(None, agent.split(' ')))
+    #   agent = re.sub('[/].*', '', pkg.agent)
+    #   self.agentLabel[agent].add(label)
 
     def _clean_db(self, ruleType):
       QUERY = consts.SQL_DELETE_AGENT_RULES
@@ -76,8 +83,6 @@ class AgentClassifier(AbsClassifer):
 
           if agent == test_str:
             print 'Rule Type is', ruleType 
-        else:
-          self.rules[ruleType][agent] = ''
 
 
       print 'number of rule', len(self.rules[consts.APP_RULE])
@@ -105,8 +110,6 @@ class AgentClassifier(AbsClassifer):
         longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 1 else ''
         label = self.rules[ruleType].get(longestWord, None)
         print wordList, longestWord, label
-        if label == '':
-            label = None
 
         rst[ruleType] = (label, 1.0)
         if label != None and label != pkg.app:
