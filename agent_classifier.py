@@ -11,8 +11,8 @@ class AgentClassifier(AbsClassifer):
     def clean_agent(self, agent):
       agent = agent.replace(';',' ').replace('(',' ').replace(')',' ').replace(',',' ').replace('-',' ').replace('_',' ')
       agent_segs = agent.split(' ')
-      agent_segs = map(lambda agent_seg: re.sub('[/]?[0-9][0-9.]*', ' ', agent_seg), agent_segs)
-      agent_segs = filter(None, map(lambda agent_seg: re.sub('  *', ' ', agent_seg), agent_segs))
+      agent_segs = map(lambda agent_seg: re.sub('[/]?[0-9][0-9.]*', '', agent_seg), agent_segs)
+      agent_segs = filter(None, map(lambda agent_seg: re.sub('  *', ' ', agent_seg.strip()), agent_segs))
       return agent_segs
 
     def __init__(self):
