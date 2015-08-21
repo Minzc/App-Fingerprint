@@ -111,7 +111,7 @@ class AgentClassifier(AbsClassifer):
         if not label:
           wordList = backward_maxmatch(pkg.agent, set(self.rules[ruleType].keys()), len(pkg.agent), 2)
           wordList = filter(lambda seg: len(self.rules[ruleType][seg]) > 1, wordList)
-          longestWord = max(wordList, key = lambda x: len(x)) if not wordList else ''
+          longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 1 else ''
           label = self.rules[ruleType].get(longestWord)
           print wordList, longestWord, label
 
