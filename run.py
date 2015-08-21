@@ -16,6 +16,7 @@ from rule_manager import RuleManager
 
 
 LIMIT = None
+INSERT = False
 FOLD = 1
 DEBUG = False
 DEBUG_CMAR = False
@@ -209,8 +210,9 @@ def cross_batch_test(train_tbls, test_tbl, appType):
     for train_set, test_set in set_pair:
         correct = 0
         rst = execute(train_set, test_set, inforTrack,appType)
-        print "INSERTING"
-        insert_rst(rst, test_tbl)
+        if INSERT:
+          print "INSERTING"
+          insert_rst(rst, test_tbl)
 
     precision = inforTrack[consts.PRECISION]
     recall = inforTrack[consts.RECALL]
