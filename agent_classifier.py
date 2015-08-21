@@ -32,8 +32,8 @@ class AgentClassifier(AbsClassifer):
 
     def count(self, pkg):
       label = pkg.label
-      agent_segs = self.clean_agent(pkg.agent)
-      map(lambda agent_seg: self.agentLabel[agent_seg].add(label), agent_segs)
+      # agent_segs = self.clean_agent(pkg.agent)
+      # map(lambda agent_seg: self.agentLabel[agent_seg].add(label), agent_segs)
       agent = re.sub('[/].*', '', pkg.agent)
       self.agentLabel[agent].add(label)
       self.agentLabel[label].add(label)
@@ -107,11 +107,14 @@ class AgentClassifier(AbsClassifer):
     def classify(self, pkg):
       rst = {}
       for ruleType in self.rules:
-        wordList = backward_maxmatch(pkg.agent, set(self.rules[ruleType].keys()), len(pkg.agent), 2)
-        wordList = filter(lambda word: len(self.rules[ruleType][word]) > 0, wordList)
-        longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 1 else ''
-        label = self.rules[ruleType].get(longestWord, None)
-        print wordList, longestWord, label
+        agent = re.sub('[/].*', '', pkg.agent)
+        label = self.rules[ruleType].get(agent, None)
+        if False:
+          wordList = backward_maxmatch(pkg.agent, set(self.rules[ruleType].keys()), len(pkg.agent), 2)
+          wordList = filter(lambda word: len(self.rules[ruleType][word]) > 0, wordList)
+          longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 1 else ''
+          label = self.rules[ruleType].get(longestWord, None)
+          print wordList, longestWord, label
 
         rst[ruleType] = (label, 1.0)
         if label != None and label != pkg.app:
