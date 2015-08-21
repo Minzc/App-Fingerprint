@@ -9,7 +9,7 @@ test_str = 'NBC'.lower()
 
 class AgentClassifier(AbsClassifer):
     def clean_agent(self, agent):
-      return re.findall('[a-zA-Z][0-9a-zA-Z. ]+', agent)
+      return re.findall('[a-zA-Z][0-9a-zA-Z. %]+', agent)
 
     def __init__(self):
       self.agentLabel = defaultdict(set)
@@ -118,5 +118,5 @@ class AgentClassifier(AbsClassifer):
 
         rst[ruleType] = (label, 1.0)
         if label != None and label != pkg.app:
-            print '>>>[AGENT CLASSIFIER ERROR]', pkg.agent, pkg.app, label, longestWord
+            print '>>>[AGENT CLASSIFIER ERROR] agent', pkg.agent, 'App:',pkg.app, 'Prediction',label, 'Longestword',longestWord
       return rst

@@ -1,3 +1,5 @@
+import urlparse
+import urllib
 class Package:
   def __init__(self):
     self.json = None
@@ -39,11 +41,14 @@ class Package:
     self.app = app.lower()
 
   def set_refer(self, refer):
-    self.refer = refer
+    path = urllib.unquote(refer).lower().replace(';', '?', 1).replace(';', '&')
+    parsed_url = urlparse.urlparse(path)
+    host = parsed_url.netloc
+    path = parsed_url.path
+    query = parsed_url.query
+    self.refer_host = host
 
   def set_path(self, path):
-      import urlparse
-      import urllib
 
       path = urllib.unquote(path).lower().replace(';', '?', 1).replace(';', '&')
       self.origPath = path

@@ -5,7 +5,7 @@ import consts
 from app_info import AppInfos
 from classifier import AbsClassifer
 
-test_str = 'voyagesarabais.com'
+test_str = 'golfchannelacademy.com'
 
 class HostApp(AbsClassifer):
     def __init__(self, appType):
@@ -36,6 +36,8 @@ class HostApp(AbsClassifer):
       appInfo = pkg.appInfo
       url = url_clean(pkg.host)
       top_domain = get_top_domain(url)
+      refer_host = pkg.refer_host
+      refer_top_domain = get_top_domain(refer_host)
       if not url or not top_domain:
         return
 
@@ -44,7 +46,7 @@ class HostApp(AbsClassifer):
         return
       
       self.labelAppInfo[label] = (pkg.app, pkg.company, pkg.category)
-      map(lambda url : self.urlLabel[url].add(label), [top_domain, url])
+      map(lambda url : self.urlLabel[url].add(label), [top_domain, url, refer_host, refer_top_domain])
       map(lambda string : addCommonStr(url, pkg, string), [pkg.app, pkg.company, pkg.name, pkg.website])
     
     def checkCommonStr(self, label, url, expApp):
@@ -112,8 +114,14 @@ class HostApp(AbsClassifer):
       for ruleType in self.rules:
         host = pkg.host.replace('-','.')
         secdomain = pkg.secdomain.replace('-', '.')
-        label = self.rules[ruleType].get(host, None)
-        label = self.rules[ruleType].get(secdomain, None) if not label else label
+        refer_host = pkg.refer_host
+        refer_top_domain = get_top_domain(refer_host)
+        label = None
+        for url in [host, secdomain, refer_host, refer_top_domain]:
+          label = self.rules[ruleType].get(url, None)
+          if label != None:
+            break
+
         rst[ruleType] = (label, 1.0)
       return rst
 

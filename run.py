@@ -16,7 +16,7 @@ from rule_manager import RuleManager
 
 
 LIMIT = None
-INSERT = False
+INSERT = True
 FOLD = 1
 DEBUG = False
 DEBUG_CMAR = False
@@ -24,8 +24,8 @@ DEBUG_CMAR = False
 validLabel = {consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE}
 trainedLabel = {
     consts.APP_RULE, 
-    #consts.COMPANY_RULE, 
-    #consts.CATEGORY_RULE
+    consts.COMPANY_RULE, 
+    consts.CATEGORY_RULE
     }
 
 def load_trian(size):
@@ -121,9 +121,9 @@ def execute(train_set, test_set, inforTrack, appType):
     classifiers = [
              #("Header Rule", HeaderClassifier()),
              ("Agent Rule", AgentClassifier()),
-             #("Host Rule", HostApp(appType)),
-             #("CMAR Rule", CMAR(min_cover = 3)),
-             #("KV Rule", KVClassifier(appType))
+             ("Host Rule", HostApp(appType)),
+             ("CMAR Rule", CMAR(min_cover = 3)),
+             ("KV Rule", KVClassifier(appType))
             ]
 
     
