@@ -9,7 +9,7 @@ test_str = 'NBC'.lower()
 
 class AgentClassifier(AbsClassifer):
     def clean_agent(self, agent):
-      return re.findall('[a-zA-Z][a-zA-Z.]+', agent)
+      return re.findall('[a-zA-Z][0-9a-zA-Z. ]+', agent)
 
     def __init__(self):
       self.agentLabel = defaultdict(set)
