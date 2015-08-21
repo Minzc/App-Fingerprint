@@ -5,7 +5,7 @@ import consts
 from classifier import AbsClassifer
 import re
 
-test_str = 'Antler%20Insanity/1.75 CFNetwork/711.4.6 Darwin/14.0.0'.lower()
+test_str = 'pugpignetwork'.lower()
 
 class AgentClassifier(AbsClassifer):
     def clean_agent(self, agent):
@@ -107,13 +107,14 @@ class AgentClassifier(AbsClassifer):
       longestWord = None
       for ruleType in self.rules:
         agent = re.sub('[/].*', '', pkg.agent)
-        label = self.rules[ruleType].get(agent, None)
+        label = self.rules[ruleType].get(agent)
         if not label:
-          wordList = backward_maxmatch(pkg.agent, set(self.rules[ruleType].keys()), len(pkg.agent), 2)
+          wordList = backward_maxmatch(pkg.agent, set(self.rules[ruleType].keys()), len(pkg.agent), 5)
           wordList = filter(lambda seg: len(self.rules[ruleType][seg]) > 1, wordList)
-          longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 1 else ''
+          longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 0 else ''
           label = self.rules[ruleType].get(longestWord)
-          print wordList, longestWord, label
+          if len(wordList) > 0:
+              print wordList, 'longestword:', longestWord, 'label:', label, 
 
         rst[ruleType] = (label, 1.0)
         if label != None and label != pkg.app:
