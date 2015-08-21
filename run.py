@@ -120,10 +120,10 @@ def execute(train_set, test_set, inforTrack, appType):
 
     classifiers = [
              #("Header Rule", HeaderClassifier()),
-             #("Agent Rule", AgentClassifier()),
+             ("Agent Rule", AgentClassifier()),
              ("Host Rule", HostApp(appType)),
-             #("CMAR Rule", CMAR(min_cover = 3)),
-             #("KV Rule", KVClassifier(appType))
+             ("CMAR Rule", CMAR(min_cover = 3)),
+             ("KV Rule", KVClassifier(appType))
             ]
 
     
