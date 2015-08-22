@@ -13,6 +13,7 @@ import sys
 import argparse
 from host import HostApp
 from rule_manager import RuleManager
+# from classifer_factory import classifier_factory
 
 
 LIMIT = None
@@ -23,18 +24,19 @@ DEBUG_CMAR = False
 
 validLabel = {consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE}
 trainedLabel = {
-    consts.APP_RULE, 
-    #consts.COMPANY_RULE, 
-    #consts.CATEGORY_RULE
-    }
+  consts.APP_RULE, 
+  #consts.COMPANY_RULE, 
+  #consts.CATEGORY_RULE
+}
 
-classifiers = [
-   #("Header Rule", HeaderClassifier()),
-   ("Agent Rule", AgentClassifier()),
-   ("Host Rule", HostApp(appType)),
-   ("CMAR Rule", CMAR(min_cover = 3)),
-   ("KV Rule", KVClassifier(appType))
+trainedClassifiers = [
+    consts.HEAD_CLASSIFIER,
+    consts.AGENT_CLASSIFIER,
+    consts.HOST_CLASSIFIER,
+    consts.CMAR_CLASSIFIER,
+    consts.KV_CLASSIFIER,
 ]
+
 def load_trian(size):
     train_set = {int(item.strip()) for item in open('train_id')}
     test_set = {i for i in range(size) if i not in train_set}
@@ -111,6 +113,21 @@ def insert_rst(rst, DB = 'packages'):
     print 'insert', len(rst),"items"
 
 
+def classifier_factory(names, appType):
+  classifiers = []
+  for name in names:
+    if name == consts.HEAD_CLASSIFIER:
+      classifier = HeaderClassifier()
+    elif name == consts.AGENT_CLASSIFIER:
+      classifier = AgentClassifier()
+    elif name == consts.HOST_CLASSIFIER:
+      classifier = HostApp(appType)
+    elif name == consts.CMAR_CLASSIFIER:
+      classifier = CMAR(min_cover = 3)
+    elif name == consts.KV_CLASSIFIER:
+      classifier = KVClassifier(appType)
+    classifiers.append((name, classifier))
+  return classifiers
 
 def execute(train_set, test_set, inforTrack, appType):
     sqldao = SqlDao()
@@ -124,24 +141,22 @@ def execute(train_set, test_set, inforTrack, appType):
     rst = {}
     for record in test_set.values():
         test_apps.add(record.app)
-
-
-    
     
     ruleDict = {}
-    for rule_type in trainedLabel:
+    for ruleType in trainedLabel:
+        classifiers = classifier_factory(trainedClassifiers, appType)
         for tbl in train_set:
             for pkg in train_set[tbl]:
-                if rule_type == consts.APP_RULE:
+                if ruleType == consts.APP_RULE:
                     pkg.set_label(pkg.app)
-                elif rule_type == consts.COMPANY_RULE:
+                elif ruleType == consts.COMPANY_RULE:
                     pkg.set_label(pkg.company)
-                elif rule_type == consts.CATEGORY_RULE:
+                elif ruleType == consts.CATEGORY_RULE:
                     pkg.set_label(pkg.category)
 
         for name, classifier in classifiers:
             print ">>> [train#%s] " % (name)
-            classifier =  classifier.train(train_set, rule_type)
+            classifier =  classifier.train(train_set, ruleType)
     train_set = None # To release memory
     
 
