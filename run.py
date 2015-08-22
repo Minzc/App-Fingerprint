@@ -1,19 +1,13 @@
 from sklearn.cross_validation import KFold
 import datetime
 from sqldao import SqlDao
-from fp import CMAR
 from utils import load_pkgs, load_exp_app
-from algo import KVClassifier
-from classifier import HeaderClassifier
-from host import HostApp
 from collections import namedtuple, defaultdict
-from agent_classifier import AgentClassifier
 import consts
 import sys
 import argparse
-from host import HostApp
 from rule_manager import RuleManager
-# from classifer_factory import classifier_factory
+from classifier_factory import classifier_factory
 
 
 LIMIT = None
@@ -113,21 +107,6 @@ def insert_rst(rst, DB = 'packages'):
     print 'insert', len(rst),"items"
 
 
-def classifier_factory(names, appType):
-  classifiers = []
-  for name in names:
-    if name == consts.HEAD_CLASSIFIER:
-      classifier = HeaderClassifier()
-    elif name == consts.AGENT_CLASSIFIER:
-      classifier = AgentClassifier()
-    elif name == consts.HOST_CLASSIFIER:
-      classifier = HostApp(appType)
-    elif name == consts.CMAR_CLASSIFIER:
-      classifier = CMAR(min_cover = 3)
-    elif name == consts.KV_CLASSIFIER:
-      classifier = KVClassifier(appType)
-    classifiers.append((name, classifier))
-  return classifiers
 
 def execute(train_set, test_set, inforTrack, appType):
     sqldao = SqlDao()
