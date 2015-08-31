@@ -1,6 +1,7 @@
 from collections import namedtuple
 
 Prediction = namedtuple('Prediction', 'label, score, evidence')
+NULLPrediction = Prediction(None, -1, None)
 
 
 LABEL = 'l'

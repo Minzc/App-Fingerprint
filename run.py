@@ -6,7 +6,7 @@ from collections import namedtuple, defaultdict
 import consts
 import sys
 import argparse
-from rule_manager import RuleManager
+from rules.rule_manager import RuleManager
 from classifier_factory import classifier_factory
 
 
@@ -24,7 +24,7 @@ trainedLabel = {
 }
 
 trainedClassifiers = [
-    consts.HEAD_CLASSIFIER,
+    #consts.HEAD_CLASSIFIER,
     consts.AGENT_CLASSIFIER,
     consts.HOST_CLASSIFIER,
     consts.CMAR_CLASSIFIER,
@@ -32,9 +32,9 @@ trainedClassifiers = [
 ]
 
 def load_trian(size):
-    train_set = {int(item.strip()) for item in open('train_id')}
-    test_set = {i for i in range(size) if i not in train_set}
-    return train_set, test_set
+    trainSet = {int(item.strip()) for item in open('train_id')}
+    testSet = {i for i in range(size) if i not in trainSet}
+    return trainSet, testSet
 
 def merge_rst(rst, tmprst):
     for pkg_id, predictions in tmprst.iteritems():
@@ -42,43 +42,47 @@ def merge_rst(rst, tmprst):
         rst[pkg_id] = predictions
       else:
         for rule_type in validLabel:
-          if rst[pkg_id][rule_type][0] == None:
+          if rst[pkg_id][rule_type].label == None:
             rst[pkg_id][rule_type] = tmprst[pkg_id][rule_type]
     return rst
 
 
-def evaluate(rst, test_set):
+def evaluate(rst, testSet):
     # app_rst, record_id
     correct, wrong, total = 0, 0, 0
-    correct_app = set()
-    for pkg_id, predictions in rst.items():
-      predict_app = predictions[consts.APP_RULE][0] 
-      predict_company = predictions[consts.COMPANY_RULE][0] 
-      predict_category = predictions[consts.CATEGORY_RULE][0] 
-      if predict_app == test_set[pkg_id].app:
-          correct += 1
-          correct_app.add(test_set[pkg_id].app)
-      elif predict_app == None and predict_company == test_set[pkg_id].company:
-          correct += 1
-          correct_app.add(test_set[pkg_id].app)
-      elif predict_app == None and predict_company == None and predict_category == test_set[pkg_id].category:
-          correct += 1
-          correct_app.add(test_set[pkg_id].app)
-      else:
-          wrong += 1
-      if sum([1 for value in predictions.values() if value[0] != None]) > 0:
+    correctApp = set()
+    for pkgId, predictions in rst.items():
+      predictApp = predictions[consts.APP_RULE].label 
+      predictCompany = predictions[consts.COMPANY_RULE].label
+      predictCategory = predictions[consts.CATEGORY_RULE].label
+      ifCorrect = True
+      if predictApp != None and predictApp != testSet[pkgId].app:
+        ifCorrect = False
+      if predictCompany != None and predictCompany != testSet[pkgId].company:
+        ifCorrect = False
+      if predictCategory != None and predictCategory != testSet[pkgId].category:
+        ifCorrect = False
+
+      if sum([1 for value in predictions.values() if value != consts.NULLPrediction]) > 0:
         total += 1
+        if ifCorrect:
+          correct += 1
+          correctApp.add(testSet[pkgId].app)
+          if predictApp == None:
+              print 'ERROR!!!!!!!!!!!!!', predictions
+        else:
+          wrong += 1
       
-    print 'Total:', len(test_set), 'Recognized:', total, 'Correct:', correct, 'Wrong:', wrong
-    return correct, correct_app
+    print 'Total:', len(testSet), 'Recognized:', total, 'Correct:', correct, 'Wrong:', wrong
+    return correct, correctApp
 
 
 
-def use_classifier(classifier, test_set):
+def use_classifier(classifier, testSet):
     rst = defaultdict(dict)
     total = 0
     recall = 0
-    for pkg_id, record in test_set.items():
+    for pkg_id, record in testSet.items():
         if len(record.queries) > 0:
           total += 1
         # predict
@@ -108,24 +112,24 @@ def insert_rst(rst, DB = 'packages'):
 
 
 
-def execute(train_set, test_set, inforTrack, appType):
+def execute(trainSet, testSet, inforTrack, appType):
     sqldao = SqlDao()
     sqldao.execute(consts.SQL_CLEAN_ALL_RULES)
     sqldao.close()
     print consts.SQL_CLEAN_ALL_RULES
 
-    print "Train:", train_set.keys(), "Test:", len(test_set)
+    print "Train:", trainSet.keys(), "Test:", len(testSet)
     correct = 0
     test_apps = set()
     rst = {}
-    for record in test_set.values():
+    for record in testSet.values():
         test_apps.add(record.app)
     
     ruleDict = {}
     for ruleType in trainedLabel:
         classifiers = classifier_factory(trainedClassifiers, appType)
-        for tbl in train_set:
-            for pkg in train_set[tbl]:
+        for tbl in trainSet:
+            for pkg in trainSet[tbl]:
                 if ruleType == consts.APP_RULE:
                     pkg.set_label(pkg.app)
                 elif ruleType == consts.COMPANY_RULE:
@@ -135,39 +139,40 @@ def execute(train_set, test_set, inforTrack, appType):
 
         for name, classifier in classifiers:
             print ">>> [train#%s] " % (name)
-            classifier =  classifier.train(train_set, ruleType)
-    train_set = None # To release memory
+            classifier =  classifier.train(trainSet, ruleType)
+    trainSet = None # To release memory
     
 
     # ruleManager = RuleManager()
     print '>>> Finish training all classifiers'
     print '>>> Start rule pruning'
     
-    # if 'CMAR Rule' in classifiers:
-    #     classifiers["CMAR Rule"].rules = ruleManager.pruneCMARRules(ruleDict['CMAR Rule'], ruleDict['Host Rule'])
-    #     classifiers["CMAR Rule"].persist()
-    # if 'KV Rule' in classifiers:
-    #     classifiers["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],{1:[],2:[]})
-    #     #classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],ruleDict['Host Rule'] )
-    #     #classifierDict["KV Rule"].persist()
+    if 'CMAR Rule' in classifiers:
+        classifiers["CMAR Rule"].rules = ruleManager.pruneCMARRules(ruleDict['CMAR Rule'], ruleDict['Host Rule'])
+        classifiers["CMAR Rule"].persist()
+    if 'KV Rule' in classifiers:
+        classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],ruleDict['Host Rule'] )
+        classifierDict["KV Rule"].persist()
     
     for name, classifier in classifiers:
         print ">>> [test#%s] " % (name)
         classifier.load_rules()
-        tmprst = use_classifier(classifier, test_set)
+        tmprst = use_classifier(classifier, testSet)
         rst = merge_rst(rst, tmprst)
         recall = sum([1 for i in rst.values() if i[consts.APP_RULE][0] or i[consts.COMPANY_RULE][0] or i[consts.CATEGORY_RULE][0]])
         print ">>> Recognized:", recall
 
 
-    c, correct_app = evaluate(rst, test_set)
+    c, correct_app = evaluate(rst, testSet)
     correct += c
     not_cover_app = test_apps - correct_app
-    recall = sum([1 for i in rst.values() if i[consts.APP_RULE][0] or i[consts.COMPANY_RULE][0] or i[consts.CATEGORY_RULE][0]])
+    recall = sum([1 for i in rst.values() if i[consts.APP_RULE].label or i[consts.COMPANY_RULE].label or i[consts.CATEGORY_RULE].label])
+    print '[TEST] recall:', recall
+    print '[TEST] correct:', correct
     print "Discoered App Number:", len(correct_app), "Total Number of App", len(test_apps)
     inforTrack[consts.DISCOVERED_APP] += len(correct_app) * 1.0 / len(test_apps)
     inforTrack[consts.PRECISION] += correct * 1.0 / recall
-    inforTrack[consts.RECALL] += recall * 1.0 / len(test_set) * 1.0
+    inforTrack[consts.RECALL] += recall * 1.0 / len(testSet) * 1.0
     return rst
 
 
@@ -191,19 +196,19 @@ def cross_batch_test(train_tbls, test_tbl, appType):
     discoveried_app = 0
 
     set_pair = []
-    test_set = {record.id:record for record in load_pkgs(limit =LIMIT, filterFunc = keep_exp_app , DB = test_tbl, appType =appType)}
-    set_pair.append((records, test_set))
+    testSet = {record.id:record for record in load_pkgs(limit =LIMIT, filterFunc = keep_exp_app , DB = test_tbl, appType =appType)}
+    set_pair.append((records, testSet))
 
     apps = set()
-    for k,v in test_set.iteritems():
+    for k,v in testSet.iteritems():
         apps.add(v.app)
-    print "len of apps", len(apps), "len of test set", len(test_set)
+    print "len of apps", len(apps), "len of test set", len(testSet)
 
     inforTrack = { consts.DISCOVERED_APP : 0.0, consts.PRECISION : 0.0, consts.RECALL : 0.0}
 
-    for train_set, test_set in set_pair:
+    for trainSet, testSet in set_pair:
         correct = 0
-        rst = execute(train_set, test_set, inforTrack,appType)
+        rst = execute(trainSet, testSet, inforTrack,appType)
         if INSERT:
           print "INSERTING"
           insert_rst(rst, test_tbl)

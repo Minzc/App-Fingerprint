@@ -116,13 +116,15 @@ class HostApp(AbsClassifer):
         secdomain = pkg.secdomain.replace('-', '.')
         refer_host = pkg.refer_host
         refer_top_domain = get_top_domain(refer_host)
+        predict = consts.NULLPrediction
         label = None
         for url in [host, secdomain, refer_host, refer_top_domain]:
           label = self.rules[ruleType].get(url, None)
           if label != None:
+            predict = consts.Prediction(label, 1, url)
             break
 
-        rst[ruleType] = (label, 1.0)
+        rst[ruleType] = predict
       return rst
 
     '''    

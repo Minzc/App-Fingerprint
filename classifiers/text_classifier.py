@@ -15,14 +15,21 @@ class TextClassifier(AbsClassifer):
     appInfos = AppInfos
     fAppCounter = defaultdict(set)
     fCompanyCounter = defaultdict(set)
-    for app in appInfos[consts.IOS]:
+    for key, app in appInfos[consts.IOS].items():
       pkgSegs = app.package.split('.')
       count(pkgSegs)
       nameSegs = app.name.split(' ')
       count(nameSegs)
       companySegs = app.company.split(' ')
     
-    rules = 
+    rules = {consts.APP_RULE:{}, consts.COMPANY_RULE:{}, consts.CATEGORY_RULE:{}}
+    for seg, apps in fAppCounter.iteritems():
+      if len(apps) == 1:
+        print 'Feature: %s App: %s' % (seg, apps.pop())
 
 
+  def load_rules(self):
+    pass
 
+  def classify(self, pkg, ruleType):
+    pass

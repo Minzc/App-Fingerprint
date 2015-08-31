@@ -33,7 +33,10 @@ class AppInformations:
         self.apps[consts.IOS][bundleId] = appInfo
     sqldao.close()
 
-  def get(self, app_type, query):
-    return self.apps[app_type].get(query, None)
+  def get(self, appType, query):
+    return self.apps[appType].get(query, None)
+
+  def __getitem__(self, appType):
+    return self.apps[appType]
 
 AppInfos = AppInformations()

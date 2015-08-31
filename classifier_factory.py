@@ -1,6 +1,6 @@
 from classifiers.agent_classifier import AgentClassifier
 from classifiers.algo import KVClassifier
-from classifiers.classifier import HeaderClassifier
+from classifiers.head import HeaderClassifier
 from classifiers.host import HostApp
 from classifiers.fp import CMAR
 import consts

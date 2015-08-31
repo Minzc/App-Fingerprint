@@ -36,26 +36,10 @@ class AgentClassifier(AbsClassifer):
       agent_segs = self.clean_agent(pkg.agent)
       map(lambda seg: self.agentLabel[seg].add(label), agent_segs)
 
-    # def count(self, pkg):
-    #   def addCommonStr(agent, label, feature_str):
-    #     common_str = longest_common_substring(agent.lower(), feature_str.lower())
-    #     if len(common_str) > 2:
-    #         self.agentLabel[common_str].add(label)
-
-    #   label = pkg.label
-    #   agent = pkg.agent
-    #   package = pkg.appInfo.package
-    #   company = pkg.appInfo.company
-    #   name = pkg.appInfo.name
-    #   map(lambda feature_str: addCommonStr(agent, label, feature_str), [package, company, name])
-    #   agent = self.clean_agent(agent)
-    #   map(lambda feature_str: self.agentLabel[feature_str].add(label), filter(None, agent.split(' ')))
-    #   agent = re.sub('[/].*', '', pkg.agent)
-    #   self.agentLabel[agent].add(label)
 
     def _clean_db(self, ruleType):
       QUERY = consts.SQL_DELETE_AGENT_RULES
-      print QUERY
+      print ">>> [Agent Classifier]", QUERY
       sqldao = SqlDao()
       sqldao.execute(QUERY % (ruleType))
       sqldao.close()
@@ -67,7 +51,7 @@ class AgentClassifier(AbsClassifer):
       # Generate Rules
       ########################
       
-      print test_str in self.agentLabel
+      # print test_str in self.agentLabel
 
       for agent, labels in self.agentLabel.iteritems():
         if agent == test_str:
@@ -85,8 +69,7 @@ class AgentClassifier(AbsClassifer):
             self.rules[ruleType][agent] = ''
 
 
-      print 'number of rule', len(self.rules[consts.APP_RULE])
-      print 'persist'
+      print '>>> [Agent Classifier] Number of Rule', len(self.rules[consts.APP_RULE])
       self.persist(self.rules, ruleType)
       self.__init__()
       return self
@@ -113,10 +96,9 @@ class AgentClassifier(AbsClassifer):
           wordList = filter(lambda seg: len(self.rules[ruleType][seg]) > 1, wordList)
           longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 0 else ''
           label = self.rules[ruleType].get(longestWord)
-          # if len(wordList) < 0:
-          #     print wordList, 'longestword:', longestWord, 'label:', label 
 
-        rst[ruleType] = (label, 1.0)
+        rst[ruleType] = consts.Prediction(label, 1.0, longestWord) if label else consts.NULLPrediction
+
         if label != None and label != pkg.app and ruleType == consts.APP_RULE:
           print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:',pkg.app, 'Prediction:',label, 'Longestword:',longestWord
       return rst

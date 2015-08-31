@@ -251,39 +251,15 @@ class CMAR:
     '''
     labelRsts = {}
     features = _get_package_f(package)
-    rst = (None, 0, None)
     for rule_type, rules in self.rules.iteritems():
+      rst = consts.NULLPrediction
       max_confidence = 0
       if package.host in rules.keys():
           for rule, label_confidence in rules[package.host].iteritems():
               label, confidence = label_confidence
               if rule.issubset(features): #and confidence > max_confidence:
                 max_confidence = confidence
-                rst = (label, confidence, rule)
+                rst = consts.Prediction(label, confidence, rule)
 
-      labelRsts[rule_type] = rst 
+      labelRsts[rule_type] = rst
     return labelRsts
-
-  # def persist(self):
-  #   rules = self.rules
-  #   self._clean_db()
-  #   sqldao = SqlDao()
-  #   QUERY = 'INSERT INTO patterns (label, pattens, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
-  #   counter = 0
-  #   for rule_type in rules:
-  #     params = []
-  #     for host in rules[rule_type]:
-  #       for pattern in rules[rule_type][host]:
-  #         label, confidence = rules[rule_type][host][pattern]
-  #         counter += 1
-  #         params.append((label, ','.join(pattern), confidence, 0, host, rule_type))
-      
-  #     sqldao.executeBatch(QUERY, params)
-  #     sqldao.close()
-  #     print ">>> [CMAR] Total Number of Rules is %s Rule type is %s" % (counter, rule_type)
-  
-
-
-if __name__ == '__main__':
-    if sys.argv[1] == 'mine':
-        mining_fp_local(sys.argv[2], tSupport=int(sys.argv[3]), tConfidence=float(sys.argv[4]))

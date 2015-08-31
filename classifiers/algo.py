@@ -105,32 +105,30 @@ class KVClassifier(AbsClassifer):
     predictRst = {}
     for ruleType in self.rules:
       for host, queries in [(pkg.host, pkg.queries), (pkg.refer_host, pkg.refer_queries)]:
-        maxScore, occurCount = -1, -1
-        prediction = None
-        evidence = (None, None)
+        occurCount = -1, -1
+        rst = consts.NULLPrediction
 
         for k, kRules in self.rules[ruleType].get(host, {}).iteritems():
           for v in queries.get(k, []):          
             for label, scoreNcount in kRules.get(v, {}).iteritems():
               score, count = scoreNcount[consts.SCORE], scoreNcount[consts.SUPPORT]
 
-              if score > maxScore or (score == maxScore and count > occurCount):
-                prediction = label
-                maxScore, occurCount = score, count
+              if score > rst.score or (score == rst.score and count > occurCount):
+                occurCount = count
                 evidence = (k, v)
-              elif not prediction:
-               #print 'value not in rules', k.encode('utf-8'), v.encode('utf-8'), pkg.app
-                pass
-        predictRst[ruleType] = (prediction, maxScore, evidence[0], evidence[1])
+                rst = consts.Prediction(label, score, evidence)
+
+        predictRst[ruleType] = rst
         
-        # If we can not prediction based on kv in urls, use suffix tree to try again
-        if not predictRst[consts.APP_RULE][0]:
+        # If we can not predict based on kv in urls, use suffix tree to try again
+        if not predictRst[consts.APP_RULE].label:
           for k, values in queries.iteritems():
             label = map(lambda v : self.classify_suffix_app(v), values)
-            predictRst[consts.APP_RULE] = (label[0], 1, k)
+            if label[0] != None:
+              predictRst[consts.APP_RULE] = consts.Prediction(label[0], 1, (k, label[0]))
 
         # If we can predict based on original url, we do not need to use refer url to predict again
-        if predictRst[ruleType][0] != None:
+        if predictRst[ruleType].label != None:
           break
 
 
