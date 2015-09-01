@@ -111,7 +111,7 @@ class AgentClassifier(AbsClassifer):
         agent = re.sub('[/].*', '', pkg.agent)
         label = self.rules[ruleType].get(agent + '/')
         if not label:
-          wordList = backward_maxmatch(pkg.agent, set(self.rules[ruleType].keys()), len(pkg.agent), 5)
+          wordList = backward_maxmatch(pkg.agent, set(self.rules[ruleType].keys()), len(pkg.agent), 3)
           wordList = filter(lambda seg: len(self.rules[ruleType][seg]) > 1, wordList)
           longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 0 else ''
           label = self.rules[ruleType].get(longestWord)
