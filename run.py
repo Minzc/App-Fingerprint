@@ -1,4 +1,3 @@
-from sklearn.cross_validation import KFold
 import datetime
 from sqldao import SqlDao
 from utils import load_pkgs, load_exp_app
