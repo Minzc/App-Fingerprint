@@ -32,6 +32,7 @@ def generate_agent_rules():
 
 def generate_host_rules():
   fileWriter = open('host.rule.head', 'w')
+  fileWriter.write('# IDS rule version=6.639 2015/05/04 11:23:50  syntax=1  fortios=501\n')
   fileWriter.write('F-SGROUP( --name ios_app; )\n')
   trainedClassifiers = [
       #consts.HEAD_CLASSIFIER,
@@ -57,6 +58,7 @@ def generate_host_rules():
 
 def generate_path_rules():
   fileWriter = open('host.rule.head', 'w')
+  fileWriter.write('# IDS rule version=6.639 2015/05/04 11:23:50  syntax=1  fortios=501\n')
   fileWriter.write('F-SGROUP( --name ios_app; )\n')
   trainedClassifiers = [
       #consts.HEAD_CLASSIFIER,
