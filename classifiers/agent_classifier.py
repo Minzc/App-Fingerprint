@@ -34,7 +34,7 @@ class AgentClassifier(AbsClassifer):
       self.agentLabel[agent].add(label)
       self.agentLabel[label].add(label)
       agent_segs = self.clean_agent(pkg.agent)
-      map(lambda seg: self.agentLabel[seg].add(label), agent_segs)
+      map(lambda seg: self.agentLabel[seg].add(label), filter(lambda seg : len(seg) > 3, agent_segs))
 
 
     def _clean_db(self, ruleType):
@@ -43,6 +43,22 @@ class AgentClassifier(AbsClassifer):
       sqldao = SqlDao()
       sqldao.execute(QUERY % (ruleType))
       sqldao.close()
+    
+    def _prune(self):
+      for ruleType in self.rules:
+        prunedRules = {}
+        for agentFeatureA in self.rules[ruleType]:
+          ifAdd = True
+          for agentFeatureB in self.rules[ruleType]:
+            if agentFeatureA != agentFeatureB and agentFeatureB in agentFeatureA:
+              if self.rules[ruleType][agentFeatureA] == self.rules[ruleType][agentFeatureB] :
+                ifAdd = False
+              else:
+                ifAdd = True
+                break
+          if ifAdd:
+            prunedRules[agentFeatureA] = self.rules[ruleType][agentFeatureA]
+        self.rules[ruleType] = prunedRules
 
     def train(self, records, ruleType):
       for pkg in [pkg for pkgs in records.values() for pkg in pkgs]:
@@ -70,6 +86,9 @@ class AgentClassifier(AbsClassifer):
 
 
       print '>>> [Agent Classifier] Number of Rule', len(self.rules[consts.APP_RULE])
+      self._prune()
+      print '>>> [Agent Classifier] Number of Rule After Pruning', len(self.rules[consts.APP_RULE])
+
       self.persist(self.rules, ruleType)
       self.__init__()
       return self

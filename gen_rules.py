@@ -23,7 +23,7 @@ def generate_agent_rules():
   for ruleType in classifier.rules:
     for agentFeature, label in classifier.rules[ruleType].items():
       pcre = re.escape('User-Agent:')+'.*' + re.escape(agentFeature)
-      fileWriter.write(ruleTmplate % (vulnID, 1, label, 1, iosGroup, 'tcp', 'HTTP', 'from_client', pcre, 'header', 10))
+      fileWriter.write(ruleTmplate % (vulnID, 1, label, 1, iosGroup, 'tcp', 'HTTP', 'from_client', pcre, 'header', len(agentFeature)))
       vulnID += 1
   fileWriter.close()
 
