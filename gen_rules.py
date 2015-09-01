@@ -4,6 +4,7 @@ import re
 ruleTmplate = 'F-SBID( --vuln_id %s; --attack_id %s; --name "%s"; --revision %s; --group %s; --protocol %s; --service %s; --flow %s; --pcre "/%s/i"; --context %s;  --weight %s;)\n'
 def generate_agent_rules():
   fileWriter = open('agent.rule.head', 'w')
+  fileWriter.write('# IDS rule version=6.639 2015/05/04 11:23:50  syntax=1  fortios=501\n')
   fileWriter.write('F-SGROUP( --name ios_app; )\n')
   trainedClassifiers = [
       #consts.HEAD_CLASSIFIER,
