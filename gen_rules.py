@@ -1,6 +1,7 @@
 from classifier_factory import classifier_factory
 import consts
 import re
+import sys
 ruleTmplate = 'F-SBID( --vuln_id %s; --attack_id %s; --name "%s"; --revision %s; --group %s; --protocol %s; --service %s; --flow %s; --pcre "/%s/i"; --context %s;  --weight %s;)\n'
 def generate_agent_rules():
   fileWriter = open('agent.rule.head', 'w')
@@ -78,4 +79,19 @@ def generate_path_rules():
       vulnID += 1
   fileWriter.close()
 
-generate_agent_rules()
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Generate rule in ips format')
+    parser.add_argument('-t', metavar='agent/host/path', help='rule type')
+    # parser.add_argument('-apptype', metavar='apptype', help='apptype')
+    args = parser.parse_args()
+
+    test_tbl = None
+    if args.t == 'agent':
+      generate_agent_rules()
+    elif args.t == 'host':
+      generate_host_rules()
+    elif args.t == 'path':
+      generate_path_rules()
+    else:
+      parser.print_help()
+
