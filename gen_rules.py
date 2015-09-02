@@ -3,7 +3,10 @@ import argparse
 import consts
 import re
 import sys
-ruleTmplate = 'F-SBID( --vuln_id %s; --attack_id %s; --name "%s"; --revision %s; --group %s; --protocol %s; --service %s; --flow %s; --pcre "/%s/i"; --context %s;  --weight %s;)\n'
+ruleTmplate = 'F-SBID( --vuln_id %s; --attack_id %s; --name "%s"; --revision %s; --group %s; --protocol %s; --service %s; --flow %s; --%s "/%s/i"; --context %s;  --weight %s;)\n'
+PATTERN = 'pattern'
+PCRE = 'pcre'
+
 def generate_agent_rules():
   fileWriter = open('agent.rule.head', 'w')
   fileWriter.write('# IDS rule version=6.639 2015/05/04 11:23:50  syntax=1  fortios=501\n')
@@ -25,8 +28,8 @@ def generate_agent_rules():
   for ruleType in classifier.rules:
     for agentFeature, label in classifier.rules[ruleType].items():
       if len(label) > 1:
-        pcre = re.escape('User-Agent:')+'.*' + re.escape(agentFeature)
-        fileWriter.write(ruleTmplate % (vulnID, 1, label, 1, iosGroup, 'tcp', 'HTTP', 'from_client', pcre, 'header', len(agentFeature)))
+        patternRegex = re.escape('User-Agent:')+'.*' + re.escape(agentFeature)
+        fileWriter.write(ruleTmplate % (vulnID, 1, label, 1, iosGroup, 'tcp', 'HTTP', 'from_client', PCRE, patternRegex, 'header', len(agentFeature)))
         vulnID += 1
   fileWriter.close()
 
@@ -50,9 +53,8 @@ def generate_host_rules():
 
   for ruleType in classifier.rules:
     for host, label in classifier.rules[ruleType].items():
-      pcre = host
-      pcre = re.escape(pcre)
-      fileWriter.write(ruleTmplate % (vulnID, 1, label, 1, iosGroup, 'tcp', 'HTTP', 'from_client', pcre, 'host', 9))
+      pattern = host
+      fileWriter.write(ruleTmplate % (vulnID, 1, label, 1, iosGroup, 'tcp', 'HTTP', 'from_client', PATTERN, pattern, 'host', 9))
       vulnID += 1
   fileWriter.close()
 
@@ -75,7 +77,7 @@ def generate_path_rules():
   iosGroup = 'ios_app'
 
   for ruleType in classifier.rules:
-    for agentFeature, label in classifier.rules[ruleType].items():
+    for cmarFeature, label in classifier.rules[ruleType].items():
       pcre = 'User-Agent:.*' + agentFeature
       pcre = re.escape(pcre)
       fileWriter.write(ruleTmplate % (vulnID, 1, label, 1, iosGroup, 'tcp', 'HTTP', 'from_client', pcre, 'uri', 8))
