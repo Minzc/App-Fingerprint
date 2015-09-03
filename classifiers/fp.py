@@ -249,20 +249,16 @@ class CMAR:
     Return {type:[(label, confidence)]}
     '''
     labelRsts = {}
-    features = _get_package_f(package)
-    features2 = _get_package_f(package)[:-1]
+    features = _get_package_f(package)[:-1]
     for rule_type, rules in self.rules.iteritems():
       rst = consts.NULLPrediction
       max_confidence = 0
       if package.host in rules.keys():
           for rule, label_confidence in rules[package.host].iteritems():
               label, confidence = label_confidence
-              if rule.issubset(features2): #and confidence > max_confidence:
+              if rule.issubset(features): #and confidence > max_confidence:
                 max_confidence = confidence
                 rst = consts.Prediction(label, confidence, rule)
-              elif rule.issubset(features): 
-                print package.app
-                print features
 
       labelRsts[rule_type] = rst
     return labelRsts
