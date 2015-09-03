@@ -53,7 +53,7 @@ def generate_agent_rules(vulnID = 100000):
       if len(label) > 1:
         rule = Rule(vulnID, label, IOS_GROUP, len(agentFeature))
         patternRegex = re.escape('User-Agent:')+'.*' + re.escape(agentFeature)
-        rule.add_feature_str(PCRE, patternRegex, 'head')
+        rule.add_feature_str(PCRE, patternRegex, 'header')
         rules.append(rule)
         vulnID += 1
   return rules
