@@ -28,7 +28,8 @@ class Rule:
   def to_string(self):
     patternStr = ''
     for patternType, featureStr, context in self.features:
-      patternStr += (patternTmplate % (patternType, featureStr, context)).encode('utf-8')
+      patternStr += patternTmplate % (patternType, featureStr, context)
+
     return ruleTmplate % (self.vulnID, self.attachID, self.name, self.revision, self.group, self.protocol, self.service, self.flow, self.weight, patternStr)
 
 def output_rules(name, rules):
@@ -36,7 +37,7 @@ def output_rules(name, rules):
   fileWriter.write('# IDS rule version=6.639 2015/05/04 11:23:50  syntax=1  fortios=501\n')
   fileWriter.write('F-SGROUP( --name ios_app; )\n')
   for rule in rules:
-    fileWriter.write(rule.to_string()+'\n')
+    fileWriter.write(rule.to_string().encode('utf-8')+'\n')
   fileWriter.close()
 
 def generate_agent_rules():

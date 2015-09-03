@@ -16,7 +16,7 @@ def _get_package_f(package):
     """Get package features"""
     features = filter(None, package.path.split('/'))
     if package.json : features += package.json
-    features.append(package.agent)
+    # features.append(package.agent)
     host = package.host if package.host else package.dst
     features.append(host)
 
