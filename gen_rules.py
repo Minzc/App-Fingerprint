@@ -135,7 +135,7 @@ def generate_path_rules():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate rule in ips format')
-    parser.add_argument('-t', metavar='agent/host/path', help='rule type')
+    parser.add_argument('-t', metavar='agent/host/path/kv', help='rule type')
     # parser.add_argument('-apptype', metavar='apptype', help='apptype')
     args = parser.parse_args()
 
