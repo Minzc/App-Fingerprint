@@ -110,6 +110,7 @@ def generate_path_rules():
       for cmarFeatures, labelConfidence in patterns.items():
         label, confidence = labelConfidence
         rule = Rule(vulnID, label, IOS_GROUP, 7)
+        rule.add_feature_str(PCRE, host, 'host')
         for feature in cmarFeatures:
           feature = re.escape(feature)
           rule.add_feature_str(PCRE, feature, 'uri')

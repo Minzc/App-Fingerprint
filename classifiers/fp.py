@@ -260,6 +260,7 @@ class CMAR:
                 max_confidence = confidence
                 rst = consts.Prediction(label, confidence, rule)
                 print package.app
+                print rule
 
       labelRsts[rule_type] = rst
     return labelRsts
