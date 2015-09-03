@@ -22,7 +22,7 @@ class Rule:
     self.weight = weight
     self.features = []
   
-  def add_feature_str(patternType, featureStr, context):
+  def add_feature_str(self, patternType, featureStr, context):
     self.features.append((patternType, featureStr, context))
 
   def to_string(self):
