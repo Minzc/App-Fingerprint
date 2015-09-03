@@ -16,7 +16,7 @@ class Rule:
     self.attachID = 1
     self.revision = 1
     self.group = group
-    self.protocal = 'tcp'
+    self.protocol = 'tcp'
     self.service = 'HTTP'
     self.flow = 'from_client'
     self.weight = weight
