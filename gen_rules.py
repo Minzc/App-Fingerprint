@@ -105,13 +105,15 @@ def generate_path_rules():
   
   rules = []
   for ruleType in classifier.rules:
-    for cmarFeature, label in classifier.rules[ruleType].items():
-      rule = Rule(vulnID, label, IOS_GROUP, 7)
-      for feature in cmarFeature:
-        feature = re.escape(feature)
-        rule.add_feature_str(PCRE, feature, 'uri')
-      vulnID += 1
-      rules.append(rule)
+    for host, patterns in classifier.rules[ruleType].items():
+      for cmarFeatures, labelConfidence in patterns.items():
+        label, confidence = labelConfidence
+        rule = Rule(vulnID, label, IOS_GROUP, 7)
+        for feature in cmarFeatures:
+          feature = re.escape(feature)
+          rule.add_feature_str(PCRE, feature, 'uri')
+        vulnID += 1
+        rules.append(rule)
   output_rules('cmar.rule.head', rules)
 
 if __name__ == '__main__':
