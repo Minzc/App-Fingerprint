@@ -14,7 +14,7 @@ Rule = namedtuple('Rule', 'rule, label, host, confidence, support')
 
 def _get_package_f(package):
     """Get package features"""
-    features = filter(None, package.path.split('/'))
+    features = filter(None, map(lambda x: x.strip(), package.path.split('/')))
     if package.json : features += package.json
     # features.append(package.agent)
     host = package.host if package.host else package.dst
@@ -230,7 +230,7 @@ class CMAR:
     SQL = consts.SQL_SELECT_CMAR_RULES
     for label, patterns, host, rule_type, confidence in sqldao.execute(SQL):
       counter += 1
-      patterns = frozenset(patterns.split(","))
+      patterns = frozenset(map(lambda x: x.strip(), patterns.split(",")))
       self.rules[rule_type][host][patterns] = (label, confidence)
     sqldao.close()
     print '>>>[CMAR] Totaly number of rules is', counter
