@@ -259,6 +259,7 @@ class CMAR:
               if rule.issubset(features): #and confidence > max_confidence:
                 max_confidence = confidence
                 rst = consts.Prediction(label, confidence, rule)
+                print package.app
 
       labelRsts[rule_type] = rst
     return labelRsts
