@@ -146,6 +146,8 @@ if __name__ == '__main__':
       generate_host_rules()
     elif args.t == 'path':
       generate_path_rules()
+    elif args.t == 'kv':
+      generate_kv_rules()
     else:
       parser.print_help()
 
