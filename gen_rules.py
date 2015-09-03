@@ -59,7 +59,7 @@ def generate_agent_rules():
       if len(label) > 1:
         rule = Rule(vulnID, label, IOS_GROUP, len(agentFeature))
         patternRegex = re.escape('User-Agent:')+'.*' + re.escape(agentFeature)
-        rule.set_label(PCRE, patternRegex, 'head')
+        rule.add_feature_str(PCRE, patternRegex, 'head')
         rules.append(rule)
         vulnID += 1
   output_rules('agent.rule.head', rules)
@@ -83,7 +83,7 @@ def generate_host_rules():
     for host, label in classifier.rules[ruleType].items():
       pattern = host
       rule = Rule(vulnID, label, IOS_GROUP, 9)
-      rule.set_label(PCRE, pattern, 'host')
+      rule.add_feature_str(PCRE, pattern, 'host')
       vulnID += 1
       rules.append(rule)
   output_rules('host.rule.head', rules)
@@ -109,7 +109,7 @@ def generate_path_rules():
       rule = Rule(vulnID, label, IOS_GROUP, 7)
       for feature in cmarFeature:
         feature = re.escape(feature)
-        rule.set_label(PCRE, feature, 'uri')
+        rule.add_feature_str(PCRE, feature, 'uri')
       vulnID += 1
       rules.append(rule)
   output_rules('cmar.rule.head', rules)
