@@ -9,8 +9,8 @@ PATTERN = 'pattern'
 PCRE = 'pcre'
 IOS_GROUP = 'ios_app'
 class Rule:
-  def __init__(self, vunlnID, name, group, weight):
-    self.vunlnID = vunlnID
+  def __init__(self, vulnID, name, group, weight):
+    self.vulnID = vulnID
     self.name = name
     self.group = group
     self.attachID = 1
@@ -29,7 +29,7 @@ class Rule:
     patternStr = ''
     for patternType, featureStr, context in self.features:
       patternStr += patternTmplate % (patternType, featureStr, context)
-    return ruleTmplate % (self.vunlnID, self.attachID, self.name, self.revision, self.group, self.protocol, self.service, self.flow, self.weight, patternStr)
+    return ruleTmplate % (self.vulnID, self.attachID, self.name, self.revision, self.group, self.protocol, self.service, self.flow, self.weight, patternStr)
 
 def output_rules(name, rules):
   fileWriter = open(name, 'w')
@@ -57,7 +57,7 @@ def generate_agent_rules():
   for ruleType in classifier.rules:
     for agentFeature, label in classifier.rules[ruleType].items():
       if len(label) > 1:
-        rule = Rule(vunlnID, label, IOS_GROUP, len(agentFeature))
+        rule = Rule(vulnID, label, IOS_GROUP, len(agentFeature))
         patternRegex = re.escape('User-Agent:')+'.*' + re.escape(agentFeature)
         rule.set_label(PCRE, patternRegex, 'head')
         rules.append(rule)
@@ -82,7 +82,7 @@ def generate_host_rules():
   for ruleType in classifier.rules:
     for host, label in classifier.rules[ruleType].items():
       pattern = host
-      rule = Rule(vunlnID, label, IOS_GROUP, 9)
+      rule = Rule(vulnID, label, IOS_GROUP, 9)
       rule.set_label(PCRE, pattern, 'host')
       vulnID += 1
       rules.append(rule)
@@ -106,7 +106,7 @@ def generate_path_rules():
   rules = []
   for ruleType in classifier.rules:
     for cmarFeature, label in classifier.rules[ruleType].items():
-      rule = Rule(vunlnID, label, IOS_GROUP, 7)
+      rule = Rule(vulnID, label, IOS_GROUP, 7)
       for feature in cmarFeature:
         feature = re.escape(feature)
         rule.set_label(PCRE, feature, 'uri')
