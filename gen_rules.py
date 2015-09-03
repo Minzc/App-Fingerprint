@@ -28,7 +28,7 @@ class Rule:
   def to_string(self):
     patternStr = ''
     for patternType, featureStr, context in self.features:
-      patternStr += patternTmplate % (patternType, featureStr, context)
+      patternStr += (patternTmplate % (patternType, featureStr, context)).encode('utf-8')
     return ruleTmplate % (self.vulnID, self.attachID, self.name, self.revision, self.group, self.protocol, self.service, self.flow, self.weight, patternStr)
 
 def output_rules(name, rules):
