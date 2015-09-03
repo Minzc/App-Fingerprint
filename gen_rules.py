@@ -99,8 +99,8 @@ def generate_kv_rules():
   
   rules = []
   for ruleType, rules in classifier.rules.items():
-    for host, keyVaules in rules.items():
-      for key, valueLabels in key.items():
+    for host, keyValues in rules.items():
+      for key, valueLabels in keyValues.items():
         for value, labelScores in valueLabels.items():
           for label, _ in labelScores.items():
             rule = Rule(vulnID, label, IOS_GROUP, 5)
