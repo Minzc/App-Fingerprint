@@ -58,7 +58,7 @@ class KVClassifier(AbsClassifer):
     for secdomain in generalRules:
       generalRules[secdomain] = sorted(generalRules[secdomain], key=lambda rule: rule.score, reverse = True)
 
-    print ">>>[HOST] generalRules", len(generalRules)
+    print ">>>[KV] generalRules", len(generalRules)
     #############################
     # Generate specific rules
     #############################
@@ -68,7 +68,8 @@ class KVClassifier(AbsClassifer):
       for pkg in filter(lambda pkg : pkg.secdomain in generalRules, pkgs):
         for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.secdomain]):
           for value in pkg.queries[rule.key]:
-            if len(self.valueLabelCounter[value]) == 1:
+            value = value.strip()
+            if len(self.valueLabelCounter[value]) == 1 and len(value) == 1:
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT] += 1
 
