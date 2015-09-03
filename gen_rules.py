@@ -137,6 +137,12 @@ if __name__ == '__main__':
     elif args.t == 'kv':
       rules = generate_kv_rules()
       output_rules('kv.rule.head', rules)
+    elif args.t == 'all':
+      rules = generate_agent_rules(vulnID = 100000)
+      rules += generate_host_rules(vulnID = 200000)
+      rules += generate_path_rules(vulnID = 300000)
+      rules += generate_kv_rules(vulnID = 400000)
+      output_rules('all.rules', rules)
     else:
       parser.print_help()
 
