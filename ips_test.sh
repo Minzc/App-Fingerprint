@@ -1,3 +1,4 @@
+#!/bin/bash
 RULE_FILE_NAME='kv.rule.head'
 RULE_FILE_NAME_BIN="$RULE_FILE_NAME".bin
 FILES=~/pcaps/ios/usa/mingxiao1998-outlook/20150812/*
