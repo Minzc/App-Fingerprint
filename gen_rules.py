@@ -89,14 +89,29 @@ def generate_host_rules():
       rules.append(rule)
   output_rules('host.rule.head', rules)
 
+def generate_kv_rules():
+  trainedClassifiers = [ consts.KV_CLASSIFIER ]
+  appType = consts.IOS
+  classifier = classifier_factory(trainedClassifiers, appType)[0][1]
+  classifier.load_rules()
+  vulnID = 400001
+  iosGroup = 'ios_app'
+  
+  rules = []
+  for ruleType, rules in classifier.rules.items():
+    for host, keyVaules in rules.items():
+      for key, valueLabels in key.items():
+        for value, labelScores in valueLabels.items():
+          for label, _ in labelScores.items():
+            rule = Rule(vulnID, label, IOS_GROUP, 5)
+            rule.add_feature_str(PCRE, host, 'host')
+            rule.add_feature_str(PCRE, key+'='+value, 'uri')
+            vulnID += 1
+  output_rules('kv.rule.head', rules)
+
+
 def generate_path_rules():
-  trainedClassifiers = [
-      #consts.HEAD_CLASSIFIER,
-      #consts.AGENT_CLASSIFIER,
-      #consts.HOST_CLASSIFIER,
-      consts.CMAR_CLASSIFIER,
-      #consts.KV_CLASSIFIER,
-  ]
+  trainedClassifiers = [ consts.CMAR_CLASSIFIER ]
 
   appType = consts.IOS
   classifier = classifier_factory(trainedClassifiers, appType)[0][1]
