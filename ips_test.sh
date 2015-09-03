@@ -6,4 +6,5 @@ FILES=~/pcaps/ios/usa/mingxiao1998-outlook/20150812/*
 for f in ~/pcaps/ios/usa/mingxiao1998-outlook/20150812/*
 do 
   echo 'Processing', $f
+  ./iscan -akpvr $RULE_FILE_NAME_BIN $f
 done
