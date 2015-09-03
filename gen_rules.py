@@ -40,19 +40,12 @@ def output_rules(name, rules):
     fileWriter.write(rule.to_string().encode('utf-8')+'\n')
   fileWriter.close()
 
-def generate_agent_rules():
-  trainedClassifiers = [
-      #consts.HEAD_CLASSIFIER,
-      consts.AGENT_CLASSIFIER,
-      #consts.HOST_CLASSIFIER,
-      #consts.CMAR_CLASSIFIER,
-      #consts.KV_CLASSIFIER,
-  ]
+def generate_agent_rules(vulnID = 100000):
+  trainedClassifiers = [ consts.AGENT_CLASSIFIER, ]
 
   appType = consts.IOS
   classifier = classifier_factory(trainedClassifiers, appType)[0][1]
   classifier.load_rules()
-  vulnID = 100001
   iosGroup = 'ios_app'
   rules = []
   for ruleType in classifier.rules:
@@ -63,54 +56,46 @@ def generate_agent_rules():
         rule.add_feature_str(PCRE, patternRegex, 'head')
         rules.append(rule)
         vulnID += 1
-  output_rules('agent.rule.head', rules)
+  return rules
 
-def generate_host_rules():
-  trainedClassifiers = [
-      #consts.HEAD_CLASSIFIER,
-      #consts.AGENT_CLASSIFIER,
-      consts.HOST_CLASSIFIER,
-      #consts.CMAR_CLASSIFIER,
-      #consts.KV_CLASSIFIER,
-  ]
-
+def generate_host_rules(vulnID = 200000):
+  trainedClassifiers = [ consts.HOST_CLASSIFIER, ] 
   appType = consts.IOS
   classifier = classifier_factory(trainedClassifiers, appType)[0][1]
   classifier.load_rules()
-  vulnID = 200001
   iosGroup = 'ios_app'
   rules = []
   for ruleType in classifier.rules:
     for host, label in classifier.rules[ruleType].items():
-      pattern = host
       rule = Rule(vulnID, label, IOS_GROUP, 9)
+      pattern = re.escape(host)
       rule.add_feature_str(PCRE, pattern, 'host')
       vulnID += 1
       rules.append(rule)
-  output_rules('host.rule.head', rules)
+  return rules
 
-def generate_kv_rules():
+def generate_kv_rules(vulnID = 300000):
   trainedClassifiers = [ consts.KV_CLASSIFIER ]
   appType = consts.IOS
   classifier = classifier_factory(trainedClassifiers, appType)[0][1]
   classifier.load_rules()
-  vulnID = 400001
   iosGroup = 'ios_app'
   
-  rules = []
+  ipsRules = []
   for ruleType, rules in classifier.rules.items():
     for host, keyValues in rules.items():
       for key, valueLabels in keyValues.items():
         for value, labelScores in valueLabels.items():
           for label, _ in labelScores.items():
             rule = Rule(vulnID, label, IOS_GROUP, 5)
-            rule.add_feature_str(PCRE, host, 'host')
-            rule.add_feature_str(PCRE, key+'='+value, 'uri')
+            rule.add_feature_str(PCRE, re.escape(host), 'host')
+            rule.add_feature_str(PCRE, re.escape(key+'='+value), 'uri')
+            ipsRules.append(rule)
             vulnID += 1
-  output_rules('kv.rule.head', rules)
+  return ipsRules
 
 
-def generate_path_rules():
+def generate_path_rules(vulnID = 400000):
   trainedClassifiers = [ consts.CMAR_CLASSIFIER ]
 
   appType = consts.IOS
@@ -131,7 +116,7 @@ def generate_path_rules():
           rule.add_feature_str(PCRE, feature, 'uri')
         vulnID += 1
         rules.append(rule)
-  output_rules('cmar.rule.head', rules)
+  return rules
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate rule in ips format')
@@ -141,13 +126,17 @@ if __name__ == '__main__':
 
     test_tbl = None
     if args.t == 'agent':
-      generate_agent_rules()
+      rules = generate_agent_rules()
+      output_rules('agent.rule.head', rules)
     elif args.t == 'host':
-      generate_host_rules()
+      rules = generate_host_rules()
+      output_rules('host.rule.head', rules)
     elif args.t == 'path':
-      generate_path_rules()
+      rules = generate_path_rules()
+      output_rules('cmar.rule.head', rules)
     elif args.t == 'kv':
-      generate_kv_rules()
+      rules = generate_kv_rules()
+      output_rules('kv.rule.head', rules)
     else:
       parser.print_help()
 
