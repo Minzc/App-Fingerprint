@@ -13,6 +13,8 @@ class App:
   def url_clean(self, url):
     url = url.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
     return url
+  def set_ios_id(self, trackId):
+    self.trackId = trackId
 
 class AppInformations:
   def __init__(self):
@@ -29,6 +31,7 @@ class AppInformations:
         trackId = str(trackId)
         bundleId = bundleId.lower()
         appInfo = App(bundleId, trackName, artistName, trackId, sellerUrl, primaryGenreName,consts.IOS)
+        appInfo.set_ios_id(trackId)
         self.apps[consts.IOS][trackId] = appInfo
         self.apps[consts.IOS][bundleId] = appInfo
     sqldao.close()

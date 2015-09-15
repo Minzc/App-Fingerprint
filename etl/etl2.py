@@ -43,6 +43,7 @@ class ETL:
         self.apps = AppInfos
         tmp_apps = {}
         for exp_app in exp_apps:
+          exp_app = exp_app.split(':')[1]
           appInfo = self.apps.get(app_type, exp_app)
           tmp_apps[exp_app] = appInfo
         self.apps = tmp_apps
