@@ -3,7 +3,7 @@ import argparse
 import consts
 import re
 import sys
-from app_info import AppInformations
+from app_info import AppInfos
 
 ruleTmplate = 'F-SBID( --vuln_id %s; --attack_id %s; --name "%s"; --revision %s; --group %s; --protocol %s; --service %s; --flow %s; --weight %s; %s)\n'
 patternTmplate = '--%s "/%s/i"; --context %s; '
@@ -12,9 +12,9 @@ PCRE = 'pcre'
 IOS_GROUP = 'ios_app'
 class Rule:
   def __init__(self, vulnID, name, group, weight):
-    trackID = AppInformations.get(consts.IOS, name)
+    trackID = AppInfos.get(consts.IOS, name).trackId
     self.vulnID = vulnID
-    self.name = name
+    self.name = '[%s]%s' % (trackID, name)
     self.group = group
     self.attachID = 1
     self.revision = 1
