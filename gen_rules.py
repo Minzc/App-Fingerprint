@@ -22,7 +22,7 @@ class Rule:
     self.protocol = 'tcp'
     self.service = 'HTTP'
     self.flow = 'from_client'
-    self.weight = weight
+    self.weight = min(weight, 255)
     self.features = []
   
   def add_feature_str(self, patternType, featureStr, context):
