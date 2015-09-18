@@ -3,7 +3,7 @@ from classifiers.algo import KVClassifier
 from classifiers.head import HeaderClassifier
 from classifiers.host import HostApp
 from classifiers.fp import CMAR
-import consts
+import const.consts as consts
 
 def classifier_factory(names, appType):
   classifiers = []

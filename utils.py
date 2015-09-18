@@ -6,7 +6,7 @@ import re
 import string
 import tldextract
 from sqldao import SqlDao
-from package import Package
+from const.package import Package
 import random
 from const.app_info import AppInfos
 import const.consts as consts

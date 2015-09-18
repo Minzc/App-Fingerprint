@@ -1,9 +1,9 @@
-from classifier_factory import classifier_factory
 import argparse
-import consts
+import const.consts as consts
 import re
 import sys
-from app_info import AppInfos
+from const.app_info import AppInfos
+from classifiers.classifier_factory import classifier_factory
 
 ruleTmplate = 'F-SBID( --vuln_id %s; --attack_id %s; --name "%s"; --revision %s; --group %s; --protocol %s; --service %s; --flow %s; --weight %s; %s)\n'
 patternTmplate = '--%s "/%s/i"; --context %s; '

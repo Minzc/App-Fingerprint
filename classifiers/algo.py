@@ -62,7 +62,7 @@ class KVClassifier(AbsClassifer):
     #############################
     # Generate specific rules
     #############################
-    specificRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:0}))))
+    specificRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:set()}))))
     
     for tbl, pkgs in trainData.iteritems():
       for pkg in filter(lambda pkg : pkg.secdomain in generalRules, pkgs):
@@ -71,7 +71,7 @@ class KVClassifier(AbsClassifer):
             value = value.strip()
             if len(self.valueLabelCounter[value]) == 1 and len(value) != 1:
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
-                specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT] += 1
+                specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT].add(tbl)
 
     #############################
     # Persist rules
@@ -106,18 +106,18 @@ class KVClassifier(AbsClassifer):
     predictRst = {}
     for ruleType in self.rules:
       for host, queries in [(pkg.host, pkg.queries), (pkg.refer_host, pkg.refer_queries)]:
-        occurCount = -1, -1
+        fatherScore = -1
         rst = consts.NULLPrediction
 
         for k, kRules in self.rules[ruleType].get(host, {}).iteritems():
           for v in queries.get(k, []):          
             for label, scoreNcount in kRules.get(v, {}).iteritems():
-              score, count = scoreNcount[consts.SCORE], scoreNcount[consts.SUPPORT]
+              score, support = scoreNcount[consts.SCORE], scoreNcount[consts.SUPPORT]
 
-              if score > rst.score or (score == rst.score and count > occurCount):
-                occurCount = count
+              if support > rst.score or (support == rst.score and score > fatherScore):
+                fatherScore = score
                 evidence = (k, v)
-                rst = consts.Prediction(label, score, evidence)
+                rst = consts.Prediction(label, support, evidence)
 
         predictRst[ruleType] = rst
         
@@ -167,16 +167,8 @@ class KVClassifier(AbsClassifer):
           max_label = None
           for label in patterns[host][key][value]:
             confidence = patterns[host][key][value][label][consts.SCORE]
-            support = patterns[host][key][value][label][consts.SUPPORT]
+            support = len(patterns[host][key][value][label][consts.SUPPORT])
             params.append((label, support, confidence, host, key, value, rule_type))
-            if confidence > max_confidence:
-              max_confidence = confidence
-              max_support = support
-              max_label = label
-            elif confidence == max_confidence and support > max_support:
-              max_support = support
-              max_label = label
-          #params.append((max_label, max_support, max_confidence, host, key+'='+value, rule_type))
     sqldao.executeBatch(QUERY, params)
     sqldao.close()
     print ">>> [KVRules] Total Number of Rules is %s Rule type is %s" % (len(params), rule_type)
