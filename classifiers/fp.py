@@ -34,10 +34,13 @@ def _encode_data(packages=None, minimum_support = 2):
       for package in packages:
           transaction = _get_package_f(package)
           transaction.append(package.label)
+          transaction.append(package.tbl)
           processed_transactions.append(transaction)
-          # Last item is app
-          # Second from last is host. Do not use host as feature
-          for item in transaction[:-2]:
+          # Last item is table name
+          # Second from last is app
+          # Third from last is host. 
+          # Do not use them as feature
+          for item in transaction[:-3]:
             f_counter[item] += 1
             f_company[item].add(package.company)
       # Get frequent 1-item
@@ -51,16 +54,19 @@ def _encode_data(packages=None, minimum_support = 2):
 
     itemIndx = defaultdict(lambda: len(itemIndx))
     packageHost = []
+    packageTbl = []
     def _encode_transaction(transaction):
         """Change string items to numbers"""
-        host = transaction[-2]
-        label = transaction[-1]
+        host = transaction[-3]
+        label = transaction[-2]
+        tbl = transaction[-1]
         # Prune infrequent items
         # Host and app are not included in transaction now
-        encode_transaction = [ itemIndx[item] for item in set(transaction[:-2])
+        encode_transaction = [ itemIndx[item] for item in set(transaction[:-3])
                 if item in items]
 
         packageHost.append(host)
+        packageTbl.append(tbl)
         return (label, encode_transaction)
 
     train_data = []
@@ -69,7 +75,7 @@ def _encode_data(packages=None, minimum_support = 2):
 
     # train_data
     # all features are encoded; decode dictionary is itemIndx
-    # ((label, [f1, f2, f3, host]))
+    # ((label, [f1, f2, f3]))
     # 1 is added to avoid index overlap 
     start_indx = len(itemIndx) + 1
     appIndx = defaultdict(lambda : start_indx + len(appIndx))
@@ -84,7 +90,7 @@ def _encode_data(packages=None, minimum_support = 2):
 
     print 'Item index is ', itemIndx[test_str]
     # encodedpackages: ([Features, app])
-    return encodedpackages, rever_map(appIndx), rever_map(itemIndx), packageHost
+    return encodedpackages, rever_map(appIndx), rever_map(itemIndx), packageHost, packageTbl
 
 def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
     '''
@@ -185,7 +191,7 @@ class CMAR:
         p += tbl_packages
       packages = p
       print "#CMAR:", len(packages)
-      encodedpackages, appIndx, featureIndx, packageHost = _encode_data(packages)
+      encodedpackages, appIndx, featureIndx, packageHost, packageTbl = _encode_data(packages)
       # Rules format : (feature, confidence, support, label)
       rules = _gen_rules(encodedpackages, tSupport, tConfidence, featureIndx)
       # feature, app, host
@@ -201,12 +207,12 @@ class CMAR:
           tmp.add(frozenset(charactor))
           decodedRules.add(Rule(rule_str, appIndx[rule.label], packageHost[rule.host], rule.confidence, rule.support))
 
-      self._add_rules(decodedRules, rule_type)
+      self._add_rules(decodedRules, packages, rule_type)
       _persist(decodedRules, rule_type)
       self.__init__()
       return self
 
-  def _add_rules(self, rules, ruleType):
+  def _add_rules(self, rules, packages,ruleType):
       tmprules = {}
       for feature, app, host, confidence, _ in rules:
           tmprules.setdefault(host, {})

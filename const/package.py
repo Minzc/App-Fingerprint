@@ -5,6 +5,9 @@ class Package:
     self.json = None
     self.form = None
   
+  def set_tbl(self, tbl):
+    self.tbl = tbl
+
   def set_label(self, label):
     self.label = label
 

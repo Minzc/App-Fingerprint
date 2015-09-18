@@ -185,6 +185,7 @@ def load_pkgs(DB, appType, limit, filterFunc=lambda x : True):
         package.set_agent(agent)
         package.set_dst(dst)
         package.set_content(raw)
+        package.set_tbl(DB)
        
         if filterFunc(package):
             records.append(package)
