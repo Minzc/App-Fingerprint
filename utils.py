@@ -8,8 +8,8 @@ import tldextract
 from sqldao import SqlDao
 from package import Package
 import random
-from app_info import AppInfos
-import consts
+from const.app_info import AppInfos
+import const.consts as consts
 
 
 regex_enpunc = re.compile("[" + string.punctuation + "]")

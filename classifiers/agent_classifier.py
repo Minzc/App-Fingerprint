@@ -1,7 +1,7 @@
 from utils import longest_common_substring, backward_maxmatch
 from sqldao import SqlDao
 from collections import defaultdict
-import consts
+import const.consts as consts
 from classifier import AbsClassifer
 import re
 

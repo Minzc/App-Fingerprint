@@ -2,11 +2,11 @@ import datetime
 from sqldao import SqlDao
 from utils import load_pkgs, load_exp_app
 from collections import namedtuple, defaultdict
-import consts
+import const.consts as consts
 import sys
 import argparse
 from rules.rule_manager import RuleManager
-from classifier_factory import classifier_factory
+from classifiers.classifier_factory import classifier_factory
 
 
 LIMIT = None
@@ -24,10 +24,10 @@ trainedLabel = {
 
 trainedClassifiers = [
     #consts.HEAD_CLASSIFIER,
-    #consts.AGENT_CLASSIFIER,
-    # consts.HOST_CLASSIFIER,
-    # consts.CMAR_CLASSIFIER,
-     consts.KV_CLASSIFIER,
+    consts.AGENT_CLASSIFIER,
+    consts.HOST_CLASSIFIER,
+    consts.CMAR_CLASSIFIER,
+    consts.KV_CLASSIFIER,
 ]
 
 def load_trian(size):

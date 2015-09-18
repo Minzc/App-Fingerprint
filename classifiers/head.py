@@ -1,5 +1,5 @@
 from classifier import AbsClassifer
-import consts
+import const.consts as consts
 
 
 class HeaderClassifier(AbsClassifer):

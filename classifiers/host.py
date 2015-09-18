@@ -1,8 +1,8 @@
 from utils import longest_common_substring, get_top_domain, url_clean, load_exp_app
 from sqldao import SqlDao
 from collections import defaultdict
-import consts
-from app_info import AppInfos
+import const.consts as consts
+from const.app_info import AppInfos
 from classifier import AbsClassifer
 
 test_str = 'fox2now.com'

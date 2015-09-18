@@ -1,4 +1,4 @@
-import consts
+import const.consts as consts
 from sqldao import SqlDao
 from utils import load_exp_app, suffix_tree
 from collections import defaultdict, namedtuple
