@@ -40,13 +40,9 @@ def _encode_data(packages=None, minimum_support = 2):
           for item in transaction[:-2]:
             f_counter[item] += 1
             f_company[item].add(package.company)
-      print 'f_company', f_company[test_str]
-      print 'counter is', f_counter[test_str]
       # Get frequent 1-item
       items = {item for item, num in f_counter.iteritems() 
           if num > minimum_support and len(f_company[item]) < 4}
-      print 'f_company', f_company[test_str]
-      print 'label in it', test_str in items
       return processed_transactions, items
     
 
@@ -107,9 +103,6 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
     rules = []
     for frequent_pattern_info in find_frequent_itemsets(transactions, tSupport, True):
         itemset, support, tag_dist = frequent_pattern_info
-        for item in itemset:
-          if test_str == featureIndx[item]:
-            print itemset
         max_clss = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
         if tag_dist[max_clss] * 1.0 / support > tConfidence:
             confidence = max(tag_dist.values()) * 1.0 / support
@@ -259,8 +252,6 @@ class CMAR:
               if rule.issubset(features): #and confidence > max_confidence:
                 max_confidence = confidence
                 rst = consts.Prediction(label, confidence, rule)
-                print package.app
-                print rule
 
       labelRsts[rule_type] = rst
     return labelRsts
