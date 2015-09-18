@@ -53,8 +53,7 @@ def _encode_data(packages=None, minimum_support = 2):
 
 
     itemIndx = defaultdict(lambda: len(itemIndx))
-    packageHost = []
-    packageTbl = []
+    packageNInfo = {}
     def _encode_transaction(transaction):
         """Change string items to numbers"""
         host = transaction[-3]
@@ -64,9 +63,10 @@ def _encode_data(packages=None, minimum_support = 2):
         # Host and app are not included in transaction now
         encode_transaction = [ itemIndx[item] for item in set(transaction[:-3])
                 if item in items]
+        packageNInfo[frozenset(encode_transaction)] = {'Tbl': tbl, 'Host': host, 'Label': label}
 
-        packageHost.append(host)
-        packageTbl.append(tbl)
+        # packageHost.append(host)
+        # packageTbl.append(tbl)
         return (label, encode_transaction)
 
     train_data = []
@@ -90,7 +90,7 @@ def _encode_data(packages=None, minimum_support = 2):
 
     print 'Item index is ', itemIndx[test_str]
     # encodedpackages: ([Features, app])
-    return encodedpackages, rever_map(appIndx), rever_map(itemIndx), packageHost, packageTbl
+    return encodedpackages, rever_map(appIndx), rever_map(itemIndx), packageNInfo
 
 def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
     '''
@@ -141,7 +141,7 @@ def _remove_duplicate(t_rules):
   print 'original size', len(t_rules), 'new size', len(new_rules)
   return new_rules
 
-def _prune_rules(t_rules, packages, min_cover = 3):
+def _prune_rules(t_rules, packageNInfo, min_cover = 3):
     '''
     Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
     Input packages: list of packets
@@ -150,22 +150,31 @@ def _prune_rules(t_rules, packages, min_cover = 3):
     import datetime
     ts = datetime.datetime.now()
 
-    # Sort generated rules according to its confidence, support and length
-    t_rules.sort(key=lambda v: (v[1], v[2], len(v[0])), reverse=True)
-    t_rules = _remove_duplicate(t_rules)
 
     cover_num = defaultdict(int)
     package_ids = {frozenset(package):i  for i, package in enumerate(packages)}
     index_packages = defaultdict(list)
     # Change packages to sets
-    map(lambda package: index_packages[package[-1]].append(frozenset(package)), packages)
+    map(lambda packageInfo: index_packages[packageInfo[1]['Label']].append(packageInfo), packages.items())
     packages = index_packages
-    
+    tblSupport = defaultdict(set)
     for rule, confidence, support, classlabel in t_rules:
-        for package in packages[classlabel]:
+        for packageInfo in packages[classlabel]:
+          package, info = packageInfo
+          tbl = info['Tbl']
+          if rule.issubset(package):
+            tblSupport[rule].add(tbl)
+    
+    # Sort generated rules according to its confidence, support and length
+    t_rules.sort(key=lambda v: (v[1], v[2], len(v[0])), reverse=True)
+    t_rules = _remove_duplicate(t_rules)
+    for rule, confidence, support, classlabel in t_rules:
+        for packageInfo in packages[classlabel]:
+            package, info = packageInfo
+            host = info['Host']
             if cover_num[package] <= min_cover and rule.issubset(package):
                 cover_num[package] += 1
-                yield Rule(rule, classlabel, package_ids[package], confidence, support)
+                yield Rule(rule, classlabel, host, confidence, support)
     print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
 
 
@@ -191,11 +200,11 @@ class CMAR:
         p += tbl_packages
       packages = p
       print "#CMAR:", len(packages)
-      encodedpackages, appIndx, featureIndx, packageHost, packageTbl = _encode_data(packages)
+      encodedpackages, appIndx, featureIndx, packageNInfo = _encode_data(packages)
       # Rules format : (feature, confidence, support, label)
       rules = _gen_rules(encodedpackages, tSupport, tConfidence, featureIndx)
       # feature, app, host
-      rules = _prune_rules(rules, encodedpackages, self.min_cover)
+      rules = _prune_rules(rules, encodedpackages, packageNInfo, self.min_cover)
       # change encoded features back to string
       decodedRules = set()
       tmp = set()
