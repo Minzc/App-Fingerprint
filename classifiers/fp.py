@@ -173,7 +173,7 @@ def _prune_rules(t_rules, packageNInfo, min_cover = 3):
             host = info['Host']
             if cover_num[package] <= min_cover and rule.issubset(package):
                 cover_num[package] += 1
-                yield Rule(rule, classlabel, host, confidence, support)
+                yield Rule(rule, classlabel, host, confidence, len(tblSupport[tbl]))
     print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
 
 
