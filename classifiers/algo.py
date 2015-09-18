@@ -69,7 +69,7 @@ class KVClassifier(AbsClassifer):
         for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.secdomain]):
           for value in pkg.queries[rule.key]:
             value = value.strip()
-            if len(self.valueLabelCounter[value]) == 1 and len(value) == 1:
+            if len(self.valueLabelCounter[value]) == 1 and len(value) != 1:
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT] += 1
 
