@@ -124,28 +124,29 @@ def generate_path_rules(vulnID = 400000):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate rule in ips format')
     parser.add_argument('-t', metavar='agent/host/path/kv', help='rule type')
+    parser.add_argument('-p', metavar='apptype_region', help='output prefix')
     # parser.add_argument('-apptype', metavar='apptype', help='apptype')
     args = parser.parse_args()
 
     test_tbl = None
     if args.t == 'agent':
       rules = generate_agent_rules()
-      output_rules('agent.rule.head', rules)
+      output_rules(args.p+'_agent.rule', rules)
     elif args.t == 'host':
       rules = generate_host_rules()
-      output_rules('host.rule.head', rules)
+      output_rules(args.p+'_host.rule', rules)
     elif args.t == 'path':
       rules = generate_path_rules()
-      output_rules('cmar.rule.head', rules)
+      output_rules(args.p+'_cmar.rule', rules)
     elif args.t == 'kv':
       rules = generate_kv_rules()
-      output_rules('kv.rule.head', rules)
+      output_rules(args.p+'_kv.rule', rules)
     elif args.t == 'all':
       rules = generate_agent_rules(vulnID = 100000)
       rules += generate_host_rules(vulnID = 200000)
       rules += generate_path_rules(vulnID = 300000)
       rules += generate_kv_rules(vulnID = 400000)
-      output_rules('all.rules', rules)
+      output_rules(args.p+'_all.rule', rules)
     else:
       parser.print_help()
 
