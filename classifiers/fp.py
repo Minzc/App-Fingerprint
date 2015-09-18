@@ -63,10 +63,8 @@ def _encode_data(packages=None, minimum_support = 2):
         # Host and app are not included in transaction now
         encode_transaction = [ itemIndx[item] for item in set(transaction[:-3])
                 if item in items]
-        packageNInfo[frozenset(encode_transaction)] = {'Tbl': tbl, 'Host': host, 'Label': label}
+        packageNInfo[frozenset(encode_transaction)] = {'Tbl': tbl, 'Host': host}
 
-        # packageHost.append(host)
-        # packageTbl.append(tbl)
         return (label, encode_transaction)
 
     train_data = []
@@ -85,6 +83,7 @@ def _encode_data(packages=None, minimum_support = 2):
     for app, encode_transaction in train_data:
         # host = encode_transaction[-1]
         # Append class lable at the end of a transaction
+        packageNInfo[frozenset(encode_transaction)]['Label'] = appIndx[app]
         encode_transaction.append(appIndx[app])
         encodedpackages.append(encode_transaction)
 
@@ -152,12 +151,12 @@ def _prune_rules(t_rules, packageNInfo, min_cover = 3):
 
 
     cover_num = defaultdict(int)
-    package_ids = {frozenset(package):i  for i, package in enumerate(packages)}
     index_packages = defaultdict(list)
     # Change packages to sets
-    map(lambda packageInfo: index_packages[packageInfo[1]['Label']].append(packageInfo), packages.items())
+    map(lambda packageInfo: index_packages[packageInfo[1]['Label']].append(packageInfo), packageNInfo.items())
     packages = index_packages
     tblSupport = defaultdict(set)
+    print 'Len of Rules is', len(t_rules)
     for rule, confidence, support, classlabel in t_rules:
         for packageInfo in packages[classlabel]:
           package, info = packageInfo
@@ -204,17 +203,13 @@ class CMAR:
       # Rules format : (feature, confidence, support, label)
       rules = _gen_rules(encodedpackages, tSupport, tConfidence, featureIndx)
       # feature, app, host
-      rules = _prune_rules(rules, encodedpackages, packageNInfo, self.min_cover)
+      rules = _prune_rules(rules, packageNInfo, self.min_cover)
       # change encoded features back to string
       decodedRules = set()
       tmp = set()
       for rule in rules:
           rule_str = frozenset({featureIndx[itemcode] for itemcode in rule[0]})
-          charactor = {packageHost[rule.host]}
-          charactor.add(rule_str)
-          # if charactor not in tmp:
-          tmp.add(frozenset(charactor))
-          decodedRules.add(Rule(rule_str, appIndx[rule.label], packageHost[rule.host], rule.confidence, rule.support))
+          decodedRules.add(Rule(rule_str, appIndx[rule.label], rule.host, rule.confidence, rule.support))
 
       self._add_rules(decodedRules, packages, rule_type)
       _persist(decodedRules, rule_type)
