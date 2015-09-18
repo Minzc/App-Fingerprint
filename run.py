@@ -10,7 +10,7 @@ from classifiers.classifier_factory import classifier_factory
 
 
 LIMIT = None
-INSERT = True
+INSERT = False
 FOLD = 1
 DEBUG = False
 DEBUG_CMAR = False
