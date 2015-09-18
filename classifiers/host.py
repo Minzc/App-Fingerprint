@@ -22,8 +22,9 @@ class HostApp(AbsClassifer):
       QUERY = consts.SQL_INSERT_HOST_RULES
       params = []
       for ruleType in patterns:
-        for url, label in patterns[ruleType].iteritems():
-          params.append((label, 1, 1, url, ruleType))
+        for url, labelNsupport in patterns[ruleType].iteritems():
+          label, support = labelNsupport
+          params.append((label, len(support), 1, url, ruleType))
       sqldao.executeBatch(QUERY, params)
       sqldao.close()
 
@@ -88,12 +89,14 @@ class HostApp(AbsClassifer):
           ifValidRule = True if self.checkCommonStr(label, url, expApp) else False
 
           if ifValidRule:
-            self.rules[rule_type][url] = label
+            self.rules[rule_type][url] = (label, set())
 
           if url == test_str:
             print 'Rule Type is', rule_type, ifValidRule
 
       print 'number of rule', len(self.rules[consts.APP_RULE])
+
+      self.count_support(records)
       self.persist(self.rules, rule_type)
       self.__init__(self.appType)
       return self
@@ -108,6 +111,23 @@ class HostApp(AbsClassifer):
         self.rules[ruleType][host] = label
       print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
       sqldao.close()
+    
+    def count_support(self, records):
+      LABEL = 0
+      TBLSUPPORT = 1
+      for tbl, pkgs in records.items():
+        for pkg in pkgs:
+          for ruleType in self.rules:
+            host = url_clean(pkg.host)
+            secdomain = get_top_domain(host)
+            refer_host = pkg.refer_host
+            refer_top_domain = get_top_domain(refer_host)
+            predict = consts.NULLPrediction
+            for url in [host, secdomain, refer_host, refer_top_domain]:
+              if url in self.rules[ruleType]:
+                label = self.rules[ruleType][url][LABEL]
+                if label == pkg.label:
+                  self.rules[ruleType][url][TBLSUPPORT].add(tbl)
 
     def classify(self, pkg):
       rst = {}
