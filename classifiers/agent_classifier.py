@@ -59,8 +59,6 @@ class AgentClassifier(AbsClassifer):
                     print '##B', self.rules[ruleType][agentFeatureB] 
               if self.rules[ruleType][agentFeatureA] == self.rules[ruleType][agentFeatureB]:
                 ifAdd = False
-              else:
-                ifAdd = True
                 break
           if ifAdd:
             prunedRules[agentFeatureA] = self.rules[ruleType][agentFeatureA]
