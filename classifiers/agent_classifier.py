@@ -53,6 +53,9 @@ class AgentClassifier(AbsClassifer):
           ifAdd = True
           for agentFeatureB in self.rules[ruleType]:
             if agentFeatureA != agentFeatureB and agentFeatureB in agentFeatureA:
+              if agentFeatureA == '3d world magazine: for 3d artists and animators 3.8.3 rv:3.8.3.0 (ipad; iphone os 8.4; en_ca)' and agentFeatureB == 'd world magazine':
+                  print '##', self.rules[ruleType][agentFeatureA] 
+                  print '##', self.rules[ruleType][agentFeatureB] 
               if self.rules[ruleType][agentFeatureA] == self.rules[ruleType][agentFeatureB] :
                 ifAdd = False
               else:
@@ -83,8 +86,6 @@ class AgentClassifier(AbsClassifer):
 
           if agent == test_str:
             print 'Rule Type is', ruleType 
-        else:
-            self.rules[ruleType][agent] = ''
 
 
       print '>>> [Agent Classifier] Number of Rule', len(self.rules[consts.APP_RULE])
