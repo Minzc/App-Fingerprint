@@ -145,7 +145,7 @@ class AgentClassifier(AbsClassifer):
 
         if rstLabel != None and rstLabel != pkg.app and ruleType == consts.APP_RULE:
           print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:',pkg.app, 'Prediction:',rstLabel, 'Longestword:',longestWord
-        return rst
+      return rst
 
     def classify2(self, pkg):
       rst = {}
