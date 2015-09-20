@@ -55,6 +55,11 @@ class AgentClassifier(AbsClassifer):
           for featureSeg in featureSegs:
             if self.rules[ruleType][agentFeatureA] == self.rules[ruleType].get(featureSeg):
                 ifAdd = False
+                print agentFeatureA
+                print featureSeg
+                print self.rules[ruleType][agentFeatureA]
+                print self.rules[ruleType].get(featureSeg)
+                print '#' * 10
           # for agentFeatureB in self.rules[ruleType]:
           #   if agentFeatureA != agentFeatureB and agentFeatureB in agentFeatureA:
           #     if agentFeatureA == '3d world magazine: for 3d artists and animators 3.8.3 rv:3.8.3.0 (ipad; iphone os 8.4; en_ca)':
