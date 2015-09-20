@@ -53,7 +53,7 @@ class AgentClassifier(AbsClassifer):
           ifAdd = True
           featureSegs = self.clean_agent(agentFeatureA)
           for featureSeg in featureSegs:
-            if self.rules[ruleType][agentFeatureA] == self.rules[ruleType][featureSeg]:
+            if self.rules[ruleType][agentFeatureA] == self.rules[ruleType].get(featureSeg):
                 ifAdd = False
           # for agentFeatureB in self.rules[ruleType]:
           #   if agentFeatureA != agentFeatureB and agentFeatureB in agentFeatureA:
