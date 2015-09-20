@@ -69,7 +69,7 @@ class AgentClassifier(AbsClassifer):
           #     if self.rules[ruleType][agentFeatureA] == self.rules[ruleType][agentFeatureB]:
           #       ifAdd = False
           #       break
-          if ifAdd:
+          if ifAdd or '/' in agentFeatureA:
             prunedRules[agentFeatureA] = self.rules[ruleType][agentFeatureA]
         self.rules[ruleType] = prunedRules
 
@@ -123,11 +123,28 @@ class AgentClassifier(AbsClassifer):
       counter = 0
       for agent, label, ruleType in sqldao.execute(QUERY):
         counter += 1
-        self.rules[ruleType][agent] = ( re.compile(re.escape(agent)),label)
+        self.rules[ruleType][agent] = ( re.compile('\b' + re.escape(agent) + '\b'),label)
       print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
       sqldao.close()
 
     def classify(self, pkg):
+      rst = {}
+      longestWord = ''
+      rstLabel = None
+      for ruleType in self.rules:
+        for agent, regxNlabel in self.rules[ruleType].items():
+          regex, label = regxNlabel
+          if regex.search(pkg.agent):
+            if len(longestWord) < len(agent):
+              rstLabel = pkg.label
+              longestWord = agent
+
+        rst[ruleType] = consts.Prediction(rstLabel, 1.0, longestWord) if rstLabel else consts.NULLPrediction
+
+        if rstLabel != None and rstLabel != pkg.app and ruleType == consts.APP_RULE:
+          print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:',pkg.app, 'Prediction:',rstLabel, 'Longestword:',longestWord
+
+    def classify2(self, pkg):
       rst = {}
       longestWord = None
       for ruleType in self.rules:
