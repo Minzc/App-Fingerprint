@@ -53,7 +53,7 @@ class AgentClassifier(AbsClassifer):
           ifAdd = True
           featureSegs = self.clean_agent(agentFeatureA)
           for featureSeg in featureSegs:
-            if self.rules[ruleType][agentFeatureA] == self.rules[ruleType].get(featureSeg):
+            if self.rules[ruleType][agentFeatureA] == self.rules[ruleType].get(featureSeg) and agentFeatureA != featureSeg:
                 ifAdd = False
                 print agentFeatureA
                 print featureSeg
@@ -112,6 +112,18 @@ class AgentClassifier(AbsClassifer):
       for agent, label, ruleType in sqldao.execute(QUERY):
         counter += 1
         self.rules[ruleType][agent] = label
+      print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
+      sqldao.close()
+
+    def load_rules2(self):
+      import re
+      self.rules = {consts.APP_RULE:{}, consts.COMPANY_RULE:{}, consts.CATEGORY_RULE:{}}
+      QUERY = consts.SQL_SELECT_AGENT_RULES
+      sqldao = SqlDao()
+      counter = 0
+      for agent, label, ruleType in sqldao.execute(QUERY):
+        counter += 1
+        self.rules[ruleType][agent] = ( re.compile(re.escape(agent)),label)
       print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
       sqldao.close()
 
