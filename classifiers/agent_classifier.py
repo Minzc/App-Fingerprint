@@ -122,6 +122,6 @@ class AgentClassifier(AbsClassifer):
 
         rst[ruleType] = consts.Prediction(label, 1.0, longestWord) if label else consts.NULLPrediction
 
-        # if label != None and label != pkg.app and ruleType == consts.APP_RULE:
-        #   print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:',pkg.app, 'Prediction:',label, 'Longestword:',longestWord
+        if label != None and label != pkg.app and ruleType == consts.APP_RULE:
+          print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:',pkg.app, 'Prediction:',label, 'Longestword:',longestWord
       return rst
