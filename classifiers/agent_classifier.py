@@ -51,15 +51,19 @@ class AgentClassifier(AbsClassifer):
         prunedRules = {}
         for agentFeatureA in self.rules[ruleType]:
           ifAdd = True
-          for agentFeatureB in self.rules[ruleType]:
-            if agentFeatureA != agentFeatureB and agentFeatureB in agentFeatureA:
-              if agentFeatureA == '3d world magazine: for 3d artists and animators 3.8.3 rv:3.8.3.0 (ipad; iphone os 8.4; en_ca)':
-                    print '##F', agentFeatureB
-                    print '##A', self.rules[ruleType][agentFeatureA] 
-                    print '##B', self.rules[ruleType][agentFeatureB] 
-              if self.rules[ruleType][agentFeatureA] == self.rules[ruleType][agentFeatureB]:
+          featureSegs = self.clean_agent(agentFeatureA)
+          for featureSeg in featureSegs:
+            if self.rules[ruleType][agentFeatureA] == self.rules[ruleType][featureSeg]:
                 ifAdd = False
-                break
+          # for agentFeatureB in self.rules[ruleType]:
+          #   if agentFeatureA != agentFeatureB and agentFeatureB in agentFeatureA:
+          #     if agentFeatureA == '3d world magazine: for 3d artists and animators 3.8.3 rv:3.8.3.0 (ipad; iphone os 8.4; en_ca)':
+          #           print '##F', agentFeatureB
+          #           print '##A', self.rules[ruleType][agentFeatureA] 
+          #           print '##B', self.rules[ruleType][agentFeatureB] 
+          #     if self.rules[ruleType][agentFeatureA] == self.rules[ruleType][agentFeatureB]:
+          #       ifAdd = False
+          #       break
           if ifAdd:
             prunedRules[agentFeatureA] = self.rules[ruleType][agentFeatureA]
         self.rules[ruleType] = prunedRules
