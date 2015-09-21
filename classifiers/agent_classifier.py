@@ -9,7 +9,8 @@ test_str = 'NBC'.lower()
 
 class AgentClassifier(AbsClassifer):
     def clean_agent(self, agent):
-      agent = re.sub(r'\b[0-9.]+\b', '1',agent)
+      agent = re.sub(r'\b[0-9.]+\b', '', agent)
+      agent = re.sub(r'  ', ' ', agent)
       return re.findall('[a-zA-Z][0-9a-zA-Z. %_-]+', agent)
 
     def __init__(self):
@@ -52,15 +53,17 @@ class AgentClassifier(AbsClassifer):
         prunedRules = {}
         for agentFeatureA in self.rules[ruleType]:
           ifAdd = True
+          if agentFeatureA+'/' in self.rules[ruleType]:
+            ifAdd = False
           featureSegs = self.clean_agent(agentFeatureA)
-          for featureSeg in featureSegs:
-            if self.rules[ruleType][agentFeatureA] == self.rules[ruleType].get(featureSeg) and agentFeatureA != featureSeg:
-                ifAdd = False
-                print agentFeatureA
-                print featureSeg
-                print self.rules[ruleType][agentFeatureA]
-                print self.rules[ruleType].get(featureSeg)
-                print '#' * 10
+          # for featureSeg in featureSegs:
+          #   if self.rules[ruleType][agentFeatureA] == self.rules[ruleType].get(featureSeg) and agentFeatureA != featureSeg:
+          #       ifAdd = False
+          #       print agentFeatureA
+          #       print featureSeg
+          #       print self.rules[ruleType][agentFeatureA]
+          #       print self.rules[ruleType].get(featureSeg)
+          #       print '#' * 10
           # for agentFeatureB in self.rules[ruleType]:
           #   if agentFeatureA != agentFeatureB and agentFeatureB in agentFeatureA:
           #     if agentFeatureA == '3d world magazine: for 3d artists and animators 3.8.3 rv:3.8.3.0 (ipad; iphone os 8.4; en_ca)':
@@ -146,8 +149,6 @@ class AgentClassifier(AbsClassifer):
 
         if rstLabel != None and rstLabel != pkg.app and ruleType == consts.APP_RULE:
           print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:',pkg.app, 'Prediction:',rstLabel, 'Longestword:',longestWord
-        if rstLabel == pkg.app and ruleType == consts.APP_RULE and ruleType == consts.APP_RULE:
-            print 'CORRECT'
       return rst
 
     def classify2(self, pkg):
