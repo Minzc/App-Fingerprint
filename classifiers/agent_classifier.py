@@ -33,18 +33,23 @@ class AgentClassifier(AbsClassifer):
 
     def count(self, pkg):
       label = pkg.label
-      # agent_segs = self.split_agent(pkg.agent)
-      # map(lambda agent_seg: self.agentLabel[agent_seg].add(label), agent_segs)
-      agent = self.clean_agent(pkg.agent)
+      # agent = self.clean_agent(pkg.agent)
+      agent = pkg.agent
       agentF = re.sub('[/].*', '', agent)
       if '/' in pkg.agent:
-        agentF = agentF + '/'
-      
+        agentF = '^' + agentF + '/'
+
       self.agentLabel[label].add(label)
       if label not in agentF:
           self.agentLabel[agentF.strip()].add(label)
-      # agent_segs = self.split_agent(agent)
-      # map(lambda seg: self.agentLabel[seg.strip()].add(label), filter(lambda seg : len(seg) > 3 and label not in seg, agent_segs))
+
+      if 'word-among-us' in agentF:
+          print pkg.agent
+      if 'freewheeladmanager' in agentF:
+          print pkg.agent
+
+      agent_segs = self.split_agent(agent)
+      map(lambda seg: self.agentLabel[seg.strip()].add(label), filter(lambda seg : len(seg) > 3 and label not in seg, agent_segs))
 
 
     def _clean_db(self, ruleType):
@@ -61,7 +66,7 @@ class AgentClassifier(AbsClassifer):
           ifAdd = True
           if agentFeatureA+'/' in self.rules[ruleType]:
             ifAdd = False
-          featureSegs = self.split_agent(agentFeatureA)
+          # featureSegs = self.split_agent(agentFeatureA)
           # for featureSeg in featureSegs:
           #   if self.rules[ruleType][agentFeatureA] == self.rules[ruleType].get(featureSeg) and agentFeatureA != featureSeg:
           #       ifAdd = False
@@ -131,9 +136,12 @@ class AgentClassifier(AbsClassifer):
       QUERY = consts.SQL_SELECT_AGENT_RULES
       sqldao = SqlDao()
       counter = 0
-      for agent, label, ruleType in sqldao.execute(QUERY):
+      for agentF, label, ruleType in sqldao.execute(QUERY):
         counter += 1
-        self.rules[ruleType][agent] = ( re.compile(r'\b' + re.escape(agent) + r'\b'),label)
+        if '^' in agentF:
+          self.rules[ruleType][agentF] = ( re.compile(re.escape(agentF) + r'\b'),label)
+        else:
+          self.rules[ruleType][agentF] = ( re.compile(r'\b' + re.escape(agentF) + r'\b'),label)
       print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
       sqldao.close()
 
@@ -149,7 +157,6 @@ class AgentClassifier(AbsClassifer):
             if len(longestWord) < len(agentF):
               rstLabel = label
               longestWord = agentF
-              break
 
         rst[ruleType] = consts.Prediction(rstLabel, 1.0, longestWord) if rstLabel else consts.NULLPrediction
 
