@@ -42,9 +42,9 @@ class AgentClassifier(AbsClassifer):
       
       self.agentLabel[label].add(label)
       if label not in agentF:
-          self.agentLabel[agentF].add(label)
+          self.agentLabel[agentF.strip()].add(label)
       agent_segs = self.split_agent(agent)
-      map(lambda seg: self.agentLabel[seg].add(label), filter(lambda seg : len(seg) > 3, agent_segs))
+      map(lambda seg: self.agentLabel[seg.strip()].add(label), filter(lambda seg : len(seg) > 3 and label not in seg, agent_segs))
 
 
     def _clean_db(self, ruleType):
