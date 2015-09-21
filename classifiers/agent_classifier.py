@@ -9,6 +9,7 @@ test_str = 'NBC'.lower()
 
 class AgentClassifier(AbsClassifer):
     def clean_agent(self, agent):
+      agent = re.sub(r'\b[0-9.]+\b', '1',agent)
       return re.findall('[a-zA-Z][0-9a-zA-Z. %_-]+', agent)
 
     def __init__(self):
@@ -129,9 +130,9 @@ class AgentClassifier(AbsClassifer):
 
     def classify(self, pkg):
       rst = {}
-      longestWord = ''
-      rstLabel = None
       for ruleType in self.rules:
+        longestWord = ''
+        rstLabel = None
         for agentF, regxNlabel in self.rules[ruleType].items():
           regex, label = regxNlabel
           match = regex.search(pkg.agent)
@@ -139,11 +140,14 @@ class AgentClassifier(AbsClassifer):
             if len(longestWord) < len(agentF):
               rstLabel = label
               longestWord = agentF
+              break
 
         rst[ruleType] = consts.Prediction(rstLabel, 1.0, longestWord) if rstLabel else consts.NULLPrediction
 
         if rstLabel != None and rstLabel != pkg.app and ruleType == consts.APP_RULE:
           print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:',pkg.app, 'Prediction:',rstLabel, 'Longestword:',longestWord
+        if rstLabel == pkg.app and ruleType == consts.APP_RULE and ruleType == consts.APP_RULE:
+            print 'CORRECT'
       return rst
 
     def classify2(self, pkg):
