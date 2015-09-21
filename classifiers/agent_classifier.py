@@ -139,7 +139,7 @@ class AgentClassifier(AbsClassifer):
       for agentF, label, ruleType in sqldao.execute(QUERY):
         counter += 1
         if '^' in agentF:
-          self.rules[ruleType][agentF] = ( re.compile(re.escape(agentF) + r'\b'),label)
+          self.rules[ruleType][agentF] = ( re.compile('^' + re.escape(agentF)[1:] + r'\b'),label)
         else:
           self.rules[ruleType][agentF] = ( re.compile(r'\b' + re.escape(agentF) + r'\b'),label)
       print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
