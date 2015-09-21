@@ -136,9 +136,8 @@ class AgentClassifier(AbsClassifer):
           regex, label = regxNlabel
           match = regex.search(pkg.agent)
           if match:
-            print 'Match', match.group()
             if len(longestWord) < len(agentF):
-              rstLabel = pkg.app
+              rstLabel = label
               longestWord = agentF
 
         rst[ruleType] = consts.Prediction(rstLabel, 1.0, longestWord) if rstLabel else consts.NULLPrediction
