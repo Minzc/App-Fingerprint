@@ -55,8 +55,8 @@ def generate_agent_rules(vulnID = 100000):
     for agentFeature, regxNlabel in classifier.rules[ruleType].items():
       if len(agentFeature) > 1:
         regex, label = regxNlabel
-        rule = Rule(vulnID, label, IOS_GROUP, 41 - float(len(agentFeature)))
-        patternRegex = re.escape('User-Agent:')+'.*' + regex.pattern()
+        rule = Rule(vulnID, label, IOS_GROUP, 41 - 1/float(len(agentFeature)))
+        patternRegex = re.escape('User-Agent:')+'.*' + regex.pattern
         rule.add_feature_str(PCRE, patternRegex, 'header')
         rules.append(rule)
         vulnID += 1
