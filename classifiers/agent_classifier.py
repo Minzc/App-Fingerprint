@@ -35,7 +35,7 @@ class AgentClassifier(AbsClassifer):
       label = pkg.label
       # agent_segs = self.split_agent(pkg.agent)
       # map(lambda agent_seg: self.agentLabel[agent_seg].add(label), agent_segs)
-      agent = clean_agent(pkg.agent)
+      agent = self.clean_agent(pkg.agent)
       agentF = re.sub('[/].*', '', agent)
       if '/' in pkg.agent:
         agentF = agentF + '/'
@@ -144,7 +144,7 @@ class AgentClassifier(AbsClassifer):
         rstLabel = None
         for agentF, regxNlabel in self.rules[ruleType].items():
           regex, label = regxNlabel
-          match = regex.search(clean_agent(pkg.agent))
+          match = regex.search(self.clean_agent(pkg.agent))
           if match:
             if len(longestWord) < len(agentF):
               rstLabel = label
