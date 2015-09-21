@@ -10,7 +10,10 @@ test_str = 'NBC'.lower()
 class AgentClassifier(AbsClassifer):
     def clean_agent(self, agent):
       agent = re.sub(r'\b[0-9.]+\b', '', agent)
-      agent = re.sub(r'  ', ' ', agent)
+      agent = re.sub(r'  *', ' ', agent)
+      return agent
+
+    def split_agent(self, agent):
       return re.findall('[a-zA-Z][0-9a-zA-Z. %_-]+', agent)
 
     def __init__(self):
@@ -30,14 +33,17 @@ class AgentClassifier(AbsClassifer):
 
     def count(self, pkg):
       label = pkg.label
-      # agent_segs = self.clean_agent(pkg.agent)
+      # agent_segs = self.split_agent(pkg.agent)
       # map(lambda agent_seg: self.agentLabel[agent_seg].add(label), agent_segs)
-      agent = re.sub('[/].*', '', pkg.agent)
+      agent = clean_agent(pkg.agent)
+      agentF = re.sub('[/].*', '', agent)
       if '/' in pkg.agent:
-        agent = agent + '/'
-      self.agentLabel[agent].add(label)
+        agentF = agentF + '/'
+      
       self.agentLabel[label].add(label)
-      agent_segs = self.clean_agent(pkg.agent)
+      if label not in agentF:
+          self.agentLabel[agentF].add(label)
+      agent_segs = self.split_agent(agent)
       map(lambda seg: self.agentLabel[seg].add(label), filter(lambda seg : len(seg) > 3, agent_segs))
 
 
@@ -55,7 +61,7 @@ class AgentClassifier(AbsClassifer):
           ifAdd = True
           if agentFeatureA+'/' in self.rules[ruleType]:
             ifAdd = False
-          featureSegs = self.clean_agent(agentFeatureA)
+          featureSegs = self.split_agent(agentFeatureA)
           # for featureSeg in featureSegs:
           #   if self.rules[ruleType][agentFeatureA] == self.rules[ruleType].get(featureSeg) and agentFeatureA != featureSeg:
           #       ifAdd = False
@@ -138,7 +144,7 @@ class AgentClassifier(AbsClassifer):
         rstLabel = None
         for agentF, regxNlabel in self.rules[ruleType].items():
           regex, label = regxNlabel
-          match = regex.search(pkg.agent)
+          match = regex.search(clean_agent(pkg.agent))
           if match:
             if len(longestWord) < len(agentF):
               rstLabel = label
