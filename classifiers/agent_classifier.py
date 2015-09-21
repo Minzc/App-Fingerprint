@@ -136,7 +136,7 @@ class AgentClassifier(AbsClassifer):
       counter = 0
       for agentF, label, ruleType in sqldao.execute(QUERY):
         counter += 1
-        if agentF == '^iphone':
+        if agentF == '^iphone/':
             continue 
         if 'cpu iphone os' in agentF:
             continue

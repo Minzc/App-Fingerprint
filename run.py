@@ -112,48 +112,50 @@ def insert_rst(rst, DB = 'packages'):
 
 
 def execute(trainSet, testSet, inforTrack, appType):
-    sqldao = SqlDao()
-    sqldao.execute(consts.SQL_CLEAN_ALL_RULES)
-    sqldao.close()
-    print consts.SQL_CLEAN_ALL_RULES
-
     print "Train:", trainSet.keys(), "Test:", len(testSet)
     correct = 0
     test_apps = set()
     rst = {}
-    for record in testSet.values():
-        test_apps.add(record.app)
-    
-    ruleDict = {}
-    for ruleType in trainedLabel:
-        classifiers = classifier_factory(trainedClassifiers, appType)
-        for tbl in trainSet:
-            for pkg in trainSet[tbl]:
-                if ruleType == consts.APP_RULE:
-                    pkg.set_label(pkg.app)
-                elif ruleType == consts.COMPANY_RULE:
-                    pkg.set_label(pkg.company)
-                elif ruleType == consts.CATEGORY_RULE:
-                    pkg.set_label(pkg.category)
+    if True:
+      sqldao = SqlDao()
+      sqldao.execute(consts.SQL_CLEAN_ALL_RULES)
+      sqldao.close()
+      print consts.SQL_CLEAN_ALL_RULES
 
-        for name, classifier in classifiers:
-            print ">>> [train#%s] " % (name)
-            classifier =  classifier.train(trainSet, ruleType)
-    trainSet = None # To release memory
-    
+      for record in testSet.values():
+          test_apps.add(record.app)
+      
+      ruleDict = {}
+      for ruleType in trainedLabel:
+          classifiers = classifier_factory(trainedClassifiers, appType)
+          for tbl in trainSet:
+              for pkg in trainSet[tbl]:
+                  if ruleType == consts.APP_RULE:
+                      pkg.set_label(pkg.app)
+                  elif ruleType == consts.COMPANY_RULE:
+                      pkg.set_label(pkg.company)
+                  elif ruleType == consts.CATEGORY_RULE:
+                      pkg.set_label(pkg.category)
 
-    # ruleManager = RuleManager()
-    print '>>> Finish training all classifiers'
-    print '>>> Start rule pruning'
-    
-    if 'CMAR Rule' in classifiers:
-        classifiers["CMAR Rule"].rules = ruleManager.pruneCMARRules(ruleDict['CMAR Rule'], ruleDict['Host Rule'])
-        classifiers["CMAR Rule"].persist()
-    if 'KV Rule' in classifiers:
-        classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],ruleDict['Host Rule'] )
-        classifierDict["KV Rule"].persist()
+          for name, classifier in classifiers:
+              print ">>> [train#%s] " % (name)
+              classifier =  classifier.train(trainSet, ruleType)
+      trainSet = None # To release memory
+      
+
+      # ruleManager = RuleManager()
+      print '>>> Finish training all classifiers'
+      print '>>> Start rule pruning'
+      
+      if 'CMAR Rule' in classifiers:
+          classifiers["CMAR Rule"].rules = ruleManager.pruneCMARRules(ruleDict['CMAR Rule'], ruleDict['Host Rule'])
+          classifiers["CMAR Rule"].persist()
+      if 'KV Rule' in classifiers:
+          classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],ruleDict['Host Rule'] )
+          classifierDict["KV Rule"].persist()
 
   
+    classifiers = classifier_factory(trainedClassifiers, appType)
     for name, classifier in classifiers:
         print ">>> [test#%s] " % (name)
         classifier.load_rules()
@@ -182,8 +184,9 @@ def cross_batch_test(train_tbls, test_tbl, appType):
       return package.app in expApp[appType]
     expApp = load_exp_app()
     records = {}
-    for tbl in train_tbls:
-      records[tbl] = load_pkgs(limit = LIMIT, filterFunc = keep_exp_app, DB = tbl, appType = appType)
+    if True:
+      for tbl in train_tbls:
+        records[tbl] = load_pkgs(limit = LIMIT, filterFunc = keep_exp_app, DB = tbl, appType = appType)
     
     apps = set()  
     for pkgs in records.values():

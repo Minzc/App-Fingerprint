@@ -139,8 +139,9 @@ class HostApp(AbsClassifer):
         predict = consts.NULLPrediction
         label = None
         for url in [host, secdomain, refer_host, refer_top_domain]:
-          label = self.rules[ruleType].get(url, None)
-          if label != None:
+          labelNsupport = self.rules[ruleType].get(url, None)
+          if labelNsupport != None:
+            label, support = labelNsupport
             predict = consts.Prediction(label, 1, url)
             break
 
