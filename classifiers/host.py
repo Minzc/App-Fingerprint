@@ -106,9 +106,9 @@ class HostApp(AbsClassifer):
       QUERY = consts.SQL_SELECT_HOST_RULES
       sqldao = SqlDao()
       counter = 0
-      for host, label, ruleType in sqldao.execute(QUERY):
+      for host, label, ruleType, support in sqldao.execute(QUERY):
         counter += 1
-        self.rules[ruleType][host] = label
+        self.rules[ruleType][host] = (label, support)
       print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
       sqldao.close()
     

@@ -24,8 +24,8 @@ trainedLabel = {
 
 trainedClassifiers = [
     #consts.HEAD_CLASSIFIER,
-    consts.AGENT_CLASSIFIER,
-    #consts.HOST_CLASSIFIER,
+    #consts.AGENT_CLASSIFIER,
+    consts.HOST_CLASSIFIER,
     #consts.CMAR_CLASSIFIER,
     #consts.KV_CLASSIFIER,
 ]
@@ -152,7 +152,8 @@ def execute(trainSet, testSet, inforTrack, appType):
     if 'KV Rule' in classifiers:
         classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'],ruleDict['Host Rule'] )
         classifierDict["KV Rule"].persist()
-    
+
+  
     for name, classifier in classifiers:
         print ">>> [test#%s] " % (name)
         classifier.load_rules()

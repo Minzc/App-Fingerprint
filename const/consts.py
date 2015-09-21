@@ -24,11 +24,11 @@ SQL_SELECT_HTTP_PKGS_LIMIT = "select id, app, add_header, path, refer, hst, agen
 SQL_CLEAN_ALL_RULES = 'DELETE FROM patterns'
 SQL_INSERT_HOST_RULES = 'INSERT INTO patterns (label, support, confidence, host, rule_type) VALUES (%s, %s, %s, %s, %s)'
 SQL_DELETE_HOST_RULES = 'DELETE FROM patterns WHERE paramkey IS NULL and pattens IS NULL and agent IS NULL and rule_type=%s'
-SQL_SELECT_HOST_RULES = 'SELECT host, label, rule_type FROM patterns WHERE paramkey is NULL and pattens is NULL and agent IS NULL'
+SQL_SELECT_HOST_RULES = 'SELECT host, label, rule_type, support FROM patterns WHERE paramkey is NULL and pattens is NULL and agent IS NULL'
 
 SQL_INSERT_CMAR_RULES = 'INSERT INTO patterns (label, pattens, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
 SQL_DELETE_CMAR_RULES ='DELETE FROM patterns WHERE pattens IS NOT NULL and rule_type = %s'
-SQL_SELECT_CMAR_RULES = 'SELECT label, pattens, host, rule_type, confidence FROM patterns where pattens is not NULL'
+SQL_SELECT_CMAR_RULES = 'SELECT label, pattens, host, rule_type, support FROM patterns where pattens is not NULL'
 
 SQL_DELETE_KV_RULES = 'DELETE FROM patterns WHERE paramkey IS NOT NULL and rule_type=%s'
 SQL_INSERT_KV_RULES = 'INSERT INTO patterns (label, support, confidence, host, paramkey, paramvalue, rule_type) VALUES (%s, %s, %s, %s, %s, %s, %s)'

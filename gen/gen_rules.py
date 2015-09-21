@@ -14,7 +14,6 @@ class Rule:
   def __init__(self, vulnID, name, group, weight):
     trackID = AppInfos.get(consts.IOS, name).trackId
     self.vulnID = vulnID
-    self.name = '[%s]%s' % (trackID, name)
     self.group = group
     self.attachID = 1
     self.revision = 1
@@ -23,6 +22,7 @@ class Rule:
     self.service = 'HTTP'
     self.flow = 'from_client'
     self.weight = min(weight, 255)
+    self.name = '[%s][%s]%s' % (self.weight, trackID, name)
     self.features = []
   
   def add_feature_str(self, patternType, featureStr, context):
@@ -44,7 +44,7 @@ def output_rules(name, rules):
   fileWriter.close()
 
 def generate_agent_rules(vulnID = 100000):
-  trainedClassifiers = [ consts.AGENT_CLASSIFIER, ]
+  trainedClassifiers = [ consts.AGENT_CLASSIFIER ]
 
   appType = consts.IOS
   classifier = classifier_factory(trainedClassifiers, appType)[0][1]
@@ -52,10 +52,11 @@ def generate_agent_rules(vulnID = 100000):
   iosGroup = 'ios_app'
   rules = []
   for ruleType in classifier.rules:
-    for agentFeature, label in classifier.rules[ruleType].items():
-      if len(label) > 1:
-        rule = Rule(vulnID, label, IOS_GROUP, len(agentFeature))
-        patternRegex = re.escape('User-Agent:')+'.*' + re.escape(agentFeature)
+    for agentFeature, regxNlabel in classifier.rules[ruleType].items():
+      if len(agentFeature) > 1:
+        regex, label = regxNlabel
+        rule = Rule(vulnID, label, IOS_GROUP, 41 - float(len(agentFeature)))
+        patternRegex = re.escape('User-Agent:')+'.*' + regex.pattern()
         rule.add_feature_str(PCRE, patternRegex, 'header')
         rules.append(rule)
         vulnID += 1
@@ -69,8 +70,9 @@ def generate_host_rules(vulnID = 200000):
   iosGroup = 'ios_app'
   rules = []
   for ruleType in classifier.rules:
-    for host, label in classifier.rules[ruleType].items():
-      rule = Rule(vulnID, label, IOS_GROUP, 9)
+    for host, labelNsupport in classifier.rules[ruleType].items():
+      label, support = labelNsupport
+      rule = Rule(vulnID, label, IOS_GROUP, 30 + support)
       pattern = re.escape(host)
       rule.add_feature_str(PCRE, pattern, 'host')
       vulnID += 1
@@ -89,8 +91,9 @@ def generate_kv_rules(vulnID = 300000):
     for host, keyValues in rules.items():
       for key, valueLabels in keyValues.items():
         for value, labelScores in valueLabels.items():
-          for label, _ in labelScores.items():
-            rule = Rule(vulnID, label, IOS_GROUP, 5)
+          for label, supNconf in labelScores.items():
+            support = supNconf['support']
+            rule = Rule(vulnID, label, IOS_GROUP, 20 + support)
             rule.add_feature_str(PCRE, re.escape(host), 'host')
             rule.add_feature_str(PCRE, re.escape(key+'='+value), 'uri')
             ipsRules.append(rule)
@@ -110,9 +113,9 @@ def generate_path_rules(vulnID = 400000):
   rules = []
   for ruleType in classifier.rules:
     for host, patterns in classifier.rules[ruleType].items():
-      for cmarFeatures, labelConfidence in patterns.items():
-        label, confidence = labelConfidence
-        rule = Rule(vulnID, label, IOS_GROUP, 7)
+      for cmarFeatures, labelNsupport in patterns.items():
+        label, support = labelNsupport
+        rule = Rule(vulnID, label, IOS_GROUP, 10 + support)
         rule.add_feature_str(PCRE, host, 'host')
         for feature in cmarFeatures:
           feature = re.escape(feature)

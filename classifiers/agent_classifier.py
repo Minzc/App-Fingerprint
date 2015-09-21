@@ -43,8 +43,6 @@ class AgentClassifier(AbsClassifer):
       if label not in agentF:
           self.agentLabel[agentF.strip()].add(label)
 
-      if 'word-among-us' in agentF:
-          print pkg.agent
       if 'freewheeladmanager' in agentF:
           print pkg.agent
 
