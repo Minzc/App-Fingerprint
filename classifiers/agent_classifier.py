@@ -9,7 +9,7 @@ test_str = 'NBC'.lower()
 
 class AgentClassifier(AbsClassifer):
     def clean_agent(self, agent):
-      agent = re.sub(r'\b[0-9.]+\b', '', agent)
+      agent = re.sub(r'\b[0-9][0-9.]*\b', '', agent)
       agent = re.sub(r'  *', ' ', agent)
       return agent
 
@@ -43,8 +43,8 @@ class AgentClassifier(AbsClassifer):
       self.agentLabel[label].add(label)
       if label not in agentF:
           self.agentLabel[agentF.strip()].add(label)
-      agent_segs = self.split_agent(agent)
-      map(lambda seg: self.agentLabel[seg.strip()].add(label), filter(lambda seg : len(seg) > 3 and label not in seg, agent_segs))
+      # agent_segs = self.split_agent(agent)
+      # map(lambda seg: self.agentLabel[seg.strip()].add(label), filter(lambda seg : len(seg) > 3 and label not in seg, agent_segs))
 
 
     def _clean_db(self, ruleType):
@@ -144,7 +144,7 @@ class AgentClassifier(AbsClassifer):
         rstLabel = None
         for agentF, regxNlabel in self.rules[ruleType].items():
           regex, label = regxNlabel
-          match = regex.search(self.clean_agent(pkg.agent))
+          match = regex.search(pkg.agent)
           if match:
             if len(longestWord) < len(agentF):
               rstLabel = label
