@@ -67,7 +67,7 @@ def train(trainTbls, appType):
   - trainTbls: A list of tables used to train classifiers
   - appType: android or ios
   '''
-  records = load_data_set(trainTbls, appType)
+  trainSet = load_data_set(trainTbls, appType)
   ruleDict = {}
   for ruleType in TRAIN_LABEL:
     for tbl in trainSet:
