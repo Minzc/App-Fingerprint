@@ -26,7 +26,7 @@ def auto_test():
         trainTbls.append(tbl)
 
     print trainTbls, test_tbl
-    output = cross_batch_test(train_tbls, test_tbl, consts.IOS)
+    output = cross_batch_test(trainTbls, test_tbl, consts.IOS)
     log(trainTbls, testTbl, output)
     break
 
