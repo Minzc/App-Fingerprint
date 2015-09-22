@@ -52,3 +52,4 @@ if __name__ == '__main__':
   elif sys.argv[1] == 'gen':
     gen_rules()
   elif sys.argv[1] == 'test':
+    test(sys.argv[2])
