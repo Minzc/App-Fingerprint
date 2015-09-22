@@ -20,12 +20,12 @@ def log(trainTbls, testTbl, output):
 
 def auto_test():
   for test_tbl in tbls:
-    train_tbls = []
+    trainTbls = []
     for tbl in tbls:
       if tbl != test_tbl:
-        train_tbls.append(tbl)
+        trainTbls.append(tbl)
 
-    print train_tbls, test_tbl
+    print trainTbls, test_tbl
     output = cross_batch_test(train_tbls, test_tbl, consts.IOS)
     log(trainTbls, testTbl, output)
     break
