@@ -18,6 +18,16 @@ def log(trainTbls, testTbl, output):
   fw.write('=' * 20 + '\n')
   fw.close()
 
+def test(testTbl):
+  trainTbls = []
+  for tbl in tbls:
+    if tbl != testTbl:
+      trainTbls.append(tbl)
+
+  print trainTbls, testTbl
+  output = cross_batch_test(trainTbls, testTbl, consts.IOS)
+  log(trainTbls, testTbl, output)
+
 def auto_test():
   for testTbl in tbls:
     trainTbls = []
@@ -28,7 +38,6 @@ def auto_test():
     print trainTbls, testTbl
     output = cross_batch_test(trainTbls, testTbl, consts.IOS)
     log(trainTbls, testTbl, output)
-    break
 
 def gen_rules():
   train(tbls, consts.IOS)
@@ -37,8 +46,9 @@ def gen_rules():
 
 if __name__ == '__main__':
   if len(sys.argv) != 2:
-    print 'python test.py [auto|gen]'
+    print 'python test.py [auto|gen|test]'
   elif sys.argv[1] == 'auto':
     auto_test()
   elif sys.argv[1] == 'gen':
     gen_rules()
+  elif sys.argv[1] == 'test':
