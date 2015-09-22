@@ -50,8 +50,8 @@ def load_data_set(trainTbls, appType):
   - record : {table_name : [list of packages]}
   """
   print 'Loading data set', trainTbls
+  expApp = load_exp_app()
   def _keep_exp_app(package):
-    expApp = load_exp_app()
     return package.app in expApp[appType]
   records = {}
   for tbl in trainTbls:
