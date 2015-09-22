@@ -227,7 +227,6 @@ def cross_batch_test(trainTbls, testTbl, appType):
   recall = inforTrack[consts.RECALL]
   app_coverage = inforTrack[consts.DISCOVERED_APP]
 
-  return rst
 
 ######### START ###########
 
