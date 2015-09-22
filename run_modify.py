@@ -132,7 +132,7 @@ def evaluate(rst, testSet, testApps):
   print '[TEST] Total:', len(testSet)
   print '[TEST] Recall:', recall
   print '[TEST] Correct:', correct
-  print '[TEST] Discoered Number of App:', len(correct_app)
+  print '[TEST] Discoered Number of App:', len(correctApp)
   print '[TEST] Total Number of App:', len(testApps)
 
   precision = correct * 1.0 / recall
