@@ -1,6 +1,6 @@
-from run import cross_batch_test
-from run import trainedLabel
-from run import trainedClassifiers
+from run_modify import cross_batch_test
+from run_modify import TRAIN_LABEL
+from run_modify import USED_CLASSIFIERS
 import const.consts as consts
 
 tbls = [  'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_08_12', 'ios_packages_2015_08_04']

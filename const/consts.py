@@ -48,3 +48,4 @@ AGENT_CLASSIFIER = "Agent Rule"
 DISCOVERED_APP ='discoveried_app' 
 PRECISION = 'precision'
 RECALL = 'recall'
+F1SCORE = 'f1'

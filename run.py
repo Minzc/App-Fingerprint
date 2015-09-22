@@ -25,9 +25,9 @@ trainedLabel = {
 trainedClassifiers = [
     #consts.HEAD_CLASSIFIER,
     #consts.AGENT_CLASSIFIER,
-    consts.HOST_CLASSIFIER,
+    #consts.HOST_CLASSIFIER,
     #consts.CMAR_CLASSIFIER,
-    #consts.KV_CLASSIFIER,
+    consts.KV_CLASSIFIER,
 ]
 
 def load_trian(size):
