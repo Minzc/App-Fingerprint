@@ -219,7 +219,7 @@ def cross_batch_test(trainTbls, testTbl, appType):
   print '>>> Start training'
   train(trainTbls, appType)
   print '>>> Start testing'
-  rst = test(testTbl, inforTrack, appType)
+  rst = test(testTbl, appType)
   print '>>> Start evaluating'
   inforTrack = evaluate(rst, testSet, testApps)
 
