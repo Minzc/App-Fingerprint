@@ -209,7 +209,9 @@ def test(testTbl, appType):
     recall = sum([1 for i in rst.values() if i[consts.APP_RULE][0] or i[consts.COMPANY_RULE][0] or i[consts.CATEGORY_RULE][0]])
     print ">>> Recognized: %s Test Size: %s" % (recall, testSize)
 
-  return rst
+  print '>>> Start evaluating'
+  inforTrack = evaluate(rst, testSet, testApps)
+  return inforTrack
 
 
 
@@ -219,9 +221,7 @@ def cross_batch_test(trainTbls, testTbl, appType):
   print '>>> Start training'
   train(trainTbls, appType)
   print '>>> Start testing'
-  rst = test(testTbl, appType)
-  print '>>> Start evaluating'
-  inforTrack = evaluate(rst, testSet, testApps)
+  inforTrack = test(testTbl, appType)
 
   precision = inforTrack[consts.PRECISION]
   recall = inforTrack[consts.RECALL]
