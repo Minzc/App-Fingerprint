@@ -49,6 +49,7 @@ def load_data_set(trainTbls, appType):
   Output
   - record : {table_name : [list of packages]}
   """
+  print 'Loading data set', trainTbls
   def _keep_exp_app(package):
     expApp = load_exp_app()
     return package.app in expApp[appType]
@@ -215,9 +216,11 @@ def test(testTbl, inforTrack, appType):
 def cross_batch_test(trainTbls, testTbl, appType):
   _clean_up()
 
-  
+  print '>>> Start training'
   train(trainTbls, appType)
+  print '>>> Start testing'
   rst = test(testTbl, inforTrack, appType)
+  print '>>> Start evaluating'
   inforTrack = evaluate(rst, testSet, testApps)
 
   precision = inforTrack[consts.PRECISION]
