@@ -191,7 +191,7 @@ def _clean_up():
   sqldao.close()
   print consts.SQL_CLEAN_ALL_RULES
 
-def test(testTbl, inforTrack, appType):
+def test(testTbl, appType):
   testSet = {}
   testApps = set()
   for record in load_data_set([testTbl], appType).values()[0]:
