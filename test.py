@@ -9,9 +9,9 @@ tbls = [  'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_20
 # tbls = ['ios_packages_2015_08_12', 'ios_packages_2015_08_10']
 
 
-def log(trainTbls, output):
+def log(trainTbls, testTbl, output):
   fw = open('autotest_ios.txt', 'a')
-  fw.write(str(trainTbls)+' ' + test_tbl+'\n')
+  fw.write(str(trainTbls)+' ' + testTbl+'\n')
   fw.write(str(TRAIN_LABEL) + '\n')
   fw.write(str(USED_CLASSIFIERS) + '\n')
   fw.write(output + '\n')
@@ -27,12 +27,12 @@ def auto_test():
 
     print train_tbls, test_tbl
     output = cross_batch_test(train_tbls, test_tbl, consts.IOS)
-    log(trainTbls, output)
+    log(trainTbls, testTbl, output)
     break
 
 def gen_rules():
   train(tbls, consts.IOS)
-  log(tbls, 'PURE TRAIN')
+  log(tbls, 'NO TEST', 'PURE TRAIN')
 
 
 if __name__ == '__main__':

@@ -81,7 +81,7 @@ class KVClassifier(AbsClassifer):
     return self
 
   def _clean_db(self, rule_type):
-    print consts.SQL_DELETE_KV_RULES % rule_type
+    print '>>> [KVRULES]', consts.SQL_DELETE_KV_RULES % rule_type
     sqldao = SqlDao()
     sqldao.execute(consts.SQL_DELETE_KV_RULES % rule_type)
     sqldao.commit()
