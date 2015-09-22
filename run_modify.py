@@ -227,6 +227,7 @@ def cross_batch_test(trainTbls, testTbl, appType):
   recall = inforTrack[consts.RECALL]
   appCoverage = inforTrack[consts.DISCOVERED_APP]
   f1Score = inforTrack[consts.F1SCORE]
+  print 'Precision %s, Recall: %s, App: %s, F1 Score: %s' % (precision, recall, appCoverage, f1Score)
   return 'Precision %s, Recall: %s, App: %s, F1 Score: %s' % (precision, recall, appCoverage, f1Score)
 
 
