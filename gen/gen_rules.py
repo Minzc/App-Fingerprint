@@ -93,7 +93,7 @@ def generate_kv_rules(vulnID = 300000):
         for value, labelScores in valueLabels.items():
           for label, supNconf in labelScores.items():
             if len(value.split('\n')) == 1:
-              support = supNconf['support']
+              support = supNconf[consts.SUPPORT]
               rule = Rule(vulnID, label, IOS_GROUP, 20 + support)
               rule.add_feature_str(PCRE, re.escape(host), 'host')
               rule.add_feature_str(PCRE, re.escape(key+'='+value), 'uri')
