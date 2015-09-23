@@ -45,7 +45,7 @@ def gen_rules():
 
 
 if __name__ == '__main__':
-  if len(sys.argv) != 2:
+  if len(sys.argv) < 2:
     print 'python test.py [auto|gen|test]'
   elif sys.argv[1] == 'auto':
     auto_test()

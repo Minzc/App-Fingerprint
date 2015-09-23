@@ -16,6 +16,26 @@ class KVClassifier(AbsClassifer):
     exp_apps = load_exp_app()
     self.appSuffix = suffix_tree(exp_apps[appType])
     self.appType = appType
+  def prune_general_rules(self, generalRules, trainData):
+    '''
+    Pruning redundant keys
+    Input
+    - generalRules : {secdomain: [Rule(secdomain, key, score, labelNum)]}
+    - trainData : {tbl: [pkgs]}
+    '''
+    PKG_IDS = 1
+    VALUES = 2
+    specificRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {PKG_IDS:{},VALUES:set()}))))
+    for tbl, pkgs in trainData.iteritems():
+      for pkg in filter(lambda pkg : pkg.secdomain in generalRules, pkgs):
+        for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.secdomain]):
+          for value in pkg.queries[rule.key]:
+            value = value.strip()
+            if len(self.valueLabelCounter[value]) == 1 and len(value) != 1:
+                specificRules[pkg.host][rule.key][pkg.label][VALUES].add(value)
+                specificRules[pkg.host][rule.key][pkg.label][PKG_IDS].add('%s_%s' % (tbl, str(pkg.id)))
+
+    pass
 
   def train(self, trainData, rule_type):
     for tbl in trainData.keys():
