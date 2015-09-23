@@ -150,14 +150,16 @@ class HostApp(AbsClassifer):
       rst = {}
       for ruleType in self.rules:
         predict = consts.NULLPrediction
-        for url in [pkg.host, pkg.refer]:
+        for url in [pkg.host]:
           for regexStr, ruleTuple in self.rules[ruleType].iteritems():
             label, support, regexObj = ruleTuple
             match = regexObj.search(pkg.agent)
             if match and predict.score < support:
-              predict = consts.Prediction(label, support, (host, regexStr))
+              predict = consts.Prediction(label, support, (pkg.host, regexStr))
 
         rst[ruleType] = predict
+        if predict.label != pkg.app and predict.label != None:
+          print predict.evidence, pkg.host
       return rst
 
     def classify2(self, pkg):
