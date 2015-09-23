@@ -4,6 +4,7 @@ from collections import defaultdict
 import const.consts as consts
 from const.app_info import AppInfos
 from classifier import AbsClassifer
+import re
 
 test_str = 'fox2now.com'
 
