@@ -108,6 +108,18 @@ class HostApp(AbsClassifer):
       counter = 0
       for host, label, ruleType, support in sqldao.execute(QUERY):
         counter += 1
+        regexObj =  re.compile(r'\b' + re.escape(host) + r'\b')
+        self.rules[ruleType][host] = (label, support, regexObj)
+      print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
+      sqldao.close()
+
+    def load_rules2(self):
+      self.rules = {consts.APP_RULE:{}, consts.COMPANY_RULE:{}, consts.CATEGORY_RULE:{}}
+      QUERY = consts.SQL_SELECT_HOST_RULES
+      sqldao = SqlDao()
+      counter = 0
+      for host, label, ruleType, support in sqldao.execute(QUERY):
+        counter += 1
         self.rules[ruleType][host] = (label, support)
       print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
       sqldao.close()
@@ -130,6 +142,25 @@ class HostApp(AbsClassifer):
                   self.rules[ruleType][url][TBLSUPPORT].add(tbl)
 
     def classify(self, pkg):
+      '''
+      Input
+      - self.rules : {ruleType: {host : (label, support, regexObj)}}
+      - pkg : http packet
+      '''
+      rst = {}
+      for ruleType in self.rules:
+        predict = consts.NULLPrediction
+        for url in [pkg.host, pkg.refer]:
+          for regexStr, ruleTuple in self.rules[ruleType].iteritems():
+            label, support, regexObj = ruleTuple
+            match = regexObj.search(pkg.agent)
+            if match and predict.score < support:
+              predict = consts.Prediction(label, support, (host, regexStr))
+
+        rst[ruleType] = predict
+      return rst
+
+    def classify2(self, pkg):
       rst = {}
       for ruleType in self.rules:
         host = pkg.host.replace('-','.')
@@ -148,172 +179,6 @@ class HostApp(AbsClassifer):
         rst[ruleType] = predict
       return rst
 
-    '''    
-    def classify(self, pkg):
-      import consts
-      host = pkg.host.replace('-','.')
-      secdomain = pkg.secdomain.replace('-', '.')
-      appRules = self.rules[consts.APP_RULE]
-      companyRules = self.rules[consts.COMPANY_RULE]
-      app = None
-      app = appRules[host] if host in appRules else None
-      app = appRules[secdomain] if (app == None and secdomain in appRules) else app
-      company = companyRules[host] if host in companyRules else None
-      company = companyRules[secdomain] if (company == None and secdomain in companyRules) else company
-      rst = {}
-      if app:
-        if app != pkg.app:
-          hostRule = ''
-          if host in appRules:
-            hostRule = appRules[host]
-          secdomainRule = ''
-          if secdomain in appRules:
-            secdomainRule = appRules[secdomain]
-          # print app, pkg.app, host, secdomain, hostRule, secdomainRule
-        rst = {consts.APP_RULE : [(app, 1.0)]}
-      elif company:
-        rst = {consts.COMPANY_RULE : (company, 1.0)}
-      return rst
-     '''
-    
-    def usePcapUrl(self):
-        sqldao = SqlDao()
-        for app, url, fileName in sqldao.execute('SELECT * FROM url_apk'):
-            app = app.lower()
-            url = url.replace('http://', '').replace('www.','').replace('-', '.').split('/')[0].split(':')[0]
-            top_domain = get_top_domain(url)
-            if url == None or top_domain == None:
-              continue
-            self.fileApp[fileName].add(self.appCompany[app])
-            self.fileUrl[fileName].add(s)
-            self.urlLabel[url].add(app)
-            self.urlCompany[url].add(self.appCompany[app])
-            top_domain = get_top_domain(url)
-            self.urlLabel[top_domain].add(app)
-            common_str_pkg = longest_common_substring(url.lower(), app)
-            self.substrCompany[common_str_pkg].add(self.appCompany[app])
-            common_str_company = longest_common_substring(url.lower(), self.appCompany[app].lower())
-            self.substrCompany[common_str_company].add(self.appCompany[app])
-            common_str_name = longest_common_substring(url.lower(), self.appName[app].lower())
-            self.substrCompany[common_str_name].add(self.appCompany[app])
-# class PathApp:
-
-#   def __init__(self):
-#     self.fileApp = defaultdict(set)
-#     self.fileUrl = defaultdict(set)
-#     self.pathApp = defaultdict(set)
-#     self.pathCompany = defaultdict(set)
-#     self.substrCompany = defaultdict(set)
-#     self.appCompany, self.appName = load_appinfo()
-
-#   def loadExpApp(self):
-#     expApp=set()
-#     for app in open("resource/exp_app.txt"):
-#         expApp.add(app.strip().lower())
-#     return expApp
-  
-#   def count(self, pkg) :
-#     app = pkg.app
-#     if app not in self.appCompany:
-#       return
-#     path = pkg.path
-#     if path == None:
-#       return
-#     for pathSeg in path.split('/'):
-#       self.pathApp[pathSeg].add(app)
-#       self.pathCompany[pathSeg].add(self.appCompany[app])
-
-#       common_str = longest_common_substring(pathSeg.lower(), app)
-#       self.substrCompany[common_str].add(self.appCompany[app])
-#       common_str_company = longest_common_substring(pathSeg.lower(), self.appCompany[app].lower())
-#       self.substrCompany[common_str_company].add(self.appCompany[app])
-#       common_str_name = longest_common_substring(pathSeg.lower(), self.appName[app].lower())
-#       self.substrCompany[common_str_name].add(self.appCompany[app])
-#       if pathSeg == '28tracks.com':
-#         print '#TOPDOMAIN'
-#       if pathSeg == 'citynews.rogersdigitalmedia.com.edgesuite.net':
-#         print 'citynews.rogersdigitalmedia.com.edgesuite.net'
-
-#   def checkCommonStr(self, app, pathSeg, expApp):
-#     for astr in [app, self.appCompany[app], self.appName[app]]:
-#       common_str = longest_common_substring(pathSeg.lower(), astr.lower())
-#       if pathSeg == '12gigs.helpshift.com':
-#           print common_str
-#           print self.substrCompany[common_str]
-#       if len(self.substrCompany[common_str]) < 5 and app in expApp:
-#           if pathSeg == '12gigs.helpshift.com':
-#               print 'INNNNNNNNNNNN'
-
-#           return True
-#     return False
-#   def train(self, training_data):
-#     expApp = self.loadExpApp()
-#     for pkgs in training_data.values():
-#       for pkg in pkgs:
-#         self.count(pkg)
-#     ########################
-#     # Generate Rules
-#     ########################
-    
-#     # fw = open('tmp', 'w')
-    
-
-
-    
-#     self.rules = defaultdict(dict)
-#     for pathSeg, apps in self.pathApp.iteritems():
-#       companySet = {self.appCompany[app] for app in apps}
-#       if pathSeg == '1citynews.ca':
-#         print '#', pathSeg in rmdUrls
-#         print '#', len(apps)
-#         print apps
-#         print companySet
-
-#       if len(apps) == 1 or len(companySet) == 1:
-#         ruleType = consts.APP_RULE if len(apps) == 1 else consts.COMPANY_RULE
-
-#         ifValidRule = False
-
-#         for app in apps:
-#           if self.checkCommonStr(app, pathSeg, expApp): 
-#             ifValidRule = True
-
-#         app = apps.pop()
-        
-#         label = app if ruleType == consts.APP_RULE else companySet.pop()
-
-#         if ifValidRule:
-#           self.rules[ruleType][pathSeg] = label
-
-#         if pathSeg == '12gigs.helpshift.com':
-#           print 'Rule Type is', ruleType, ifValidRule
-
-#     # fw.close()
-#     return self
-
-#   def classify(self, pkg):
-#     import consts
-#     path = pkg.path
-#     appRules = self.rules[consts.APP_RULE]
-#     companyRules = self.rules[consts.COMPANY_RULE]
-#     app = None
-#     for pathSeg in path.split('/'):
-#       app = appRules[pathSeg] if pathSeg in appRules else None
-#       company = companyRules[pathSeg] if pathSeg in companyRules else None
-#       rst = defaultdict(list)
-#       if app:
-#         if app != pkg.app:
-#           hostRule = ''
-#           if pathSeg in appRules:
-#             hostRule = appRules[pathSeg]
-#           secdomainRule = ''
-#           if pathSeg in appRules:
-#             secdomainRule = appRules[pathSeg]
-#           # print app, pkg.app, host, secdomain, hostRule, secdomainRule
-#         rst[consts.APP_RULE].append((app, 1.0))
-#       elif company:
-#         rst[consts.COMPANY_RULE].append((company, 1.0))
-#     return rst
 
 if __name__ == '__main__':
   records = load_pkgs()
