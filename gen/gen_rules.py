@@ -10,7 +10,7 @@ patternTmplate = '--%s "/%s/i"; --context %s; '
 PATTERN = 'pattern'
 PCRE = 'pcre'
 IOS_GROUP = 'ios_app'
-HTTP_GET = '­­parsed_type HTTP_GET;'
+HTTP_GET = '--parsed_type HTTP_GET;'
 class Rule:
   def __init__(self, vulnID, name, group, weight):
     trackID = AppInfos.get(consts.IOS, name).trackId
