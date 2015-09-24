@@ -38,7 +38,7 @@ class Rule:
       wholePatternStr += patternStr
 
 
-    return ruleTmplate % (self.vulnID, self.attachID, self.name, self.revision, self.group, self.protocol, self.service, self.flow, self.weight, patternStr)
+    return ruleTmplate % (self.vulnID, self.attachID, self.name, self.revision, self.group, self.protocol, self.service, self.flow, self.weight, wholePatternStr)
 
 def output_rules(name, rules):
   fileWriter = open(name, 'w')
