@@ -10,7 +10,7 @@ patternTmplate = '--%s "/%s/i"; --context %s; '
 PATTERN = 'pattern'
 PCRE = 'pcre'
 IOS_GROUP = 'ios_app'
-HTTP_GET = '--parsed_type HTTP_GET;'
+HTTP_GET = '--parsed_type HTTP_GET; '
 class Rule:
   def __init__(self, vulnID, name, group, weight):
     trackID = AppInfos.get(consts.IOS, name).trackId
@@ -79,7 +79,7 @@ def generate_host_rules(vulnID = 200000):
       label, support, regexObj = labelNsupport
       rule = Rule(vulnID, label, IOS_GROUP, 30 + support)
       pattern = re.escape(host)
-      rule.add_feature_str(PCRE, pattern, 'host')
+      rule.add_feature_str(PCRE, pattern, 'host', HTTP_GET)
       vulnID += 1
       rules.append(rule)
   return rules
@@ -100,8 +100,8 @@ def generate_kv_rules(vulnID = 300000):
             if len(value.split('\n')) == 1:
               support = supNconf[consts.SUPPORT]
               rule = Rule(vulnID, label, IOS_GROUP, 20 + support)
-              rule.add_feature_str(PCRE, re.escape(host), 'host')
-              rule.add_feature_str(PCRE, re.escape(key+'='+value), 'uri')
+              rule.add_feature_str(PCRE, re.escape(host), 'host', HTTP_GET)
+              rule.add_feature_str(PCRE, re.escape(key+'='+value), 'uri', HTTP_GET)
               ipsRules.append(rule)
               vulnID += 1
   return ipsRules
@@ -122,10 +122,10 @@ def generate_path_rules(vulnID = 400000):
       for cmarFeatures, labelNsupport in patterns.items():
         label, support = labelNsupport
         rule = Rule(vulnID, label, IOS_GROUP, 10 + support)
-        rule.add_feature_str(PCRE, host, 'host')
+        rule.add_feature_str(PCRE, host, 'host', HTTP_GET)
         for feature in cmarFeatures:
           feature = re.escape(feature)
-          rule.add_feature_str(PCRE, feature, 'uri')
+          rule.add_feature_str(PCRE, feature, 'uri', HTTP_GET)
         vulnID += 1
         rules.append(rule)
   return rules
