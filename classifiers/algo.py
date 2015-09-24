@@ -111,7 +111,7 @@ class KVClassifier(AbsClassifer):
     sqldao.commit()
     sqldao.close()
 
-  def load_rules(self):
+  def load_rules2(self):
     self.rules = {}
     sqldao = SqlDao()
     self.rules[consts.APP_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'support':0}))))

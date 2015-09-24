@@ -10,6 +10,7 @@ patternTmplate = '--%s "/%s/i"; --context %s; '
 PATTERN = 'pattern'
 PCRE = 'pcre'
 IOS_GROUP = 'ios_app'
+HTTP_GET = '­­parsed_type HTTP_GET;'
 class Rule:
   def __init__(self, vulnID, name, group, weight):
     trackID = AppInfos.get(consts.IOS, name).trackId
@@ -25,13 +26,17 @@ class Rule:
     self.name = '[%s][%s]%s' % (self.weight, trackID, name)
     self.features = []
   
-  def add_feature_str(self, patternType, featureStr, context):
-    self.features.append((patternType, featureStr, context))
+  def add_feature_str(self, patternType, featureStr, context, parsedType = None):
+    self.features.append((patternType, featureStr, context, parsedType))
 
   def to_string(self):
-    patternStr = ''
-    for patternType, featureStr, context in self.features:
-      patternStr += patternTmplate % (patternType, featureStr, context)
+    wholePatternStr = ''
+    for patternType, featureStr, context, parsedType in self.features:
+      patternStr = patternTmplate % (patternType, featureStr, context)
+      if parsedType:
+        patternStr = parsedType + patternStr
+      wholePatternStr += patternStr
+
 
     return ruleTmplate % (self.vulnID, self.attachID, self.name, self.revision, self.group, self.protocol, self.service, self.flow, self.weight, patternStr)
 
@@ -57,7 +62,7 @@ def generate_agent_rules(vulnID = 100000):
         regex, label = regxNlabel
         rule = Rule(vulnID, label, IOS_GROUP, 41 - 1/float(len(agentFeature)))
         patternRegex = re.escape('User-Agent:')+'.*' + regex.pattern
-        rule.add_feature_str(PCRE, patternRegex, 'header')
+        rule.add_feature_str(PCRE, patternRegex, 'header', HTTP_GET)
         rules.append(rule)
         vulnID += 1
   return rules
@@ -71,7 +76,7 @@ def generate_host_rules(vulnID = 200000):
   rules = []
   for ruleType in classifier.rules:
     for host, labelNsupport in classifier.rules[ruleType].items():
-      label, support = labelNsupport
+      label, support, regexObj = labelNsupport
       rule = Rule(vulnID, label, IOS_GROUP, 30 + support)
       pattern = re.escape(host)
       rule.add_feature_str(PCRE, pattern, 'host')
