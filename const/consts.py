@@ -7,6 +7,7 @@ NULLPrediction = Prediction(None, -1, None)
 LABEL = 'l'
 SCORE = 's'
 SUPPORT = 't'
+REGEX_OBJ = 'r'
 
 #############TYPE###############
 APP_RULE = 1

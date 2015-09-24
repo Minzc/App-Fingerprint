@@ -160,7 +160,7 @@ class HostApp(AbsClassifer):
 
         rst[ruleType] = predict
         if predict.label != pkg.app and predict.label != None:
-          print predict.evidence, pkg.app, pkg.label
+          print predict.evidence, pkg.app, predict.label
       return rst
 
     def classify2(self, pkg):

@@ -1,4 +1,5 @@
 import const.consts as consts
+import re
 from sqldao import SqlDao
 from utils import load_exp_app, suffix_tree
 from collections import defaultdict, namedtuple
@@ -14,6 +15,9 @@ class KVClassifier(AbsClassifer):
     self.valueLabelCounter = defaultdict(set)
     self.rules = {}
     exp_apps = load_exp_app()
+    self.appRegex = {}
+    for appName in exp_apps([appType]):
+      self.appRegex[appName] = re.compile(appName)
     self.appSuffix = suffix_tree(exp_apps[appType])
     self.appType = appType
   def prune_general_rules(self, generalRules, trainData):
@@ -122,7 +126,56 @@ class KVClassifier(AbsClassifer):
     print '>>> [KV Rules#Load Rules] total number of rules is', counter
     sqldao.close()
 
+  def load_rules(self):
+    self.rules = {}
+    sqldao = SqlDao()
+    self.rules[consts.APP_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'support':0, 'regexObj': None}))))
+    self.rules[consts.COMPANY_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'support':0, 'regexObj': None}))))
+    self.rules[consts.CATEGORY_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {'score':0, 'support':0, 'regexObj': None}))))
+    QUERY = consts.SQL_SELECT_KV_RULES
+    counter = 0
+    for key, value, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
+      if len(value.split('\n')) == 1:
+        counter += 1
+        self.rules[rule_type][host][key][value][label][consts.SCORE] = confidence
+        self.rules[rule_type][host][key][value][label][consts.SUPPORT] = support
+        self.rules[rule_type][host][key][value][label][consts.REGEX_OBJ] = re.compile(re.escape(key+'='+value))
+    print '>>> [KV Rules#Load Rules] total number of rules is', counter
+    sqldao.close()
+
   def classify(self, pkg):
+    predictRst = {}
+    for ruleType in self.rules:
+      for host, queries in [(pkg.host, pkg.queries)]:
+        fatherScore = -1
+        rst = consts.NULLPrediction
+
+        for k, kRules in self.rules[ruleType].get(host, {}).iteritems():
+          for v in queries.get(k, []):          
+            for label, scoreNcount in kRules.get(v, {}).iteritems():
+              score, support, regexObj = scoreNcount[consts.SCORE], scoreNcount[consts.SUPPORT], scoreNcount[consts.REGEX_OBJ]
+              match = regexObj.search(pkg.host)
+
+              if support > rst.score or (support == rst.score and score > fatherScore):
+                fatherScore = score
+                evidence = (k, v)
+                rst = consts.Prediction(label, support, evidence)
+
+        predictRst[ruleType] = rst
+        
+        # If we can not predict based on kv in urls, use suffix tree to try again
+        if not predictRst[consts.APP_RULE].label:
+          for appName, regexObj in self.appRegex.iteritems():
+            match = regexObj.search(pkg.origPath)
+            if match:
+              predictRst[consts.APP_RULE]= consts.Prediction(appName, support, ('ORIGINAL_PATH', appName))
+            
+
+        # If we can predict based on original url, we do not need to use refer url to predict again
+        if predictRst[ruleType].label != None:
+          break
+    return predictRst
+  def classify2(self, pkg):
     predictRst = {}
     for ruleType in self.rules:
       for host, queries in [(pkg.host, pkg.queries), (pkg.refer_host, pkg.refer_queries)]:
@@ -151,8 +204,6 @@ class KVClassifier(AbsClassifer):
         # If we can predict based on original url, we do not need to use refer url to predict again
         if predictRst[ruleType].label != None:
           break
-
-
     return predictRst
 
   def classify_suffix_app(self, value):
