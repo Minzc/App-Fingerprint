@@ -49,7 +49,7 @@ class Package:
     query = urlparse.parse_qs(urlparse.urlparse(url).query, True)
     host = parsed_url.netloc
     path = parsed_url.path
-    self.refer_host = host
+    self.refer_host == host.split(':')[0].replace('www.', '').replace('http://','')
     self.refer_queries = query
 
   def set_path(self, path):
@@ -67,11 +67,6 @@ class Package:
       import tldextract
 
       host = host.lower()
-      if self.app == 'com.lowes.mobile.consumer.iphone.lowes':
-        print host
-        print host.split(':')[0]
-        print host.split(':')[0].replace('www.', '')
-        print host.split(':')[0].replace('www.', '').replace('http://','')
 
       self.host = host.split(':')[0].replace('www.', '').replace('http://','')
       extracted = tldextract.extract(host)
