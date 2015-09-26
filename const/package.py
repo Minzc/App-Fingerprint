@@ -49,7 +49,7 @@ class Package:
     query = urlparse.parse_qs(urlparse.urlparse(url).query, True)
     host = parsed_url.netloc
     path = parsed_url.path
-    self.refer_host == host.split(':')[0].replace('www.', '').replace('http://','')
+    self.refer_host = host.split(':')[0].replace('www.', '').replace('http://','')
     self.refer_queries = query
 
   def set_path(self, path):
