@@ -6,7 +6,7 @@ from const.app_info import AppInfos
 from classifier import AbsClassifer
 import re
 
-test_str = 'fox2now.com'
+test_str = 'www.lowes.com'
 
 class HostApp(AbsClassifer):
     def __init__(self, appType):

@@ -67,6 +67,12 @@ class Package:
       import tldextract
 
       host = host.lower()
+      if self.app == 'com.lowes.mobile.consumer.iphone.lowes':
+        print host
+        print host.split(':')[0]
+        print host.split(':')[0].replace('www.', '')
+        print host.split(':')[0].replace('www.', '').replace('http://','')
+
       self.host = host.split(':')[0].replace('www.', '').replace('http://','')
       extracted = tldextract.extract(host)
       self.secdomain = None
