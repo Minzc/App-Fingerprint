@@ -32,7 +32,8 @@ class HostApp(AbsClassifer):
     def count(self, pkg):
       def addCommonStr(url, pkg, string):
         common_str = longest_common_substring(url.lower(), string.lower())
-        self.substrCompany[common_str].add(pkg.label)
+        if len(common_str) > 3 or common_str in self.fLib[pkg.label]:
+          self.substrCompany[common_str].add(pkg.label)
 
       label = pkg.label
       appInfo = pkg.appInfo
@@ -68,9 +69,21 @@ class HostApp(AbsClassifer):
       sqldao = SqlDao()
       sqldao.execute(QUERY % (rule_type))
       sqldao.close()
+    
+    def _feature_lib(self, expApp):
+      self.fLib = defaultdict(set)
+      for label, appInfo in expApp.iteritems():
+        appSegs = appInfo.app.split('.')
+        companySegs = appInfo.company.split(' ')
+        categorySegs = appInfo.category.split(' ')
+        wholeSegs = [appSegs, companySegs, categorySegs]
+        for segs in wholeSegs:
+          for seg in segs:
+            self.fLib[label].add(seg)
 
     def train(self, records, rule_type):
       expApp = load_exp_app()[self.appType]
+      self._feature_lib(expApp)
       for pkgs in records.values():
         for pkg in pkgs:
           self.count(pkg)
