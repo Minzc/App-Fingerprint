@@ -127,7 +127,7 @@ def evaluate(rst, testSet, testApps):
       recall += 1
       if ifCorrect:
         correct += 1
-        correctApp.add(testSet[pkgId].app)
+        correctApp.add((testSet[pkgId].app, testSet[pkgId].trackId))
     
   print '[TEST] Total:', len(testSet)
   print '[TEST] Recall:', recall
@@ -142,6 +142,7 @@ def evaluate(rst, testSet, testApps):
   inforTrack[consts.PRECISION] = precision
   inforTrack[consts.RECALL] = recall
   inforTrack[consts.F1SCORE] = f1Score
+  inforTrack[consts.DISCOVERED_APP_LIST] = correctApp
   return inforTrack
 
 

@@ -6,6 +6,7 @@ import const.consts as consts
 import sys
 
 tbls = [  'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_08_12', 'ios_packages_2015_08_04']
+tbls = [  ios_packages_2015_08_10, ios_packages_2015_06_08, ios_packages_2015_08_12, ios_packages_2015_08_04]
 # tbls = ['ios_packages_2015_08_12', 'ios_packages_2015_08_10']
 
 
@@ -25,8 +26,28 @@ def test(testTbl):
       trainTbls.append(tbl)
 
   print trainTbls, testTbl
-  output = cross_batch_test(trainTbls, testTbl, consts.IOS)
+  inforTrack = cross_batch_test(trainTbls, testTbl, consts.IOS)
+  output = _output_rst(inforTrack)
   log(trainTbls, testTbl, output)
+  _compare_rst(inforTrack[consts.DISCOVERED_APP_LIST])
+
+def _compare_rst(discoveriedApps):
+  testDisApps = set()
+  for ln in open('ios_usa_agent-20150924.txt'):
+    appId = ln.strip().split('.')[0].replace('[','')
+    testDisApps.add(appId)
+
+  for app in discoveriedApps:
+    _, trackId = app
+    if trackId not in appId:
+      print appId, 'not found'
+
+def _output_rst(inforTrack):
+  precision = inforTrack[consts.PRECISION]
+  recall = inforTrack[consts.RECALL]
+  appCoverage = inforTrack[consts.DISCOVERED_APP]
+  f1Score = inforTrack[consts.F1SCORE]
+  return 'Precision %s, Recall: %s, App: %s, F1 Score: %s' % (precision, recall, appCoverage, f1Score)
 
 def auto_test():
   for testTbl in tbls:
@@ -36,7 +57,8 @@ def auto_test():
         trainTbls.append(tbl)
 
     print trainTbls, testTbl
-    output = cross_batch_test(trainTbls, testTbl, consts.IOS)
+    inforTrack = cross_batch_test(trainTbls, testTbl, consts.IOS)
+    output = _output_rst(inforTrack)
     log(trainTbls, testTbl, output)
 
 def gen_rules():
