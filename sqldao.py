@@ -2,10 +2,10 @@ import mysql.connector
 class SqlDao:
     def __init__(self):
       try:
-        self.cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
+        self.cnx=mysql.connector.connect(user='zicun',password='5636595',host='127.0.0.1',database='fortinet')
         self.cursor = self.cnx.cursor()
       except:
-        self.cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
+        self.cnx=mysql.connector.connect(user='zicun',password='5636595',host='127.0.0.1',database='fortinet')
         self.cursor = self.cnx.cursor()
     
     def executeBatch(self, query, params):
