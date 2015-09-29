@@ -83,6 +83,7 @@ class HostApp(AbsClassifer):
 
     def train(self, records, rule_type):
       expApp = load_exp_app()[self.appType]
+      expApp = {label: AppInfos.get(self.appType, label) for label in expApp}
       self._feature_lib(expApp)
       for pkgs in records.values():
         for pkg in pkgs:
