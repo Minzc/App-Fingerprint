@@ -33,8 +33,9 @@ def test(testTbl):
 def _compare_rst(discoveriedApps):
   testDisApps = set()
   for ln in open('ios_rules/ios_usa_agent-20150924.txt'):
-    appId = ln.strip().split('.')[0].replace('[','')
-    testDisApps.add(appId)
+    if 'Correct_Detection' in ln:
+        appId = ln.strip().split('.')[0].replace('[','')
+        testDisApps.add(appId)
 
   for app in discoveriedApps:
     _, trackId = app
