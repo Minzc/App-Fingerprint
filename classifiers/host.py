@@ -32,6 +32,7 @@ class HostApp(AbsClassifer):
     def count(self, pkg):
       def addCommonStr(url, pkg, string):
         common_str = longest_common_substring(url.lower(), string.lower())
+        common_str = common_str.strip('.')
         if len(common_str) > 3 or common_str in self.fLib[pkg.label]:
           self.substrCompany[common_str].add(pkg.label)
 
@@ -73,7 +74,7 @@ class HostApp(AbsClassifer):
     def _feature_lib(self, expApp):
       self.fLib = defaultdict(set)
       for label, appInfo in expApp.iteritems():
-        appSegs = appInfo.app.split('.')
+        appSegs = appInfo.package.split('.')
         companySegs = appInfo.company.split(' ')
         categorySegs = appInfo.category.split(' ')
         wholeSegs = [appSegs, companySegs, categorySegs]
