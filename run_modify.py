@@ -217,10 +217,10 @@ def test(testTbl, appType):
 
 
 def cross_batch_test(trainTbls, testTbl, appType, ifTrain = True):
-  _clean_up()
 
   print '>>> Start training'
   if ifTrain:
+    _clean_up()
     train(trainTbls, appType)
   print '>>> Start testing'
   inforTrack = test(testTbl, appType)
