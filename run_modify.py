@@ -127,7 +127,7 @@ def evaluate(rst, testSet, testApps):
       recall += 1
       if ifCorrect:
         correct += 1
-        correctApp.add((testSet[pkgId].app, testSet[pkgId].trackId))
+        correctApp.add((testSet[pkgId].app, testSet[pkgId].appInfo.trackId))
     
   print '[TEST] Total:', len(testSet)
   print '[TEST] Recall:', recall
@@ -229,7 +229,7 @@ def cross_batch_test(trainTbls, testTbl, appType):
   appCoverage = inforTrack[consts.DISCOVERED_APP]
   f1Score = inforTrack[consts.F1SCORE]
   print 'Precision %s, Recall: %s, App: %s, F1 Score: %s' % (precision, recall, appCoverage, f1Score)
-  return 'Precision %s, Recall: %s, App: %s, F1 Score: %s' % (precision, recall, appCoverage, f1Score)
+  return inforTrack
 
 
 ######### START ###########

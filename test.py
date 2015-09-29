@@ -6,7 +6,6 @@ import const.consts as consts
 import sys
 
 tbls = [  'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_08_12', 'ios_packages_2015_08_04']
-tbls = [  ios_packages_2015_08_10, ios_packages_2015_06_08, ios_packages_2015_08_12, ios_packages_2015_08_04]
 # tbls = ['ios_packages_2015_08_12', 'ios_packages_2015_08_10']
 
 
@@ -39,8 +38,8 @@ def _compare_rst(discoveriedApps):
 
   for app in discoveriedApps:
     _, trackId = app
-    if trackId not in appId:
-      print appId, 'not found'
+    if trackId not in testDisApps:
+      print trackId, 'not found'
 
 def _output_rst(inforTrack):
   precision = inforTrack[consts.PRECISION]
