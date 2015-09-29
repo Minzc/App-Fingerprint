@@ -6,7 +6,7 @@ from const.app_info import AppInfos
 from classifier import AbsClassifer
 import re
 
-test_str = 'www.lowes.com'
+test_str = {'1.ticketm.net', 't.homedepot.com', 'pepperjamnetwork.com', 'players.brightcove.net', 'pagefair.com'}
 
 class HostApp(AbsClassifer):
     def __init__(self, appType):
@@ -57,12 +57,13 @@ class HostApp(AbsClassifer):
       for astr in self.labelAppInfo[label]:
         common_str = longest_common_substring(url.lower(), astr.lower())
         common_str = common_str.strip('.')
-        if url == test_str:
-          print common_str
-          print self.substrCompany[common_str]
-        if common_str in self.substrCompany and len(self.substrCompany[common_str]) < 5 and self.labelAppInfo[label][0] in expApp:
-          if url == test_str:
-            print 'INNNNNNNNNNNN'
+        if url in test_str:
+          print common_str, url
+          print self.substrCompany[common_str], url
+        subCompanyLen = len(self.substrCompany[common_str])
+        if subCompanyLen < 5 and subCompanyLen > 0 and self.labelAppInfo[label][0] in expApp:
+          if url in test_str:
+            print 'INNNNNNNNNNNN', url
           return True
       return False
 
@@ -97,9 +98,10 @@ class HostApp(AbsClassifer):
       print test_str in self.urlLabel
 
       for url, labels in self.urlLabel.iteritems():
-        if url == test_str:
+        if url in test_str:
           print '#', len(labels)
           print labels
+          print url
 
         if len(labels) == 1:
           label = labels.pop()
@@ -108,8 +110,8 @@ class HostApp(AbsClassifer):
           if ifValidRule:
             self.rules[rule_type][url] = (label, set())
 
-          if url == test_str:
-            print 'Rule Type is', rule_type, ifValidRule
+          if url in test_str:
+            print 'Rule Type is', rule_type, ifValidRulem, url
 
       print 'number of rule', len(self.rules[consts.APP_RULE])
 
