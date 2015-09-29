@@ -56,10 +56,11 @@ class HostApp(AbsClassifer):
     def checkCommonStr(self, label, url, expApp):
       for astr in self.labelAppInfo[label]:
         common_str = longest_common_substring(url.lower(), astr.lower())
+        common_str = common_str.strip('.')
         if url == test_str:
           print common_str
           print self.substrCompany[common_str]
-        if len(self.substrCompany[common_str]) < 5 and self.labelAppInfo[label][0] in expApp:
+        if common_str in self.substrCompany and len(self.substrCompany[common_str]) < 5 and self.labelAppInfo[label][0] in expApp:
           if url == test_str:
             print 'INNNNNNNNNNNN'
           return True
