@@ -17,7 +17,11 @@ class KVClassifier(AbsClassifer):
     exp_apps = load_exp_app()
     self.appRegex = {}
     for appName in exp_apps[appType]:
-      self.appRegex[appName] = re.compile(appName)
+      if '.' in appName:
+        self.appRegex[appName] = re.compile(appName)
+      else:
+        self.appRegex[appName] = re.compile('='+appName)
+
     self.appSuffix = suffix_tree(exp_apps[appType])
     self.appType = appType
   def prune_general_rules(self, generalRules, trainData):
@@ -169,12 +173,13 @@ class KVClassifier(AbsClassifer):
             match = regexObj.search(pkg.origPath)
             if match:
               predictRst[consts.APP_RULE]= consts.Prediction(appName, 1, ('ORIGINAL_PATH', appName))
+              print 'ORIGNI PATH', pkg.origPath
             
 
         # If we can predict based on original url, we do not need to use refer url to predict again
         if predictRst[ruleType].label != None:
           break
-    if predictRst != consts.NULLPrediction and predictRst[consts.APP_RULE].label != pkg.app:
+    if predictRst[consts.APP_RULE] != consts.NULLPrediction and predictRst[consts.APP_RULE].label != pkg.app:
       print predictRst[consts.APP_RULE].evidence, predictRst[consts.APP_RULE].label, pkg.app
       print '=' * 10
     return predictRst
