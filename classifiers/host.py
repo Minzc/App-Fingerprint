@@ -95,7 +95,6 @@ class HostApp(AbsClassifer):
       # Generate Rules
       ########################
       
-      print test_str in self.urlLabel
 
       for url, labels in self.urlLabel.iteritems():
         if url in test_str:

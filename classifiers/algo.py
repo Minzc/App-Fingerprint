@@ -174,7 +174,7 @@ class KVClassifier(AbsClassifer):
         # If we can predict based on original url, we do not need to use refer url to predict again
         if predictRst[ruleType].label != None:
           break
-    if predictRst[consts.APP_RULE].label != pkg.app:
+    if predictRst != consts.NULLPrediction and predictRst[consts.APP_RULE].label != pkg.app:
       print predictRst[consts.APP_RULE].evidence, predictRst[consts.APP_RULE].label, pkg.app
       print '=' * 10
     return predictRst
