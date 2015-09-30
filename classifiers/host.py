@@ -33,7 +33,7 @@ class HostApp(AbsClassifer):
       def addCommonStr(url, pkg, string):
         common_str = longest_common_substring(url.lower(), string.lower())
         common_str = common_str.strip('.')
-        if len(common_str) > 3 or common_str in self.fLib[pkg.label]:
+        if len(common_str) > 3 or (common_str in self.fLib[pkg.label] and len(common_str) > 1):
           self.substrCompany[common_str].add(pkg.label)
 
       label = pkg.label
@@ -111,7 +111,7 @@ class HostApp(AbsClassifer):
             self.rules[rule_type][url] = (label, set())
 
           if url in test_str:
-            print 'Rule Type is', rule_type, ifValidRulem, url
+            print 'Rule Type is', rule_type, ifValidRule, url
 
       print 'number of rule', len(self.rules[consts.APP_RULE])
 
