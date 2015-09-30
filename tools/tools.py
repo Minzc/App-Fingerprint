@@ -310,6 +310,22 @@ def getExpAppList(folder):
   for expId in expIds:
     print expId
 
+def select_field(fieldName):
+  sqlDao = SqlDao()
+  SELECT_APP_SQL = 'SELECT app FROM ios_packages_2015_09_14 where classified is not NULL'
+  identifiedApps = set()
+  for app in sqlDao.execute(SELECT_APP_SQL):
+    identifiedApps.add(app)
+  SELECT_FIELD_SQL = 'SELECT app, %s FROM ios_packages_2015_09_14 where classified is not NULL'
+  
+  records = defaultdict(set())
+  for app, field in sqlDao.execute(SQL):
+    if app not in identifiedApps:
+      records[app].add(field)
+
+  for app, fields in records.iteritems():
+    print app, fields
+
 
 if __name__ == '__main__':
   if len(sys.argv) < 2:
@@ -338,6 +354,8 @@ if __name__ == '__main__':
     test_suffix_tree()
   elif sys.argv[1] == 'expids':
     getExpAppList(sys.argv[2])
+  elif sys.argv[1] == 'select':
+    select_field(sys.argv[2])
 
 
 

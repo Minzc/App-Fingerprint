@@ -10,7 +10,7 @@ from classifiers.classifier_factory import classifier_factory
 
 
 LIMIT = None
-INSERT = False
+INSERT = True
 PRUNE = False
 
 VALID_LABEL = {consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE}
@@ -23,9 +23,9 @@ TRAIN_LABEL = {
 USED_CLASSIFIERS = [
     #consts.HEAD_CLASSIFIER,
     consts.AGENT_CLASSIFIER,
-    #consts.HOST_CLASSIFIER,
-    #consts.CMAR_CLASSIFIER,
-    #consts.KV_CLASSIFIER,
+    consts.HOST_CLASSIFIER,
+    consts.CMAR_CLASSIFIER,
+    consts.KV_CLASSIFIER,
 ]
 
 
