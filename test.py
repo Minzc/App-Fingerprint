@@ -25,7 +25,7 @@ def test(testTbl):
       trainTbls.append(tbl)
 
   print trainTbls, testTbl
-  inforTrack = cross_batch_test(trainTbls, testTbl, consts.IOS, ifTrain = True)
+  inforTrack = cross_batch_test(trainTbls, testTbl, consts.IOS, ifTrain = False)
   output = _output_rst(inforTrack)
   log(trainTbls, testTbl, output)
   _compare_rst(inforTrack[consts.DISCOVERED_APP_LIST], inforTrack[consts.RESULT])
@@ -36,7 +36,7 @@ def _compare_rst(discoveriedApps, rst):
   - rst {pkgId: {labelType: Prediction(label, score, evidence)}}
   '''
   testDisApps = set()
-  for ln in open('ios_rules/ios_usa_cmar-20150930.txt'):
+  for ln in open('ios_rules/all_rules_20151001.txt'):
     if 'Correct_Detection' in ln:
         appId = ln.strip().split('.')[0].replace('[','')
         testDisApps.add(appId)
