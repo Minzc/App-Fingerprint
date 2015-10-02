@@ -78,8 +78,8 @@ def generate_host_rules(vulnID = 200000):
     for host, labelNsupport in classifier.rules[ruleType].items():
       label, support, regexObj = labelNsupport
       rule = Rule(vulnID, label, IOS_GROUP, 30 + support)
-      pattern = re.escape(host)
-      rule.add_feature_str(PCRE, pattern, 'host', HTTP_GET)
+      pattern = regexObj.pattern
+      rule.add_feature_str(PCRE, pattern, 'host')
       vulnID += 1
       rules.append(rule)
   return rules
@@ -92,16 +92,17 @@ def generate_kv_rules(vulnID = 300000):
   iosGroup = IOS_GROUP
   
   ipsRules = []
+
   for ruleType, rules in classifier.rules.items():
     for host, keyValues in rules.items():
       for key, valueLabels in keyValues.items():
         for value, labelScores in valueLabels.items():
-          for label, supNconf in labelScores.items():
+          for label, scoreNcount in labelScores.items():
+            score, support, regexObj = scoreNcount[consts.SCORE], scoreNcount[consts.SUPPORT], scoreNcount[consts.REGEX_OBJ]
             if len(value.split('\n')) == 1:
-              support = supNconf[consts.SUPPORT]
               rule = Rule(vulnID, label, IOS_GROUP, 20 + support)
               rule.add_feature_str(PCRE, re.escape(host), 'host', HTTP_GET)
-              rule.add_feature_str(PCRE, re.escape(key+'='+value), 'uri', HTTP_GET)
+              rule.add_feature_str(PCRE, regexObj.pattern, 'uri', HTTP_GET)
               ipsRules.append(rule)
               vulnID += 1
   return ipsRules
