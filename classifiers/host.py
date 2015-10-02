@@ -65,9 +65,9 @@ class HostApp(AbsClassifer):
         strValid = True if common_str in self.fLib[label] and len(common_str) > 1 else False
         companyValid = True if subCompanyLen < 5 and subCompanyLen > 0 else False
           
-        if subCompanyLen and strValid:
+        if companyValid and strValid:
           if url in test_str:
-            print 'INNNNNNNNNNNN', url, label
+            print 'INNNNNNNNNNNN', url, label, common_str
           return True
       return False
 
