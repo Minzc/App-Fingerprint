@@ -30,17 +30,26 @@ def test(testTbl):
   log(trainTbls, testTbl, output)
   _compare_rst(inforTrack[consts.DISCOVERED_APP_LIST])
 
-def _compare_rst(discoveriedApps):
+def _compare_rst(discoveriedApps, rst):
   testDisApps = set()
   for ln in open('ios_rules/ios_usa_cmar-20150930.txt'):
     if 'Correct_Detection' in ln:
         appId = ln.strip().split('.')[0].replace('[','')
         testDisApps.add(appId)
-
-  for app in discoveriedApps:
-    _, trackId = app
+  
+  rstDiff = []
+  appDiff = {}
+  for appNid in discoveriedApps:
+    app, trackId = appNid
     if trackId not in testDisApps:
-      print trackId, 'not found'
+      appDiff[app] = trackId
+
+  for prediction in rst:
+    if prediction.label in appDiff:
+      rstDiff.append((prediction.label, str(prediction.evidence)))
+  rstDiff = sorted(rstDiff, key = lambda x: x[0])
+  for diff in rstDiff:
+    print diff
 
 def _output_rst(inforTrack):
   precision = inforTrack[consts.PRECISION]

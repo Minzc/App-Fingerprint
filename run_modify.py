@@ -212,6 +212,7 @@ def test(testTbl, appType):
 
   print '>>> Start evaluating'
   inforTrack = evaluate(rst, testSet, testApps)
+  inforTrack[consts.RESULT] = rst
   return inforTrack
 
 
