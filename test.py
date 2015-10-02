@@ -28,7 +28,7 @@ def test(testTbl):
   inforTrack = cross_batch_test(trainTbls, testTbl, consts.IOS, ifTrain = True)
   output = _output_rst(inforTrack)
   log(trainTbls, testTbl, output)
-  _compare_rst(inforTrack[consts.DISCOVERED_APP_LIST])
+  _compare_rst(inforTrack[consts.DISCOVERED_APP_LIST], inforTrack[consts.RESULT])
 
 def _compare_rst(discoveriedApps, rst):
   testDisApps = set()
