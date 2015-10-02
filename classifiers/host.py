@@ -6,7 +6,8 @@ from const.app_info import AppInfos
 from classifier import AbsClassifer
 import re
 
-test_str = {'1.ticketm.net', 't.homedepot.com', 'pepperjamnetwork.com', 'players.brightcove.net', 'pagefair.com'}
+#test_str = {'1.ticketm.net', 't.homedepot.com', 'pepperjamnetwork.com', 'players.brightcove.net', 'pagefair.com'}
+test_str = {'sharesdk.cn'}
 
 class HostApp(AbsClassifer):
     def __init__(self, appType):
@@ -63,7 +64,7 @@ class HostApp(AbsClassifer):
         subCompanyLen = len(self.substrCompany[common_str])
         if subCompanyLen < 5 and subCompanyLen > 0 and self.labelAppInfo[label][0] in expApp:
           if url in test_str:
-            print 'INNNNNNNNNNNN', url
+            print 'INNNNNNNNNNNN', url, label
           return True
       return False
 
@@ -174,6 +175,9 @@ class HostApp(AbsClassifer):
             match = regexObj.search(pkg.host)
             if match and predict.score < support:
               predict = consts.Prediction(label, support, (pkg.host, regexStr))
+            if pkg.app == 'com.logos.vyrso' and pkg.host == 'gsp1.apple.com':
+              print regexStr
+	      print match
 
         rst[ruleType] = predict
         if predict.label != pkg.app and predict.label != None:
