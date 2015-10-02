@@ -31,6 +31,10 @@ def test(testTbl):
   _compare_rst(inforTrack[consts.DISCOVERED_APP_LIST], inforTrack[consts.RESULT])
 
 def _compare_rst(discoveriedApps, rst):
+  '''
+  Input:
+  - rst {pkgId: {labelType: Prediction(label, score, evidence)}}
+  '''
   testDisApps = set()
   for ln in open('ios_rules/ios_usa_cmar-20150930.txt'):
     if 'Correct_Detection' in ln:
@@ -44,7 +48,8 @@ def _compare_rst(discoveriedApps, rst):
     if trackId not in testDisApps:
       appDiff[app] = trackId
 
-  for prediction in rst:
+  for pkgID, predictions in rst.iteritems():
+    prediction = predictions[consts.APP_RULE]
     if prediction.label in appDiff:
       rstDiff.append((prediction.label, str(prediction.evidence)))
   rstDiff = sorted(rstDiff, key = lambda x: x[0])
