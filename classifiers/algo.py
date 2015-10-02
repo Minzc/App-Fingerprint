@@ -173,8 +173,6 @@ class KVClassifier(AbsClassifer):
             match = regexObj.search(pkg.origPath)
             if match:
               predictRst[consts.APP_RULE]= consts.Prediction(appName, 1, ('ORIGINAL_PATH', appName))
-              print 'ORIGNI PATH', pkg.origPath
-            
 
         # If we can predict based on original url, we do not need to use refer url to predict again
         if predictRst[ruleType].label != None:
