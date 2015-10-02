@@ -51,7 +51,7 @@ def _compare_rst(discoveriedApps, rst):
   for pkgID, predictions in rst.iteritems():
     prediction = predictions[consts.APP_RULE]
     if prediction.label in appDiff:
-      rstDiff.append((prediction.label, str(prediction.evidence)))
+      rstDiff.append((prediction.label, appDiff[prediction.label],str(prediction.evidence)))
   rstDiff = sorted(rstDiff, key = lambda x: x[0])
   for diff in rstDiff:
     print diff
