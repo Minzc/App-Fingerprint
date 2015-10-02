@@ -62,7 +62,7 @@ class HostApp(AbsClassifer):
           print common_str, url
           print self.substrCompany[common_str], url
         subCompanyLen = len(self.substrCompany[common_str])
-        strValid = True if common_str in self.fLib[pkg.label] and len(common_str) > 1 else False
+        strValid = True if common_str in self.fLib[label] and len(common_str) > 1 else False
         companyValid = True if subCompanyLen < 5 and subCompanyLen > 0 else False
           
         if subCompanyLen and strValid:
