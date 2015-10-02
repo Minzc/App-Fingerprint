@@ -62,7 +62,10 @@ class HostApp(AbsClassifer):
           print common_str, url
           print self.substrCompany[common_str], url
         subCompanyLen = len(self.substrCompany[common_str])
-        if subCompanyLen < 5 and subCompanyLen > 0 and self.labelAppInfo[label][0] in expApp:
+        strValid = True if common_str in self.fLib[pkg.label] and len(common_str) > 1 else False
+        companyValid = True if subCompanyLen < 5 and subCompanyLen > 0 else False
+          
+        if subCompanyLen and strValid:
           if url in test_str:
             print 'INNNNNNNNNNNN', url, label
           return True
@@ -175,9 +178,9 @@ class HostApp(AbsClassifer):
             match = regexObj.search(pkg.host)
             if match and predict.score < support:
               predict = consts.Prediction(label, support, (pkg.host, regexStr))
-            if pkg.app == 'com.logos.vyrso' and pkg.host == 'gsp1.apple.com':
-              print regexStr
-	      print match
+            # if pkg.app == 'com.logos.vyrso' and pkg.host == 'gsp1.apple.com':
+            #   print regexStr
+	      # print match
 
         rst[ruleType] = predict
         if predict.label != pkg.app and predict.label != None:
