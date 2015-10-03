@@ -114,7 +114,6 @@ def generate_path_rules(vulnID = 400000):
   appType = consts.IOS
   classifier = classifier_factory(trainedClassifiers, appType)[0][1]
   classifier.load_rules()
-  vulnID = 300001
   iosGroup = IOS_GROUP
   
   rules = []
@@ -123,10 +122,10 @@ def generate_path_rules(vulnID = 400000):
       for cmarFeatures, labelNsupport in patterns.items():
         label, support = labelNsupport
         rule = Rule(vulnID, label, IOS_GROUP, 10 + support)
-        rule.add_feature_str(PCRE, host, 'host', HTTP_GET)
+        rule.add_feature_str(PCRE, host, 'host')
         for feature in cmarFeatures:
           feature = re.escape(feature)
-          rule.add_feature_str(PCRE, feature, 'uri', HTTP_GET)
+          rule.add_feature_str(PCRE, feature, 'uri')
         vulnID += 1
         rules.append(rule)
   return rules

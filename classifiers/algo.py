@@ -49,11 +49,9 @@ class KVClassifier(AbsClassifer):
     for tbl in trainData.keys():
       for pkg in trainData[tbl]:
         for k,v in pkg.queries.items():
-          if pkg.secdomain == 'bluecorner.es' or pkg.host == 'bluecorner.es' or pkg.label == 'com.bluecorner.totalgym':
-            #print 'OK contains bluecorner', pkg.secdomain
-            pass
           map(lambda x : self.featureTbl[pkg.secdomain][pkg.label][k][x].add(tbl), v)
           map(lambda x : self.valueLabelCounter[x].add(pkg.label), v)
+    print self.valueLabelCounter['interactivevideo_inlinevideo_mraid1_th_autoplay_mediation_sdkadmobapiforads']
     ##################
     # Count
     ##################
