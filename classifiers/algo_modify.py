@@ -52,8 +52,8 @@ class KVClassifier(AbsClassifer):
     reversPkgids = defaultdict(lambda : defaultdict(set))
     for host in recorder:
       for key in recorder[host]:
-        for pkgSet in recorder[host][key]:
-          reversPkgids[host][frozenset(pkgSet)].add((host,key, scores[host][key], len(pkgSet)))
+        pkgSet = recorder[host][key]
+        reversPkgids[host][frozenset(pkgSet)].add((host,key, scores[host][key], len(pkgSet)))
 
     for host, pkgIdNrules in reversPkgids.iteritems():
       finalTuples = []
