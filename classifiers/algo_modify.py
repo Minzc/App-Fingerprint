@@ -53,10 +53,23 @@ class KVClassifier(AbsClassifer):
     for host in recorder:
       for key in recorder[host]:
         for pkgSet in recorder[host][key]:
-          reversPkgids[frozenset(pkgSet)][host].add((host,key, scores[host][key]))
+          reversPkgids[host][frozenset(pkgSet)].add((host,key, scores[host][key], len(pkgSet)))
 
-    for pkgSet, hostNrules in reversPkgids.iteritems():
-      for host, rules in hostNrules.iteritems():
+    for host, pkgIdNrules in reversPkgids.iteritems():
+      finalTuples = []
+      pkgIdNrules = pkgIdNrules.items()
+      # pkgIdNrules : (pkgIds, {(host, key, score, len_pkg_set), rule, rule}), (....), ...
+      pkgIdNrules = sorted(pkgIdNrules, key=lambda x: len(x[0]),reverse=True)
+      for pkgIdNrule in pkgIdNrules:
+        ifPut = True
+        for finalTuple in finalTuples:
+          if pkgIdNrule[0].issubset(finalTuple):
+              ifPut = False
+              finalTuple[1] += finalTuple[1]
+        if ifPut:
+          finalTuples.append(pkgIdNrule)
+            
+      for pkgIds, rules in finalTuples:
           print host, rules
           print '=' * 10
 
