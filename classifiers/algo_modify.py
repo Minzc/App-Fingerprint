@@ -49,15 +49,16 @@ class KVClassifier(AbsClassifer):
               ruleScore = specificRules[host][key][value][pkg.label][consts.SUPPORT]
               scores[host][key] = specificRules[host][key][value][pkg.label][consts.SCORE]
               recorder[host][key].add(tbl+'#'+str(pkg.id))
-    reversPkgids = defaultdict(set)
+    reversPkgids = defaultdict(lambda : defaultdict(set))
     for host in recorder:
       for key in recorder[host]:
         for pkgSet in recorder[host][key]:
-          reversPkgids[frozenset(pkgSet)].add((host, key))
+          reversPkgids[frozenset(pkgSet)][host].add((host,key))
 
-    for pkgSet, rules in reversPkgids.iteritems():
-      print rules
-      print '=' * 10
+    for pkgSet, hostNrules in reversPkgids.iteritems():
+      for host, rules in hostNrules.iteritems():
+          print host, rules
+          print '=' * 10
 
   def train(self, trainData, rule_type):
     for tbl in trainData.keys():
