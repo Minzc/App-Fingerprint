@@ -63,7 +63,7 @@ class KVClassifier(AbsClassifer):
       for pkgIdNrule in pkgIdNrules:
         ifPut = True
         for finalTuple in finalTuples:
-          if pkgIdNrule[0].issubset(finalTuple):
+          if pkgIdNrule[0].issubset(finalTuple[0]):
               ifPut = False
               finalTuple[1] += finalTuple[1]
         if ifPut:
