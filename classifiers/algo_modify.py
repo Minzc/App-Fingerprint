@@ -49,7 +49,7 @@ class KVClassifier(AbsClassifer):
               ruleScore = specificRules[host][key][value][pkg.label][consts.SUPPORT]
               scores[host][key] = specificRules[host][key][value][pkg.label][consts.SCORE]
               recorder[host][key].add(tbl+'#'+str(pkg.id))
-    reversPkgids = defaultdict(set())
+    reversPkgids = defaultdict(set)
     for host in recorder:
       for key in recorder[host]:
         for pkgSet in recorder[host][key]:
