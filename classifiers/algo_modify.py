@@ -33,6 +33,7 @@ class KVClassifier(AbsClassifer):
     '''
                 # specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
                 # specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT].add(tbl)
+    print 'Start Pruning'
     PKG_IDS = 1
     VALUES = 2
     newSpecificRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {PKG_IDS:{},VALUES:set()}))))
