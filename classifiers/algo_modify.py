@@ -62,10 +62,10 @@ class KVClassifier(AbsClassifer):
       pkgIdNrules = sorted(pkgIdNrules, key=lambda x: len(x[0]),reverse=True)
       for pkgIdNrule in pkgIdNrules:
         ifPut = True
-        for finalTuple in finalTuples:
+        for i, finalTuple in enumerate(finalTuples):
           if pkgIdNrule[0].issubset(finalTuple[0]):
               ifPut = False
-              finalTuple[1] |= finalTuple[1]
+              finalTuples[i] = (finalTuple[0], finalTuple[1] | pkgIdNrule[1])
         if ifPut:
           finalTuples.append(pkgIdNrule)
             
