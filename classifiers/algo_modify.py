@@ -53,7 +53,7 @@ class KVClassifier(AbsClassifer):
     for host in recorder:
       for key in recorder[host]:
         for pkgSet in recorder[host][key]:
-          reversPkgids[frozenset(pkgSet)][host].add((host,key))
+          reversPkgids[frozenset(pkgSet)][host].add((host,key, scores[host][key]))
 
     for pkgSet, hostNrules in reversPkgids.iteritems():
       for host, rules in hostNrules.iteritems():
