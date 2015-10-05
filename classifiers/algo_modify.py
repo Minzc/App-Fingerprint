@@ -37,8 +37,8 @@ class KVClassifier(AbsClassifer):
     PKG_IDS = 1
     VALUES = 2
     newSpecificRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {PKG_IDS:{},VALUES:set()}))))
-    recorder = defaultdict(lambda : defaultdict(lambda : defaultdict(set)))
-    scores = defaultdict(lambda : defaultdict(lambda : defaultdict(set)))
+    recorder = defaultdict(lambda : defaultdict(set))
+    scores = defaultdict(lambda : defaultdict(set))
     for tbl, pkgs in trainData.iteritems():
       for pkg in pkgs:
         host = pkg.host
@@ -114,7 +114,7 @@ class KVClassifier(AbsClassifer):
             if len(self.valueLabelCounter[value]) == 1 and len(value) != 1:
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT].add(tbl)
-    prune_specific_rules(specificRules, trainData)
+    self.prune_specific_rules(specificRules, trainData)
     #############################
     # Persist rules
     #############################
