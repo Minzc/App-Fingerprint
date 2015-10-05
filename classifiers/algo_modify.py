@@ -70,7 +70,7 @@ class KVClassifier(AbsClassifer):
           finalTuples.append(pkgIdNrule)
             
       for pkgIds, rules in finalTuples:
-        print host, rules, len(pkgIdNrules)
+        print host, rules, len(pkgIdNrules), pkgIdNrules
       print '=' * 10
 
   def train(self, trainData, rule_type):
