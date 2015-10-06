@@ -153,7 +153,7 @@ class KVClassifier(AbsClassifer):
             if len(self.valueLabelCounter[value]) == 1 and len(value) != 1:
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT].add(tbl)
-    self.prune_general_rule(generalRule, trainData)
+    self.prune_general_rule(generalRules, trainData)
     #############################
     # Persist rules
     #############################
