@@ -90,7 +90,7 @@ class KVClassifier(AbsClassifer):
       keyNpkgIds = sorted(keyNpkgIds.items(), key=lambda keyNid : len(keyNid[1]))
       for i in range(len(keyNpkgIds)):
         ifOutput = True
-        for j in range(j, len(keyNpkgIds)):
+        for j in range(i, len(keyNpkgIds)):
           if keyNpkgIds[i][1].issubset(keyNpkgIds[j][1]):
             ifOutput = False
         if ifOutput:
