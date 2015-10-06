@@ -94,9 +94,8 @@ class KVClassifier(AbsClassifer):
           if keyNpkgIds[i][1].issubset(keyNpkgIds[j][1]):
             ifOutput = False
         if ifOutput:
-          host, keyNpkgIds[0], len(keyNpkgIds)
-
-    pass
+          print host, keyNpkgIds[0], len(keyNpkgIds)
+      print '='*10
 
 
   def train(self, trainData, rule_type):
@@ -154,7 +153,7 @@ class KVClassifier(AbsClassifer):
             if len(self.valueLabelCounter[value]) == 1 and len(value) != 1:
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT].add(tbl)
-    self.prune_specific_rules(specificRules, trainData)
+    self.prune_general_rule(specificRules, trainData)
     #############################
     # Persist rules
     #############################
