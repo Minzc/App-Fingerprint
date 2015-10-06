@@ -87,7 +87,7 @@ class KVClassifier(AbsClassifer):
             specificRules[pkg.secdomain][rule.key].add(tbl + '#' + str(pkg.id))
 
     for host, keyNpkgIds in specificRules.iteritems():
-      keyNpkgIds = sorted(keyNpkgIds.items(), lambda keyNid : len(keyNid[1]))
+      keyNpkgIds = sorted(keyNpkgIds.items(), key=lambda keyNid : len(keyNid[1]))
       for i in range(len(keyNpkgIds)):
         ifOutput = True
         for j in range(j, len(keyNpkgIds)):
@@ -153,7 +153,7 @@ class KVClassifier(AbsClassifer):
             if len(self.valueLabelCounter[value]) == 1 and len(value) != 1:
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT].add(tbl)
-    self.prune_general_rule(generalRules, trainData)
+    self.prune_general_rule(generalRule, trainData)
     #############################
     # Persist rules
     #############################
