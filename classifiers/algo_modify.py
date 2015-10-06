@@ -31,14 +31,12 @@ class KVClassifier(AbsClassifer):
     - generalRules : {secdomain: [Rule(secdomain, key, score, labelNum)]}
     - trainData : {tbl: [pkgs]}
     '''
-                # specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
-                # specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT].add(tbl)
     print 'Start Pruning'
     PKG_IDS = 1
     VALUES = 2
     newSpecificRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {PKG_IDS:{},VALUES:set()}))))
-    recorder = defaultdict(lambda : defaultdict(set))
-    scores = defaultdict(lambda : defaultdict(set))
+    countPkgIds = defaultdict(lambda : defaultdict(set))
+    ruleScores = defaultdict(lambda : defaultdict(set))
     for tbl, pkgs in trainData.iteritems():
       for pkg in pkgs:
         host = pkg.host
@@ -46,14 +44,14 @@ class KVClassifier(AbsClassifer):
           for value in pkg.queries[key]:
             if pkg.label in specificRules[host][key][value]:
               # Here we can change it to rule score
-              ruleScore = specificRules[host][key][value][pkg.label][consts.SUPPORT]
-              scores[host][key] = specificRules[host][key][value][pkg.label][consts.SCORE]
-              recorder[host][key].add(tbl+'#'+str(pkg.id))
+              ruleSupport = specificRules[host][key][value][pkg.label][consts.SUPPORT]
+              ruleScores[host][key] = specificRules[host][key][value][pkg.label][consts.SCORE]
+              countPkgIds[host][key].add(tbl+'#'+str(pkg.id))
+
     reversPkgids = defaultdict(lambda : defaultdict(set))
-    for host in recorder:
-      for key in recorder[host]:
-        pkgSet = recorder[host][key]
-        reversPkgids[host][frozenset(pkgSet)].add((host,key, scores[host][key], len(pkgSet)))
+    for host in countPkgIds:
+      for key, pkgSet in countPkgIds[host].items():
+        reversPkgids[host][frozenset(pkgSet)].add((host, key, ruleScores[host][key], len(pkgSet)))
 
     for host, pkgIdNrules in reversPkgids.iteritems():
       finalTuples = []
@@ -64,14 +62,42 @@ class KVClassifier(AbsClassifer):
         ifPut = True
         for i, finalTuple in enumerate(finalTuples):
           if pkgIdNrule[0] == finalTuple[0]:
-              ifPut = False
-              finalTuples[i] = (finalTuple[0], finalTuple[1] | pkgIdNrule[1])
+            ifPut = False
+            finalTuples[i] = (finalTuple[0], finalTuple[1] | pkgIdNrule[1])
         if ifPut:
           finalTuples.append(pkgIdNrule)
             
       for pkgIds, rules in finalTuples:
-        print host, rules, len(pkgIdNrules), pkgIdNrules
+        print host, rules, len(pkgIdNrules)
       print '=' * 10
+
+  
+  def prune_general_rule(self, generalRules, trainData):
+    '''
+    Input
+    - generalRules : {secdomain : [(secdomain, key, score, labelNum), rule, rule]}
+    '''
+    specificRules = defaultdict(lambda : defaultdict(set))
+    
+    for tbl, pkgs in trainData.iteritems():
+      for pkg in filter(lambda pkg : pkg.secdomain in generalRules, pkgs):
+        for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.secdomain]):
+          for value in pkg.queries[rule.key]:
+            value = value.strip()
+            specificRules[pkg.secdomain][rule.key].add(tbl + '#' + str(pkg.id))
+
+    for host, keyNpkgIds in specificRules.iteritems():
+      keyNpkgIds = sorted(keyNpkgIds.items(), lambda keyNid : len(keyNid[1]))
+      for i in range(len(keyNpkgIds)):
+        ifOutput = True
+        for j in range(j, len(keyNpkgIds)):
+          if keyNpkgIds[i][1].issubset(keyNpkgIds[j][1]):
+            ifOutput = False
+        if ifOutput:
+          host, keyNpkgIds[0], len(keyNpkgIds)
+
+    pass
+
 
   def train(self, trainData, rule_type):
     for tbl in trainData.keys():
@@ -108,7 +134,7 @@ class KVClassifier(AbsClassifer):
       for key in keyScore[secdomain]:
         labelNum = len(keyScore[secdomain][key][consts.LABEL]) 
         score = keyScore[secdomain][key][consts.SCORE]
-        if labelNum == 1 or score == 0:
+        if labelNum == 1 or score < 1:
           continue
         generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
     for secdomain in generalRules:
