@@ -88,9 +88,10 @@ class KVClassifier(AbsClassifer):
 
     for host, keyNpkgIds in specificRules.iteritems():
       keyNpkgIds = sorted(keyNpkgIds.items(), key=lambda keyNid : len(keyNid[1]))
+      print keyNpkgIds
       for i in range(len(keyNpkgIds)):
         ifOutput = True
-        for j in range(i, len(keyNpkgIds)):
+        for j in range(i+1, len(keyNpkgIds)):
           if keyNpkgIds[i][1].issubset(keyNpkgIds[j][1]):
             ifOutput = False
         if ifOutput:
