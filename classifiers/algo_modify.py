@@ -24,62 +24,18 @@ class KVClassifier(AbsClassifer):
 
     self.appSuffix = suffix_tree(exp_apps[appType])
     self.appType = appType
-  def prune_specific_rules(self, specificRules, trainData):
-    '''
-    Pruning redundant keys
-    Input
-    - generalRules : {secdomain: [Rule(secdomain, key, score, labelNum)]}
-    - trainData : {tbl: [pkgs]}
-    '''
-    print 'Start Pruning'
-    PKG_IDS = 1
-    VALUES = 2
-    newSpecificRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {PKG_IDS:{},VALUES:set()}))))
-    countPkgIds = defaultdict(lambda : defaultdict(set))
-    ruleScores = defaultdict(lambda : defaultdict(set))
-    for tbl, pkgs in trainData.iteritems():
-      for pkg in pkgs:
-        host = pkg.host
-        for key in pkg.queries:
-          for value in pkg.queries[key]:
-            if pkg.label in specificRules[host][key][value]:
-              # Here we can change it to rule score
-              ruleSupport = specificRules[host][key][value][pkg.label][consts.SUPPORT]
-              ruleScores[host][key] = specificRules[host][key][value][pkg.label][consts.SCORE]
-              countPkgIds[host][key].add(tbl+'#'+str(pkg.id))
-
-    reversPkgids = defaultdict(lambda : defaultdict(set))
-    for host in countPkgIds:
-      for key, pkgSet in countPkgIds[host].items():
-        reversPkgids[host][frozenset(pkgSet)].add((host, key, ruleScores[host][key], len(pkgSet)))
-
-    for host, pkgIdNrules in reversPkgids.iteritems():
-      finalTuples = []
-      pkgIdNrules = pkgIdNrules.items()
-      # pkgIdNrules : (pkgIds, {(host, key, score, len_pkg_set), rule, rule}), (....), ...
-      pkgIdNrules = sorted(pkgIdNrules, key=lambda x: len(x[0]),reverse=True)
-      for pkgIdNrule in pkgIdNrules:
-        ifPut = True
-        for i, finalTuple in enumerate(finalTuples):
-          if pkgIdNrule[0] == finalTuple[0]:
-            ifPut = False
-            finalTuples[i] = (finalTuple[0], finalTuple[1] | pkgIdNrule[1])
-        if ifPut:
-          finalTuples.append(pkgIdNrule)
-            
-      for pkgIds, rules in finalTuples:
-        print host, rules, len(pkgIdNrules)
-      print '=' * 10
 
   
   def prune_general_rule(self, generalRules, trainData):
     '''
     Input
     - generalRules : {secdomain : [(secdomain, key, score, labelNum), rule, rule]}
+self.valueLabelCounter[value]
     '''
     ruleCoverage = defaultdict(lambda : defaultdict(set))
     ruleScores = defaultdict(lambda : defaultdict())
     ruleLabelNum = defaultdict(lambda : defaultdict())
+    ruleErrorValue = defaultdict(lambda : defaultdict(lambda : set()))
     
     for tbl, pkgs in trainData.iteritems():
       for pkg in filter(lambda pkg : pkg.secdomain in generalRules, pkgs):
@@ -122,7 +78,7 @@ class KVClassifier(AbsClassifer):
           if pkg.secdomain == 'bluecorner.es' or pkg.host == 'bluecorner.es' or pkg.label == 'com.bluecorner.totalgym':
             #print 'OK contains bluecorner', pkg.secdomain
             pass
-          map(lambda x : self.featureTbl[pkg.secdomain][pkg.label][k][x].add(tbl), v)
+          map(lambda x : self.featureTbl[pkg.secdomain][k][pkg.label][x].add(tbl), v)
           map(lambda x : self.valueLabelCounter[x].add(pkg.label), v)
     ##################
     # Count
@@ -131,20 +87,15 @@ class KVClassifier(AbsClassifer):
     # secdomain -> key -> (label, score)
     keyScore = defaultdict(lambda : defaultdict(lambda : {consts.LABEL:set(), consts.SCORE:0, consts.ERROR: set()}))
     for secdomain in self.featureTbl:
-      for label in self.featureTbl[secdomain]:
-        for k in self.featureTbl[secdomain][label]:
-          for v, tbls in self.featureTbl[secdomain][label][k].iteritems():
-            if secdomain == 'bluecorner.es':
-              pass
+      for k in self.featureTbl[secdomain]:
+        cleanedK = k.replace("\t", "")
+        for label in self.featureTbl[secdomain][k]:
+          for v, tbls in self.featureTbl[secdomain][k][label].iteritems():
             if len(self.valueLabelCounter[v]) == 1:
-              cleanedK = k.replace("\t", "")
-              if len(self.featureTbl[secdomain][label][k]) == 1:
-                keyScore[secdomain][cleanedK][consts.SCORE] += \
-                    (len(tbls) - 1) / float(len(self.featureTbl[secdomain][label][k]))
-                keyScore[secdomain][cleanedK][consts.LABEL].add(label)
-                if cleanedK == 'ord':
-                    print (len(tbls) - 1) / float(len(self.featureTbl[secdomain][label][k])), v, label
-              else:
+              keyScore[secdomain][cleanedK][consts.SCORE] += \
+                    (len(tbls) - 1) / float(len(self.featureTbl[secdomain][k][label]) * len(self.featureTbl[secdomain][k]))
+              keyScore[secdomain][cleanedK][consts.LABEL].add(label)
+              if len(self.featureTbl[secdomain][k][label]) == 1:
                 keyScore[secdomain][cleanedK][consts.ERROR].add(label)
     #############################
     # Generate interesting keys
