@@ -100,7 +100,7 @@ self.valueLabelCounter[value]
               if len(self.featureTbl[secdomain][k][label]) == 1:
                 keyScore[secdomain][cleanedK][consts.ERROR].add(label)
             elif len(self.valueCompanyCounter[v]) == 1:
-                print key, secdomain
+                print cleanedK, secdomain
     #############################
     # Generate interesting keys
     #############################
