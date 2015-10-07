@@ -58,7 +58,7 @@ class KVClassifier(AbsClassifer):
           if iCoveredIds.issubset(jCoveredIds) and ruleScores[ (host, iKey) ] < ruleScores[ (host, jKey) ]:
             ifKeepRule = (False, jKey)
         if ifKeepRule[0]:
-          rule = consts.Rule(host, ruleI[0], ruleScores[ (host, iKey) ],  ruleLabelNum[ (host, iKey) ])
+          rule = consts.Rule(host, iKey, ruleScores[ (host, iKey) ],  ruleLabelNum[ (host, iKey) ])
           prunedGenRules[host].append(rule)
           # print 'Keep', host, ruleI[0], ruleScores[ (host, ruleI[0]) ]
         # else:
