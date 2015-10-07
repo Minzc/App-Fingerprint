@@ -13,6 +13,7 @@ class KVClassifier(AbsClassifer):
     self.name = consts.KV_CLASSIFIER
     self.featureTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
     self.valueLabelCounter = defaultdict(set)
+    self.valueCompanyCounter = defaultdict(set)
     self.rules = {}
     exp_apps = load_exp_app()
     self.appRegex = {}
@@ -80,6 +81,7 @@ self.valueLabelCounter[value]
             pass
           map(lambda x : self.featureTbl[pkg.secdomain][k][pkg.label][x].add(tbl), v)
           map(lambda x : self.valueLabelCounter[x].add(pkg.label), v)
+          map(lambda x : self.valueCompanyCounter[x].add(pkg.company), v)
     ##################
     # Count
     ##################
@@ -97,6 +99,8 @@ self.valueLabelCounter[value]
               keyScore[secdomain][cleanedK][consts.LABEL].add(label)
               if len(self.featureTbl[secdomain][k][label]) == 1:
                 keyScore[secdomain][cleanedK][consts.ERROR].add(label)
+            elif len(self.valueCompanyCounter[v]) == 1:
+                print key, secdomain
     #############################
     # Generate interesting keys
     #############################
