@@ -107,7 +107,7 @@ self.valueLabelCounter[value]
         labelNum = len(keyScore[secdomain][key][consts.LABEL]) 
         score = keyScore[secdomain][key][consts.SCORE]
         errorLabelNum = len(keyScore[secdomain][key][consts.ERROR])
-        if labelNum == 1 or score <= 1:# or errorLabelNum * 1.0 / labelNum > 0.3:
+        if labelNum == 1 or score <= 0.5:# or errorLabelNum * 1.0 / labelNum > 0.3:
           continue
         generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
     for secdomain in generalRules:
