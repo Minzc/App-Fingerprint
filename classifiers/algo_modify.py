@@ -77,26 +77,42 @@ class KVClassifier(AbsClassifer):
     Input
     - generalRules : {secdomain : [(secdomain, key, score, labelNum), rule, rule]}
     '''
-    specificRules = defaultdict(lambda : defaultdict(set))
+    ruleCoverage = defaultdict(lambda : defaultdict(set))
+    ruleScores = defaultdict(lambda : defaultdict())
+    ruleLabelNum = defaultdict(lambda : defaultdict())
     
     for tbl, pkgs in trainData.iteritems():
       for pkg in filter(lambda pkg : pkg.secdomain in generalRules, pkgs):
         for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.secdomain]):
           for value in pkg.queries[rule.key]:
             value = value.strip()
-            specificRules[pkg.secdomain][rule.key].add(tbl + '#' + str(pkg.id))
-
-    for host, keyNpkgIds in specificRules.iteritems():
+            ruleCoverage[pkg.host][rule.key].add(tbl + '#' + str(pkg.id))
+            ruleScores[pkg.host][rule.key] = rule.score
+            ruleLabelNum[pkg.host][rule.key] = rule.labelNum
+    
+    prunedGenRules = defaultdict(list)
+    KEY = 0
+    PKG_IDS= 1
+    for host, keyNpkgIds in ruleCoverage.iteritems():
       keyNpkgIds = sorted(keyNpkgIds.items(), key=lambda keyNid : len(keyNid[1]))
-      print keyNpkgIds
       for i in range(len(keyNpkgIds)):
-        ifOutput = True
+        ifOutput = (True, None)
+        ruleI = keyNpkgIds[i]
         for j in range(i+1, len(keyNpkgIds)):
-          if keyNpkgIds[i][1].issubset(keyNpkgIds[j][1]):
-            ifOutput = False
-        if ifOutput:
-          print host, keyNpkgIds[0], len(keyNpkgIds)
-      print '='*10
+          ruleJ = keyNpkgIds[j]
+          if ruleI[PKG_IDS].issubset(ruleJ[PKG_IDS]) and ruleScores[host][ruleI[0]] < ruleScores[host][ruleJ[0]]:
+            ifOutput = (False, ruleJ[0])
+        if ifOutput[0]:
+          rule = consts.Rule(host, ruleI[0], ruleScores[host][ruleI[0]],  ruleLabelNum[host][ruleI[0]])
+          prunedGenRules[host].append(rule)
+          # print 'Keep', host, ruleI[0], ruleScores[host][ruleI[0]]
+        # else:
+        #   print 'Pruned'
+        #   print host, ruleI[0], ruleScores[host][ruleI[0]], 'pruned by:', ifOutput[1]
+        #   print '-' * 10
+
+      # print '='*10
+    return prunedGenRules
 
 
   def train(self, trainData, rule_type):
@@ -113,7 +129,7 @@ class KVClassifier(AbsClassifer):
     ##################
     # secdomain -> app -> key -> value -> tbls
     # secdomain -> key -> (label, score)
-    keyScore = defaultdict(lambda : defaultdict(lambda : {consts.LABEL:set(), consts.SCORE:0}))
+    keyScore = defaultdict(lambda : defaultdict(lambda : {consts.LABEL:set(), consts.SCORE:0, consts.ERROR: set()}))
     for secdomain in self.featureTbl:
       for label in self.featureTbl[secdomain]:
         for k in self.featureTbl[secdomain][label]:
@@ -122,24 +138,31 @@ class KVClassifier(AbsClassifer):
               pass
             if len(self.valueLabelCounter[v]) == 1:
               cleanedK = k.replace("\t", "")
-              keyScore[secdomain][cleanedK][consts.SCORE] += \
-                (len(tbls) - 1) / float(len(self.featureTbl[secdomain][label][k]))
-              keyScore[secdomain][cleanedK][consts.LABEL].add(label)
+              if len(self.featureTbl[secdomain][label][k]) == 1:
+                keyScore[secdomain][cleanedK][consts.SCORE] += \
+                    (len(tbls) - 1) / float(len(self.featureTbl[secdomain][label][k]))
+                keyScore[secdomain][cleanedK][consts.LABEL].add(label)
+                if cleanedK == 'ord':
+                    print (len(tbls) - 1) / float(len(self.featureTbl[secdomain][label][k])), v, label
+              else:
+                keyScore[secdomain][cleanedK][consts.ERROR].add(label)
     #############################
     # Generate interesting keys
     #############################
-    Rule = namedtuple('Rule', 'secdomain, key, score, labelNum')
+    Rule = consts.Rule
     generalRules = defaultdict(list)
     for secdomain in keyScore:
       for key in keyScore[secdomain]:
         labelNum = len(keyScore[secdomain][key][consts.LABEL]) 
         score = keyScore[secdomain][key][consts.SCORE]
-        if labelNum == 1 or score < 1:
+        errorLabelNum = len(keyScore[secdomain][key][consts.ERROR])
+        if labelNum == 1 or score <= 1:# or errorLabelNum * 1.0 / labelNum > 0.3:
           continue
         generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
     for secdomain in generalRules:
       generalRules[secdomain] = sorted(generalRules[secdomain], key=lambda rule: rule.score, reverse = True)
 
+    generalRules = self.prune_general_rule(generalRules, trainData)
     print ">>>[KV] generalRules", len(generalRules)
     #############################
     # Generate specific rules
@@ -147,14 +170,13 @@ class KVClassifier(AbsClassifer):
     specificRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:set()}))))
     
     for tbl, pkgs in trainData.iteritems():
-      for pkg in filter(lambda pkg : pkg.secdomain in generalRules, pkgs):
-        for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.secdomain]):
+      for pkg in filter(lambda pkg : pkg.host in generalRules, pkgs):
+        for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.host]):
           for value in pkg.queries[rule.key]:
             value = value.strip()
             if len(self.valueLabelCounter[value]) == 1 and len(value) != 1:
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
                 specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT].add(tbl)
-    self.prune_general_rule(generalRules, trainData)
     #############################
     # Persist rules
     #############################

@@ -1,10 +1,12 @@
 from collections import namedtuple
 
 Prediction = namedtuple('Prediction', 'label, score, evidence')
+Rule = namedtuple('Rule', 'secdomain, key, score, labelNum')
 NULLPrediction = Prediction(None, -1, None)
 
 
 LABEL = 'l'
+ERROR = 'e'
 SCORE = 's'
 SUPPORT = 't'
 REGEX_OBJ = 'r'

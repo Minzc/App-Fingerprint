@@ -2,9 +2,8 @@
 
 import sys
 from sqldao import SqlDao
-from utils import loadfile
+from utils import loadfile, load_pkgs, load_data_set
 import math
-from utils import load_pkgs
 from package import Package
 from nltk import FreqDist
 
@@ -272,29 +271,6 @@ def statCompany():
       if output and len(value_label[key][value]) > 1:
         print "%s; %s; %s; %s; %s" % (key, value, value_label[key][value], ';'.join(map(lambda app : app_company[app], value_label[key][value])), ','.join(map(lambda app : app_category[app], value_label[key][value])))
 
-def test_suffix_tree():
-  from utils import suffix_tree, loadExpApp
-  def classify_suffix_app(app_suffix,value):
-    value = value.split('.')
-    node = app_suffix
-    meet_first = False
-    rst = []
-    for i in reversed(value):
-      if not meet_first and i in node.children:
-        meet_first = True
-      if meet_first:
-        if i in node.children:
-          rst.append(i)
-          node = node.children[i]
-        if len(node.children) == 0:
-          return '.'.join(reversed(rst))
-    return None
-  app_name = '1.android.com.usmann.whitagramforandroid'
-  exp_apps = loadExpApp()
-  app_suffix = suffix_tree(exp_apps)
-  label = classify_suffix_app(app_suffix, app_name)
-  print label
-
 def getExpAppList(folder):
   from os import listdir
   from os.path import isfile, join
@@ -326,6 +302,22 @@ def select_field(fieldName):
   for app, fields in records.iteritems():
     print app, fields
 
+def compare_xml_with_pkg(folder):
+  from os import listdir
+  from os.path import isfile, join
+  import re
+  
+  regxObj = re.compile('(Raw: "(.)")')
+  trainData = load_data_set([''], consts.ANDROID)
+  counter = 0
+  xmlValues = defaultdict(set)
+  for f in listdir(folder):
+    file_path = join(folder, f)
+    if isfile(file_path):
+      app_name = f[0:-4]
+      fr = open(file_path)
+      for ln in fr:
+        ln = ln.strip()
 
 if __name__ == '__main__':
   if len(sys.argv) < 2:
@@ -356,71 +348,3 @@ if __name__ == '__main__':
     getExpAppList(sys.argv[2])
   elif sys.argv[1] == 'select':
     select_field(sys.argv[2])
-
-
-
-
-
-####################################################
-# def insert_rules(filepath):
-#   import mysql.connector
-#   from utils import loadfile
-#   cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
-#   cursor = cnx.cursor()
-#   query = 'insert into rules (app, hst, status) values (%s, %s, %s)'
-#   def parser(ln):
-#     hst, _, apps = ln.split('\t')
-#     status, hst = hst.split(' ')
-#     for app in apps.split(','):
-#       cursor.execute(query, (app, hst, status))
-#   loadfile(filepath, parser)
-#   cnx.commit()  
-
-
-####################################################
-# def samplepcap(file_path):
-#   from os import listdir
-#   from os.path import isfile, join
-#   import pyshark
-
-#   startFlag = True
-#   for f in listdir(file_path):
-#     if isfile(join(file_path,f)):
-#       cap =pyshark.FileCapture(join(file_path,f), keep_packets = False, display_filter='http')
-#       try:
-#         for p in cap:
-#           print f
-#           print p['http']
-#           print '-'*10
-#       except:
-#         pass
-
-####################################################
-# def extractHttpHeads(file_path):
-#   from os import listdir
-#   from os.path import isfile, join
-#   import pyshark
-#   startFlag = True
-#   for f in listdir(file_path):
-#     if isfile(join(file_path,f)):
-#       cap =pyshark.FileCapture(join(file_path,f), keep_packets = False, display_filter='http')
-#       try:
-#         for p in cap:
-#           print f
-#           print p['http']
-#           print '-'*10
-#       except:
-#         pass
-
-####################################################
-#def transportfiles(mypath):
-#   """
-#   Insert pcap information into db
-#   """
-#   from os import listdir
-#   from os.path import isfile, join
-#   from utils import file2mysqlv2
-#   startFlag = True
-#   for f in listdir(mypath):
-#     if isfile(join(mypath,f)):  
-#       file2mysqlv2(join(mypath,f), f[0:-5])

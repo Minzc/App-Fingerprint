@@ -25,10 +25,20 @@ def test(testTbl):
       trainTbls.append(tbl)
 
   print trainTbls, testTbl
-  inforTrack = cross_batch_test(trainTbls, testTbl, consts.IOS, ifTrain = False)
+  inforTrack = cross_batch_test(trainTbls, testTbl, consts.IOS, ifTrain = True)
   output = _output_rst(inforTrack)
   log(trainTbls, testTbl, output)
   _compare_rst(inforTrack[consts.DISCOVERED_APP_LIST], inforTrack[consts.RESULT])
+  output_app_list(inforTrack[consts.DISCOVERED_APP_LIST])
+
+
+def output_app_list(discoveriedApps):
+  fw = open('discovered_apps.txt', 'w')
+  for appNid in discoveriedApps:
+    app, trackId = appNid
+    fw.write('[%s.pcap] Correct_Detection\n' % trackId)
+  fw.close()
+  print 'Discovered Apps: discovered_apps.txt'
 
 def _compare_rst(discoveriedApps, rst):
   '''
@@ -36,24 +46,24 @@ def _compare_rst(discoveriedApps, rst):
   - rst {pkgId: {labelType: Prediction(label, score, evidence)}}
   '''
   testDisApps = set()
-  for ln in open('ios_rules/all_rules_20151001.txt'):
+  for ln in open('ios_rules/discovered_apps.txt'):
     if 'Correct_Detection' in ln:
         appId = ln.strip().split('.')[0].replace('[','')
         testDisApps.add(appId)
   
-  rstDiff = []
-  appDiff = {}
+  notDiscoveredPkg = []
+  notDiscoveredApps = {}
   for appNid in discoveriedApps:
     app, trackId = appNid
     if trackId not in testDisApps:
-      appDiff[app] = trackId
+      notDiscoveredApps[app] = trackId
 
   for pkgID, predictions in rst.iteritems():
     prediction = predictions[consts.APP_RULE]
-    if prediction.label in appDiff:
-      rstDiff.append((prediction.label, appDiff[prediction.label],str(prediction.evidence)))
-  rstDiff = sorted(rstDiff, key = lambda x: x[0])
-  for diff in rstDiff:
+    if prediction.label in notDiscoveredApps:
+      notDiscoveredPkg.append((prediction.label, notDiscoveredApps[prediction.label],str(prediction.evidence)))
+  notDiscoveredPkg = sorted(notDiscoveredPkg, key = lambda x: x[0])
+  for diff in notDiscoveredPkg:
     print diff
 
 def _output_rst(inforTrack):
