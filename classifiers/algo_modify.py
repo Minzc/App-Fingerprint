@@ -15,6 +15,8 @@ class KVClassifier(AbsClassifer):
     self.featureCompanyTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
     self.valueAppCounter = defaultdict(set)
     self.valueCompanyCounter = defaultdict(set)
+    self.appCompanyRelation = {}
+    self.companyAppRelation = defaultdict(set)
     self.rules = {}
     exp_apps = load_exp_app()
     self.appRegex = {}
@@ -118,7 +120,7 @@ class KVClassifier(AbsClassifer):
       generalRules[secdomain] = sorted(generalRules[secdomain], key=lambda rule: rule.score, reverse = True)
     return generalRules
 
-  def _generate_rules(self, trainData, generalRules, valueLabelCounter):
+  def _generate_rules(self, trainData, generalRules, valueLabelCounter, ruleType):
     '''
     Generate specific rules
     Input
@@ -139,21 +141,46 @@ class KVClassifier(AbsClassifer):
           for value in pkg.queries[rule.key]:
             value = value.strip()
             if len(valueLabelCounter[value]) == 1 and len(value) != 1:
-                specificRules[pkg.host][rule.key][value][pkg.label][consts.SCORE] = rule.score
-                specificRules[pkg.host][rule.key][value][pkg.label][consts.SUPPORT].add(tbl)
+              if ruleType == consts.APP_RULE:
+                label = pkg.app
+              else:
+                label = pkg.company
+              specificRules[pkg.host][rule.key][value][label][consts.SCORE] = rule.score
+              specificRules[pkg.host][rule.key][value][label][consts.SUPPORT].add(tbl)
     return specificRules
+
+  def _merge_result(self, appSpecificRules, companySpecificRules):
+    specificRules = {}
+    specificRules[consts.APP_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:set()}))))
+    specificRules[consts.COMPANY_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:set()}))))
+    for host in appSpecificRules:
+      for key in appSpecificRules[host]:
+        for value in appSpecificRules[host][key]:
+          for app, scores in appSpecificRules[host][key][value].iteritems():
+            specificRules[consts.APP_RULE][host][key][value][app] = scores
+            specificRules[consts.COMPANY_RULE][host][key][value][self.appCompanyRelation[app]] = scores
+    for host in companySpecificRules:
+      for key in companySpecificRules[host]:
+        for value in companySpecificRules[host][key]:
+          for company, scores in companySpecificRules[host][key][value].iteritems():
+            if len(specificRules[consts.COMPANY_RULE][host][key][value]) == 0:
+              specificRules[consts.COMPANY_RULE][host][key][value][company] = scores
+              specificRules[consts.APP_RULE][host][key][value][';'.join(self.companyAppRelation[company])] = scores
+              if len(self.companyAppRelation[company]) == 0:
+                  print company
+    return specificRules
+
 
   def train(self, trainData, rule_type):
     for tbl in trainData.keys():
       for pkg in trainData[tbl]:
         for k,v in pkg.queries.items():
-          if pkg.secdomain == 'bluecorner.es' or pkg.host == 'bluecorner.es' or pkg.label == 'com.bluecorner.totalgym':
-            #print 'OK contains bluecorner', pkg.secdomain
-            pass
           map(lambda x : self.featureAppTbl[pkg.secdomain][k][pkg.label][x].add(tbl), v)
           map(lambda x : self.featureCompanyTbl[pkg.secdomain][k][pkg.company][x].add(tbl), v)
           map(lambda x : self.valueAppCounter[x].add(pkg.label), v)
           map(lambda x : self.valueCompanyCounter[x].add(pkg.company), v)
+          self.appCompanyRelation[pkg.app] = pkg.company
+          self.companyAppRelation[pkg.company].add(pkg.app)
     ##################
     # Count
     ##################
@@ -174,13 +201,13 @@ class KVClassifier(AbsClassifer):
     #############################
     # Generate specific rules
     #############################
-    appSpecificRules = self._generate_rules(trainData, appGeneralRules, self.valueAppCounter)
-    companySpecificRules = self._generate_rules(trainData, companyGeneralRules, self.valueCompanyCounter)
-
+    appSpecificRules = self._generate_rules(trainData, appGeneralRules, self.valueAppCounter, consts.APP_RULE)
+    companySpecificRules = self._generate_rules(trainData, companyGeneralRules, self.valueCompanyCounter, consts.COMPANY_RULE)
+    specificRules = self._merge_result(appSpecificRules, companySpecificRules)
     #############################
     # Persist rules
     #############################
-    self.persist(appSpecificRules, rule_type)
+    self.persist(specificRules, rule_type)
     self.__init__(self.appType)
     return self
 
@@ -200,8 +227,9 @@ class KVClassifier(AbsClassifer):
     QUERY = consts.SQL_SELECT_KV_RULES
     counter = 0
     for key, value, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
-      if len(value.split('\n')) == 1:
-        counter += 1
+      if len(value.split('\n')) == 1 and ';' not in label:
+        if rule_type == consts.APP_RULE:
+          counter += 1
         self.rules[rule_type][host][key][value][label][consts.SCORE] = confidence
         self.rules[rule_type][host][key][value][label][consts.SUPPORT] = support
         self.rules[rule_type][host][key][value][label][consts.REGEX_OBJ] = re.compile(re.escape(key+'='+value))
@@ -228,38 +256,29 @@ class KVClassifier(AbsClassifer):
 
         predictRst[ruleType] = rst
         
-        # If we can not predict based on kv in urls, use suffix tree to try again
-        if not predictRst[consts.APP_RULE].label:
-          for appName, regexObj in self.appRegex.iteritems():
-            match = regexObj.search(pkg.origPath)
-            if match:
-              predictRst[consts.APP_RULE]= consts.Prediction(appName, 1, ('ORIGINAL_PATH', appName))
-
-        # If we can predict based on original url, we do not need to use refer url to predict again
-        if predictRst[ruleType].label != None:
-          break
     if predictRst[consts.APP_RULE] != consts.NULLPrediction and predictRst[consts.APP_RULE].label != pkg.app:
       print predictRst[consts.APP_RULE].evidence, predictRst[consts.APP_RULE].label, pkg.app
       print '=' * 10
     return predictRst
 
 
-  def persist(self, patterns, rule_type):
+  def persist(self, specificRules, rule_type):
     self._clean_db(rule_type)
     QUERY = consts.SQL_INSERT_KV_RULES
     sqldao = SqlDao()
     # Param rules
     params = []
-    for host in patterns:
-      for key in patterns[host]:
-        for value in patterns[host][key]:
-          max_confidence = -1
-          max_support = -1
-          max_label = None
-          for label in patterns[host][key][value]:
-            confidence = patterns[host][key][value][label][consts.SCORE]
-            support = len(patterns[host][key][value][label][consts.SUPPORT])
-            params.append((label, support, confidence, host, key, value, rule_type))
+    for ruleType, patterns in specificRules.iteritems():
+      for host in patterns:
+        for key in patterns[host]:
+          for value in patterns[host][key]:
+            max_confidence = -1
+            max_support = -1
+            max_label = None
+            for label in patterns[host][key][value]:
+              confidence = patterns[host][key][value][label][consts.SCORE]
+              support = len(patterns[host][key][value][label][consts.SUPPORT])
+              params.append((label, support, confidence, host, key, value, ruleType))
     sqldao.executeBatch(QUERY, params)
     sqldao.close()
     print ">>> [KVRules] Total Number of Rules is %s Rule type is %s" % (len(params), rule_type)
