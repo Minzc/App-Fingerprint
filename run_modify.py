@@ -111,6 +111,8 @@ def evaluate(rst, testSet, testApps):
   inforTrack = { consts.DISCOVERED_APP : 0.0, consts.PRECISION : 0.0, consts.RECALL : 0.0}
   correct, recall = 0, 0
   correctApp = set()
+  wrongApp = set()
+  detectedApp = set()
   for pkgId, predictions in rst.items():
     predictApp = predictions[consts.APP_RULE].label 
     predictCompany = predictions[consts.COMPANY_RULE].label
@@ -125,14 +127,19 @@ def evaluate(rst, testSet, testApps):
 
     if sum([1 for value in predictions.values() if value != consts.NULLPrediction]) > 0:
       recall += 1
+      detectedApp.add((testSet[pkgId].app, testSet[pkgId].appInfo.trackId))
       if ifCorrect:
         correct += 1
         correctApp.add((testSet[pkgId].app, testSet[pkgId].appInfo.trackId))
+      else:
+        wrongApp.add((testSet[pkgId].app, testSet[pkgId].appInfo.trackId))
     
   print '[TEST] Total:', len(testSet)
   print '[TEST] Recall:', recall
   print '[TEST] Correct:', correct
-  print '[TEST] Discoered Number of App:', len(correctApp)
+  print '[TEST] Correct Number of App:', len(correctApp)
+  print '[TEST] Wrong Number of App:', len(wrongApp)
+  print '[TEST] Total Detect Number of App:', len(detectedApp)
   print '[TEST] Total Number of App:', len(testApps)
 
   precision = correct * 1.0 / recall
