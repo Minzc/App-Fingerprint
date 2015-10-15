@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>7.1</string>
+	<key>CFBundleIconFile</key>
+	<string>icon_logo.png</string>
+	<key>CFBundleName</key>
+	<string>WKYC Radar</string>
+	<key>ChangelistNumber</key>
+	<string></string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>DTSDKName</key>
+	<string>iphoneos7.1</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>icon_logo.png</string>
+				<string>icon_logo@2x.png</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<false/>
+		</dict>
+	</dict>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleDefault</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UIRequiresPersistentWiFi</key>
+	<true/>
+	<key>CompanyName</key>
+	<string>WKYC</string>
+	<key>CFBundleDisplayName</key>
+	<string>WKYC Radar</string>
+	<key>DTSDKBuild</key>
+	<string>11D167</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.7.2007</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13F34</string>
+	<key>DTPlatformBuild</key>
+	<string>11D167</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>5B1008</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>MinimumOSVersion</key>
+	<string>6.1</string>
+	<key>CFBundleVersion</key>
+	<string>2.7.2007</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UIApplicationExitsOnSuspend</key>
+	<true/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.wkyc.WKYC-Radar</string>
+	<key>DTXcode</key>
+	<string>0511</string>
+	<key>CFBundleExecutable</key>
+	<string>WKYC Radar</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DTCompiler</key>
+	<string></string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>6.0</string>
+	<key>CFBundleIconFile</key>
+	<string>icon.png</string>
+	<key>CFBundleName</key>
+	<string>Backup Assistant</string>
+	<key>DTSDKName</key>
+	<string>iphoneos6.0</string>
+	<key>F1OTA_URL</key>
+	<string>builddepot/builds/iOS</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>CFBundleDisplayName</key>
+	<string>Backup Assist</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>F1App_Name</key>
+	<string>Backup Assistant</string>
+	<key>DTSDKBuild</key>
+	<string>10A403</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>11E53</string>
+	<key>F1TermsUrl</key>
+	<string>http://www.vzw.com/baplus</string>
+	<key>UIFileSharingEnabled</key>
+	<false/>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleVersion</key>
+	<string>2500</string>
+	<key>F1URL3g</key>
+	<string>http://syncba.myvzw.com</string>
+	<key>DTPlatformBuild</key>
+	<string>10A403</string>
+	<key>DTXcodeBuild</key>
+	<string>4G182</string>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>F1OTA_Subtitle</key>
+	<string>Backup Assistant</string>
+	<key>UIApplicationExitsOnSuspend</key>
+	<true/>
+	<key>SBUsesNetwork</key>
+	<true/>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>F1ServerVersionString</key>
+	<string>MB</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.fusionone.ct</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>icon.png</string>
+		<string>icon@2x.png</string>
+	</array>
+	<key>F1URLWifi</key>
+	<string>https://sync.nab.myvzw.com</string>
+	<key>DTXcode</key>
+	<string>0450</string>
+	<key>F1OTA_Title</key>
+	<string>Backup Assistant.app</string>
+	<key>F1SCP_Deploy_Path</key>
+	<string>builddepot/builds/iOS</string>
+	<key>F1BundleShortVersionString</key>
+	<string>2.6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>Backup Assistant</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>F1BundleVersion</key>
+	<string>30</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>F1TermsUrlDisplayText</key>
+	<string>Terms and Conditions</string>
+</dict>
+</plist>

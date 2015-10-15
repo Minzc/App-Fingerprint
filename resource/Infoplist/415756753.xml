@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>UTUniversalLite</string>
+	<key>DTSDKName</key>
+	<string>iphoneos4.2</string>
+	<key>DTXcode</key>
+	<string>0325</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>13</string>
+	<key>PhunFrameworkServer</key>
+	<string>configuration.phunware.com</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>UIStatusBarHidden</key>
+	<false/>
+	<key>CFBundleShortVersionString</key>
+	<string>1.03</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>UTUniversalLite</string>
+	<key>DTCompiler</key>
+	<string>4.2</string>
+	<key>MinimumOSVersion</key>
+	<string>3.1.2</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.phunware.utorlando.universal.iphone.lite</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>DTXcodeBuild</key>
+	<string>10M2423</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon@2x.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Universal</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformVersion</key>
+	<string>4.2 Seed 2</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>DTPlatformBuild</key>
+	<string>8C134</string>
+</dict>
+</plist>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>6.1</string>
+	<key>CFBundleName</key>
+	<string>Red Robin</string>
+	<key>DTSDKName</key>
+	<string>iphoneos6.1</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Icon.png</string>
+				<string>Icon@2x.png</string>
+				<string>Icon_120.png</string>
+			</array>
+		</dict>
+	</dict>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Red Robin</string>
+	<key>DTSDKBuild</key>
+	<string>10B141</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.1</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13B3116</string>
+	<key>DTPlatformBuild</key>
+	<string>10B141</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>4H1503</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Trade Gothic LT Bold Condensed.ttf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>2</string>
+	<key>MinimumOSVersion</key>
+	<string>5.1</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>FacebookAppID</key>
+	<string>479905092037903</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>FacebookDisplayName</key>
+	<string>Red Robin Royalty</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.redrobin.RedRoyalty</string>
+	<key>DTXcode</key>
+	<string>0463</string>
+	<key>CFBundleExecutable</key>
+	<string>Red Robin</string>
+	<key>UIMainStoryboardFile</key>
+	<string>MainStoryboard</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb479905092037903</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

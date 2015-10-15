@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AuthorName</key>
+	<string>Charles H. Spurgeon</string>
+	<key>CFBundleName</key>
+	<string>DailyHelp</string>
+	<key>DTXcode</key>
+	<string>0420</string>
+	<key>DTSDKName</key>
+	<string>iphoneos5.0</string>
+	<key>MailTagLine</key>
+	<string>Daily Help Devotional</string>
+	<key>DTSDKBuild</key>
+	<string>9A334</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>1.5.6</string>
+	<key>BuildMachineOSBuild</key>
+	<string>11C74</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon.png</string>
+	<key>AppStoreUrl</key>
+	<string>http://itunes.apple.com/us/app/daily-help-devotional-charles/id319109885?mt=8</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>MailSubject</key>
+	<string>Charles Spurgeon - Daily Help</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>DailyHelp</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvmgcc42</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb118325831514609</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleIdentifier</key>
+	<string>com.43rdelement.dailyhelp</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformVersion</key>
+	<string>5.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Daily Help</string>
+	<key>DTXcodeBuild</key>
+	<string>4D199</string>
+	<key>MinimumOSVersion</key>
+	<string>3.1.3</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>DTPlatformBuild</key>
+	<string>9A334</string>
+</dict>
+</plist>

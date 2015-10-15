@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.2</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLIconFile</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>tastemade</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>Tastemade</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLIconFile</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb351770938225050eats</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>Facebook</string>
+		</dict>
+	</array>
+	<key>CFBundleName</key>
+	<string>Tastemade City</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.2</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Tastemade uses your photo library for importing photos and videos!</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon29x29</string>
+				<string>AppIcon40x40</string>
+				<string>AppIcon60x60</string>
+			</array>
+		</dict>
+	</dict>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.lifestyle</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Tastemade City</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Tastemade uses your location to help you find amazing nearby places that you'll love!</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Tastemade uses your camera to capture videos!</string>
+	<key>DTSDKBuild</key>
+	<string>12D508</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.11.3</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Tastemade uses your location to help you find amazing nearby places that you'll love!</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13F34</string>
+	<key>DTPlatformBuild</key>
+	<string>12D508</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6C131e</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Museo-Slab-300.ttf</string>
+		<string>Whitney-Medium-Bas.otf</string>
+		<string>Whitney-Light-Bas.otf</string>
+		<string>Whitney-Semibold-Adv.otf</string>
+		<string>Whitney-Book-Adv.otf</string>
+		<string>MuseoForDell-300.otf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>1503111056</string>
+	<key>MinimumOSVersion</key>
+	<string>7.1</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-568h</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-Landscape</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Landscape</string>
+		</dict>
+	</array>
+	<key>FacebookAppID</key>
+	<string>351770938225050</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Tastemade uses your microphone to record audio for videos!</string>
+	<key>FacebookDisplayName</key>
+	<string>Tastemade</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.tastemade.eats</string>
+	<key>DTXcode</key>
+	<string>0620</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Tastemade uses your location to help you find amazing nearby places that you'll love!</string>
+	<key>CFBundleExecutable</key>
+	<string>Tastemade City</string>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon29x29</string>
+				<string>AppIcon40x40</string>
+				<string>AppIcon60x60</string>
+				<string>AppIcon76x76</string>
+			</array>
+		</dict>
+	</dict>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Your contacts are used to help find people you know on Tastemade!</string>
+</dict>
+</plist>

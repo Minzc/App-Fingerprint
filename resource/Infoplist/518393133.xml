@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>Toll Roads</string>
+	<key>DTXcode</key>
+	<string>0630</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.3</string>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+	</dict>
+	<key>DTSDKBuild</key>
+	<string>12F69</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>BuildMachineOSBuild</key>
+	<string>14C109</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.5.1</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>Toll Roads</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-568h</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+	</array>
+	<key>MinimumOSVersion</key>
+	<string>5.1.1</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.thetollroads.tollroads</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>DTPlatformVersion</key>
+	<string>8.3</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon29x29.png</string>
+				<string>AppIcon29x29@2x.png</string>
+				<string>AppIcon40x40@2x.png</string>
+				<string>AppIcon57x57.png</string>
+				<string>AppIcon57x57@2x.png</string>
+				<string>AppIcon60x60@2x.png</string>
+			</array>
+		</dict>
+	</dict>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>Toll Roads</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>UILaunchImageFile</key>
+	<string>LaunchImage</string>
+	<key>DTPlatformBuild</key>
+	<string>12F69</string>
+	<key>DTXcodeBuild</key>
+	<string>6D570</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+</dict>
+</plist>

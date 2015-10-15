@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>7.0</string>
+	<key>CFBundleName</key>
+	<string>Text2Pic</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.0</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+	<key>UIMainStoryboardFile~ipad</key>
+	<string>MainStoryboard_iPad</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Text2Pic</string>
+	<key>DTSDKBuild</key>
+	<string>11A465</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.1.1</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>12E55</string>
+	<key>DTPlatformBuild</key>
+	<string>11A465</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Walkway SemiBold.ttf</string>
+		<string>LeagueGothic-Regular.otf</string>
+		<string>Walkway UltraBold.ttf</string>
+		<string>riesling.ttf</string>
+		<string>neon_pixel-7.ttf</string>
+		<string>Pycuaf.ttf</string>
+		<string>OldeEnglish.ttf</string>
+		<string>lovenesstwo.ttf</string>
+		<string>Harabara.ttf</string>
+		<string>dotness.ttf</string>
+		<string>DecoMonType.ttf</string>
+		<string>small_pixel-7.ttf</string>
+		<string>GreatVictorian-Standard.otf</string>
+		<string>Champagne &amp; Limousines.ttf</string>
+		<string>Slug Bug Open Regular.ttf</string>
+		<string>PWChristmasfont.ttf</string>
+		<string>led_display-7.ttf</string>
+		<string>frenchy.ttf</string>
+		<string>Carnevalee Freakshow.ttf</string>
+		<string>SailAway.ttf</string>
+		<string>Brittany.ttf</string>
+		<string>BEBAS___.TTF</string>
+		<string>ALBA____.TTF</string>
+		<string>All Star Resort.ttf</string>
+		<string>Chicken Butt.ttf</string>
+		<string>Colleged.ttf</string>
+		<string>DIMIS___.TTF</string>
+		<string>KINKEE__.TTF</string>
+		<string>Love_and_Passion.ttf</string>
+		<string>SCRIPTIN.ttf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>3.1.1</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UIStatusBarHidden</key>
+	<false/>
+	<key>DTXcodeBuild</key>
+	<string>5A1413</string>
+	<key>FacebookAppID</key>
+	<string>380163528680845</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>FacebookDisplayName</key>
+	<string>Text2Pic</string>
+	<key>CFBundleIdentifier</key>
+	<string>vn.gamefam.Text2Pic</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>FreeIcon.png</string>
+		<string>FreeIcon@2x.png</string>
+		<string>FreeIcon-72.png</string>
+		<string>FreeIcon-72@2x.png</string>
+		<string>FreeIcon-Small-50.png</string>
+		<string>FreeIcon-Small.png</string>
+		<string>FreeIcon-Small@2x.png</string>
+		<string>FreeIcon-40.png</string>
+		<string>FreeIcon-40@2x.png</string>
+		<string>FreeIcon-57.png</string>
+		<string>FreeIcon-57@2x.png</string>
+		<string>FreeIcon-76.png</string>
+		<string>FreeIcon-76@2x.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0500</string>
+	<key>CFBundleExecutable</key>
+	<string>Text2Pic</string>
+	<key>UIMainStoryboardFile</key>
+	<string>MainStoryboard</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

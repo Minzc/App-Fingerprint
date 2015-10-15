@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>gps</string>
+		<string>location-services</string>
+		<string>magnetometer</string>
+		<string>armv7</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.telenav.AttNavigator</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>scout</string>
+				<string>attnav</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>DTPlatformVersion</key>
+	<string>7.0</string>
+	<key>CFBundleIconFile</key>
+	<string>app_icon.png</string>
+	<key>CFBundleName</key>
+	<string>AttNavigator</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.0</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>AT&amp;T Nav</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>fetch</string>
+		<string>location</string>
+		<string>remote-notification</string>
+	</array>
+	<key>DTSDKBuild</key>
+	<string>11A465</string>
+	<key>CFBundleShortVersionString</key>
+	<string>5.0.10</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>AT&amp;T Nav needs your location to provide real-time GPS navigation and help you discover what’s nearby.</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13F34</string>
+	<key>DTPlatformBuild</key>
+	<string>11A465</string>
+	<key>UIFileSharingEnabled</key>
+	<false/>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleVersion</key>
+	<string>5.0.10.1</string>
+	<key>DTXcodeBuild</key>
+	<string>5A1413</string>
+	<key>UIStatusBarHidden</key>
+	<false/>
+	<key>MinimumOSVersion</key>
+	<string>7.0</string>
+	<key>FacebookAppID</key>
+	<string>157995254340534</string>
+	<key>CFBundleGetInfoString</key>
+	<string>AT&amp;T Navigator</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Try saying an address, "Find gas", or "Report traffic" hands-free while driving.</string>
+	<key>FacebookDisplayName</key>
+	<string>AT&amp;T Nav </string>
+	<key>CFBundleIdentifier</key>
+	<string>com.att.telenav.iphoneqpass</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>app_icon.png</string>
+		<string>app_icon-114@2x.png</string>
+		<string>app_icon-120@2x.png</string>
+		<string>app_icon-180@3x.png</string>
+		<string>app_icon_152x152.png</string>
+		<string>app_icon_76x76.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0500</string>
+	<key>NSLocationUsageDescription</key>
+	<string>AT&amp;T Nav needs your location to provide real-time GPS navigation and help you discover what’s nearby.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Let AT&amp;T Nav check for entries with location info to help you get to appointments on time.</string>
+	<key>CFBundleExecutable</key>
+	<string>AttNavigator</string>
+	<key>UISupportedInterfaceOrientations~iphone</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>LSMinimumSystemVersion</key>
+	<string>5.0.3</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Easily drive to, search for, and share ETA with the people who matter most to you.</string>
+</dict>
+</plist>

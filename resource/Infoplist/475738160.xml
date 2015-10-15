@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SFFacebookConfiguration</key>
+	<dict>
+		<key>appId</key>
+		<string>483252215024222</string>
+		<key>message</key>
+		<string>Just satisfied my hunger using the #Snapfinger app...Tasty! #Tap2Snap</string>
+		<key>suffix</key>
+		<string>snapfinger</string>
+		<key>description</key>
+		<string>Who waits in lines anymore? Tap to SNAP! Search, Order and Pay for your food right from your phone whether you want to order ahead, pick it up or get it delivered.</string>
+		<key>name</key>
+		<string>Download the Snapfinger App</string>
+	</dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb483252215024222mcalisters</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>SFTestFlightToken</key>
+	<string>ae2693e9-676a-4471-a47b-dc92e6fda9f6</string>
+	<key>DTPlatformVersion</key>
+	<string>6.1</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Snapfinger, 2010</string>
+	<key>CFBundleName</key>
+	<string>McAlisters</string>
+	<key>DTSDKName</key>
+	<string>iphoneos6.1</string>
+	<key>LoadingTextColor</key>
+	<string>ffffff</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>CFBundleDisplayName</key>
+	<string>McAlisters Deli</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>SFThemingFile</key>
+	<string>McAlisters-Theming.plist</string>
+	<key>DTSDKBuild</key>
+	<string>10B141</string>
+	<key>CFBundleShortVersionString</key>
+	<string>4.7.1</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13A524d</string>
+	<key>DTPlatformBuild</key>
+	<string>10B141</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>4H1503</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleVersion</key>
+	<string>4893</string>
+	<key>MinimumOSVersion</key>
+	<string>5.0</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>FacebookAppID</key>
+	<string>483252215024222</string>
+	<key>UIApplicationExitsOnSuspend</key>
+	<false/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>SFBuildRevision</key>
+	<string>4892:a3871db92d19</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>SFConceptID</key>
+	<string>22</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.snapfinger.mobile.mcalisters</string>
+	<key>LoadingTextValue</key>
+	<string>Loading</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon@2x.png</string>
+		<string>Icon.png</string>
+	</array>
+	<key>LoadingSplashHeight</key>
+	<integer>480</integer>
+	<key>ETG Root</key>
+	<string>https://www.snapfinger.com/applications/etg</string>
+	<key>DTXcode</key>
+	<string>0463</string>
+	<key>CFBundleExecutable</key>
+	<string>McAlisters</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>LoadingTextFontSize</key>
+	<string>22</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>ETG Root 2</key>
+	<string>https://www.kiofc.com/applications/etg</string>
+	<key>ConceptId</key>
+	<string>22</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string></string>
+</dict>
+</plist>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>8.3</string>
+	<key>CFBundleIconFile</key>
+	<string>wfAppIcon.png</string>
+	<key>CFBundleName</key>
+	<string>Wells_Fargo_Mobile_Banking_iPhone</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.3</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UIRequiresPersistentWiFi</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Wells Fargo</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<key>DTSDKBuild</key>
+	<string>12F69</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.45</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14C1514</string>
+	<key>DTPlatformBuild</key>
+	<string>12F69</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>DTXcodeBuild</key>
+	<string>6D570</string>
+	<key>CFBundleVersion</key>
+	<string>81</string>
+	<key>UIStatusBarHidden</key>
+	<false/>
+	<key>UILaunchStoryboardName</key>
+	<string>Launch Screen</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>Configuration</key>
+	<string>AppStoreDistribution</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.wf.mobilebanking</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>wfAppIcon.png</string>
+		<string>wfAppIcon@2x.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0630</string>
+	<key>CFBundleExecutable</key>
+	<string>Wells_Fargo_Mobile_Banking_iPhone</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

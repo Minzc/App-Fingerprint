@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>8.1</string>
+	<key>CFBundleName</key>
+	<string>Citizens Bank</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.1</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Citizens Bank</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<key>DTSDKBuild</key>
+	<string>12B411</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.7</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string></string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14C109</string>
+	<key>DTPlatformBuild</key>
+	<string>12B411</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6A2008a</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>CitizenBook.ttf</string>
+		<string>CitizenRoman.ttf</string>
+		<string>CitizenBold.ttf</string>
+		<string>CitizenBoldItalic.ttf</string>
+		<string>CitizenBookItalic.ttf</string>
+		<string>CitizenExtraBold.ttf</string>
+		<string>CitizenItalic.ttf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>3.7.2</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>UIApplicationExitsOnSuspend</key>
+	<false/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.CitizensBank.MobileBankingApp</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>icon-80</string>
+		<string>icon-58</string>
+		<string>icon-120</string>
+		<string>Icon</string>
+		<string>Icon@2x.png</string>
+		<string>Icon-72</string>
+		<string>icon-144</string>
+		<string>icon-50</string>
+		<string>icon-100</string>
+		<string>icon-60</string>
+		<string>icon-120</string>
+		<string>icon-76</string>
+		<string>icon-152</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0611</string>
+	<key>NSLocationUsageDescription</key>
+	<string></string>
+	<key>Ensighten App ID</key>
+	<string>com.CitizensBank.MobileBankingApp</string>
+	<key>CFBundleExecutable</key>
+	<string>Citizens Bank</string>
+	<key>Ensighten Client ID</key>
+	<string>rbscitizensmobile</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

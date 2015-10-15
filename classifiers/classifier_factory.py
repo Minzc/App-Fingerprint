@@ -1,4 +1,4 @@
-from classifiers.agent_classifier import AgentClassifier
+from classifiers.agent_classifier_modify import AgentClassifier
 from classifiers.algo_modify import KVClassifier
 from classifiers.head import HeaderClassifier
 from classifiers.host import HostApp

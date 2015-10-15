@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.1</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>CFBundleName</key>
+	<string>Drivers Ed</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.1</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>PreferredCountry</key>
+	<string>us</string>
+	<key>OtherApps</key>
+	<array>
+		<string>CDLTest</string>
+		<string>AirBrakesTest</string>
+		<string>IQTest</string>
+		<string>GrammarUp</string>
+		<string>SATSuper</string>
+		<string>GRESuper</string>
+		<string>ACTSuper</string>
+		<string>Idioms</string>
+	</array>
+	<key>BrandWebsite</key>
+	<string>www.brilliantbrains.me</string>
+	<key>AppID</key>
+	<string>309540044</string>
+	<key>CFBundleDisplayName</key>
+	<string>Drivers Ed</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UIStatusBarHidden~ipad</key>
+	<true/>
+	<key>SupportEmailID</key>
+	<string>support@webrichsoftware.com</string>
+	<key>DeveloperPageTerm</key>
+	<integer>290203591</integer>
+	<key>CFBundleShortVersionString</key>
+	<string>3.5</string>
+	<key>FBPageID</key>
+	<string>364762540216958</string>
+	<key>AppDisplayNameFull</key>
+	<string>Drivers Ed</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14A389</string>
+	<key>DTPlatformBuild</key>
+	<string>12B411</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6A1052d</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>CenturyGothic.TTF</string>
+		<string>CenturyGothic-Bold.TTF</string>
+		<string>MyriadPro-Bold.otf</string>
+		<string>MyriadPro-Regular.otf</string>
+		<string>MyriadPro-Semibold.otf</string>
+		<string>Avenir.ttc</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>3.5</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>DTSDKBuild</key>
+	<string>12B411</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>SocialText</key>
+	<string>This is a cool App! Check this out on the App Store.</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow~iphone</string>
+	<key>FullVersionInfo</key>
+	<string>Unlocking full version will enable 13 topics with525 questions and Remove Ads.</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.eknathkadam.DriversEdLite</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon@2x.png</string>
+		<string>Icon-72.png</string>
+		<string>Icon-72@2x.png</string>
+		<string>iTunesArtwork.png</string>
+		<string>iTunesArtwork@2x.png</string>
+		<string>Icon-Small-50.png</string>
+		<string>Icon-Small-50@2x.png</string>
+		<string>Icon-Small.png</string>
+		<string>Icon-Small@2x.png</string>
+		<string>Icon-76@2x.png</string>
+		<string>Icon-76.png</string>
+		<string>Icon-120.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0610</string>
+	<key>FullVersionProductID</key>
+	<string>DRIVERSED_FULL_VERSION</string>
+	<key>CFBundleExecutable</key>
+	<string>Drivers Ed</string>
+	<key>StateNames</key>
+	<array>
+		<string>Alabama</string>
+		<string>Alaska</string>
+		<string>Arizona</string>
+		<string>Arkansas</string>
+		<string>California</string>
+		<string>Colorado</string>
+		<string>Connecticut</string>
+		<string>District Of Columbia</string>
+		<string>Delaware</string>
+		<string>Florida</string>
+		<string>Georgia</string>
+		<string>Hawaii</string>
+		<string>Idaho</string>
+		<string>Illinois</string>
+		<string>Indiana</string>
+		<string>Iowa</string>
+		<string>Kansas</string>
+		<string>Kentucky</string>
+		<string>Louisiana</string>
+		<string>Maine</string>
+		<string>Maryland</string>
+		<string>Massachusetts</string>
+		<string>Michigan</string>
+		<string>Minnesota</string>
+		<string>Mississippi</string>
+		<string>Missouri</string>
+		<string>Montana</string>
+		<string>Nebraska</string>
+		<string>Nevada</string>
+		<string>New Hampshire</string>
+		<string>New Jersey</string>
+		<string>New Mexico</string>
+		<string>New York</string>
+		<string>North Carolina</string>
+		<string>North Dakota</string>
+		<string>Ohio</string>
+		<string>Oklahoma</string>
+		<string>Oregon</string>
+		<string>Pennsylvania</string>
+		<string>Rhode Island</string>
+		<string>South Carolina</string>
+		<string>South Dakota</string>
+		<string>Tennessee</string>
+		<string>Texas</string>
+		<string>Utah</string>
+		<string>Vermont</string>
+		<string>Virginia</string>
+		<string>Washington</string>
+		<string>West Virginia</string>
+		<string>Wisconsin</string>
+		<string>Wyoming</string>
+	</array>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindow~ipad</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>AdMobAdUnitID</key>
+	<string>ca-app-pub-8588149230963760/3790065938</string>
+	<key>HelpText</key>
+	<array>
+		<string>Line1</string>
+		<string>Line2</string>
+		<string>Line3</string>
+		<string>Line4</string>
+		<string>Line5</string>
+		<string>Line6</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>SocialDetails</key>
+	<array>
+		<dict>
+			<key>SocialName</key>
+			<string>Share on Twitter</string>
+			<key>SocialButtonName</key>
+			<string>Twitter</string>
+		</dict>
+		<dict>
+			<key>SocialName</key>
+			<string>Share via Email</string>
+			<key>SocialButtonName</key>
+			<string>Email</string>
+		</dict>
+		<dict>
+			<key>SocialName</key>
+			<string>Share via SMS</string>
+			<key>SocialButtonName</key>
+			<string>SMS</string>
+		</dict>
+		<dict>
+			<key>SocialName</key>
+			<string>Write A Review</string>
+			<key>SocialButtonName</key>
+			<string>Review</string>
+		</dict>
+		<dict>
+			<key>SocialName</key>
+			<string>Explore More Apps</string>
+			<key>SocialButtonName</key>
+			<string>ExploreApps</string>
+		</dict>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

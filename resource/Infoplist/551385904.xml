@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb213807252079502</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.1</string>
+	<key>CFBundleName</key>
+	<string>com.nbdapps.imessage</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.1</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Icon.png</string>
+				<string>Icon@2x.png</string>
+				<string>Icon-72.png</string>
+				<string>Icon-72@2x.png</string>
+				<string>Icon-120.png</string>
+				<string>Icon-76.png</string>
+				<string>Icon-152.png</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>InstaMessage</string>
+	<key>DTSDKBuild</key>
+	<string>12B411</string>
+	<key>CFBundleShortVersionString</key>
+	<string>8.0.1</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14B25</string>
+	<key>DTPlatformBuild</key>
+	<string>12B411</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>AlfaSlabOne-Regular.ttf</string>
+		<string>ArchitectsDaughter.ttf</string>
+		<string>Arista2.0 light.ttf</string>
+		<string>CrackandBold-Regular.ttf</string>
+		<string>Arial Bold.ttf</string>
+		<string>Arial.ttf</string>
+		<string>COASBL__.TTF</string>
+		<string>Arvo-Bold.ttf</string>
+		<string>Bangers.ttf</string>
+		<string>BodoniStd-Italic.otf</string>
+		<string>BreeSerif-Regular.ttf</string>
+		<string>BOYCOTT_.ttf</string>
+		<string>Blackout-Midnight.ttf</string>
+		<string>CantataOne-Regular.ttf</string>
+		<string>Carton-Slab.otf</string>
+		<string>ClaireHandRegular.otf</string>
+		<string>ComingSoon.ttf</string>
+		<string>CooperBlackStd.otf</string>
+		<string>CREAMPUF.TTF</string>
+		<string>Cubano-Regular.otf</string>
+		<string>Exo-Black.ttf</string>
+		<string>FABULOUS.TTF</string>
+		<string>Graduate-Regular.ttf</string>
+		<string>Gill Sans.TTF</string>
+		<string>gunplay.ttf</string>
+		<string>HelveticaLTStd-Bold.otf</string>
+		<string>HelveticaLTStd-Roman.otf</string>
+		<string>HelveticaNeueLTCom-Lt.ttf</string>
+		<string>Impact Label.ttf</string>
+		<string>Impact Label Reversed.ttf</string>
+		<string>LondrinaSolid-Regular.ttf</string>
+		<string>LovedbytheKing.ttf</string>
+		<string>OleoScript-Regular.ttf</string>
+		<string>Outage Cut.ttf</string>
+		<string>NeutraTextTF-Bold.otf</string>
+		<string>Podkova-Bold.ttf</string>
+		<string>Righteous-Regular.ttf</string>
+		<string>Ranger.ttf</string>
+		<string>Roddenberry.ttf</string>
+		<string>RussoOne-Regular.ttf</string>
+		<string>ShadowsIntoLightTwo-Regular.ttf</string>
+		<string>YesevaOne.ttf</string>
+		<string>AvenirLTStd Black.otf</string>
+		<string>baskvl.ttf</string>
+		<string>bloody.ttf</string>
+		<string>Chalkduster.ttf</string>
+		<string>DrawingBlood.ttf</string>
+		<string>RomanAntique.ttf</string>
+		<string>FBS.otf</string>
+		<string>Impact.ttf</string>
+		<string>Carnevalee Freakshow.ttf</string>
+		<string>minecraft_font_by_pwnage_block-d37t6nb.ttf</string>
+		<string>SpecialElite.ttf</string>
+		<string>Futura Medium.ttf</string>
+		<string>Momtype.ttf</string>
+		<string>Prism-Regular.otf</string>
+		<string>Upon A Dream (Maleficent).ttf</string>
+		<string>Eraser.ttf</string>
+		<string>True Lies.ttf</string>
+		<string>SnowtopCaps.otf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>8.0.1</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>DTXcodeBuild</key>
+	<string>6A2008a</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.nbdapps.imessage</string>
+	<key>DTXcode</key>
+	<string>0611</string>
+	<key>CFBundleExecutable</key>
+	<string>InstaMessage</string>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindow</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>ATH Móvil</string>
+	<key>DTXcode</key>
+	<string>0511</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.1</string>
+	<key>DTSDKBuild</key>
+	<string>11D167</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleVersion</key>
+	<string>1.0.9</string>
+	<key>BuildMachineOSBuild</key>
+	<string>13D65</string>
+	<key>UIStatusBarHidden</key>
+	<false/>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.9</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>ATH Móvil</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>MinimumOSVersion</key>
+	<string>5.0</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.evertecinc.athmovil</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>ios7_spotlight_icon</string>
+		<string>ios7_app_icon_iphone</string>
+		<string>Icon.png</string>
+		<string>Icon@2x.png</string>
+		<string>Icon-72.png</string>
+		<string>Icon-72@2x.png</string>
+		<string>Icon-Small-50.png</string>
+		<string>Icon-Small-50@2x.png</string>
+		<string>Icon-Small.png</string>
+		<string>Icon-Small@2x.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>ATH Móvil</string>
+	<key>DTPlatformVersion</key>
+	<string>7.1</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformBuild</key>
+	<string>11D167</string>
+	<key>DTXcodeBuild</key>
+	<string>5B1008</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+</dict>
+</plist>

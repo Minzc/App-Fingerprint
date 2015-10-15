@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleName</key>
+	<string>PhotoSplash</string>
+	<key>DTXcode</key>
+	<string>0600</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTSDKBuild</key>
+	<string>12A365</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleVersion</key>
+	<string>3.4</string>
+	<key>BuildMachineOSBuild</key>
+	<string>14A379a</string>
+	<key>CFBundleIconFiles~ipad</key>
+	<array>
+		<string>ps_icon-152</string>
+		<string>ps_icon-76</string>
+		<string>ps_icon-120</string>
+		<string>ps_icon.png</string>
+		<string>ps_icon@2x.png</string>
+		<string>ps_icon-72.png</string>
+		<string>ps_icon-72@2x.png</string>
+	</array>
+	<key>CFBundleShortVersionString</key>
+	<string>3.4</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>PhotoSplash</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb147256862037494</string>
+				<string>vj417582128</string>
+			</array>
+		</dict>
+	</array>
+	<key>DTXcodeBuild</key>
+	<string>6A313</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.dsrtech.colorsplash</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Abscissa.ttf</string>
+		<string>Appetite.ttf</string>
+		<string>BoyzRGrossNF.ttf</string>
+		<string>HeroOfFools.ttf</string>
+		<string>Quikhand.ttf</string>
+		<string>Otto.ttf</string>
+		<string>amazingspider.ttf</string>
+		<string>CandyTime.ttf</string>
+		<string>CrashLandingBB.ttf</string>
+		<string>Super Webcomic Bros..ttf</string>
+		<string>color basic.ttf</string>
+		<string>Ethopool.ttf</string>
+		<string>FLATPACK.TTF</string>
+		<string>holy smokes.ttf</string>
+		<string>instant tunes.ttf</string>
+		<string>JandaAsLongAsYouLoveMe.ttf</string>
+		<string>JandaHappyDay.ttf</string>
+		<string>JandaPolkadotParty.ttf</string>
+		<string>JandaPolkadotPunch.ttf</string>
+		<string>KR Tigrrr.ttf</string>
+		<string>ManlyMenBB.ttf</string>
+		<string>Sharp.ttf</string>
+		<string>StraightToHellBB.ttf</string>
+		<string>StraightToHellSinnerBB.ttf</string>
+		<string>welfare brat.ttf</string>
+		<string>SCRIPTBL_0.TTF</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.0</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>ps_icon-120</string>
+		<string>ps_icon.png</string>
+		<string>ps_icon@2x.png</string>
+		<string>ps_icon-72.png</string>
+		<string>ps_icon-72@2x.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Photo Splash</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>DTPlatformBuild</key>
+	<string>12A365</string>
+</dict>
+</plist>

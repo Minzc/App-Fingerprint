@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>LDDayByDay30</string>
+	<key>DTSDKName</key>
+	<string>iphoneos3.0</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleVersion</key>
+	<string>4.09.002801</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleIconFile</key>
+	<string>BH_LoveDareDXDApp57X57</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>LDDayByDay30</string>
+	<key>MinimumOSVersion</key>
+	<string>3.0</string>
+	<key>CFBundleIdentifier</key>
+	<string>BH.LDDayByDay30</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>LoveDare30</string>
+	<key>otUIBrandingOptionsPList</key>
+	<string>Branding-LoveDareDxD30</string>
+</dict>
+</plist>

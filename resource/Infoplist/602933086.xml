@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIViewControllerIdentifiersToNibNames</key>
+	<dict>
+		<key>infoViewController</key>
+		<string>infoViewController</string>
+		<key>bedTimeViewController</key>
+		<string>bedTimeViewController</string>
+		<key>setBedtimeViewController</key>
+		<string>setBedtimeViewController</string>
+		<key>soundOptionsViewController</key>
+		<string>soundOptionsViewController</string>
+		<key>setAlarmViewController</key>
+		<string>setAlarmViewController</string>
+		<key>optionsViewController</key>
+		<string>optionsViewController</string>
+		<key>settingsViewController</key>
+		<string>settingsViewController</string>
+		<key>alarmSetViewController</key>
+		<string>alarmSetViewController</string>
+		<key>sensitivityOptionsViewController</key>
+		<string>sensitivityOptionsViewController</string>
+		<key>UIViewController-i8t-sY-GFb</key>
+		<string>UIViewController-i8t-sY-GFb</string>
+		<key>adViewController</key>
+		<string>adViewController</string>
+	</dict>
+	<key>UIStoryboardDesignatedEntryPointIdentifier</key>
+	<string>UIViewController-i8t-sY-GFb</string>
+	<key>UIStoryboardVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

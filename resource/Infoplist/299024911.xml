@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.0</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>CFBundleName</key>
+	<string>Grammar Up Free</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.0</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>PreferredCountry</key>
+	<string>us</string>
+	<key>OtherApps</key>
+	<array>
+		<dict>
+			<key>appName</key>
+			<string>Grammar Up: Phrasal Verbs</string>
+			<key>appID</key>
+			<string>367966770</string>
+			<key>buttonImage</key>
+			<string>Phrasal Verbs</string>
+		</dict>
+		<dict>
+			<key>appName</key>
+			<string>Grammar Express: Tenses</string>
+			<key>appID</key>
+			<string>335485915</string>
+			<key>buttonImage</key>
+			<string>Tenses</string>
+		</dict>
+		<dict>
+			<key>appName</key>
+			<string>Grammar Express: Parts of Speech</string>
+			<key>appID</key>
+			<string>345344091</string>
+			<key>buttonImage</key>
+			<string>Parts of Speech</string>
+		</dict>
+		<dict>
+			<key>appName</key>
+			<string>Grammar Express: Nouns</string>
+			<key>appID</key>
+			<string>357360218</string>
+			<key>buttonImage</key>
+			<string>Nouns</string>
+		</dict>
+		<dict>
+			<key>appName</key>
+			<string>Grammar express: Degees</string>
+			<key>appID</key>
+			<string>357358937</string>
+			<key>buttonImage</key>
+			<string>Degrees</string>
+		</dict>
+		<dict>
+			<key>appName</key>
+			<string>Grammar Express: Articles</string>
+			<key>appID</key>
+			<string>348801036</string>
+			<key>buttonImage</key>
+			<string>Articles</string>
+		</dict>
+		<dict>
+			<key>appName</key>
+			<string>Grammar express: Prepositions</string>
+			<key>appID</key>
+			<string>356842712</string>
+			<key>buttonImage</key>
+			<string>Prepositions</string>
+		</dict>
+		<dict>
+			<key>appName</key>
+			<string>Grammar Express: Active and Passive Voice</string>
+			<key>appID</key>
+			<string>357359615</string>
+			<key>buttonImage</key>
+			<string>Active &amp; Passive Voice</string>
+		</dict>
+		<dict>
+			<key>appName</key>
+			<string>Grammar Express: Clause Analysis</string>
+			<key>appID</key>
+			<string>358131331</string>
+			<key>buttonImage</key>
+			<string>Clause Analysis</string>
+		</dict>
+	</array>
+	<key>BrandWebsite</key>
+	<string>www.grammar-express.com</string>
+	<key>AppID</key>
+	<string>313112265</string>
+	<key>CFBundleDisplayName</key>
+	<string>Grammar Up</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>SupportEmailID</key>
+	<string>support@webrichsoftware.com</string>
+	<key>DeveloperPageTerm</key>
+	<integer>290203591</integer>
+	<key>CFBundleShortVersionString</key>
+	<string>3.8</string>
+	<key>FBPageID</key>
+	<string>311493328881997</string>
+	<key>AppDisplayNameFull</key>
+	<string>Grammar Up</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformBuild</key>
+	<string>12A365</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6A317</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>CenturyGothic.TTF</string>
+		<string>CenturyGothic-Bold.TTF</string>
+		<string>MyriadPro-Bold.otf</string>
+		<string>MyriadPro-Regular.otf</string>
+		<string>MyriadPro-Semibold.otf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>3.8</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>BuildMachineOSBuild</key>
+	<string>13F34</string>
+	<key>DTSDKBuild</key>
+	<string>12A365</string>
+	<key>SocialText</key>
+	<string>This is a cool App! Check this out on the App Store.</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow~iphone</string>
+	<key>FullVersionInfo</key>
+	<string>Unlocking full version will enable all 20 topics, each having 90 questions, i.e. 1800 total questions and REMOVE Ads.</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.eknathkadam.AUCitizenshipTest</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon@2x.png</string>
+		<string>Icon-72.png</string>
+		<string>Icon-72@2x.png</string>
+		<string>Icon512.png</string>
+		<string>Icon-Small-50.png</string>
+		<string>Icon-Small-50@2x.png</string>
+		<string>Icon-Small.png</string>
+		<string>Icon-Small@2x.png</string>
+		<string>Icon-76.png</string>
+		<string>Icon-76@2x.png</string>
+		<string>Icon-120.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0600</string>
+	<key>FullVersionProductID</key>
+	<string>GrammarUp_Full_Version</string>
+	<key>CFBundleExecutable</key>
+	<string>Grammar Up Free</string>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindow~ipad</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>AdMobAdUnitID</key>
+	<string>ca-app-pub-8588149230963760/9976200332</string>
+	<key>HelpText</key>
+	<array>
+		<string>Line1</string>
+		<string>Line2</string>
+		<string>Line3</string>
+		<string>Line4</string>
+		<string>Line5</string>
+		<string>Line6</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>SocialDetails</key>
+	<array>
+		<dict>
+			<key>SocialName</key>
+			<string>Share on Twitter</string>
+			<key>SocialButtonName</key>
+			<string>Twitter</string>
+		</dict>
+		<dict>
+			<key>SocialName</key>
+			<string>Share via Email</string>
+			<key>SocialButtonName</key>
+			<string>Email</string>
+		</dict>
+		<dict>
+			<key>SocialName</key>
+			<string>Share via SMS</string>
+			<key>SocialButtonName</key>
+			<string>SMS</string>
+		</dict>
+		<dict>
+			<key>SocialName</key>
+			<string>Write A Review</string>
+			<key>SocialButtonName</key>
+			<string>Review</string>
+		</dict>
+		<dict>
+			<key>SocialName</key>
+			<string>Explore More Apps</string>
+			<key>SocialButtonName</key>
+			<string>ExploreApps</string>
+		</dict>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

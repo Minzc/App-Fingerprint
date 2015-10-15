@@ -12,7 +12,7 @@ tbls = [  'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_20
 def log(trainTbls, testTbl, output):
   import time
   dateStr = str(time.strftime("%d/%m/%Y"))
-  timeStr = str(trftime("%H:%M:%S"))
+  timeStr = str(time.strftime("%H:%M:%S"))
   fw = open('autotest_ios.txt', 'a')
   fw.write(dateStr + ' ' + timeStr+'\n')
   fw.write(str(trainTbls)+' ' + testTbl+'\n')

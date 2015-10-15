@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>8.1</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.1</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Icon-60</string>
+				<string>Icon</string>
+				<string>Icon@2x</string>
+				<string>Icon-60@3x</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>URL types</key>
+	<array>
+		<dict>
+			<key>URL identifier</key>
+			<string>fb206746422820612</string>
+			<key>URL Schemes</key>
+			<dict>
+				<key>Item 0</key>
+				<string>ampfbc94be4edfbb8923ab17e3-b2a229ea-7834-11e1-2222-00a68a4c01fc</string>
+			</dict>
+		</dict>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>CVS</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+		<string>external-accessory</string>
+		<string>fetch</string>
+		<string>location</string>
+		<string>remote-notification</string>
+	</array>
+	<key>DTSDKBuild</key>
+	<string>12B411</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.1.1</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Location is required to find out where you are</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>QA_Environment</key>
+	<string>ED_QA3</string>
+	<key>DTPlatformBuild</key>
+	<string>12B411</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6A2008a</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleVersion</key>
+	<string>2.1</string>
+	<key>isManagePickupListOn</key>
+	<false/>
+	<key>UIStatusBarHidden</key>
+	<false/>
+	<key>MinimumOSVersion</key>
+	<string>7.0</string>
+	<key>FacebookAppID</key>
+	<string>310349749112155</string>
+	<key>BuildMachineOSBuild</key>
+	<string>14C109</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>FacebookDisplayName</key>
+	<string>CVS</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.cvs.cvspharmacy</string>
+	<key>Quick_Build_Version</key>
+	<string>768</string>
+	<key>DTXcode</key>
+	<string>0611</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Location is required for beacon monitoring and ranging</string>
+	<key>CFBundleExecutable</key>
+	<string>CVSOnlineiPhone</string>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+	</dict>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CVSBeaconUUID</key>
+	<string>43A2BC29-C111-4A76-8B6F-78AECB142E5A</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

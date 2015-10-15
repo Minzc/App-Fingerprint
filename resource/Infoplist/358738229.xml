@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>8.1</string>
+	<key>CFBundleIconFile</key>
+	<string>icon-iap-iphone.png</string>
+	<key>CFBundleName</key>
+	<string>EMSG-iap</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.1</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>icon-iap-iphone.png</string>
+				<string>icon-iap-ipad.png</string>
+				<string>Icon_114x114.png</string>
+				<string>Icon_57x57.png</string>
+				<string>Icon_72x72.png</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<false/>
+		</dict>
+	</dict>
+	<key>CFBundleDisplayName</key>
+	<string>EMSG</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>InAppPurchaseInfo</key>
+	<dict>
+		<key>featurePriceUnlockFull</key>
+		<string>$5.99</string>
+		<key>featureIdUnlockAudio</key>
+		<string>com.mavro.emsg.iap.audio_content_unlock</string>
+		<key>featureIdUnlockFull</key>
+		<string>com.mavro.emsg.iap.full_version_unlock</string>
+		<key>isEnabled</key>
+		<true/>
+		<key>featurePriceUnlockAudio</key>
+		<string>$0.99</string>
+	</dict>
+	<key>TopicsTitle</key>
+	<string>Medical Spanish Topics</string>
+	<key>DTSDKBuild</key>
+	<string>12B411</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.7.44</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13F34</string>
+	<key>DTPlatformBuild</key>
+	<string>12B411</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6A1052c</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIPrerenderedIcon</key>
+	<false/>
+	<key>CFBundleVersion</key>
+	<string>3.7.44</string>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>CFBundleIdentifier</key>
+	<string>com.mavro.emsg.iap</string>
+	<key>SharingInfo</key>
+	<dict>
+		<key>EmailTitle</key>
+		<string>Emergency Medical Spanish Guide</string>
+		<key>sharingImageURL</key>
+		<string>http://www.mavroinc.com/images/icon_img1.png</string>
+		<key>SharingTitle</key>
+		<string>Emergency Medical Spanish Guide</string>
+		<key>sharingAppSuffix</key>
+		<string>emsgiap</string>
+		<key>SharingBody</key>
+		<string>Go download the free Medical Spanish Guide by Mavro Inc.</string>
+		<key>SharingURL</key>
+		<string>http://www.mavroinc.com/EMSG</string>
+		<key>EmailBody</key>
+		<string>Go download the free Medical Spanish Guide by Mavro Inc.
+Emergency Medical Spanish Guide - Assessment for the English speaking healthcare provider in Yes/No format.
+Learn more at:
+http://mavroinc.com/EMSG</string>
+	</dict>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>icon-iap-iphone.png</string>
+		<string>icon-iap-ipad.png</string>
+		<string>Icon_114x114.png</string>
+		<string>Icon_57x57.png</string>
+		<string>Icon_72x72.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0610</string>
+	<key>CFBundleExecutable</key>
+	<string>EMSG-iap</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>fb347542271924857emsgiap</string>
+		</dict>
+	</array>
+</dict>
+</plist>

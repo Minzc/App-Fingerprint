@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.1</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>CFBundleName</key>
+	<string>My MBFS</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.1</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.business</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>My MBFS</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location Service is required to find out your location</string>
+	<key>Icon already includes gloss effects</key>
+	<true/>
+	<key>DTSDKBuild</key>
+	<string>12B411</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.5</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Location Service is required to find out your location</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13F34</string>
+	<key>DTPlatformBuild</key>
+	<string>12B411</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6A2008a</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>CFBundleVersion</key>
+	<string>2.5</string>
+	<key>FacebookAppID</key>
+	<string>137630666324131</string>
+	<key>UIApplicationExitsOnSuspend</key>
+	<true/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.mercedesbenzfinancial.mbfaccountapp</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon~ipad.png</string>
+		<string>Icon@2x.png</string>
+		<string>Icon-Small.png</string>
+		<string>Icon-Small@2x.png</string>
+		<string>Icon-80.png</string>
+		<string>Icon-120.png</string>
+		<string>Icon-152.png</string>
+		<string>Icon-76.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0611</string>
+	<key>CFBundleExecutable</key>
+	<string>My MBFS</string>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindow-iPad</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb137630666324131</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.mercedesbenzfinancial.mbfaccountapp</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.mercedesbenzfinancial.mbfaccountapp</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
