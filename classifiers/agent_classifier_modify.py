@@ -176,7 +176,7 @@ class AgentClassifier(AbsClassifer):
     for app, agent in agentTuples:
       for f in self.appFeatures[app]:
         for feature in self._gen_features(f):
-          if feature in agent:
+          if feature in agent.encode('utf-8'):
             regexObj = re.compile(r'\b' + re.escape(feature+'/'), re.IGNORECASE)
             appFeatureRegex[app].add(regexObj)
 
@@ -206,6 +206,7 @@ class AgentClassifier(AbsClassifer):
     for app, agents in appAgent.items():
       for agent in agents:
         for regexObj, predictApps in regexApp.items():
+          regexObj = re.compile(regexObj)
           if len(predictApps) == 1 and regexObj.search(agent):
             for predict in predictApps:
               if app == predict:
