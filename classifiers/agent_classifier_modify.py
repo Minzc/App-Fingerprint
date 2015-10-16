@@ -223,7 +223,7 @@ class AgentClassifier(AbsClassifer):
             print regexObj.pattern, agent, regexObj.search(agent)
           if re.escape('razywritersdemo') in regexObj.pattern and app == 'com.fred.crazywritersdemo':
             print regexObj.pattern, agent, regexObj.search(agent)
-          if re.escape('live%20organic') in regexObj.pattern:
+          if re.escape('live%20organic') in regexObj.pattern and app == 'com.smartwithlife.organiclifemagazine':
             print regexObj.pattern, agent, regexObj.search(agent)
 
           if len(predictApps) == 1 and regexObj.search(agent):
