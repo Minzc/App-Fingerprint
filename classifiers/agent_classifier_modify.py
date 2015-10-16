@@ -35,8 +35,6 @@ class AgentClassifier(AbsClassifer):
     for key in VALID_FEATURES:
       if key in plistObj:
         value = self._unescape(plistObj[key].lower())
-        if '459481464.xml' in filePath:
-            print value
         features.add(value)
       else:
         print filePath, key
@@ -181,7 +179,7 @@ class AgentClassifier(AbsClassifer):
           feature = feature.lower()
           if feature in agent.encode('utf-8'):
             if app == 'com.elnuevodia.eldia':
-                print '[TEST]', feature
+                print '[TEST]', feature.encode('utf-8')
             regexObj = re.compile(r'\b' + re.escape(feature+'/'), re.IGNORECASE)
             appFeatureRegex[app][regexObj.pattern] = regexObj
 
