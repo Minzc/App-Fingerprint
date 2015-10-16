@@ -35,6 +35,8 @@ class AgentClassifier(AbsClassifer):
     for key in VALID_FEATURES:
       if key in plistObj:
         value = self._unescape(plistObj[key].lower())
+        if '459481464.xml' in filePath:
+            print value
         features.add(value)
       else:
         print filePath, key
@@ -172,32 +174,37 @@ class AgentClassifier(AbsClassifer):
       agentTuples.add((app.lower(),  agent.lower()))
       appCompany[app] = company
     
-    appFeatureRegex = defaultdict(set)
+    appFeatureRegex = defaultdict(lambda : {})
     for app, agent in agentTuples:
       for f in self.appFeatures[app]:
         for feature in self._gen_features(f):
+          feature = feature.lower()
           if feature in agent.encode('utf-8'):
+            if app == 'com.elnuevodia.eldia':
+                print '[TEST]', feature
             regexObj = re.compile(r'\b' + re.escape(feature+'/'), re.IGNORECASE)
-            appFeatureRegex[app].add(regexObj)
+            appFeatureRegex[app][regexObj.pattern] = regexObj
 
             regexObj = re.compile(r'^' + re.escape(feature+'/'), re.IGNORECASE)
-            appFeatureRegex[app].add(regexObj)
+            appFeatureRegex[app][regexObj.pattern] = regexObj
 
             regexObj = re.compile(r'\b' + re.escape(feature) + r' \b[vr]?[0-9.]+\b', re.IGNORECASE)
-            appFeatureRegex[app].add(regexObj)
+            appFeatureRegex[app][regexObj.pattern] = regexObj
             
-            appFeatureRegex[app].add(re.compile(r'\b' + re.escape(app)+ r'\b', re.IGNORECASE))
+            regexObj = re.compile(r'\b' + re.escape(app)+ r'\b', re.IGNORECASE)
+            appFeatureRegex[app][regexObj.pattern] = regexObj
 
-            appFeatureRegex[app].add(re.compile(r'\b' + re.escape(feature)+ r'\b', re.IGNORECASE))
+            regexObj = re.compile(r'\b' + re.escape(feature)+ r'\b', re.IGNORECASE)
+            appFeatureRegex[app][regexObj.pattern] = regexObj
 
-    
     regexApp = defaultdict(set)
     for app, agents in appAgent.items():
       for agent in agents:
-        for predict, regexObjs in appFeatureRegex.items():
-          for regexObj in regexObjs:
-            if regexObj.search(agent):
-              regexApp[regexObj.pattern].add(app)
+        for predict, patternNregexObjs in appFeatureRegex.items():
+          for pattern, regexObj in patternNregexObjs.items():
+            for regexObj in regexObjs:
+              if regexObj.search(agent):
+                regexApp[regexObj.pattern].add(app)
     
     
     corrects = set()
@@ -228,8 +235,8 @@ class AgentClassifier(AbsClassifer):
     for agent in notCovered:
       print '[NOTCOVERED]', agent
     print '========REGEX============'
-    for agent, regexObjs in appFeatureRegex.items():
-      for regexObj in regexObjs:
+    for agent, patternNregexObjs in appFeatureRegex.items():
+      for pattern, regexObj in patternNregexObjs.items():
         print agent, 'REGEX', regexObj.pattern
 
     
