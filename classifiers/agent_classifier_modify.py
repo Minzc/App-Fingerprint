@@ -207,18 +207,9 @@ class AgentClassifier(AbsClassifer):
       for agent in agents:
         for predict, patternNregexObjs in appFeatureRegex.items():
           for pattern, regexObj in patternNregexObjs.items():
-            if regexObj.pattern == '^thebus6/':
-              print regexObj.pattern, regexApp[regexObj.pattern]
-            if re.escape('com.smartwithlife.organiclifemagazine') in regexObj.pattern:
-              print regexObj.pattern, regexApp[regexObj.pattern]
-            if re.escape('razywritersdemo') in regexObj.pattern:
-              print regexObj.pattern, regexApp[regexObj.pattern]
-            if re.escape('live%20organic') in regexObj.pattern:
-              print regexObj.pattern, regexApp[regexObj.pattern]
             if regexObj.search(agent):
               regexApp[regexObj.pattern].add(app)
     
-    return 
     corrects = set()
     wrongs = set()
     notCovered = set()
@@ -226,6 +217,15 @@ class AgentClassifier(AbsClassifer):
       for agent in agents:
         for regexObj, predictApps in regexApp.items():
           regexObj = re.compile(regexObj)
+          if regexObj.pattern == '^thebus6/' and app =='gov.honolulu.thebus6':
+            print regexObj.pattern, agent, regexObj.search(agent)
+          if re.escape('com.smartwithlife.organiclifemagazine') in regexObj.pattern and app == 'com.smartwithlife.organiclifemagazine':
+            print regexObj.pattern, agent, regexObj.search(agent)
+          if re.escape('razywritersdemo') in regexObj.pattern and app == 'com.fred.crazywritersdemo':
+            print regexObj.pattern, agent, regexObj.search(agent)
+          if re.escape('live%20organic') in regexObj.pattern:
+            print regexObj.pattern, agent, regexObj.search(agent)
+
           if len(predictApps) == 1 and regexObj.search(agent):
             for predict in predictApps:
               if app == predict:
