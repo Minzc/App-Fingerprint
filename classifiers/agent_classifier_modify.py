@@ -7,7 +7,7 @@ import re
 from const.app_info import AppInfos
 
 test_str = 'NBC'.lower()
-VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName'}
+VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName', 'CFBundleURLSchemes'}
 class AgentClassifier(AbsClassifer):
   def _load_info_features(self):
     from os import listdir
@@ -193,6 +193,11 @@ class AgentClassifier(AbsClassifer):
             appFeatureRegex[app][regexObj.pattern] = regexObj
 
             regexObj = re.compile(r'\b' + re.escape(feature)+ r'\b', re.IGNORECASE)
+            appFeatureRegex[app][regexObj.pattern] = regexObj
+
+          if '/' in agent:
+            feature = re.sub('[/].*', '', agent)
+            regexObj = re.compile(r'^' + re.escape(feature+'/'), re.IGNORECASE)
             appFeatureRegex[app][regexObj.pattern] = regexObj
 
     regexApp = defaultdict(set)
