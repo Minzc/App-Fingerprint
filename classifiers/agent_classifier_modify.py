@@ -199,7 +199,7 @@ class AgentClassifier(AbsClassifer):
     for app, agents in appAgent.items():
       for agent in agents:
         for predict, patternNregexObjs in appFeatureRegex.items():
-          for pattern, regexObj in patternNregexObjs.items():
+          for pattern, regexObjs in patternNregexObjs.items():
             for regexObj in regexObjs:
               if regexObj.search(agent):
                 regexApp[regexObj.pattern].add(app)
