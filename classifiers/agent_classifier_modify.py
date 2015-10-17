@@ -157,6 +157,7 @@ class AgentClassifier(AbsClassifer):
     featureSet.add(f.replace(' ', '%20'))
     featureSet.add(f.replace(' ', '-'))
     featureSet.add(f.replace(' ', '_'))
+    featureSet.add(f.replace(' ', ''))
     return featureSet
 
 
@@ -227,10 +228,8 @@ class AgentClassifier(AbsClassifer):
                 regexApp[regexObj.pattern].add(app)
             elif regexObj.search(agent):
               regexApp[regexObj.pattern].add(app)
-            if app == '6f68888n5z.us.pandav.iwmata' and predict == '6f68888n5z.us.pandav.iwmata':
-              print 'PATTERN', regexObj.pattern
-              print 'AGENT', agent
-              print 'RESULT',regexObj.search(agent)
+            elif pattern == predict:
+              regexApp[regexObj.pattern].add(app)
 
     
     corrects = set()
