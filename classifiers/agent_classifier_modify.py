@@ -222,10 +222,15 @@ class AgentClassifier(AbsClassifer):
         for predict, patternNregexObjs in appFeatureRegex.items():
           for pattern, regexObj in patternNregexObjs.items():
             if '#' in pattern:
+              pattern = pattern.replace('#', '')
               if pattern in agent:
                 regexApp[regexObj.pattern].add(app)
             elif regexObj.search(agent):
               regexApp[regexObj.pattern].add(app)
+            if app == '6f68888n5z.us.pandav.iwmata' and predict == '6f68888n5z.us.pandav.iwmata':
+              print 'PATTERN', regexObj.pattern
+              print 'AGENT', agent
+              print 'RESULT',regexObj.search(agent)
 
     
     corrects = set()
@@ -256,7 +261,6 @@ class AgentClassifier(AbsClassifer):
                 wrongApp.add(app)
         if agent not in corrects and agent not in wrongs:
           notCovered.add(agent)
-    return
     print '========Correct========='
     for agent in corrects:
       print '[CORRECT]', agent
