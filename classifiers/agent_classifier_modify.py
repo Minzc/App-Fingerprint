@@ -170,6 +170,15 @@ class AgentClassifier(AbsClassifer):
           trainTbls.append(tbl)
       self.train(trainTbls, testTbl)
       break
+    
+  def _gen_regex(self, feature):
+    regex = set()
+    regex.add(r'\b' + re.escape(feature+'/'))
+    regex.add(r'^' + re.escape(feature+'/'))
+    regex.add(r'\b' + re.escape(feature) + r' \b[vr]?[0-9.]+\b')
+    regex.add(r'\b' + re.escape(app)+ r'\b')
+    regex.add(r'\b' + re.escape(feature)+ r'\b')
+    return regex
 
   def train(self, trainTbls, testTbl):
     from sqldao import SqlDao
@@ -179,6 +188,9 @@ class AgentClassifier(AbsClassifer):
     agentTuples = set()
     appCompany = {}
     appAgent = defaultdict(set)
+    '''
+    Load data
+    '''
     for tbl in trainTbls:
       for app, agent, company in sqldao.execute(SQL % tbl):
         appAgent[app].add(agent.lower())
@@ -190,27 +202,33 @@ class AgentClassifier(AbsClassifer):
     for app, agent, company in sqldao.execute(SQL % testTbl):
       testAgentTuples.add((app.lower(),  agent.lower()))
       testAppAgent[app].add(agent.lower())
-
+    
+    '''
+    Compose regular expression
+    '''
     appFeatureRegex = defaultdict(lambda : {})
     for app, agent in agentTuples:
       for f in self.appFeatures[app]:
         for feature in self._gen_features(f):
-          feature = feature.lower()
           if feature in agent.encode('utf-8'):
-            regexObj = re.compile(r'\b' + re.escape(feature+'/'), re.IGNORECASE)
-            appFeatureRegex[app][regexObj.pattern] = regexObj
+            regexes = self._gen_regex(feature)
+            for regex in regexes:
+              regexObj = re.compile(regex, re.IGNORECASE)
+              appFeatureRegex[app][regexObj.pattern] = regexObj
+            # regexObj = re.compile(r'\b' + re.escape(feature+'/'), re.IGNORECASE)
+            # appFeatureRegex[app][regexObj.pattern] = regexObj
 
-            regexObj = re.compile(r'^' + re.escape(feature+'/'), re.IGNORECASE)
-            appFeatureRegex[app][regexObj.pattern] = regexObj
+            # regexObj = re.compile(r'^' + re.escape(feature+'/'), re.IGNORECASE)
+            # appFeatureRegex[app][regexObj.pattern] = regexObj
 
-            regexObj = re.compile(r'\b' + re.escape(feature) + r' \b[vr]?[0-9.]+\b', re.IGNORECASE)
-            appFeatureRegex[app][regexObj.pattern] = regexObj
+            # regexObj = re.compile(r'\b' + re.escape(feature) + r' \b[vr]?[0-9.]+\b', re.IGNORECASE)
+            # appFeatureRegex[app][regexObj.pattern] = regexObj
             
-            regexObj = re.compile(r'\b' + re.escape(app)+ r'\b', re.IGNORECASE)
-            appFeatureRegex[app][regexObj.pattern] = regexObj
+            # regexObj = re.compile(r'\b' + re.escape(app)+ r'\b', re.IGNORECASE)
+            # appFeatureRegex[app][regexObj.pattern] = regexObj
 
-            regexObj = re.compile(r'\b' + re.escape(feature)+ r'\b', re.IGNORECASE)
-            appFeatureRegex[app][regexObj.pattern] = regexObj
+            # regexObj = re.compile(r'\b' + re.escape(feature)+ r'\b', re.IGNORECASE)
+            # appFeatureRegex[app][regexObj.pattern] = regexObj
 
       if '/' in agent:
         feature = re.sub('[/].*', '', agent)
@@ -228,7 +246,7 @@ class AgentClassifier(AbsClassifer):
                 regexApp[regexObj.pattern].add(app)
             elif regexObj.search(agent):
               regexApp[regexObj.pattern].add(app)
-            elif pattern == predict:
+            elif predict in pattern:
               regexApp[regexObj.pattern].add(app)
 
     
@@ -238,16 +256,12 @@ class AgentClassifier(AbsClassifer):
     correctApp = set()
     wrongApp = set()
     for app, agents in testAppAgent.items():
-      if '6f68888n5z.us.pandav.iwmata' not in app:
-        continue
+      # if '6f68888n5z.us.pandav.iwmata' not in app:
+      #   continue
       for agent in agents:
         print agent
         for regexStr, predictApps in regexApp.items():
           regexObj = re.compile(regexStr)
-          if 'iwmata' in regexStr:
-            print regexStr
-            print '##', predictApps
-            print '$$', regexObj.search(agent)
           if len(predictApps) == 1 and regexObj.search(agent):
             for predict in predictApps:
               if app == predict:
