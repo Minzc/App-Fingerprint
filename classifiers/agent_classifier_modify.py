@@ -237,11 +237,12 @@ class AgentClassifier(AbsClassifer):
       if '6f68888n5z.us.pandav.iwmata' not in app:
         continue
       for agent in agents:
+        print agent
         for regexStr, predictApps in regexApp.items():
           regexObj = re.compile(regexStr)
-          if '\.iwmata' in regexStr:
-            print '##', predictApps
-            print '$$', regexObj.search(agent)
+          print regexStr
+          print '##', predictApps
+          print '$$', regexObj.search(agent)
           if len(predictApps) == 1 and regexObj.search(agent):
             for predict in predictApps:
               if app == predict:
@@ -254,7 +255,7 @@ class AgentClassifier(AbsClassifer):
                 wrongApp.add(app)
         if agent not in corrects and agent not in wrongs:
           notCovered.add(agent)
-
+    return
     print '========Correct========='
     for agent in corrects:
       print '[CORRECT]', agent
