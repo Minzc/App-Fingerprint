@@ -36,8 +36,6 @@ class AgentClassifier(AbsClassifer):
       if key in plistObj:
         value = self._unescape(plistObj[key].lower())
         features.add(value)
-      else:
-        print filePath, key
     return features
 
   def _parse_xml2(self, filePath):
