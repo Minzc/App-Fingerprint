@@ -234,10 +234,12 @@ class AgentClassifier(AbsClassifer):
     correctApp = set()
     wrongApp = set()
     for app, agents in testAppAgent.items():
+      if '6f68888n5z.us.pandav.iwmata' not in app:
+        continue
       for agent in agents:
         for regexStr, predictApps in regexApp.items():
           regexObj = re.compile(regexStr)
-          if '6f68888n5z.us.pandav.iwmata' in app and '\.iwmata' in regexStr:
+          if '\.iwmata' in regexStr:
             print '##', predictApps
             print '$$', regexObj.search(agent)
           if len(predictApps) == 1 and regexObj.search(agent):
