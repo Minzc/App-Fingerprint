@@ -235,6 +235,9 @@ class AgentClassifier(AbsClassifer):
               regexApp[regexObj.pattern].add(app)
             elif regexObj.search(app):
               regexApp[regexObj.pattern].add(app)
+            if predict == 'com.hanitaro.tidenavi2usafree' and app == predict:
+              print '[239]', regexApp.pattern
+              print '[240]', regexObj.search(app)
 
     
     corrects = set()
@@ -243,8 +246,8 @@ class AgentClassifier(AbsClassifer):
     correctApp = set()
     wrongApp = set()
     for app, agents in testAppAgent.items():
-      # if '6f68888n5z.us.pandav.iwmata' not in app:
-      #   continue
+      if 'com.hanitaro.tidenavi2usafree' not in app:
+        continue
       for agent in agents:
         # print agent
         for regexStr, predictApps in regexApp.items():
