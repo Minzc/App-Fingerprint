@@ -171,7 +171,7 @@ class AgentClassifier(AbsClassifer):
       self.train(trainTbls, testTbl)
       break
     
-  def _gen_regex(self, feature):
+  def _gen_regex(self, feature, app):
     regex = set()
     regex.add(r'\b' + re.escape(feature+'/'))
     regex.add(r'^' + re.escape(feature+'/'))
@@ -211,7 +211,7 @@ class AgentClassifier(AbsClassifer):
       for f in self.appFeatures[app]:
         for feature in self._gen_features(f):
           if feature in agent.encode('utf-8'):
-            regexes = self._gen_regex(feature)
+            regexes = self._gen_regex(feature, app)
             for regex in regexes:
               regexObj = re.compile(regex, re.IGNORECASE)
               appFeatureRegex[app][regexObj.pattern] = regexObj
