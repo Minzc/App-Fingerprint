@@ -215,26 +215,15 @@ class AgentClassifier(AbsClassifer):
             for regex in regexes:
               regexObj = re.compile(regex, re.IGNORECASE)
               appFeatureRegex[app][regexObj.pattern] = regexObj
-            # regexObj = re.compile(r'\b' + re.escape(feature+'/'), re.IGNORECASE)
-            # appFeatureRegex[app][regexObj.pattern] = regexObj
-
-            # regexObj = re.compile(r'^' + re.escape(feature+'/'), re.IGNORECASE)
-            # appFeatureRegex[app][regexObj.pattern] = regexObj
-
-            # regexObj = re.compile(r'\b' + re.escape(feature) + r' \b[vr]?[0-9.]+\b', re.IGNORECASE)
-            # appFeatureRegex[app][regexObj.pattern] = regexObj
-            
-            # regexObj = re.compile(r'\b' + re.escape(app)+ r'\b', re.IGNORECASE)
-            # appFeatureRegex[app][regexObj.pattern] = regexObj
-
-            # regexObj = re.compile(r'\b' + re.escape(feature)+ r'\b', re.IGNORECASE)
-            # appFeatureRegex[app][regexObj.pattern] = regexObj
 
       if '/' in agent:
         feature = re.sub('[/].*', '', agent)
         regexObj = re.compile(r'^' + re.escape(feature+'/'), re.IGNORECASE)
         appFeatureRegex[app]['#'+ feature] = regexObj
-
+    
+    '''
+    Count regex
+    '''
     regexApp = defaultdict(set)
     for app, agents in appAgent.items():
       for agent in agents:
@@ -246,7 +235,7 @@ class AgentClassifier(AbsClassifer):
                 regexApp[regexObj.pattern].add(app)
             elif regexObj.search(agent):
               regexApp[regexObj.pattern].add(app)
-            elif predict in pattern:
+            elif regexObj.search(predict):
               regexApp[regexObj.pattern].add(app)
 
     
@@ -256,8 +245,8 @@ class AgentClassifier(AbsClassifer):
     correctApp = set()
     wrongApp = set()
     for app, agents in testAppAgent.items():
-      # if '6f68888n5z.us.pandav.iwmata' not in app:
-      #   continue
+      if '6f68888n5z.us.pandav.iwmata' not in app:
+        continue
       for agent in agents:
         print agent
         for regexStr, predictApps in regexApp.items():
@@ -284,9 +273,9 @@ class AgentClassifier(AbsClassifer):
     for agent in notCovered:
       print '[NOTCOVERED]', agent
     print '========REGEX============'
-    for agent, patternNregexObjs in appFeatureRegex.items():
-      for pattern, regexObj in patternNregexObjs.items():
-        print agent, 'REGEX', regexObj.pattern
+    for regexStr, predictApps in regexApp.items():
+      if len(predictApps) == 1:
+        print 'regexStr:', regexStr, 'predictApps', predictApps
     print '========STAT============='
     print 'Train:', trainTbls, 'Test:', testTbl
     print 'TOTAL:', len(testAppAgent),'Correct:', len(correctApp - wrongApp), 'Discover:', len(correctApp)
