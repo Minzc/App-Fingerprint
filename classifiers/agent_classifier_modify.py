@@ -161,7 +161,7 @@ class AgentClassifier(AbsClassifer):
 
 
   def foldTest(self):
-    tbls = [  'ios_packages_2015_06_08', 'ios_packages_2015_08_10', 'ios_packages_2015_08_12', 'ios_packages_2015_08_04', 'ios_packages_2015_09_14']
+    tbls = [ 'ios_packages_2015_06_08', 'ios_packages_2015_08_10', 'ios_packages_2015_08_12', 'ios_packages_2015_08_04', 'ios_packages_2015_09_14']
     for testTbl in tbls:
       trainTbls = []
       for tbl in tbls:
@@ -213,19 +213,18 @@ class AgentClassifier(AbsClassifer):
       if '/' in agent:
         feature = re.sub('[/].*', '', agent)
         regexObj = re.compile(r'^' + re.escape(feature+'/'), re.IGNORECASE)
-        appFeatureRegex[app]['#'+regexObj.pattern] = regexObj
+        appFeatureRegex[app]['#'+ feature] = regexObj
 
     regexApp = defaultdict(set)
     for app, agents in appAgent.items():
       for agent in agents:
         for predict, patternNregexObjs in appFeatureRegex.items():
           for pattern, regexObj in patternNregexObjs.items():
-            if regexObj.search(agent):
-              regexApp[regexObj.pattern].add(app)
-            if '#' in regexObj.pattern:
-              pattern = regexObj.pattern.replace('#^', '').replace('/', '')
+            if '#' in pattern:
               if pattern in agent:
-                regexApp['^'+ pattern + '/'].add(app)
+                regexApp[regexObj.pattern].add(app)
+            elif regexObj.search(agent):
+              regexApp[regexObj.pattern].add(app)
 
     
     corrects = set()
