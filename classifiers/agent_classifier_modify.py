@@ -168,6 +168,7 @@ class AgentClassifier(AbsClassifer):
         if tbl != testTbl:
           trainTbls.append(tbl)
       self.train(trainTbls, testTbl)
+      break
 
   def train(self, trainTbls, testTbl):
     from sqldao import SqlDao
@@ -234,8 +235,11 @@ class AgentClassifier(AbsClassifer):
     wrongApp = set()
     for app, agents in testAppAgent.items():
       for agent in agents:
-        for regexObj, predictApps in regexApp.items():
-          regexObj = re.compile(regexObj)
+        for regexStr, predictApps in regexApp.items():
+          regexObj = re.compile(regexStr)
+          if '6f68888n5z.us.pandav.iwmata' in app and '\.iwmata' in regexStr:
+            print '##', predictApps
+            print '$$', regexObj.search(agent)
           if len(predictApps) == 1 and regexObj.search(agent):
             for predict in predictApps:
               if app == predict:
