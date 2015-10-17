@@ -240,9 +240,10 @@ class AgentClassifier(AbsClassifer):
         print agent
         for regexStr, predictApps in regexApp.items():
           regexObj = re.compile(regexStr)
-          print regexStr
-          print '##', predictApps
-          print '$$', regexObj.search(agent)
+          if 'iwmata' in regexStr:
+            print regexStr
+            print '##', predictApps
+            print '$$', regexObj.search(agent)
           if len(predictApps) == 1 and regexObj.search(agent):
             for predict in predictApps:
               if app == predict:
