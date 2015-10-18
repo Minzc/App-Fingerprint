@@ -236,7 +236,7 @@ class AgentClassifier(AbsClassifer):
             elif regexObj.search(app):
               regexApp[regexObj.pattern].add(app)
             if predict == 'com.hanitaro.tidenavi2usafree' and app == predict:
-              print '[239]', regexOb.pattern
+              print '[239]', regexObj.pattern
               print '[240]', regexObj.search(app)
 
     
