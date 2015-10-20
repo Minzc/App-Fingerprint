@@ -109,7 +109,7 @@ class AgentClassifier(AbsClassifer):
     QUERY = consts.SQL_INSERT_AGENT_RULES
     params = []
     for regex, apps in patterns.iteritems():
-      if len(app) == 1:
+      if len(apps) == 1:
         for app in apps:
           params.append((app, 1, 1, regex, consts.APP_RULE))
     sqldao.executeBatch(QUERY, params)
