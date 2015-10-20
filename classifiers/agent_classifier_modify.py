@@ -100,13 +100,18 @@ class AgentClassifier(AbsClassifer):
     self._load_info_features()
   
   def persist(self, patterns, ruleType):
+    '''
+    Input
+    - regexApp : {regex: {app1, app2}}
+    '''
     self._clean_db(ruleType)
     sqldao = SqlDao()
     QUERY = consts.SQL_INSERT_AGENT_RULES
     params = []
-    for ruleType in patterns:
-      for agent, label in patterns[ruleType].iteritems():
-        params.append((label, 1, 1, agent, ruleType))
+    for regex, apps in patterns.iteritems():
+      if len(app) == 1:
+        for app in apps:
+          params.append((app, 1, 1, regex, consts.APP_RULE))
     sqldao.executeBatch(QUERY, params)
     sqldao.close()
 
@@ -171,7 +176,6 @@ class AgentClassifier(AbsClassifer):
         if tbl != testTbl:
           trainTbls.append(tbl)
       self.train(trainTbls, testTbl)
-      break
     
   def _gen_regex(self, feature, app):
     regex = set()
@@ -181,11 +185,49 @@ class AgentClassifier(AbsClassifer):
     regex.add(r'\b' + re.escape(app)+ r'\b')
     regex.add(r'\b' + re.escape(feature)+ r'\b')
     return regex
+  
+  def _compose_regxobj(self, agentTuples):
+    '''
+    Compose regular expression
+    '''
+    appFeatureRegex = defaultdict(lambda : {})
+    for app, agent in agentTuples:
+      for f in self.appFeatures[app]:
+        for feature in self._gen_features(f):
+          if feature in agent.encode('utf-8'):
+            for regex in self._gen_regex(feature, app):
+              regexObj = re.compile(regex, re.IGNORECASE)
+              appFeatureRegex[app][regexObj.pattern] = regexObj
+
+      if '/' in agent:
+        feature = re.sub('[/].*', '', agent)
+        regexObj = re.compile(r'^' + re.escape(feature+'/'), re.IGNORECASE)
+        appFeatureRegex[app]['#'+ feature] = regexObj
+    return agentTuples
+    
+  def _count(self, appFeatureRegex, appAgent):
+    '''
+    Count regex
+    '''
+    regexApp = defaultdict(set)
+    for app, agents in appAgent.items():
+      for agent in agents:
+        for predict, patternNregexObjs in appFeatureRegex.items():
+          for pattern, regexObj in patternNregexObjs.items():
+            if '#' in pattern:
+              pattern = pattern.replace('#', '')
+              if pattern in agent:
+                regexApp[regexObj.pattern].add(app)
+            elif regexObj.search(agent):
+              regexApp[regexObj.pattern].add(app)
+            elif regexObj.search(app):
+              regexApp[regexObj.pattern].add(app)
+    return regexApp
 
   def train(self, trainTbls, testTbl):
     from sqldao import SqlDao
     print 'Start Training'
-    SQL = 'select app, agent, company from %s'
+    SQL = 'select app, agent, company from %s where app = \'com.autozone.mobileapp\''
     sqldao = SqlDao()
     agentTuples = set()
     appCompany = {}
@@ -204,42 +246,17 @@ class AgentClassifier(AbsClassifer):
     for app, agent, company in sqldao.execute(SQL % testTbl):
       testAgentTuples.add((app.lower(),  agent.lower()))
       testAppAgent[app].add(agent.lower())
-    
+
     '''
     Compose regular expression
     '''
-    appFeatureRegex = defaultdict(lambda : {})
-    for app, agent in agentTuples:
-      for f in self.appFeatures[app]:
-        for feature in self._gen_features(f):
-          if feature in agent.encode('utf-8'):
-            for regex in self._gen_regex(feature, app):
-              regexObj = re.compile(regex, re.IGNORECASE)
-              appFeatureRegex[app][regexObj.pattern] = regexObj
-
-      if '/' in agent:
-        feature = re.sub('[/].*', '', agent)
-        regexObj = re.compile(r'^' + re.escape(feature+'/'), re.IGNORECASE)
-        appFeatureRegex[app]['#'+ feature] = regexObj
+    appFeatureRegex = self._compose_regxobj(agentTuples)
     
     '''
     Count regex
     '''
-    regexApp = defaultdict(set)
-    for app, agents in appAgent.items():
-      for agent in agents:
-        for predict, patternNregexObjs in appFeatureRegex.items():
-          for pattern, regexObj in patternNregexObjs.items():
-            if '#' in pattern:
-              pattern = pattern.replace('#', '')
-              if pattern in agent:
-                regexApp[regexObj.pattern].add(app)
-            elif regexObj.search(agent):
-              regexApp[regexObj.pattern].add(app)
-            elif regexObj.search(app):
-              regexApp[regexObj.pattern].add(app)
+    regexApp = self._count(appFeatureRegex, appAgent)
 
-    
     corrects = set()
     wrongs = set()
     notCovered = set()
@@ -278,57 +295,8 @@ class AgentClassifier(AbsClassifer):
     print '========STAT============='
     print 'Train:', trainTbls, 'Test:', testTbl
     print 'TOTAL:', len(testAppAgent),'Correct:', len(correctApp - wrongApp), 'Discover:', len(correctApp)
+    self.persist(regexApp)
 
-    
-
-
-
-  def train2(self, records, ruleType):
-    for pkg in [pkg for pkgs in records.values() for pkg in pkgs]:
-      self.count(pkg)
-    for pkgs in records.values():
-      for pkg in pkgs:
-        for seg in self.agentLabel:
-          if seg in pkg.agent:
-            self.agentLabel[seg].add(pkg.app)
-
-    ########################
-    # Generate Rules
-    ########################
-    
-    # print test_str in self.agentLabel
-
-    for agent, labels in self.agentLabel.iteritems():
-      if agent == test_str:
-        print '#', len(labels)
-        print labels
-      
-      if len(labels) == 1:
-        label = labels.pop()
-        self.rules[ruleType][agent] = label
-
-        if agent == test_str:
-          print 'Rule Type is', ruleType 
-
-
-    print '>>> [Agent Classifier] Number of Rule', len(self.rules[consts.APP_RULE])
-    self._prune()
-    print '>>> [Agent Classifier] Number of Rule After Pruning', len(self.rules[consts.APP_RULE])
-
-    self.persist(self.rules, ruleType)
-    self.__init__()
-    return self
-
-  def load_rules2(self):
-    self.rules = {consts.APP_RULE:{}, consts.COMPANY_RULE:{}, consts.CATEGORY_RULE:{}}
-    QUERY = consts.SQL_SELECT_AGENT_RULES
-    sqldao = SqlDao()
-    counter = 0
-    for agent, label, ruleType in sqldao.execute(QUERY):
-      counter += 1
-      self.rules[ruleType][agent] = label
-    print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
-    sqldao.close()
 
   def load_rules(self):
     import re
@@ -363,26 +331,6 @@ class AgentClassifier(AbsClassifer):
       
       if rstLabel != None and rstLabel != pkg.app and ruleType == consts.APP_RULE:
         print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:',pkg.app, 'Prediction:',rstLabel, 'Longestword:',longestWord
-    return rst
-
-  def classify2(self, pkg):
-    rst = {}
-    longestWord = None
-    for ruleType in self.rules:
-      agent = re.sub('[/].*', '', pkg.agent)
-      if '/' in pkg.agent:
-        agent = agent + '/'
-      label = self.rules[ruleType].get(agent)
-      if not label:
-        wordList = backward_maxmatch(pkg.agent, set(self.rules[ruleType].keys()), len(pkg.agent), 3)
-        wordList = filter(lambda seg: len(self.rules[ruleType][seg]) > 1, wordList)
-        longestWord = max(wordList, key = lambda x: len(x)) if len(wordList) > 0 else ''
-        label = self.rules[ruleType].get(longestWord)
-
-      rst[ruleType] = consts.Prediction(label, 1.0, longestWord) if label else consts.NULLPrediction
-
-      if label != None and label != pkg.app and ruleType == consts.APP_RULE:
-        print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:',pkg.app, 'Prediction:',label, 'Longestword:',longestWord
     return rst
 
 if __name__ == '__main__':
