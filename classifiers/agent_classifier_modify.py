@@ -203,7 +203,7 @@ class AgentClassifier(AbsClassifer):
         feature = re.sub('[/].*', '', agent)
         regexObj = re.compile(r'^' + re.escape(feature+'/'), re.IGNORECASE)
         appFeatureRegex[app]['#'+ feature] = regexObj
-    return agentTuples
+    return appFeatureRegex
     
   def _count(self, appFeatureRegex, appAgent):
     '''
