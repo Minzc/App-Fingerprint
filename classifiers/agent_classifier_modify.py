@@ -227,7 +227,7 @@ class AgentClassifier(AbsClassifer):
   def train(self, trainTbls, testTbl):
     from sqldao import SqlDao
     print 'Start Training'
-    SQL = 'select app, agent, company from %s where app = \'com.autozone.mobileapp\''
+    SQL = 'select app, agent, company from %s'
     sqldao = SqlDao()
     agentTuples = set()
     appCompany = {}
