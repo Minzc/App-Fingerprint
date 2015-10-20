@@ -20,6 +20,7 @@ class AgentClassifier(AbsClassifer):
         trackId = f[0:-4]
         app = AppInfos.get(consts.IOS, trackId).package
         features = self._parse_xml(filePath )
+        features.add(app)
         self.appFeatures[app] = features
   def _unescape(self, s):
     s = s.replace("&lt;", "<")
@@ -147,6 +148,9 @@ class AgentClassifier(AbsClassifer):
       self.rules[ruleType] = prunedRules
 
   def _gen_features(self, f):
+    '''
+    Generate different type of feature
+    '''
     import urllib
     featureSet = set()
     f = f.encode('utf-8')
@@ -209,8 +213,7 @@ class AgentClassifier(AbsClassifer):
       for f in self.appFeatures[app]:
         for feature in self._gen_features(f):
           if feature in agent.encode('utf-8'):
-            regexes = self._gen_regex(feature, app)
-            for regex in regexes:
+            for regex in self._gen_regex(feature, app):
               regexObj = re.compile(regex, re.IGNORECASE)
               appFeatureRegex[app][regexObj.pattern] = regexObj
 
@@ -235,9 +238,6 @@ class AgentClassifier(AbsClassifer):
               regexApp[regexObj.pattern].add(app)
             elif regexObj.search(app):
               regexApp[regexObj.pattern].add(app)
-            if predict == 'com.hanitaro.tidenavi2usafree' and app == predict:
-              print '[239]', regexObj.pattern
-              print '[240]', regexObj.search(app)
 
     
     corrects = set()
@@ -246,8 +246,6 @@ class AgentClassifier(AbsClassifer):
     correctApp = set()
     wrongApp = set()
     for app, agents in testAppAgent.items():
-      if 'com.hanitaro.tidenavi2usafree' not in app:
-        continue
       for agent in agents:
         # print agent
         for regexStr, predictApps in regexApp.items():
