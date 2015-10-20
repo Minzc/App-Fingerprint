@@ -243,7 +243,7 @@ class AgentClassifier(AbsClassifer):
     '''
     regexApp = self._count(appFeatureRegex, appAgent)
 
-    self.persist(regexApp)
+    self.persist(regexApp, 1)
 
 
   def load_rules(self):
