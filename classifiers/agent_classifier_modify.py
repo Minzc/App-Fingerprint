@@ -295,7 +295,7 @@ class AgentClassifier(AbsClassifer):
     print '========STAT============='
     print 'Train:', trainTbls, 'Test:', testTbl
     print 'TOTAL:', len(testAppAgent),'Correct:', len(correctApp - wrongApp), 'Discover:', len(correctApp)
-    self.persist(regexApp)
+    self.persist(regexApp, 1)
 
 
   def load_rules(self):
