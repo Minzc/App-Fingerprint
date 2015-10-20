@@ -224,29 +224,15 @@ class AgentClassifier(AbsClassifer):
               regexApp[regexObj.pattern].add(app)
     return regexApp
 
-  def train(self, trainTbls, testTbl):
-    from sqldao import SqlDao
-    print 'Start Training'
-    SQL = 'select app, agent, company from %s'
-    sqldao = SqlDao()
+  def train(self, trainSet, ruleType):
     agentTuples = set()
-    appCompany = {}
     appAgent = defaultdict(set)
-    '''
-    Load data
-    '''
-    for tbl in trainTbls:
-      for app, agent, company in sqldao.execute(SQL % tbl):
-        appAgent[app].add(agent.lower())
-        agentTuples.add((app.lower(),  agent.lower()))
-        appCompany[app] = company
-    
-    testAgentTuples = set()
-    testAppAgent = defaultdict(set)
-    for app, agent, company in sqldao.execute(SQL % testTbl):
-      testAgentTuples.add((app.lower(),  agent.lower()))
-      testAppAgent[app].add(agent.lower())
-
+    for tbl,pkgs in trainSet.items():
+      for pkg in pkgs:
+        label = pkg.label
+        agent = pkg.agent
+        agentTuples.add((label, agent))
+        appAgent[label].add(agent)
     '''
     Compose regular expression
     '''
@@ -256,46 +242,6 @@ class AgentClassifier(AbsClassifer):
     Count regex
     '''
     regexApp = self._count(appFeatureRegex, appAgent)
-
-    corrects = set()
-    wrongs = set()
-    notCovered = set()
-    correctApp = set()
-    wrongApp = set()
-    for app, agents in testAppAgent.items():
-      for agent in agents:
-        # print agent
-        for regexStr, predictApps in regexApp.items():
-          regexObj = re.compile(regexStr)
-          if len(predictApps) == 1 and regexObj.search(agent):
-            for predict in predictApps:
-              if app == predict:
-                print '[CORRECT]', regexObj.pattern, agent
-                corrects.add(agent)
-                correctApp.add(app)
-              else:
-                print '[WRONG]', regexObj.pattern, agent, '[APP]', app, '[PREDICT]', predict
-                wrongs.add(agent)
-                wrongApp.add(app)
-        if agent not in corrects and agent not in wrongs:
-          notCovered.add(agent)
-    print '========Correct========='
-    for agent in corrects:
-      print '[CORRECT]', agent
-    print '========Wrong========='
-    for agent in wrongs:
-      print '[WRONG]', agent
-    print '========NOTCOVER========='
-    for agent in notCovered:
-      print '[NOTCOVERED]', agent
-    print '========REGEX============'
-    for regexStr, predictApps in regexApp.items():
-      if len(predictApps) == 1:
-        print 'regexStr:', regexStr, 'predictApps', predictApps
-    print '========STAT============='
-    print 'Train:', trainTbls, 'Test:', testTbl
-    print 'TOTAL:', len(testAppAgent),'Correct:', len(correctApp - wrongApp), 'Discover:', len(correctApp)
-    self.persist(regexApp, 1)
 
 
   def load_rules(self):
