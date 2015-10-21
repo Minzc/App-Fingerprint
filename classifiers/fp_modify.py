@@ -178,7 +178,7 @@ def _prune_rules(tRules, trainData, min_cover = 3):
   specificRules = defaultdict(lambda : defaultdict(lambda : defaultdict(lambda : { consts.SCORE: 0, consts.SUPPORT: 0 })))
   for rule in tRules:
     ruleStrSet, confidence, support, classlabel = rule
-    for packageInfo in packages[classlabel]:
+    for packageInfo in packageInfos[classlabel]:
       package, info = packageInfo
       host = info['Host']
       if cover_num[package] <= min_cover and ruleStrSet.issubset(package):
