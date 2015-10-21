@@ -181,7 +181,7 @@ def _prune_rules(tRules, trainData, min_cover = 3):
     for packageInfo in packageInfos[classlabel]:
       package, info = packageInfo
       host = info
-      if cover_num[package] <= min_cover and ruleStrSet.issubset(package):
+      if cover_num[package] <= min_cover and ruleStrSet.issubset(package) and len(tblSupport[ruleStrSet]) > 1:
         cover_num[package] += 1
         specificRules[host][ruleStrSet][classlabel][consts.SCORE] = confidence
         specificRules[host][ruleStrSet][classlabel][consts.SUPPORT] = len(tblSupport[ruleStrSet])
