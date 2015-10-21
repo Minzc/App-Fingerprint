@@ -218,9 +218,11 @@ class AgentClassifier(AbsClassifer):
           for pattern, regexObj in patternNregexObjs.items():
             if '#' in pattern:
               pattern = pattern.replace('#', '')
-              print pattern
-              if pattern in agent:
-                regexApp[regexObj.pattern].add(app)
+              try:
+                if pattern.encode('utf-8') in agent:
+                  regexApp[regexObj.pattern].add(app)
+              except:
+                print pattern
             elif regexObj.search(agent):
               regexApp[regexObj.pattern].add(app)
             elif regexObj.search(app):
