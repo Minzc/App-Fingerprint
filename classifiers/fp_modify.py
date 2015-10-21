@@ -206,7 +206,7 @@ class CMAR:
     for ruleType in rules:
       for host in rules[ruleType]:
         for ruleStrSet in rules[ruleType][host]:
-          for label, scores in rules[ruleType][host][ruleStrSet]:
+          for label, scores in rules[ruleType][host][ruleStrSet].items():
             confidence, support = scores[consts.SCORE], len(score[consts.SUPPORT])
             params.append((label, ','.join(ruleStrSet), confidence, support, host, ruleType))
       sqldao.executeBatch(QUERY, params)
@@ -228,7 +228,7 @@ class CMAR:
     ''' change encoded features back to string '''
 
     self.rules[rule_type] = specificRules
-    self._persist(specificRules)
+    self._persist(self.rules)
     self.__init__()
     return self
 
