@@ -184,7 +184,7 @@ def _prune_rules(tRules, trainData, min_cover = 3):
       if cover_num[package] <= min_cover and ruleStrSet.issubset(package):
         cover_num[package] += 1
         specificRules[host][ruleStrSet][classlabel][consts.SCORE] = confidence
-        specificRules[host][ruleStrSet][classlabel][consts.SUPPORT] = len(tblSupport[rule])
+        specificRules[host][ruleStrSet][classlabel][consts.SUPPORT] = len(tblSupport[ruleStrSet])
   print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
   return specificRules
 
