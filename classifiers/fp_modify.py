@@ -207,7 +207,7 @@ class CMAR:
       for host in rules[ruleType]:
         for ruleStrSet in rules[ruleType][host]:
           for label, scores in rules[ruleType][host][ruleStrSet].items():
-            confidence, support = scores[consts.SCORE], len(scores[consts.SUPPORT])
+            confidence, support = scores[consts.SCORE], scores[consts.SUPPORT]
             params.append((label, ','.join(ruleStrSet), confidence, support, host, ruleType))
       sqldao.executeBatch(QUERY, params)
       sqldao.close()
