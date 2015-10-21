@@ -128,18 +128,21 @@ def _remove_duplicate(rawRules):
   for rule in rawRules:
     rules[rule[3]].append(rule)
   prunedRules = []
+  print 'Total number of rules', len(rawRules)
   for label in rules:
+    print label
     '''From large to small set'''
-    rules[label] = sorted(rules[label], key = lambda x: len(x[0]), reverse = True)
-    for i in range(len(rules[label])):
+    sortedRules = sorted(rules[label], key = lambda x: len(x[0]), reverse = True)
+    for i in range(len(sortedRules)):
+      print i, len(sortedRules)
       ifKeep = True
-      iStrSet = rules[label][i][0]
-      for j in range(i + 1, len(rules[label])):
-        jStrSet = rules[label][j][0]
+      iStrSet = sortedRules[0]
+      for j in range(i + 1, len(sortedRules)):
+        jStrSet = sortedRules[j][0]
         if jStrSet.issubset(iStrSet):
           ifKeep = False
       if ifKeep:
-        prunedRules.append(rules[label][i])
+        prunedRules.append(sortedRules[i])
   return prunedRules
 
 
