@@ -113,8 +113,6 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx, appIndx):
       ruleStrSet = frozenset({featureIndx[itemcode] for itemcode in itemset})
       labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
       if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
-          print 'Conf', tag_dist[labelIndex] * 1.0 / support 
-          print 'Sup', support
           confidence = max(tag_dist.values()) * 1.0 / support
           rules.add((ruleStrSet, confidence, support, appIndx[labelIndex]))
     
@@ -132,9 +130,9 @@ def _remove_duplicate(rawRules):
   prunedRules = []
   print 'Total number of rules', len(rawRules)
   for label in rules:
-    print label
     '''From large to small set'''
     sortedRules = sorted(rules[label], key = lambda x: len(x[0]), reverse = True)
+    root = {}
     for i in range(len(sortedRules)):
       print i, len(sortedRules)
       ifKeep = True
@@ -224,7 +222,7 @@ class CMAR:
     ''' Rules format : (feature, confidence, support, label) '''
     rules = _gen_rules(encodedpackages, self.tSupport, self.tConfidence, featureIndx, appIndx)
     ''' Prune duplicated rules'''
-    rules = _remove_duplicate(rules)
+    #rules = _remove_duplicate(rules)
     ''' feature, app, host '''
     specificRules = _prune_rules(rules, trainData, self.min_cover)
     ''' change encoded features back to string '''
