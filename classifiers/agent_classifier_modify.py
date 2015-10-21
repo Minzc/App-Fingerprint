@@ -200,8 +200,8 @@ class AgentClassifier(AbsClassifer):
               appFeatureRegex[app][regexObj.pattern] = regexObj
 
       if '/' in agent:
-        feature = re.sub('[/].*', '', agent)
-        regexObj = re.compile(r'^' + re.escape(feature+'/'), re.IGNORECASE)
+        feature = re.findall('^[a-zA-Z0-9][0-9a-zA-Z. %_\-:&?\']+/', agent)[0]
+        regexObj = re.compile(r'^' + re.escape(feature), re.IGNORECASE)
         appFeatureRegex[app]['#'+ feature] = regexObj
     return appFeatureRegex
     
@@ -225,6 +225,7 @@ class AgentClassifier(AbsClassifer):
     return regexApp
 
   def train(self, trainSet, ruleType):
+    print 'NEW AGENT METHOD'
     agentTuples = set()
     appAgent = defaultdict(set)
     for tbl,pkgs in trainSet.items():
