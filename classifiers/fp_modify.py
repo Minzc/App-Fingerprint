@@ -106,7 +106,7 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx, appIndx):
     # FP-tree Version
     ###########################
     print '_gen_rules', featureIndx.keys()[:10]
-    rules = []
+    rules = set()
     frequentPatterns = find_frequent_itemsets(transactions, tSupport, True)
     for frequent_pattern_info in frequentPatterns:
       itemset, support, tag_dist = frequent_pattern_info
@@ -114,9 +114,9 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx, appIndx):
       labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
       if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
           confidence = max(tag_dist.values()) * 1.0 / support
-          rules.append((ruleStrSet, confidence, support, appIndx[labelIndex]))
+          rules.add((ruleStrSet, confidence, support, appIndx[labelIndex]))
     
-    print ">>> Finish Rule Generating"
+    print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
 
 def _remove_duplicate(rawRules):
