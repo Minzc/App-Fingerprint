@@ -113,6 +113,8 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx, appIndx):
       ruleStrSet = frozenset({featureIndx[itemcode] for itemcode in itemset})
       labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
       if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
+          print 'Conf', tag_dist[labelIndex] * 1.0 / support 
+          print 'Sup', support
           confidence = max(tag_dist.values()) * 1.0 / support
           rules.add((ruleStrSet, confidence, support, appIndx[labelIndex]))
     
