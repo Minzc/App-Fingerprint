@@ -294,7 +294,7 @@ class CMAR:
                 rst = consts.Prediction(label, confidence, rule)
 
       labelRsts[rule_type] = rst
-      if rule_type == consts.APP_RULE and rst != consts.NULLPrediction and rst.label != pkg.app:
+      if rule_type == consts.APP_RULE and rst != consts.NULLPrediction and rst.label != package.app:
         print rst, package.app
         print '=' * 10
     return labelRsts
