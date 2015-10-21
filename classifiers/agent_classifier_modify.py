@@ -204,7 +204,11 @@ class AgentClassifier(AbsClassifer):
         if len(features) > 0:
           feature = features[0]
         regexObj = re.compile(r'^' + re.escape(feature), re.IGNORECASE)
-        appFeatureRegex[app]['#'+ feature] = regexObj
+        try:
+          feature = feature.encode('utf-8')
+          appFeatureRegex[app]['#'+ feature] = regexObj
+        except:
+          print feature
     return appFeatureRegex
     
   def _count(self, appFeatureRegex, appAgent):
@@ -218,11 +222,8 @@ class AgentClassifier(AbsClassifer):
           for pattern, regexObj in patternNregexObjs.items():
             if '#' in pattern:
               pattern = pattern.replace('#', '')
-              try:
-                if pattern.encode('utf-8') in agent:
-                  regexApp[regexObj.pattern].add(app)
-              except:
-                print pattern
+              if pattern in agent:
+                regexApp[regexObj.pattern].add(app)
             elif regexObj.search(agent):
               regexApp[regexObj.pattern].add(app)
             elif regexObj.search(app):
