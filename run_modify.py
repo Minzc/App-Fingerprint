@@ -162,13 +162,17 @@ def _use_classifier(classifier, testSet):
   - testSet : testData set {pkgId : package}
   """
   rst = defaultdict(dict)
+  wrongApp = set()
   for pkg_id, record in testSet.items():
-      # predict
-      labelDists = classifier.classify(record)
-      for labelType, prediction in labelDists.iteritems():
-        # TODO need to do result selection
-        if labelType in VALID_LABEL:
-            rst[pkg_id][labelType] = prediction
+    # predict
+    labelDists = classifier.classify(record)
+    for labelType, prediction in labelDists.iteritems():
+      # TODO need to do result selection
+      if labelType in VALID_LABEL:
+        rst[pkg_id][labelType] = prediction
+        if prediction.label != record.app and labelType == consts.APP_RULE:
+          wrongApp.add(record.app)
+  print '====', classifier.name, '====', '[WRONG]', len(wrongApp)
   return rst
 
 
@@ -211,6 +215,7 @@ def test(testTbl, appType):
   classifiers = classifier_factory(USED_CLASSIFIERS, appType)
   for name, classifier in classifiers:
     print ">>> [test#%s] " % (name)
+    classifier.set_name(name)
     classifier.load_rules()
     tmprst = _use_classifier(classifier, testSet)
     rst = merge_rst(rst, tmprst)

@@ -11,3 +11,6 @@ class AbsClassifer:
   @abstractmethod
   def load_rules(self): pass
 
+  def set_name(self, name):
+    self.name = name
+
