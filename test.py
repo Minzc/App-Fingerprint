@@ -5,7 +5,7 @@ from run_modify import train
 import const.consts as consts
 import sys
 
-tbls = [  'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_08_12', 'ios_packages_2015_08_04']
+tbls = [   'ios_packages_2015_09_14','ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_08_12', 'ios_packages_2015_08_04']
 # tbls = ['ios_packages_2015_08_12', 'ios_packages_2015_08_10']
 
 
