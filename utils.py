@@ -284,3 +284,62 @@ def longest_common_substring(s1, s2):
                 m[x][y] = 0
     return s1[x_longest - longest: x_longest]
 
+def load_xml_features():
+  '''
+  Output
+  - appFeatures : {appInfo : set()}
+  '''
+  from os import listdir
+  from os.path import isfile, join
+  folder = './resource/Infoplist/'
+  appFeatures = defaultdict(set)
+  for f in listdir(folder):
+    filePath = join(folder, f)
+    if isfile(filePath):
+      trackId = f[0:-4]
+      app = AppInfos.get(consts.IOS, trackId).package
+      features = _parse_xml2(filePath )
+      features.add(app)
+      appFeatures[app] = features
+
+def _parse_xml2(filePath):
+  import plistlib
+  plistObj = plistlib.readPlist(filePath)
+  def _flat(plistObj):
+    values = set()
+    if type(plistObj) == plistlib._InternalDict:
+      for key, value in plistObj.items():
+        if type(value) == list:
+          values |= _flat(value)
+        elif type(value) == plistlib._InternalDict:
+          values |= _flat(value)
+        elif type(value) == str:
+          values.add(value)
+        elif type(value) == unicode:
+          print 'type:', type(value)
+          print 'value:', value.encode('utf-8')
+        else:
+          print 'type:', type(value)
+          print 'value:', value
+    elif type(plistObj) == list:
+      for value in plistObj:
+        if type(value) == list:
+          values |= _flat(value)
+        elif type(value) == plistlib._InternalDict:
+          values |= _flat(value)
+        elif type(value) == str:
+          values.add(value)
+        elif type(value) == unicode:
+          print 'type:', type(value)
+          print 'value:', value.encode('utf-8')
+        else:
+          print 'type:', type(value)
+          print 'value:', value
+    return values
+  values = _flat(plistObj)
+  for value in values:
+    try:
+      print filePath, value.encode('utf-8')
+    except:
+      pass
+  return values
