@@ -170,7 +170,7 @@ def _use_classifier(classifier, testSet):
       # TODO need to do result selection
       if labelType in VALID_LABEL:
         rst[pkg_id][labelType] = prediction
-        if prediction.label != record.app and labelType == consts.APP_RULE:
+        if prediction.label != None and prediction.label != record.app and labelType == consts.APP_RULE:
           wrongApp.add(record.app)
   print '====', classifier.name, '====', '[WRONG]', len(wrongApp)
   return rst

@@ -1,4 +1,5 @@
 import sys
+from classifier import AbsClassifer
 import operator
 from sqldao import SqlDao
 from fp_growth import find_frequent_itemsets
@@ -190,7 +191,7 @@ def _prune_rules(tRules, trainData, min_cover = 3):
 
 
 
-class CMAR:
+class CMAR(AbsClassifer):
   def __init__(self, min_cover=3, tSupport = 2, tConfidence = 0.8):
     # feature, app, host
     self.rules = defaultdict(lambda : defaultdict(lambda : defaultdict()))
