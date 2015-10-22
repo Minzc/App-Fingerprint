@@ -177,7 +177,7 @@ class HostApp(AbsClassifer):
             label, support, regexObj = ruleTuple
             match = regexObj.search(pkg.host)
             if match and predict.score < support:
-              predict = consts.Prediction(label, support, (pkg.host, regexStr))
+              predict = consts.Prediction(label, support, (pkg.host, regexStr, support))
             # if pkg.app == 'com.logos.vyrso' and pkg.host == 'gsp1.apple.com':
             #   print regexStr
 	      # print match

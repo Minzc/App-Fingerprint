@@ -135,7 +135,6 @@ def _remove_duplicate(rawRules):
     sortedRules = sorted(rules[label], key = lambda x: len(x[0]), reverse = True)
     root = {}
     for i in range(len(sortedRules)):
-      print i, len(sortedRules)
       ifKeep = True
       iStrSet = sortedRules[0]
       for j in range(i + 1, len(sortedRules)):
@@ -192,7 +191,7 @@ def _prune_rules(tRules, trainData, min_cover = 3):
 
 
 class CMAR(AbsClassifer):
-  def __init__(self, min_cover=3, tSupport = 2, tConfidence = 0.8):
+  def __init__(self, min_cover=3, tSupport = 2, tConfidence = 1.0):
     # feature, app, host
     self.rules = defaultdict(lambda : defaultdict(lambda : defaultdict()))
     self.min_cover = min_cover
@@ -209,7 +208,6 @@ class CMAR(AbsClassifer):
         for ruleStrSet in rules[ruleType][host]:
           for label, scores in rules[ruleType][host][ruleStrSet].items():
             confidence, support = scores[consts.SCORE], scores[consts.SUPPORT]
-            print (label, ','.join(ruleStrSet), confidence, support, host, ruleType)
             params.append((label, ','.join(ruleStrSet), confidence, support, host, ruleType))
       sqldao.executeBatch(QUERY, params)
       sqldao.close()

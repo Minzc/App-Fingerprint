@@ -1,5 +1,5 @@
 from classifiers.agent_classifier_modify import AgentClassifier
-from classifiers.algo import KVClassifier
+from classifiers.algo_modify_with_xml import KVClassifier
 from classifiers.head import HeaderClassifier
 from classifiers.host import HostApp
 from classifiers.fp_modify import CMAR

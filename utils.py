@@ -10,6 +10,7 @@ from const.package import Package
 import random
 from const.app_info import AppInfos
 import const.consts as consts
+from collections import defaultdict
 
 
 regex_enpunc = re.compile("[" + string.punctuation + "]")
@@ -291,6 +292,7 @@ def load_xml_features():
   '''
   from os import listdir
   from os.path import isfile, join
+  from const.app_info import AppInfos
   folder = './resource/Infoplist/'
   appFeatures = defaultdict(set)
   for f in listdir(folder):
@@ -301,6 +303,7 @@ def load_xml_features():
       features = _parse_xml2(filePath )
       features.add(app)
       appFeatures[app] = features
+  return appFeatures
 
 def _parse_xml2(filePath):
   import plistlib
@@ -316,11 +319,9 @@ def _parse_xml2(filePath):
         elif type(value) == str:
           values.add(value)
         elif type(value) == unicode:
-          print 'type:', type(value)
-          print 'value:', value.encode('utf-8')
+          values.add(value.encode('utf-8'))
         else:
-          print 'type:', type(value)
-          print 'value:', value
+          pass
     elif type(plistObj) == list:
       for value in plistObj:
         if type(value) == list:
@@ -330,16 +331,9 @@ def _parse_xml2(filePath):
         elif type(value) == str:
           values.add(value)
         elif type(value) == unicode:
-          print 'type:', type(value)
-          print 'value:', value.encode('utf-8')
+          values.add(value.encode('utf-8'))
         else:
-          print 'type:', type(value)
-          print 'value:', value
+          pass
     return values
   values = _flat(plistObj)
-  for value in values:
-    try:
-      print filePath, value.encode('utf-8')
-    except:
-      pass
   return values
