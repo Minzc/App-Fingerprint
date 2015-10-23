@@ -156,31 +156,43 @@ class KVClassifier(AbsClassifer):
         { host : { key : { value : { label : { rule.score, support : { tbl, tbl, tbl } } } } } }
     '''
     specificRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:set()}))))
+    
+    for tbl, pkg, key, value in self.iterate_traindata(trainData):
+      for rule in [r for r in generalRules[pkg.host] if r.key == key]:
+        value = value.strip()
+        if len(valueLabelCounter[value]) == 1 and len(value) != 1:
+          label = pkg.app if ruleType == consts.APP_RULE else pkg.company
+          specificRules[pkg.host][key][value][label][consts.SCORE] = rule.score
+          specificRules[pkg.host][key][value][label][consts.SUPPORT].add(tbl)
 
-    for tbl, pkgs in trainData.iteritems():
-      for pkg in filter(lambda pkg : pkg.host in generalRules, pkgs):
-        for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.host]):
-          for value in pkg.queries[rule.key]:
-            value = value.strip()
-            if len(valueLabelCounter[value]) == 1 and len(value) != 1:
-              if ruleType == consts.APP_RULE:
-                label = pkg.app
-              else:
-                label = pkg.company
-              specificRules[pkg.host][rule.key][value][label][consts.SCORE] = rule.score
-              specificRules[pkg.host][rule.key][value][label][consts.SUPPORT].add(tbl)
+    # for tbl, pkgs in trainData.iteritems():
+    #   for pkg in filter(lambda pkg : pkg.host in generalRules, pkgs):
+    #     for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.host]):
+    #       for value in pkg.queries[rule.key]:
+    #         value = value.strip()
+    #         if len(valueLabelCounter[value]) == 1 and len(value) != 1:
+    #           if ruleType == consts.APP_RULE:
+    #             label = pkg.app
+    #           else:
+    #             label = pkg.company
+    #           specificRules[pkg.host][rule.key][value][label][consts.SCORE] = rule.score
+    #           specificRules[pkg.host][rule.key][value][label][consts.SUPPORT].add(tbl)
     return specificRules
 
   def _merge_result(self, appSpecificRules, companySpecificRules):
     specificRules = {}
     specificRules[consts.APP_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:set()}))))
     specificRules[consts.COMPANY_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:set()}))))
-    for host in appSpecificRules:
-      for key in appSpecificRules[host]:
-        for value in appSpecificRules[host][key]:
-          for app, scores in appSpecificRules[host][key][value].iteritems():
-            specificRules[consts.APP_RULE][host][key][value][app] = scores
-            specificRules[consts.COMPANY_RULE][host][key][value][self.appCompanyRelation[app]] = scores
+    for host, key, value, app, scores in flatten(appSpecificRules):
+      specificRules[consts.APP_RULE][host][key][value][app] = scores
+      specificRules[consts.COMPANY_RULE][host][key][value][self.appCompanyRelation[app]] = scores
+
+    # for host in appSpecificRules:
+    #   for key in appSpecificRules[host]:
+    #     for value in appSpecificRules[host][key]:
+    #       for app, scores in appSpecificRules[host][key][value].iteritems():
+    #         specificRules[consts.APP_RULE][host][key][value][app] = scores
+    #         specificRules[consts.COMPANY_RULE][host][key][value][self.appCompanyRelation[app]] = scores
     # for host in companySpecificRules:
     #   for key in companySpecificRules[host]:
     #     for value in companySpecificRules[host][key]:
@@ -192,12 +204,16 @@ class KVClassifier(AbsClassifer):
 
   def _compare(self, trainData, specificRules):
     tmpRules = set()
-    for tbl in trainData.keys():
-      for pkg in trainData[tbl]:
-        for k,vs in pkg.queries.items():
-          for v in vs:
-            if v in self.xmlFeatures[pkg.app] and len(v) > 2:
-              tmpRules.add((pkg.host, k, v, pkg.app))
+    for tbl, pkg, k, v in self.iterate_traindata(trainData):
+      if v in self.xmlFeatures[pkg.app] and len(v) > 2:
+        tmpRules.add((pkg.host, k, v, pkg.app))
+
+    # for tbl in trainData.keys():
+    #   for pkg in trainData[tbl]:
+    #     for k,vs in pkg.queries.items():
+    #       for v in vs:
+    #         if v in self.xmlFeatures[pkg.app] and len(v) > 2:
+    #           tmpRules.add((pkg.host, k, v, pkg.app))
     for host, key, value, app in tmpRules:
       if app not in specificRules[consts.APP_RULE][host][key][value]:
         print host, key, value, app
