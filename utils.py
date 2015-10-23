@@ -353,6 +353,7 @@ def if_version(v):
 
 
 def flatten( d):
+  import collections
   '''
   Flat nested dictionary to lists
   '''
