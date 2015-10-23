@@ -36,15 +36,15 @@ class KVClassifier(AbsClassifer):
     ruleLabelNum = {}
     for tbl, pkg, key, value in self.iterate_traindata(trainData):
       for rule in [r for r in generalRules[pkg.host] if r.key == key]:
-        ruleCoverage[pkg.host][rule.key].add(tbl + '#' + str(pkg.id))
-        ruleScores[ (pkg.host, rule.key) ] = rule.score
-        ruleLabelNum[ (pkg.host, rule.key) ] = rule.labelNum
+            ruleCoverage[pkg.host][rule.key].add(tbl + '#' + str(pkg.id))
+            ruleScores[ (pkg.host, rule.key) ] = rule.score
+            ruleLabelNum[ (pkg.host, rule.key) ] = rule.labelNum
 
-    # for tbl, pkgs in trainData.iteritems():
-    #   for pkg in filter(lambda pkg : pkg.secdomain in generalRules, pkgs):
-    #     for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.secdomain]):
-    #       for value in pkg.queries[rule.key]:
-    #         value = value.strip()
+    for tbl, pkgs in trainData.iteritems():
+      for pkg in filter(lambda pkg : pkg.secdomain in generalRules, pkgs):
+        for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.secdomain]):
+          for value in pkg.queries[rule.key]:
+            value = value.strip()
 
     PKG_IDS= 1
     prunedGenRules = defaultdict(list)
@@ -60,7 +60,8 @@ class KVClassifier(AbsClassifer):
             if iCoveredIds.issubset(jCoveredIds) and (host, iKey) not in highConfRules:
               ifKeepRule = (False, jKey, '1')
         ''' Prune by assuming host should has only one identifier '''
-        for jKey, _ in keyNcoveredIds:
+        for j in range(1, len(keyNcoveredIds)):
+          jKey, jCoveredIds = keyNcoveredIds[j]
           if (host, jKey) in highConfRules and (host, iKey) not in highConfRules:
             ifKeepRule = (False, jKey, '2')
 
