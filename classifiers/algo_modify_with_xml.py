@@ -25,7 +25,8 @@ class KVClassifier(AbsClassifer):
 
   def _prune_general_rules(self, generalRules, trainData, highConfRules):
     '''
-    PK by coverage
+    1. PK by coverage
+    2. Prune by xml rules
     Input
     - generalRules : {secdomain : [(secdomain, key, score, labelNum), rule, rule]}
     - trainData : { tbl : [ packet, packet, ... ] }
@@ -63,7 +64,7 @@ class KVClassifier(AbsClassifer):
           rule = consts.Rule(host, iKey, ruleScores[ (host, iKey) ],  ruleLabelNum[ (host, iKey) ])
           prunedGenRules[host].append(rule)
         if host == 'googleadservices.com' and iKey == 'label':
-          print 'IF HIGH CONF', (host, jKey) in highConfRules 
+          print 'IF HIGH CONF', (host, jKey) in highConfRules
           # # print 'Keep', host, ruleI[0], ruleScores[ (host, ruleI[0]) ]
         # else:
           # print 'Pruned'
@@ -76,7 +77,7 @@ class KVClassifier(AbsClassifer):
 
   def _count(self, featureTbl, valueLabelCounter):
     '''
-    Give score to very ( secdomain, key ) pairs
+    Give score to every ( secdomain, key ) pairs
     Input
     - featureTbl :
         Relationships between host, key, value and label(app or company) from training data
@@ -120,7 +121,7 @@ class KVClassifier(AbsClassifer):
       for key in keyScore[secdomain]:
         labelNum = len(keyScore[secdomain][key][consts.LABEL])
         score = keyScore[secdomain][key][consts.SCORE]
-        if (labelNum == 1 and (secdomain, key) not in highConfRules) or score <= 0.5: 
+        if (labelNum == 1 and (secdomain, key) not in highConfRules) or score <= 0.5:
           if (secdomain, key) in highConfRules:
             print '[LOST]', (secdomain, key), labelNum, score, highConfRules[(secdomain, key)]
           continue
@@ -143,7 +144,7 @@ class KVClassifier(AbsClassifer):
         { host : { key : { value : { label : { rule.score, support : { tbl, tbl, tbl } } } } } }
     '''
     specificRules = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:set()}))))
-    
+
     for tbl, pkg, key, value in self.iterate_traindata(trainData):
       for rule in [r for r in generalRules[pkg.host] if r.key == key]:
         value = value.strip()
@@ -152,18 +153,6 @@ class KVClassifier(AbsClassifer):
           specificRules[pkg.host][key][value][label][consts.SCORE] = rule.score
           specificRules[pkg.host][key][value][label][consts.SUPPORT].add(tbl)
 
-    # for tbl, pkgs in trainData.iteritems():
-    #   for pkg in filter(lambda pkg : pkg.host in generalRules, pkgs):
-    #     for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.host]):
-    #       for value in pkg.queries[rule.key]:
-    #         value = value.strip()
-    #         if len(valueLabelCounter[value]) == 1 and len(value) != 1:
-    #           if ruleType == consts.APP_RULE:
-    #             label = pkg.app
-    #           else:
-    #             label = pkg.company
-    #           specificRules[pkg.host][rule.key][value][label][consts.SCORE] = rule.score
-    #           specificRules[pkg.host][rule.key][value][label][consts.SUPPORT].add(tbl)
     return specificRules
 
   def _merge_result(self, appSpecificRules, companySpecificRules):
@@ -201,11 +190,27 @@ class KVClassifier(AbsClassifer):
 
   def _gen_high_confrules(self, trainData):
     highConfRules = defaultdict(lambda : defaultdict(set))
+    matchedHighConfRules = defaultdict(lambda : defaultdict(lambda : defaultdict(set)))
     for tbl, pkg, k, v in self.iterate_traindata(trainData):
       if v in self.xmlFeatures[pkg.app] and if_version(v) == False:
         highConfRules[(pkg.host, k)][v].add(pkg.app)
+        matchedHighConfRules[(pkg.host, k)][v][pkg.app].add(tbl)
         highConfRules[(pkg.secdomain, k)][v].add(pkg.app)
-    return highConfRules
+    return highConfRules, matchedHighConfRules
+
+  def gen_specific_rules_xml(self, matchedHighConfRules, specificRules):
+    '''
+    specificRules : specific rules for apps
+        { host : { key : { value : { label : { rule.score, support : { tbl, tbl, tbl } } } } } }
+    '''
+    for rule, v, app, tbls in flatten(matchedHighConfRules):
+      host, key = rule
+      if len(re.sub('[0-9]','',v)) < 2 or len(self.valueAppCounter[v]) > 1:
+        continue
+      specificRules[host][key][v][app][consts.SCORE] = 1.0
+      specificRules[host][key][v][app][consts.SUPPORT] = tbls
+    return specificRules
+
 
   def train(self, trainData, rule_type):
     highConfRules = set()
@@ -217,7 +222,7 @@ class KVClassifier(AbsClassifer):
       self.appCompanyRelation[pkg.app] = pkg.company
       self.companyAppRelation[pkg.company].add(pkg.app)
 
-    highConfRules = self._gen_high_confrules(trainData)
+    highConfRules, matchedHighConfRules = self._gen_high_confrules(trainData)
     ##################
     # Count
     ##################
@@ -239,6 +244,7 @@ class KVClassifier(AbsClassifer):
     # Generate specific rules
     #############################
     appSpecificRules = self._generate_rules(trainData, appGeneralRules, self.valueAppCounter, consts.APP_RULE)
+    appSpecificRules = self.gen_specific_rules_xml( matchedHighConfRules, appSpecificRules)
     companySpecificRules = self._generate_rules(trainData, companyGeneralRules, self.valueCompanyCounter, consts.COMPANY_RULE)
     specificRules = self._merge_result(appSpecificRules, companySpecificRules)
     #############################
