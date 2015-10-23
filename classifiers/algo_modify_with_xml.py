@@ -62,11 +62,13 @@ class KVClassifier(AbsClassifer):
         if ifKeepRule[0]:
           rule = consts.Rule(host, iKey, ruleScores[ (host, iKey) ],  ruleLabelNum[ (host, iKey) ])
           prunedGenRules[host].append(rule)
-          # print 'Keep', host, ruleI[0], ruleScores[ (host, ruleI[0]) ]
-        else:
-          print 'Pruned'
-          print host, iKey, ruleScores[(host, iKey)], 'pruned by:', ifKeepRule
-          print '-' * 10
+        if host == 'googleadservices.com' and iKey == 'label':
+          print 'IF HIGH CONF', (host, jKey) in highConfRules 
+          # # print 'Keep', host, ruleI[0], ruleScores[ (host, ruleI[0]) ]
+        # else:
+          # print 'Pruned'
+          # print host, iKey, ruleScores[(host, iKey)], 'pruned by:', ifKeepRule
+          # print '-' * 10
 
       # print '='*10
     return prunedGenRules
@@ -118,8 +120,6 @@ class KVClassifier(AbsClassifer):
       for key in keyScore[secdomain]:
         labelNum = len(keyScore[secdomain][key][consts.LABEL])
         score = keyScore[secdomain][key][consts.SCORE]
-        if key == 'utme':
-          print 'score is', score
         if (labelNum == 1 and (secdomain, key) not in highConfRules) or score <= 0.5: 
           if (secdomain, key) in highConfRules:
             print '[LOST]', (secdomain, key), labelNum, score, highConfRules[(secdomain, key)]
