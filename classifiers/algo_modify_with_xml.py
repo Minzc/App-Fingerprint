@@ -93,15 +93,6 @@ class KVClassifier(AbsClassifer):
             (len(tbls) - 1) / float(len(featureTbl[secdomain][k][label]) * len(featureTbl[secdomain][k]))
         keyScore[secdomain][cleanedK][consts.LABEL].add(label)
 
-    # for secdomain in featureTbl:
-    #   for k in featureTbl[secdomain]:
-    #     cleanedK = k.replace("\t", "")
-    #     for label in featureTbl[secdomain][k]:
-    #       for v, tbls in featureTbl[secdomain][k][label].iteritems():
-    #         if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
-    #           keyScore[secdomain][cleanedK][consts.SCORE] += \
-    #               (len(tbls) - 1) / float(len(featureTbl[secdomain][k][label]) * len(featureTbl[secdomain][k]))
-    #           keyScore[secdomain][cleanedK][consts.LABEL].add(label)
     return keyScore
 
   def _check_high_confrule(self, valueApps):
@@ -129,7 +120,7 @@ class KVClassifier(AbsClassifer):
         score = keyScore[secdomain][key][consts.SCORE]
         if key == 'utme':
           print 'score is', score
-        if labelNum == 1 or score <= 0.5:
+        if (labelNum == 1 or score <= 0.5) and (secdomain, key) not in highConfRules:
           if (secdomain, key) in highConfRules:
             print '[LOST]', (secdomain, key), labelNum, score, highConfRules[(secdomain, key)]
           continue
