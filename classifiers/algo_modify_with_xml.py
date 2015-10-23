@@ -200,12 +200,9 @@ class KVClassifier(AbsClassifer):
 
   def _compare(self, trainData, specificRules):
     tmpRules = set()
-    for tbl in trainData.keys():
-      for pkg in trainData[tbl]:
-        for k,vs in pkg.queries.items():
-          for v in vs:
-            if v in self.xmlFeatures[pkg.app] and len(v) > 2:
-              tmpRules.add((pkg.host, k, v, pkg.app))
+    for tbl, pkg, k, v in self.iterate_traindata(trainData):
+      if v in self.xmlFeatures[pkg.app] and len(v) > 2:
+        tmpRules.add((pkg.host, k, v, pkg.app))
     for host, key, value, app in tmpRules:
       if app not in specificRules[consts.APP_RULE][host][key][value]:
         print host, key, value, app
