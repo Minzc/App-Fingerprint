@@ -120,7 +120,7 @@ class KVClassifier(AbsClassifer):
         score = keyScore[secdomain][key][consts.SCORE]
         if key == 'utme':
           print 'score is', score
-        if (labelNum == 1 and (secdomain, key) in highConfRules) or score <= 0.5: 
+        if (labelNum == 1 and (secdomain, key) not in highConfRules) or score <= 0.5: 
           if (secdomain, key) in highConfRules:
             print '[LOST]', (secdomain, key), labelNum, score, highConfRules[(secdomain, key)]
           continue
