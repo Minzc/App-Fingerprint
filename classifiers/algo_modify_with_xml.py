@@ -53,7 +53,6 @@ class KVClassifier(AbsClassifer):
       for i in range(len(keyNcoveredIds)):
         ifKeepRule = (True, None)
         iKey, iCoveredIds = keyNcoveredIds[i]
-
         ''' Prune by coverage '''
         for j in range(i + 1, len(keyNcoveredIds)):
           jKey, jCoveredIds = keyNcoveredIds[j]
@@ -99,6 +98,15 @@ class KVClassifier(AbsClassifer):
             (len(tbls) - 1) / float(len(featureTbl[secdomain][k][label]) * len(featureTbl[secdomain][k]))
         keyScore[secdomain][cleanedK][consts.LABEL].add(label)
 
+    # for secdomain in featureTbl:
+    #   for k in featureTbl[secdomain]:
+    #     cleanedK = k.replace("\t", "")
+    #     for label in featureTbl[secdomain][k]:
+    #       for v, tbls in featureTbl[secdomain][k][label].iteritems():
+    #         if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
+    #           keyScore[secdomain][cleanedK][consts.SCORE] += \
+    #               (len(tbls) - 1) / float(len(featureTbl[secdomain][k][label]) * len(featureTbl[secdomain][k]))
+    #           keyScore[secdomain][cleanedK][consts.LABEL].add(label)
     return keyScore
 
   def _check_high_confrule(self, valueApps):
@@ -158,6 +166,18 @@ class KVClassifier(AbsClassifer):
           specificRules[pkg.host][key][value][label][consts.SCORE] = rule.score
           specificRules[pkg.host][key][value][label][consts.SUPPORT].add(tbl)
 
+    # for tbl, pkgs in trainData.iteritems():
+    #   for pkg in filter(lambda pkg : pkg.host in generalRules, pkgs):
+    #     for rule in filter(lambda rule : rule.key in pkg.queries, generalRules[pkg.host]):
+    #       for value in pkg.queries[rule.key]:
+    #         value = value.strip()
+    #         if len(valueLabelCounter[value]) == 1 and len(value) != 1:
+    #           if ruleType == consts.APP_RULE:
+    #             label = pkg.app
+    #           else:
+    #             label = pkg.company
+    #           specificRules[pkg.host][rule.key][value][label][consts.SCORE] = rule.score
+    #           specificRules[pkg.host][rule.key][value][label][consts.SUPPORT].add(tbl)
     return specificRules
 
   def _merge_result(self, appSpecificRules, companySpecificRules):
@@ -168,6 +188,19 @@ class KVClassifier(AbsClassifer):
       specificRules[consts.APP_RULE][host][key][value][app][scoreType] = score
       specificRules[consts.COMPANY_RULE][host][key][value][self.appCompanyRelation[app]][scoreType] = score
 
+    # for host in appSpecificRules:
+    #   for key in appSpecificRules[host]:
+    #     for value in appSpecificRules[host][key]:
+    #       for app, scores in appSpecificRules[host][key][value].iteritems():
+    #         specificRules[consts.APP_RULE][host][key][value][app] = scores
+    #         specificRules[consts.COMPANY_RULE][host][key][value][self.appCompanyRelation[app]] = scores
+    # for host in companySpecificRules:
+    #   for key in companySpecificRules[host]:
+    #     for value in companySpecificRules[host][key]:
+    #       for company, scores in companySpecificRules[host][key][value].iteritems():
+    #         if len(specificRules[consts.COMPANY_RULE][host][key][value]) == 0:
+    #           specificRules[consts.COMPANY_RULE][host][key][value][company] = scores
+    #           specificRules[consts.APP_RULE][host][key][value][';'.join(self.companyAppRelation[company])] = scores
     return specificRules
 
   def _compare(self, trainData, specificRules):
@@ -176,6 +209,12 @@ class KVClassifier(AbsClassifer):
       if v in self.xmlFeatures[pkg.app] and len(v) > 2:
         tmpRules.add((pkg.host, k, v, pkg.app))
 
+    # for tbl in trainData.keys():
+    #   for pkg in trainData[tbl]:
+    #     for k,vs in pkg.queries.items():
+    #       for v in vs:
+    #         if v in self.xmlFeatures[pkg.app] and len(v) > 2:
+    #           tmpRules.add((pkg.host, k, v, pkg.app))
     for host, key, value, app in tmpRules:
       if app not in specificRules[consts.APP_RULE][host][key][value]:
         print host, key, value, app
