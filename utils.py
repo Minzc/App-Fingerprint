@@ -343,3 +343,25 @@ def _parse_xml2(filePath):
     return values
   values = _flat(plistObj)
   return values
+
+def if_version(v):
+  '''
+  Check if a string is version type (x1.23123)
+  '''
+  v = re.sub('[0-9]\.[.0-9]+', '', v)
+  return len(v) < 2
+
+
+def flatten( d):
+  '''
+  Flat nested dictionary to lists
+  '''
+  items = []
+  for k, v in d.items():
+    if isinstance(v, collections.MutableMapping):
+      children = flatten(v)
+      map(lambda child : child.insert(0, k), children)
+      items.extend(children)
+    else:
+      items.append([k,v])
+  return items

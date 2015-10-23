@@ -1,9 +1,10 @@
 import const.consts as consts
 import re
 from sqldao import SqlDao
-from utils import load_exp_app, load_xml_features
+from utils import load_exp_app, load_xml_features, if_version, flatten
 from collections import defaultdict
 from classifier import AbsClassifer
+import collections
 
 
 DEBUG = False
@@ -89,18 +90,32 @@ class KVClassifier(AbsClassifer):
     # secdomain -> app -> key -> value -> tbls
     # secdomain -> key -> (label, score)
     keyScore = defaultdict(lambda : defaultdict(lambda : {consts.LABEL:set(), consts.SCORE:0 }))
-    for secdomain in featureTbl:
-      for k in featureTbl[secdomain]:
-        cleanedK = k.replace("\t", "")
-        for label in featureTbl[secdomain][k]:
-          for v, tbls in featureTbl[secdomain][k][label].iteritems():
-            if len(valueLabelCounter[v]) == 1 and len(re.sub('[0-9]\.[.0-9]+', '', v)) > 1:
-                keyScore[secdomain][cleanedK][consts.SCORE] += \
-                    (len(tbls) - 1) / float(len(featureTbl[secdomain][k][label]) * len(featureTbl[secdomain][k]))
-                keyScore[secdomain][cleanedK][consts.LABEL].add(label)
+    for secdomain, k, label, v, tbls in flatten(featureTbl):
+      cleanedK = k.replace("\t", "")
+      if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
+        keyScore[secdomain][cleanedK][consts.SCORE] += \
+            (len(tbls) - 1) / float(len(featureTbl[secdomain][k][label]) * len(featureTbl[secdomain][k]))
+        keyScore[secdomain][cleanedK][consts.LABEL].add(label)
+
+    # for secdomain in featureTbl:
+    #   for k in featureTbl[secdomain]:
+    #     cleanedK = k.replace("\t", "")
+    #     for label in featureTbl[secdomain][k]:
+    #       for v, tbls in featureTbl[secdomain][k][label].iteritems():
+    #         if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
+    #           keyScore[secdomain][cleanedK][consts.SCORE] += \
+    #               (len(tbls) - 1) / float(len(featureTbl[secdomain][k][label]) * len(featureTbl[secdomain][k]))
+    #           keyScore[secdomain][cleanedK][consts.LABEL].add(label)
     return keyScore
 
-  def _generate_keys(self, keyScore):
+  def _check_high_confrule(self, valueApps):
+    ifValid = True
+    for value, apps in valueApps.items():
+      if len(apps) > 1:
+        ifValid = False
+    return ifValid
+
+  def _generate_keys(self, keyScore, highConfRules):
     '''
     Find interesting ( secdomain, key ) pairs
     Input
@@ -119,6 +134,8 @@ class KVClassifier(AbsClassifer):
         if key == 'utme':
           print 'score is', score
         if labelNum == 1 or score <= 0.5:
+          if (secdomain, key) in highConfRules:
+            print '[LOST]', (secdomain, key), labelNum, score, highConfRules[(secdomain, key)]
           continue
         generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
     for secdomain in generalRules:
@@ -185,33 +202,33 @@ class KVClassifier(AbsClassifer):
       if app not in specificRules[consts.APP_RULE][host][key][value]:
         print host, key, value, app
 
-
-  def _gen_high_confrules(self, trainData):
-    highConfRules = set()
+  def iterate_traindata(self, trainData):
     for tbl in trainData.keys():
       for pkg in trainData[tbl]:
         for k,vs in pkg.queries.items():
           for v in vs:
-            v = re.sub('[0-9]\.[.0-9]+', '', v)
-            if v in self.xmlFeatures[pkg.app] and len(v) > 2:
-              highConfRules.add((pkg.host, k))
+            yield (tbl, pkg, k, v)
+
+
+  def _gen_high_confrules(self, trainData):
+    highConfRules = defaultdict(lambda : defaultdict(set))
+    for tbl, pkg, k, v in self.iterate_traindata(trainData):
+      if v in self.xmlFeatures[pkg.app] and if_version(v) == False:
+        highConfRules[(pkg.host, k)][v].add(pkg.app)
+        highConfRules[(pkg.secdomain, k)][v].add(pkg.app)
     return highConfRules
 
   def train(self, trainData, rule_type):
     highConfRules = set()
-    for tbl in trainData.keys():
-      for pkg in trainData[tbl]:
-        for k,v in pkg.queries.items():
-          map(lambda x : self.featureAppTbl[pkg.secdomain][k][pkg.label][x].add(tbl), v)
-          map(lambda x : self.featureCompanyTbl[pkg.secdomain][k][pkg.company][x].add(tbl), v)
-          map(lambda x : self.valueAppCounter[x].add(pkg.label), v)
-          map(lambda x : self.valueCompanyCounter[x].add(pkg.company), v)
-          self.appCompanyRelation[pkg.app] = pkg.company
-          self.companyAppRelation[pkg.company].add(pkg.app)
+    for tbl, pkg, k, v in self.iterate_traindata(trainData):
+      self.featureAppTbl[pkg.secdomain][k][pkg.label][v].add(tbl)
+      self.featureCompanyTbl[pkg.secdomain][k][pkg.company][v].add(tbl)
+      self.valueAppCounter[v].add(pkg.label)
+      self.valueCompanyCounter[v].add(pkg.company)
+      self.appCompanyRelation[pkg.app] = pkg.company
+      self.companyAppRelation[pkg.company].add(pkg.app)
 
     highConfRules = self._gen_high_confrules(trainData)
-    for host, key in highConfRules:
-      print '[HIGH]', host, key
     ##################
     # Count
     ##################
@@ -220,8 +237,8 @@ class KVClassifier(AbsClassifer):
     #############################
     # Generate interesting keys
     #############################
-    appGeneralRules = self._generate_keys(appKeyScore)
-    companyGeneralRules = self._generate_keys(companyKeyScore)
+    appGeneralRules = self._generate_keys(appKeyScore, highConfRules)
+    companyGeneralRules = self._generate_keys(companyKeyScore, highConfRules)
     #############################
     # Pruning general rules
     #############################
@@ -318,18 +335,3 @@ class KVClassifier(AbsClassifer):
     sqldao.executeBatch(QUERY, params)
     sqldao.close()
     print ">>> [KVRules] Total Number of Rules is %s Rule type is %s" % (len(params), rule_type)
-
-
-import sys
-
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print 'Number of args is wrong'
-    elif sys.argv[1] == 'test':
-      KVPredictor()
-    elif sys.argv[1] == 'train':
-      KVMiner()
-
-
-
-
