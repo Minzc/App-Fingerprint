@@ -122,8 +122,6 @@ class KVClassifier(AbsClassifer):
         labelNum = len(keyScore[secdomain][key][consts.LABEL])
         score = keyScore[secdomain][key][consts.SCORE]
         if (labelNum == 1 and (secdomain, key) not in highConfRules) or score <= 0.5:
-          if (secdomain, key) in highConfRules:
-            print '[LOST]', (secdomain, key), labelNum, score, highConfRules[(secdomain, key)]
           continue
         generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
     for secdomain in generalRules:
