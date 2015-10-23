@@ -317,9 +317,12 @@ def _parse_xml2(filePath):
         elif type(value) == plistlib._InternalDict:
           values |= _flat(value)
         elif type(value) == str:
+          value = value.lower()
           values.add(value)
         elif type(value) == unicode:
-          values.add(value.encode('utf-8'))
+          value = value.encode('utf-8')
+          value = value.lower()
+          values.add(value)
         else:
           pass
     elif type(plistObj) == list:
@@ -329,9 +332,12 @@ def _parse_xml2(filePath):
         elif type(value) == plistlib._InternalDict:
           values |= _flat(value)
         elif type(value) == str:
+          value = value.lower()
           values.add(value)
         elif type(value) == unicode:
-          values.add(value.encode('utf-8'))
+          value = value.encode('utf-8')
+          value = value.lower()
+          values.add(value)
         else:
           pass
     return values
