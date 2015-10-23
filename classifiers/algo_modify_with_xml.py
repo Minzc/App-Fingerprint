@@ -179,12 +179,9 @@ class KVClassifier(AbsClassifer):
     specificRules = {}
     specificRules[consts.APP_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:set()}))))
     specificRules[consts.COMPANY_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(lambda : {consts.SCORE:0,consts.SUPPORT:set()}))))
-    for host in appSpecificRules:
-      for key in appSpecificRules[host]:
-        for value in appSpecificRules[host][key]:
-          for app, scores in appSpecificRules[host][key][value].iteritems():
-            specificRules[consts.APP_RULE][host][key][value][app] = scores
-            specificRules[consts.COMPANY_RULE][host][key][value][self.appCompanyRelation[app]] = scores
+    for host, key, value, app, scoreType, score in flatten(appSpecificRules):
+      specificRules[consts.APP_RULE][host][key][value][app][scoreType] = score
+      specificRules[consts.COMPANY_RULE][host][key][value][self.appCompanyRelation[app]][scoreType] = score
     # for host in companySpecificRules:
     #   for key in companySpecificRules[host]:
     #     for value in companySpecificRules[host][key]:
