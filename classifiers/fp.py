@@ -141,40 +141,40 @@ def _remove_duplicate(t_rules):
   return new_rules
 
 def _prune_rules(t_rules, packageNInfo, min_cover = 3):
-    '''
-    Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
-    Input packages: list of packets
-    Return: (rule, label, package_id, confidence, support)
-    '''
-    import datetime
-    ts = datetime.datetime.now()
+  '''
+  Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
+  Input packages: list of packets
+  Return: (rule, label, package_id, confidence, support)
+  '''
+  import datetime
+  ts = datetime.datetime.now()
 
 
-    cover_num = defaultdict(int)
-    index_packages = defaultdict(list)
-    # Change packages to sets
-    map(lambda packageInfo: index_packages[packageInfo[1]['Label']].append(packageInfo), packageNInfo.items())
-    packages = index_packages
-    tblSupport = defaultdict(set)
-    print 'Len of Rules is', len(t_rules)
-    for rule, confidence, support, classlabel in t_rules:
-        for packageInfo in packages[classlabel]:
+  cover_num = defaultdict(int)
+  index_packages = defaultdict(list)
+  # Change packages to sets
+  map(lambda packageInfo: index_packages[packageInfo[1]['Label']].append(packageInfo), packageNInfo.items())
+  packages = index_packages
+  tblSupport = defaultdict(set)
+  print 'Len of Rules is', len(t_rules)
+  for rule, confidence, support, classlabel in t_rules:
+      for packageInfo in packages[classlabel]:
+        package, info = packageInfo
+        tbl = info['Tbl']
+        if rule.issubset(package):
+          tblSupport[rule].add(tbl)
+  
+  # Sort generated rules according to its confidence, support and length
+  t_rules.sort(key=lambda v: (v[1], v[2], len(v[0])), reverse=True)
+  t_rules = _remove_duplicate(t_rules)
+  for rule, confidence, support, classlabel in t_rules:
+      for packageInfo in packages[classlabel]:
           package, info = packageInfo
-          tbl = info['Tbl']
-          if rule.issubset(package):
-            tblSupport[rule].add(tbl)
-    
-    # Sort generated rules according to its confidence, support and length
-    t_rules.sort(key=lambda v: (v[1], v[2], len(v[0])), reverse=True)
-    t_rules = _remove_duplicate(t_rules)
-    for rule, confidence, support, classlabel in t_rules:
-        for packageInfo in packages[classlabel]:
-            package, info = packageInfo
-            host = info['Host']
-            if cover_num[package] <= min_cover and rule.issubset(package):
-                cover_num[package] += 1
-                yield Rule(rule, classlabel, host, confidence, len(tblSupport[rule]))
-    print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
+          host = info['Host']
+          if cover_num[package] <= min_cover and rule.issubset(package):
+              cover_num[package] += 1
+              yield Rule(rule, classlabel, host, confidence, len(tblSupport[rule]))
+  print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
 
 
 def _persist(rules, rule_type):

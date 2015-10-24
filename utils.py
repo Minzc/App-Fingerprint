@@ -366,3 +366,27 @@ def flatten( d):
     else:
       items.append([k,v])
   return items
+
+
+def unescape(s):
+  s = s.replace("&lt;", "<")
+  s = s.replace("&gt;", ">")
+  # this has to be last:
+  s = s.replace("&amp;", "&")
+  return s
+
+
+def load_info_features():
+  from os import listdir
+  from os.path import isfile, join
+  folder = './resource/Infoplist/'
+  appFeatures = defaultdict(set)
+  for f in listdir(folder):
+    filePath = join(folder, f)
+    if isfile(filePath):
+      trackId = f[0:-4]
+      app = AppInfos.get(consts.IOS, trackId).package
+      features = self._parse_xml(filePath )
+      features.add(app)
+      appFeatures[app] = features
+  return appFeatures

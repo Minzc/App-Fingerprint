@@ -1,7 +1,7 @@
-from run_modify import cross_batch_test
-from run_modify import TRAIN_LABEL
-from run_modify import USED_CLASSIFIERS
-from run_modify import train
+from run import cross_batch_test
+from run import TRAIN_LABEL
+from run import USED_CLASSIFIERS
+from run import train
 import const.consts as consts
 import sys
 

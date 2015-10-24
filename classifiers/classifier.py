@@ -14,3 +14,9 @@ class AbsClassifer:
   def set_name(self, name):
     self.name = name
 
+  def clean_db(self, ruleType, QUERY):
+    print ">>> [%s Classifier]" % (self.name), QUERY
+    sqldao = SqlDao()
+    sqldao.execute(QUERY % (ruleType))
+    sqldao.close()
+
