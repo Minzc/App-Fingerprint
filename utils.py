@@ -392,7 +392,7 @@ def load_info_features():
   return appFeatures
 
 
-def _parse_xml(self, filePath):
+def _parse_xml( filePath):
   import plistlib
   plistObj = plistlib.readPlist(filePath)
   features = set()
