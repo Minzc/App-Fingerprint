@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from sqldao import SqlDao
 
 class AbsClassifer:
   __metaclass__ = ABCMeta
