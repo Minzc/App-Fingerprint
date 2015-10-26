@@ -81,6 +81,7 @@ def train(trainTbls, appType):
 
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
     for name, classifier in classifiers:
+        classifier.set_name(name)
         print ">>> [train#%s] " % (name)
         classifier.train(trainSet, ruleType)
   trainSet = None # To release memory
