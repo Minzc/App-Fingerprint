@@ -11,7 +11,7 @@ class AgentClassifier(AbsClassifer):
   def __init__(self):
     self.agentLabel = defaultdict(set)
     self.rules = defaultdict(dict)
-    self.appFeatures = load_info_features()
+    self.appFeatures = load_info_features(self._parse_xml)
 
   def _parse_xml(self, filePath):
     import plistlib

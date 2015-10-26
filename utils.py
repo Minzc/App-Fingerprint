@@ -376,7 +376,7 @@ def unescape(s):
   return s
 
 
-def load_info_features():
+def load_info_features(_parse_xml):
   from os import listdir
   from os.path import isfile, join
   folder = './resource/Infoplist/'
