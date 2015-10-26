@@ -386,7 +386,18 @@ def load_info_features():
     if isfile(filePath):
       trackId = f[0:-4]
       app = AppInfos.get(consts.IOS, trackId).package
-      features = self._parse_xml(filePath )
+      features = _parse_xml(filePath )
       features.add(app)
       appFeatures[app] = features
   return appFeatures
+
+
+def _parse_xml(self, filePath):
+  import plistlib
+  plistObj = plistlib.readPlist(filePath)
+  features = set()
+  for key in VALID_FEATURES:
+    if key in plistObj:
+      value = unescape(plistObj[key].lower())
+      features.add(value)
+  return features
