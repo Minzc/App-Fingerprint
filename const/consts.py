@@ -51,7 +51,8 @@ AGENT_CLASSIFIER = "Agent Rule"
 
 #############EVALUATIONS###############
 DISCOVERED_APP ='discoveried_app' 
-DISCOVERED_APP_LIST ='discoveried_app_list' 
+DISCOVERED_APP_LIST = 'discoveried_app_list' 
+DETECTED_APP_LIST = 'detect_app_list' 
 PRECISION = 'precision'
 RECALL = 'recall'
 F1SCORE = 'f1'

@@ -146,11 +146,11 @@ def evaluate(rst, testSet, testApps):
   precision = correct * 1.0 / recall
   recall = recall * 1.0 / len(testSet)
   f1Score = 2.0 * precision * recall / (precision + recall)
-  inforTrack[consts.DISCOVERED_APP] = len(correctApp) * 1.0 / len(testApps)
+  inforTrack[consts.DISCOVERED_APP] = len(correctApp.difference(wrongApp)) * 1.0 / len(testApps)
   inforTrack[consts.PRECISION] = precision
   inforTrack[consts.RECALL] = recall
   inforTrack[consts.F1SCORE] = f1Score
-  inforTrack[consts.DISCOVERED_APP_LIST] = correctApp
+  inforTrack[consts.DISCOVERED_APP_LIST] = correctApp | wrongApp
   return inforTrack
 
 
@@ -177,22 +177,22 @@ def _use_classifier(classifier, testSet):
   return rst
 
 
-def _insert_rst(rst, DB):
+def _insert_rst(testSet, DB, inforTrack):
   """
   Insert prediction results into data base
   Input
-  - rst : prediction results. {pkgId: {ruleType: prediction}}
   - DB : inserted table name
+  - testSet : test packages
+  - infoTrack : information about test result
   """
   print 'Start inserting results'
   QUERY = 'UPDATE ' + DB + ' SET classified = %s WHERE id = %s'
   sqldao = SqlDao()
   params = []
-  for k, v in rst.iteritems():
-    for ruleType in VALID_LABEL:
-      if v[ruleType][0]:
-        params.append((3,k));
-        break
+  for pkgId, pkg in testSet.iteritems():
+    if pkg.app not in inforTrack[consts.DETECTED_APP_LIST]:
+      params.append((3,pkgId));
+
   sqldao.executeBatch(QUERY,  params)
   sqldao.close()
   print 'Finish inserting %s items' % len(rst)
@@ -226,6 +226,8 @@ def test(testTbl, appType):
   print '>>> Start evaluating'
   inforTrack = evaluate(rst, testSet, testApps)
   inforTrack[consts.RESULT] = rst
+  if INSERT:
+    _insert_rst(testSet, testTbl, inforTrack)
   return inforTrack
 
 
