@@ -165,7 +165,7 @@ class HostApp(AbsClassifer):
         if pkg.host in self.rules[ruleType]:
           label, support, regexObj = self.rules[ruleType][pkg.host]
           if predict.score < support:
-            predict = consts.Prediction(label, support, (pkg.host, regexStr, support))
+            predict = consts.Prediction(label, support, (pkg.host, pkg.host, support))
           
       rst[ruleType] = predict
       if predict.label != pkg.app and predict.label != None:
