@@ -189,6 +189,7 @@ def _insert_rst(testSet, DB, inforTrack):
   QUERY = 'UPDATE ' + DB + ' SET classified = %s WHERE id = %s'
   sqldao = SqlDao()
   params = []
+  detectedApps = {app for app, _ in inforTrack[consts.DISCOVERED_APP_LIST]}
   for pkgId, pkg in testSet.iteritems():
     if pkg.app not in inforTrack[consts.DISCOVERED_APP_LIST]:
       params.append((3,pkgId));
