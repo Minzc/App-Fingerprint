@@ -1,7 +1,7 @@
 from classifiers.agent import AgentClassifier
 from classifiers.algo import KVClassifier
 from classifiers.head import HeaderClassifier
-from classifiers.host import HostApp
+from classifiers.host_modify import HostApp
 from classifiers.fp_modify import CMAR
 import const.consts as consts
 

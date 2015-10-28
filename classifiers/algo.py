@@ -203,8 +203,6 @@ class KVClassifier(AbsClassifer):
     '''
     for rule, v, app, tbls in flatten(matchedHighConfRules):
       host, key = rule
-      if v == 'en':
-        print 'en is', len(self.valueAppCounter[v]) 
       if len(re.sub('[0-9]','',v)) < 2 or len(self.valueAppCounter[v]) > 1:
         continue
       specificRules[host][key][v][app][consts.SCORE] = 1.0
