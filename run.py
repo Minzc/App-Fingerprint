@@ -150,7 +150,7 @@ def evaluate(rst, testSet, testApps):
   inforTrack[consts.PRECISION] = precision
   inforTrack[consts.RECALL] = recall
   inforTrack[consts.F1SCORE] = f1Score
-  inforTrack[consts.DISCOVERED_APP_LIST] = correctApp | wrongApp
+  inforTrack[consts.DISCOVERED_APP_LIST] = detectedApp
   return inforTrack
 
 
