@@ -190,7 +190,7 @@ def _insert_rst(testSet, DB, inforTrack):
   sqldao = SqlDao()
   params = []
   for pkgId, pkg in testSet.iteritems():
-    if pkg.app not in inforTrack[consts.DETECTED_APP_LIST]:
+    if pkg.app not in inforTrack[consts.DISCOVERED_APP_LIST]:
       params.append((3,pkgId));
 
   sqldao.executeBatch(QUERY,  params)
