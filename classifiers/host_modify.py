@@ -134,16 +134,6 @@ class HostApp(AbsClassifer):
     print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
     sqldao.close()
 
-  def load_rules2(self):
-    self.rules = {consts.APP_RULE:{}, consts.COMPANY_RULE:{}, consts.CATEGORY_RULE:{}}
-    QUERY = consts.SQL_SELECT_HOST_RULES
-    sqldao = SqlDao()
-    counter = 0
-    for host, label, ruleType, support in sqldao.execute(QUERY):
-      counter += 1
-      self.rules[ruleType][host] = (label, support)
-    print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
-    sqldao.close()
   
   def count_support(self, records):
     LABEL = 0
@@ -172,12 +162,11 @@ class HostApp(AbsClassifer):
     for ruleType in self.rules:
       predict = consts.NULLPrediction
       for url in [pkg.host]:
-        for regexStr, ruleTuple in self.rules[ruleType].iteritems():
-          label, support, regexObj = ruleTuple
-          match = regexObj.search(pkg.host)
-          if match and predict.score < support:
+        if pkg.host in self.rules[ruleTuple]:
+          label, support, regexObj = self.rules[ruleTuple][pkg.host]
+          if predict.score < support:
             predict = consts.Prediction(label, support, (pkg.host, regexStr, support))
-
+          
       rst[ruleType] = predict
       if predict.label != pkg.app and predict.label != None:
         print predict.evidence, pkg.app, predict.label
