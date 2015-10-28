@@ -195,7 +195,7 @@ def _insert_rst(testSet, DB, inforTrack):
 
   sqldao.executeBatch(QUERY,  params)
   sqldao.close()
-  print 'Finish inserting %s items' % len(rst)
+  print 'Finish inserting %s items' % len(params)
 
 
 def _clean_up():
