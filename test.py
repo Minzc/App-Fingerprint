@@ -66,7 +66,7 @@ def _compare_rst(discoveriedApps, rst):
       notDiscoveredApps[app] = trackId
   
   print '###' * 10
-  for appid in notDiscoveredApps.value():
+  for appid in notDiscoveredApps.values():
     print 'not dis appid', appid
   print '###' * 10
 
