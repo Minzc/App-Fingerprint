@@ -120,7 +120,7 @@ class AgentClassifier(AbsClassifer):
     '''
     appFeatureRegex = defaultdict(lambda : {})
     for app, features in self.appFeatures.items():
-      for f in features:
+      for f in features.values():
         if app not in agentTuples:
           for featureStr in self._gen_features(f):
             for regex in self._gen_regex(feature, app):
