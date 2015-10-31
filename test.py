@@ -54,13 +54,21 @@ def _compare_rst(discoveriedApps, rst):
     if 'Correct_Detection' in ln:
         appId = ln.strip().split('.')[0].replace('[','')
         testDisApps.add(appId)
-  
+  print '###' * 10
+  for appid in testDisApps:
+    print 'test dis app ', appid
+  print '###' * 10
   notDiscoveredPkg = []
   notDiscoveredApps = {}
   for appNid in discoveriedApps:
     app, trackId = appNid
     if trackId not in testDisApps:
       notDiscoveredApps[app] = trackId
+  
+  print '###' * 10
+  for appid in notDiscoveredApps.value():
+    print 'not dis appid', appid
+  print '###' * 10
 
   for pkgID, predictions in rst.iteritems():
     prediction = predictions[consts.APP_RULE]
