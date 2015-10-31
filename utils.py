@@ -387,7 +387,7 @@ def load_info_features(_parse_xml):
       trackId = f[0:-4]
       app = AppInfos.get(consts.IOS, trackId).package
       features = _parse_xml(filePath )
-      features.add(app)
+      features['CFBundleIdentifier'] = app
       appFeatures[app] = features
   return appFeatures
 

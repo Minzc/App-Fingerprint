@@ -7,6 +7,7 @@ import re
 from const.app_info import AppInfos
 
 VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName', 'CFBundleURLSchemes'}
+STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName'}
 class AgentClassifier(AbsClassifer):
   def __init__(self):
     self.agentLabel = defaultdict(set)
@@ -16,11 +17,11 @@ class AgentClassifier(AbsClassifer):
   def _parse_xml(self, filePath):
     import plistlib
     plistObj = plistlib.readPlist(filePath)
-    features = set()
+    features = {}
     for key in VALID_FEATURES:
       if key in plistObj:
         value = unescape(plistObj[key].lower())
-        features.add(value)
+        features[key] = value
     return features
   
   def persist(self, patterns, ruleType):
@@ -72,13 +73,54 @@ class AgentClassifier(AbsClassifer):
     regex.add(r'\b' + re.escape(feature)+ r'\b')
     return regex
   
+  def _compose_regxobj2(self, agentTuples):
+    appFeatureRegex = defaultdict(lambda : {})
+    for app in self.appFeatures:
+      for f in self.appFeatures[app].values():
+        for feature in self._gen_features(f):
+          for regex in self._gen_regex(feature, app):
+            regexObj = re.compile(regex, re.IGNORECASE)
+            appFeatureRegex[app][regexObj.pattern] = regexObj
+    return appFeatureRegex
+
+
+  def _count2(self, appFeatureRegex, appAgent):
+    '''
+    Count regex
+    '''
+    
+    minedAppFeatureRegex = defaultdict(lambda : {})
+    for app, agents in appAgent.items():
+      for agent in agents:
+        if '/' in agent:
+          features = re.findall('^[a-zA-Z0-9][0-9a-zA-Z. %_\-:&?\']+/', agent)
+          if len(features) > 0:
+            feature = features[0]
+          regexObj = re.compile(r'^' + re.escape(feature), re.IGNORECASE)
+          try:
+            feature = feature.encode('utf-8')
+            minedAppFeatureRegex[app][feature] = regexObj
+          except:
+            pass
+    regexApp = defaultdict(set)
+    for app, agents in appAgent.items():
+      for agent in agents:
+        for predict, pattern, regexObj in flatten(minedAppFeatureRegex):
+          if pattern in agent:
+            regexApp[regexObj.pattern].add(app)
+
+    for predict, pattern, regexObj in flatten(appFeatureRegex):
+      regexApp[regexObj.pattern].add(predict)
+
+    return regexApp
+
   def _compose_regxobj(self, agentTuples):
     '''
     Compose regular expression
     '''
     appFeatureRegex = defaultdict(lambda : {})
     for app, agent in agentTuples:
-      for f in self.appFeatures[app]:
+      for f in self.appFeatures[app].values():
         for feature in self._gen_features(f):
           if feature in agent.encode('utf-8'):
             for regex in self._gen_regex(feature, app):
@@ -95,6 +137,8 @@ class AgentClassifier(AbsClassifer):
           appFeatureRegex[app]['#'+ feature] = regexObj
         except:
           pass
+
+
     return appFeatureRegex
     
   def _count(self, appFeatureRegex, appAgent):
@@ -105,6 +149,7 @@ class AgentClassifier(AbsClassifer):
     for app, agents in appAgent.items():
       for agent in agents:
         for predict, pattern, regexObj in flatten(appFeatureRegex):
+          regexApp[regexObj.pattern].add(predict)
           if '#' in pattern:
             pattern = pattern.replace('#', '')
             if pattern in agent:
