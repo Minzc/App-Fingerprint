@@ -119,13 +119,20 @@ class AgentClassifier(AbsClassifer):
     Compose regular expression
     '''
     appFeatureRegex = defaultdict(lambda : {})
-    for app, agent in agentTuples:
-      for f in self.appFeatures[app].values():
-        for feature in self._gen_features(f):
-          if feature in agent.encode('utf-8'):
+    for app, features in self.appFeatures.items():
+      for f in features:
+        if app not in agentTuples:
+          for featureStr in self._gen_features(f):
             for regex in self._gen_regex(feature, app):
               regexObj = re.compile(regex, re.IGNORECASE)
               appFeatureRegex[app][regexObj.pattern] = regexObj
+        else:
+          for featureStr in self._gen_features(f):
+            for agent in agentTuples[app]:
+              if featureStr in agent.encode('utf-8'):
+                for regex in self._gen_regex(featureStr, app):
+                  regexObj = re.compile(regex, re.IGNORECASE)
+                  appFeatureRegex[app][regexObj.pattern] = regexObj
 
       if '/' in agent:
         features = re.findall('^[a-zA-Z0-9][0-9a-zA-Z. %_\-:&?\']+/', agent)
@@ -137,7 +144,6 @@ class AgentClassifier(AbsClassifer):
           appFeatureRegex[app]['#'+ feature] = regexObj
         except:
           pass
-
 
     return appFeatureRegex
     
@@ -161,13 +167,13 @@ class AgentClassifier(AbsClassifer):
     return regexApp
 
   def train(self, trainSet, ruleType):
-    agentTuples = set()
+    agentTuples = defaultdict(set)
     appAgent = defaultdict(set)
     for tbl,pkgs in trainSet.items():
       for pkg in pkgs:
         label = pkg.label
         agent = pkg.agent
-        agentTuples.add((label, agent))
+        agentTuples[label].add( agent)
         appAgent[label].add(agent)
     '''
     Compose regular expression
