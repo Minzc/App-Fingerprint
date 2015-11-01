@@ -158,7 +158,8 @@ class AgentClassifier(AbsClassifer):
     for app, agents in appAgent.items():
       for agent in agents:
         for predict, pattern, regexObj in flatten(appFeatureRegex):
-          regexApp[regexObj.pattern].add(predict)
+          if predict not in appAgent:
+            regexApp[regexObj.pattern].add(predict)
           if '#' in pattern:
             pattern = pattern.replace('#', '')
             if pattern in agent:
