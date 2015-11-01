@@ -124,7 +124,7 @@ class AgentClassifier(AbsClassifer):
       for f in features.values():
         if app not in agentTuples:
           for featureStr in self._gen_features(f):
-            for regex in self._gen_regex(feature, app):
+            for regex in self._gen_regex(featureStr, app):
               regexObj = re.compile(regex, re.IGNORECASE)
               appFeatureRegex[app][regexObj.pattern] = regexObj
         else:
