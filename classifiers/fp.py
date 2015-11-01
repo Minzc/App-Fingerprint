@@ -1,4 +1,5 @@
 import sys
+from classifier import AbsClassifer
 import operator
 from sqldao import SqlDao
 from fp_growth import find_frequent_itemsets
@@ -6,6 +7,7 @@ from utils import loadfile, rever_map, agent_clean
 from itertools import imap
 from collections import defaultdict, namedtuple
 import const.consts as consts
+import re
 
 DEBUG_INDEX = None
 DEBUG_ITEM = 'Mrd/1.2.1 (Linux; U; Android 5.0.2; google Nexus 7) com.crossfield.casinogame_bingo/20'.lower()
@@ -91,137 +93,146 @@ def _encode_data(packages=None, minimum_support = 2):
     # encodedpackages: ([Features, app])
     return encodedpackages, rever_map(appIndx), rever_map(itemIndx), packageNInfo
 
-def _gen_rules(transactions, tSupport, tConfidence, featureIndx):
+def _gen_rules(transactions, tSupport, tConfidence, featureIndx, appIndx):
     '''
     Generate encoded rules
     Input
     - transactions : encoded transaction
-    - tSupport    : frequent pattern support
-    - tConfidence : frequent pattern confidence
-    - featureIndx : a map between number and feature string
+    - tSupport     : frequent pattern support
+    - tConfidence  : frequent pattern confidence
+    - featureIndx  : a map between number and feature string
+    - appIndex     : a map between number and app
     Return : (itemsets, confidencet, support, label)
     '''
     ###########################
     # FP-tree Version
     ###########################
     print '_gen_rules', featureIndx.keys()[:10]
-    rules = []
-    for frequent_pattern_info in find_frequent_itemsets(transactions, tSupport, True):
-        itemset, support, tag_dist = frequent_pattern_info
-        max_clss = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
-        if tag_dist[max_clss] * 1.0 / support > tConfidence:
-            confidence = max(tag_dist.values()) * 1.0 / support
-            rules.append((frozenset(itemset), confidence, support, max_clss))
+    rules = set()
+    frequentPatterns = find_frequent_itemsets(transactions, tSupport, True)
+    for frequent_pattern_info in frequentPatterns:
+      itemset, support, tag_dist = frequent_pattern_info
+      ruleStrSet = frozenset({featureIndx[itemcode] for itemcode in itemset})
+      labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
+      if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
+          confidence = max(tag_dist.values()) * 1.0 / support
+          rules.add((ruleStrSet, confidence, support, appIndx[labelIndex]))
     
-    print ">>> Finish Rule Generating"
+    print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
 
-def _remove_duplicate(t_rules):
+def _remove_duplicate(rawRules):
+  '''
+  Input
+  - rawRules : [(ruleStrSet, confidence, support, label), ...]
+  '''
+  rules = defaultdict(list)
+  for rule in rawRules:
+    rules[rule[3]].append(rule)
+  prunedRules = []
+  print 'Total number of rules', len(rawRules)
+  for label in rules:
+    '''From large to small set'''
+    sortedRules = sorted(rules[label], key = lambda x: len(x[0]), reverse = True)
+    root = {}
+    for i in range(len(sortedRules)):
+      ifKeep = True
+      iStrSet = sortedRules[0]
+      for j in range(i + 1, len(sortedRules)):
+        jStrSet = sortedRules[j][0]
+        if jStrSet.issubset(iStrSet):
+          ifKeep = False
+      if ifKeep:
+        prunedRules.append(sortedRules[i])
+  return prunedRules
 
-  root ={'rule': None, 'child':{}, 'label':None, 'support':0, 'confidence':0}
-  new_rules = []
-  for rule in t_rules:
-    node = root
-    pruned = False
-    for item in rule[0]:
-      if item in node['child'] and node['child'][item]['label'] != None:
-        pruned = True
-        break
-      else:
-          new_node ={'rule':item, 'child':{}, 'label':None, 'support':0, 'confidence':0}
-          node['child'][item] = new_node
-      node = node['child'][item]
 
-    if not pruned:
-      node['label'] = rule[3]
-      node['support'] = rule[2]
-      node['confidence'] = rule[1]
-      new_rules.append(rule)
-  print 'original size', len(t_rules), 'new size', len(new_rules)
-  return new_rules
-
-def _prune_rules(t_rules, packageNInfo, min_cover = 3):
+def _prune_rules(tRules, trainData, min_cover = 3):
   '''
   Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
   Input packages: list of packets
-  Return: (rule, label, package_id, confidence, support)
+  Return
+  - specificRules host -> ruleStrSet -> label -> {consts.SUPPORT, consts.SCORE}
+  defaultdict(lambda : defaultdict(lambda : defaultdict(lambda : { consts.SCORE: 0, consts.SUPPORT: 0 })))
+
   '''
   import datetime
   ts = datetime.datetime.now()
-
-
   cover_num = defaultdict(int)
   index_packages = defaultdict(list)
-  # Change packages to sets
-  map(lambda packageInfo: index_packages[packageInfo[1]['Label']].append(packageInfo), packageNInfo.items())
-  packages = index_packages
   tblSupport = defaultdict(set)
-  print 'Len of Rules is', len(t_rules)
-  for rule, confidence, support, classlabel in t_rules:
-      for packageInfo in packages[classlabel]:
-        package, info = packageInfo
-        tbl = info['Tbl']
-        if rule.issubset(package):
-          tblSupport[rule].add(tbl)
-  
-  # Sort generated rules according to its confidence, support and length
-  t_rules.sort(key=lambda v: (v[1], v[2], len(v[0])), reverse=True)
-  t_rules = _remove_duplicate(t_rules)
-  for rule, confidence, support, classlabel in t_rules:
-      for packageInfo in packages[classlabel]:
-          package, info = packageInfo
-          host = info['Host']
-          if cover_num[package] <= min_cover and rule.issubset(package):
-              cover_num[package] += 1
-              yield Rule(rule, classlabel, host, confidence, len(tblSupport[rule]))
+  for tbl, packages in trainData.iteritems():
+    packageInfos = defaultdict(set)
+    for package in packages:
+      featuresNhost = _get_package_f(package)
+      features = frozenset(featuresNhost[:-1])
+      host = featuresNhost[-1]
+      packageInfos[package.label].add((features, host))
+    print 'Len of Rules is', len(tRules)
+    for rule, confidence, support, classlabel in tRules:
+      for packageInfo in packageInfos[classlabel]:
+        features, host = packageInfo
+        if rule.issubset(features):
+            tblSupport[rule].add(tbl)
+
+  tRules = sorted(tRules, key = lambda x : len(tblSupport[x]), reverse = True)
+  specificRules = defaultdict(lambda : defaultdict(lambda : defaultdict(lambda : { consts.SCORE: 0, consts.SUPPORT: 0 })))
+  for rule in tRules:
+    ruleStrSet, confidence, support, classlabel = rule
+    for packageInfo in packageInfos[classlabel]:
+      package, info = packageInfo
+      host = info
+      if cover_num[package] <= min_cover and ruleStrSet.issubset(package) and len(tblSupport[ruleStrSet]) > 1:
+        cover_num[package] += 1
+        specificRules[host][ruleStrSet][classlabel][consts.SCORE] = confidence
+        specificRules[host][ruleStrSet][classlabel][consts.SUPPORT] = len(tblSupport[ruleStrSet])
   print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
+  return specificRules
 
 
-def _persist(rules, rule_type):
-    sqldao = SqlDao()
-    QUERY = consts.SQL_INSERT_CMAR_RULES
-    params = []
-    for rule in rules:
-        params.append((rule.label, ','.join(rule.rule), rule.confidence, rule.support, rule.host, rule_type))
-    sqldao.executeBatch(QUERY, params)
-    sqldao.close()
-    print "Total Number of Rules is", len(rules)
 
-class CMAR:
-  def __init__(self, min_cover=3):
+class CMAR(AbsClassifer):
+  def __init__(self, min_cover=3, tSupport = 2, tConfidence = 1.0):
     # feature, app, host
     self.rules = defaultdict(lambda : defaultdict(lambda : defaultdict()))
     self.min_cover = min_cover
+    self.tSupport = tSupport
+    self.tConfidence = tConfidence
 
-  def train(self, packages, rule_type, tSupport=2, tConfidence=0.8):
-      p = []
-      for tbl_packages in packages.values():
-        p += tbl_packages
-      packages = p
-      print "#CMAR:", len(packages)
-      encodedpackages, appIndx, featureIndx, packageNInfo = _encode_data(packages)
-      # Rules format : (feature, confidence, support, label)
-      rules = _gen_rules(encodedpackages, tSupport, tConfidence, featureIndx)
-      # feature, app, host
-      rules = _prune_rules(rules, packageNInfo, self.min_cover)
-      # change encoded features back to string
-      decodedRules = set()
-      tmp = set()
-      for rule in rules:
-          rule_str = frozenset({featureIndx[itemcode] for itemcode in rule[0]})
-          decodedRules.add(Rule(rule_str, appIndx[rule.label], rule.host, rule.confidence, rule.support))
+  def _persist(self, rules):
+    '''specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support''' 
+    sqldao = SqlDao()
+    QUERY = consts.SQL_INSERT_CMAR_RULES
+    params = []
+    for ruleType in rules:
+      for host in rules[ruleType]:
+        for ruleStrSet in rules[ruleType][host]:
+          for label, scores in rules[ruleType][host][ruleStrSet].items():
+            confidence, support = scores[consts.SCORE], scores[consts.SUPPORT]
+            params.append((label, ','.join(ruleStrSet), confidence, support, host, ruleType))
+      sqldao.executeBatch(QUERY, params)
+      sqldao.close()
+      print "Total Number of Rules is", len(rules)
 
-      self._add_rules(decodedRules, packages, rule_type)
-      _persist(decodedRules, rule_type)
-      self.__init__()
-      return self
+  def train(self, trainData, rule_type):
+    packages = []
+    for tblPackages in trainData.values():
+      packages += tblPackages
+    print "#CMAR:", len(packages)
+    encodedpackages, appIndx, featureIndx, packageNInfo = _encode_data(packages)
+    ''' Rules format : (feature, confidence, support, label) '''
+    rules = _gen_rules(encodedpackages, self.tSupport, self.tConfidence, featureIndx, appIndx)
+    ''' Prune duplicated rules'''
+    #rules = _remove_duplicate(rules)
+    ''' feature, app, host '''
+    specificRules = _prune_rules(rules, trainData, self.min_cover)
+    ''' change encoded features back to string '''
 
-  def _add_rules(self, rules, packages,ruleType):
-      tmprules = {}
-      for feature, app, host, confidence, _ in rules:
-          tmprules.setdefault(host, {})
-          tmprules[host][feature] = (app, confidence)
-      self.rules[ruleType] = tmprules
+    self.rules[rule_type] = specificRules
+    self._persist(self.rules)
+    self.__init__()
+    return self
+
 
   def load_rules(self):
     self.rules = {}
@@ -231,14 +242,14 @@ class CMAR:
     sqldao = SqlDao()
     counter = 0
     SQL = consts.SQL_SELECT_CMAR_RULES
-    for label, patterns, host, rule_type, confidence in sqldao.execute(SQL):
+    for label, patterns, host, ruleType, support in sqldao.execute(SQL):
       counter += 1
       patterns = frozenset(map(lambda x: x.strip(), patterns.split(",")))
-      self.rules[rule_type][host][patterns] = (label, confidence)
+      self.rules[ruleType][host][patterns] = (label, support)
     sqldao.close()
     print '>>>[CMAR] Totaly number of rules is', counter
-    for rule_type in self.rules:
-      print '>>>[CMAR] Rule Type %s Number of Rules %s' % (rule_type, len(self.rules[rule_type]))
+    for ruleType in self.rules:
+      print '>>>[CMAR] Rule Type %s Number of Rules %s' % (ruleType, len(self.rules[ruleType]))
     
 
   def _clean_db(self, rule_type):
@@ -246,6 +257,25 @@ class CMAR:
     sqldao.execute( consts.SQL_DELETE_CMAR_RULES % (rule_type))
     sqldao.commit()
     sqldao.close()
+
+  def _count(self, specificRules, trainData):
+    '''
+    Input
+    - rules
+        specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support
+    Return {type:[(label, confidence)]}
+    '''
+    labelRsts = {}
+    for tbl, packages in trainData.iteritems():
+      for package in packages:
+        if package.host not in self.specificRules:
+          continue
+        rules = self.specificRules[package.host]
+        features = _get_package_f(package)[:-1]
+        for rule in rules:
+          if rule.issubset(features):
+            rule[package.app][consts.SUPPORT].add(tbl)
+    return specificRules
 
   def classify(self, package):
     '''
@@ -257,14 +287,14 @@ class CMAR:
       rst = consts.NULLPrediction
       max_confidence = 0
       if package.host in rules.keys():
-          for rule, label_confidence in rules[package.host].iteritems():
-              label, confidence = label_confidence
-              if rule.issubset(features): #and confidence > max_confidence:
-                max_confidence = confidence
-                rst = consts.Prediction(label, confidence, rule)
+        for rule, label_confidence in rules[package.host].iteritems():
+          label, confidence = label_confidence
+          if rule.issubset(features): #and confidence > max_confidence:
+            max_confidence = confidence
+            rst = consts.Prediction(label, confidence, rule)
 
       labelRsts[rule_type] = rst
-      if rule_type == consts.APP_RULE and rst != consts.NULLPrediction and rst.label != pkg.app:
-        print rst, pkg.app
+      if rule_type == consts.APP_RULE and rst != consts.NULLPrediction and rst.label != package.app:
+        print rst, package.app
         print '=' * 10
     return labelRsts
