@@ -7,6 +7,7 @@ from utils import loadfile, rever_map, agent_clean
 from itertools import imap
 from collections import defaultdict, namedtuple
 import const.consts as consts
+import re
 
 DEBUG_INDEX = None
 DEBUG_ITEM = 'Mrd/1.2.1 (Linux; U; Android 5.0.2; google Nexus 7) com.crossfield.casinogame_bingo/20'.lower()
