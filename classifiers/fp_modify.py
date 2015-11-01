@@ -15,7 +15,7 @@ Rule = namedtuple('Rule', 'rule, label, host, confidence, support')
 
 def _get_package_f(package):
     """Get package features"""
-    features = filter(None, map(lambda x: x.strip(), package.path.split('/')))
+    features = filter(lambda x : re.sub('[a-zA-Z]?[_]?[0-9]', '', x), map(lambda x: x.strip(), package.path.split('/')))
     if package.json : features += package.json
     # features.append(package.agent)
     host = package.host if package.host else package.dst
