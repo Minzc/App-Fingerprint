@@ -161,11 +161,12 @@ class HostApp(AbsClassifer):
     rst = {}
     for ruleType in self.rules:
       predict = consts.NULLPrediction
-      for url in [pkg.host]:
-        if pkg.host in self.rules[ruleType]:
-          label, support, regexObj = self.rules[ruleType][pkg.host]
-          if predict.score < support:
-            predict = consts.Prediction(label, support, (pkg.host, pkg.host, support))
+      if len(pkg.queries) == 0:
+        for url in [pkg.host]:
+          if pkg.host in self.rules[ruleType]:
+            label, support, regexObj = self.rules[ruleType][pkg.host]
+            if predict.score < support:
+              predict = consts.Prediction(label, support, (pkg.host, pkg.host, support))
           
       rst[ruleType] = predict
       if predict.label != pkg.app and predict.label != None:
