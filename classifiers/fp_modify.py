@@ -286,7 +286,7 @@ class CMAR(AbsClassifer):
     for rule_type, rules in self.rules.iteritems():
       rst = consts.NULLPrediction
       max_confidence = 0
-      if len(pkg.queries) == 0:
+      if len(package.queries) == 0:
         if package.host in rules.keys():
           for rule, label_confidence in rules[package.host].iteritems():
             label, confidence = label_confidence
