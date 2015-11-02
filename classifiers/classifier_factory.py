@@ -15,7 +15,7 @@ def classifier_factory(names, appType):
     elif name == consts.HOST_CLASSIFIER:
       classifier = HostApp(appType)
     elif name == consts.CMAR_CLASSIFIER:
-      classifier = CMAR(min_cover = 3)
+      classifier = CMAR(min_cover = 1)
     elif name == consts.KV_CLASSIFIER:
       classifier = KVClassifier(appType)
     classifiers.append((name, classifier))

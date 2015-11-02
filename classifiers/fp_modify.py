@@ -114,7 +114,7 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx, appIndx):
       itemset, support, tag_dist = frequent_pattern_info
       ruleStrSet = frozenset({featureIndx[itemcode] for itemcode in itemset})
       labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
-      if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
+      if tag_dist[labelIndex] * 1.0 / support >= tConfidence and len(ruleStrSet) == 1:
           confidence = max(tag_dist.values()) * 1.0 / support
           rules.add((ruleStrSet, confidence, support, appIndx[labelIndex]))
     
@@ -147,7 +147,7 @@ def _remove_duplicate(rawRules):
   return prunedRules
 
 
-def _prune_rules(tRules, trainData, min_cover = 3):
+def _prune_rules(tRules, trainData, min_cover = 1):
   '''
   Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
   Input packages: list of packets
@@ -175,7 +175,7 @@ def _prune_rules(tRules, trainData, min_cover = 3):
         if rule.issubset(features):
             tblSupport[rule].add(tbl)
 
-  tRules = sorted(tRules, key = lambda x : len(tblSupport[x]), reverse = True)
+  tRules = sorted(tRules, key = lambda x : (len(tblSupport[x]), 1000 - len(x[0])), reverse = True)
   specificRules = defaultdict(lambda : defaultdict(lambda : defaultdict(lambda : { consts.SCORE: 0, consts.SUPPORT: 0 })))
   for rule in tRules:
     ruleStrSet, confidence, support, classlabel = rule
@@ -192,7 +192,7 @@ def _prune_rules(tRules, trainData, min_cover = 3):
 
 
 class CMAR(AbsClassifer):
-  def __init__(self, min_cover=3, tSupport = 2, tConfidence = 1.0):
+  def __init__(self, min_cover=1, tSupport = 2, tConfidence = 1.0):
     # feature, app, host
     self.rules = defaultdict(lambda : defaultdict(lambda : defaultdict()))
     self.min_cover = min_cover
