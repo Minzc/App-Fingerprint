@@ -59,9 +59,9 @@ class CMAR(AbsClassifer):
         pathSegs = self._get_package_f(pkg)
         map(lambda pathSeg : self.pathLabel[pathSeg].add(label), pathSegs)
 
-    for label, pathSegs in self.pathLabel.iteritems():
-      pathSegsPrune = {pathSeg for pathSeg in pathSegs if len(self.pathLabel[pathSeg]) == 1}
-      map(lambda pathSeg : addCommonStr(pathSeg, self.fLib[pkg.app]), pathSegsPrune)
+    for pathSeg, labels in self.pathLabel.iteritems():
+      if len(labels) == 1:
+        addCommonStr(pathSeg, self.fLib[label])
   
   def checkCommonStr(self, label, pathSeg, expApp):
     for astr in self.fLib:
@@ -105,6 +105,7 @@ class CMAR(AbsClassifer):
       self.fLib[label] |= xmlFeatures[label]
       for feature in self.fLib[label]:
         featureCategory[feature].add(appInfo.company)
+    '''Only keep strings that are related to one category as features'''
     for label, features in self.fLib.iteritems():
       self.fLib[label] = {f for f in features if len(featureCategory[f]) == 1}
 
