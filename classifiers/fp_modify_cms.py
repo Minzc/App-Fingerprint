@@ -60,8 +60,8 @@ class CMAR(AbsClassifer):
         map(lambda pathSeg : self.pathLabel[pathSeg].add(label), pathSegs)
 
     for label, pathSegs in self.pathLabel.iteritems():
-      pathSegs = {pathSeg for pathSeg in pathSegs if len(self.pathLabel[pathSeg]) == 1}
-      map(lambda pathSeg : addCommonStr(pathSeg, self.fLib[pkg.app]), pathSegs)
+      pathSegsPrune = {pathSeg for pathSeg in pathSegs if len(self.pathLabel[pathSeg]) == 1}
+      map(lambda pathSeg : addCommonStr(pathSeg, self.fLib[pkg.app]), pathSegsPrune)
   
   def checkCommonStr(self, label, pathSeg, expApp):
     for astr in self.fLib:
