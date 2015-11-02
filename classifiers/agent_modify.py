@@ -155,8 +155,6 @@ class AgentClassifier(AbsClassifer):
     Compose regular expression
     '''
     appFeatureRegex = self._compose_regxobj(agentTuples)
-    if self.trainFrmData:
-      self._infer_from_xml(appFeatureRegex, agentTuples)
     
     '''
     Count regex
