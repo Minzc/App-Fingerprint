@@ -7,20 +7,22 @@ import re
 from const.app_info import AppInfos
 
 VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName', 'CFBundleURLSchemes'}
+STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName'}
 class AgentClassifier(AbsClassifer):
-  def __init__(self):
+  def __init__(self, trainFrmData = True):
     self.agentLabel = defaultdict(set)
     self.rules = defaultdict(dict)
     self.appFeatures = load_info_features(self._parse_xml)
+    self.trainFrmData = trainFrmData
 
   def _parse_xml(self, filePath):
     import plistlib
     plistObj = plistlib.readPlist(filePath)
-    features = set()
+    features = {}
     for key in VALID_FEATURES:
       if key in plistObj:
         value = unescape(plistObj[key].lower())
-        features.add(value)
+        features[key] = value
     return features
   
   def persist(self, patterns, ruleType):
@@ -72,29 +74,52 @@ class AgentClassifier(AbsClassifer):
     regex.add(r'\b' + re.escape(feature)+ r'\b')
     return regex
   
+  def _compose_regxobj2(self, agentTuples):
+    appFeatureRegex = defaultdict(lambda : {})
+    for app in self.appFeatures:
+      for f in self.appFeatures[app].values():
+        for feature in self._gen_features(f):
+          for regex in self._gen_regex(feature, app):
+            regexObj = re.compile(regex, re.IGNORECASE)
+            appFeatureRegex[app][regexObj.pattern] = regexObj
+    return appFeatureRegex
+
+
   def _compose_regxobj(self, agentTuples):
+    def _compile_regex():
+      for featureStr in self._gen_features(f):
+        for agent in agentTuples[app]:
+          if featureStr in agent.encode('utf-8'):
+            for regex in self._gen_regex(featureStr, app):
+              regexObj = re.compile(regex, re.IGNORECASE)
+              appFeatureRegex[app][regexObj.pattern] = regexObj
     '''
     Compose regular expression
     '''
     appFeatureRegex = defaultdict(lambda : {})
-    for app, agent in agentTuples:
-      for f in self.appFeatures[app]:
-        for feature in self._gen_features(f):
-          if feature in agent.encode('utf-8'):
-            for regex in self._gen_regex(feature, app):
+    for app, features in self.appFeatures.items():
+      for f in features.values():
+        if app not in agentTuples:
+          for featureStr in self._gen_features(f):
+            for regex in self._gen_regex(featureStr, app):
               regexObj = re.compile(regex, re.IGNORECASE)
               appFeatureRegex[app][regexObj.pattern] = regexObj
+        else:
+          _compile_regex()
 
-      if '/' in agent:
-        features = re.findall('^[a-zA-Z0-9][0-9a-zA-Z. %_\-:&?\']+/', agent)
-        if len(features) > 0:
-          feature = features[0]
-        regexObj = re.compile(r'^' + re.escape(feature), re.IGNORECASE)
-        try:
-          feature = feature.encode('utf-8')
-          appFeatureRegex[app]['#'+ feature] = regexObj
-        except:
-          pass
+    for app, agents in agentTuples.items():
+      for agent in agents:
+        if '/' in agent:
+          features = re.findall('^[a-zA-Z0-9][0-9a-zA-Z. %_\-:&?\']+/', agent)
+          if len(features) > 0:
+            feature = features[0]
+            regexObj = re.compile(r'^' + re.escape(feature), re.IGNORECASE)
+            try:
+              feature = feature.encode('utf-8')
+              appFeatureRegex[app]['#'+ feature] = regexObj
+            except:
+              pass
+
     return appFeatureRegex
     
   def _count(self, appFeatureRegex, appAgent):
@@ -105,6 +130,8 @@ class AgentClassifier(AbsClassifer):
     for app, agents in appAgent.items():
       for agent in agents:
         for predict, pattern, regexObj in flatten(appFeatureRegex):
+          if predict not in appAgent:
+            regexApp[regexObj.pattern].add(predict)
           if '#' in pattern:
             pattern = pattern.replace('#', '')
             if pattern in agent:
@@ -116,18 +143,20 @@ class AgentClassifier(AbsClassifer):
     return regexApp
 
   def train(self, trainSet, ruleType):
-    agentTuples = set()
+    agentTuples = defaultdict(set)
     appAgent = defaultdict(set)
     for tbl,pkgs in trainSet.items():
       for pkg in pkgs:
         label = pkg.label
         agent = pkg.agent
-        agentTuples.add((label, agent))
+        agentTuples[label].add( agent)
         appAgent[label].add(agent)
     '''
     Compose regular expression
     '''
     appFeatureRegex = self._compose_regxobj(agentTuples)
+    if self.trainFrmData:
+      self._infer_from_xml(appFeatureRegex, agentTuples)
     
     '''
     Count regex
