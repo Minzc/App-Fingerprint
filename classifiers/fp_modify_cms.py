@@ -22,8 +22,7 @@ class CMAR(AbsClassifer):
 
   def _get_package_f(self, package):
     """Get package features"""
-    features = filter(lambda x : re.sub('[a-zA-Z]?[_]?[0-9]', '', x) or x == package.appInfo.trackId
-        , map(lambda x: x.strip(), package.path.split('/')))
+    features = filter(None, map(lambda x: x.strip(), package.path.split('/')))
     if package.json : features += package.json
     return features
   
@@ -61,7 +60,7 @@ class CMAR(AbsClassifer):
 
     for pathSeg, labels in self.pathLabel.iteritems():
       if len(labels) == 1:
-        addCommonStr(pathSeg, self.fLib[label])
+        addCommonStr(pathSeg, self.fLib[labels.pop()])
   
   def checkCommonStr(self, label, pathSeg, expApp):
     for astr in self.fLib:
