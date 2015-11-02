@@ -286,12 +286,13 @@ class CMAR(AbsClassifer):
     for rule_type, rules in self.rules.iteritems():
       rst = consts.NULLPrediction
       max_confidence = 0
-      if package.host in rules.keys():
-        for rule, label_confidence in rules[package.host].iteritems():
-          label, confidence = label_confidence
-          if rule.issubset(features): #and confidence > max_confidence:
-            max_confidence = confidence
-            rst = consts.Prediction(label, confidence, rule)
+      if len(pkg.queries) == 0:
+        if package.host in rules.keys():
+          for rule, label_confidence in rules[package.host].iteritems():
+            label, confidence = label_confidence
+            if rule.issubset(features): #and confidence > max_confidence:
+              max_confidence = confidence
+              rst = consts.Prediction(label, confidence, rule)
 
       labelRsts[rule_type] = rst
       if rule_type == consts.APP_RULE and rst != consts.NULLPrediction and rst.label != package.app:
