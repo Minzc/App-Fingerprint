@@ -43,7 +43,7 @@ class CMAR(AbsClassifer):
       sqldao.close()
       print "Total Number of Rules is", len(rules)
 
-  def count(self, pkg):
+  def count(self, records):
     def addCommonStr(pathSeg, features):
       for string in features:
         commonStr = longest_common_substring(pathSeg.lower(), string.lower())
@@ -113,9 +113,7 @@ class CMAR(AbsClassifer):
     xmlFeatures = load_xml_features()
     expApp = {AppInfos.get(self.appType, label) for label in load_exp_app()[self.appType]}
     self._feature_lib(expApp, xmlFeatures)
-    for pkgs in records.values():
-      for pkg in pkgs:
-        self.count(pkg)
+    self.count(records)
     ########################
     # Generate Rules
     ########################
