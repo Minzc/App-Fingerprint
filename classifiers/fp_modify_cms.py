@@ -52,12 +52,16 @@ class CMAR(AbsClassifer):
           self.substrCompany[commonStr].add(pkg.company)
           self.pathCmmStr[label][pathSeg].add(commonStr)
 
-    label = pkg.label
-    appInfo = pkg.appInfo
-    pathSegs = self._get_package_f(pkg)
-    
-    map(lambda pathSeg : self.pathLabel[pathSeg].add(label), pathSegs)
-    map(lambda pathSeg : addCommonStr(pathSeg, self.fLib[pkg.app]), pathSegs)
+    for pkgs in records.values():
+      for pkg in pkgs:
+        label = pkg.label
+        appInfo = pkg.appInfo
+        pathSegs = self._get_package_f(pkg)
+        map(lambda pathSeg : self.pathLabel[pathSeg].add(label), pathSegs)
+
+    for label, pathSegs in self.pathLabel.iteritems():
+      pathSegs = {pathSeg for pathSeg in pathSegs if len(self.pathLabel[pathSeg]) == 1}
+      map(lambda pathSeg : addCommonStr(pathSeg, self.fLib[pkg.app]), pathSegs)
   
   def checkCommonStr(self, label, pathSeg, expApp):
     for astr in self.fLib:
@@ -84,6 +88,7 @@ class CMAR(AbsClassifer):
   
   def _feature_lib(self, expApp, xmlFeatures):
     self.fLib = defaultdict(set)
+    featureCategory = defaultdict(set)
     for appInfo in expApp:
       label = appInfo.package
       appSegs = appInfo.package.split('.')
@@ -98,6 +103,11 @@ class CMAR(AbsClassifer):
       self.fLib[label].add(appInfo.company)
       self.fLib[label].add(appInfo.category)
       self.fLib[label] |= xmlFeatures[label]
+      for feature in self.fLib[label]:
+        featureCategory[feature].add(appInfo.company)
+    for label, features in self.fLib.iteritems():
+      self.fLib[label] = {f for f in features if len(featureCategory[f]) == 1}
+
 
   def train(self, records, rule_type):
     xmlFeatures = load_xml_features()

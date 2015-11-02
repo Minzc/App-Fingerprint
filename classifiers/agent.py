@@ -34,7 +34,6 @@ class AgentClassifier(AbsClassifer):
     QUERY = consts.SQL_INSERT_AGENT_RULES
     params = []
     for regex, apps in patterns.iteritems():
-      print regex, apps
       if len(apps) == 1:
         app = list(apps)[0]
         params.append((app, 1, 1, regex, consts.APP_RULE))
