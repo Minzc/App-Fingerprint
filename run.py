@@ -9,7 +9,7 @@ from rules.rule_manager import RuleManager
 from classifiers.classifier_factory import classifier_factory
 
 
-LIMIT = 100
+LIMIT = None
 INSERT = False
 PRUNE = False
 
@@ -22,9 +22,9 @@ TRAIN_LABEL = {
 
 USED_CLASSIFIERS = [
     #consts.HEAD_CLASSIFIER,
-    consts.AGENT_CLASSIFIER,
+    #consts.AGENT_CLASSIFIER,
     #consts.HOST_CLASSIFIER,
-    #consts.CMAR_CLASSIFIER,
+    consts.CMAR_CLASSIFIER,
     #consts.KV_CLASSIFIER,
 ]
 
