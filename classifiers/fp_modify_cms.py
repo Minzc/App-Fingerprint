@@ -60,7 +60,9 @@ class CMAR(AbsClassifer):
 
     for pathSeg, labels in self.pathLabel.iteritems():
       if len(labels) == 1:
-        addCommonStr(pathSeg, self.fLib[labels.pop()])
+        label = labels.pop()
+        addCommonStr(pathSeg, self.fLib[label])
+        labels.add(label)
   
   def checkCommonStr(self, label, pathSeg, expApp):
     for astr in self.fLib:

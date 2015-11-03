@@ -157,6 +157,8 @@ class AgentClassifier(AbsClassifer):
     Compose regular expression
     '''
     appFeatureRegex = self._compose_regxobj(agentTuples)
+
+    print 'Infer From Data Is', self.inferFrmData
     if self.inferFrmData:
       self._infer_from_xml(appFeatureRegex, agentTuples)
     
