@@ -14,6 +14,7 @@ class AgentClassifier(AbsClassifer):
     self.rules = defaultdict(dict)
     self.appFeatures = load_info_features(self._parse_xml)
     self.inferFrmData = inferFrmData
+    self.sampleRate = sampleRate
 
   def _parse_xml(self, filePath):
     import plistlib
