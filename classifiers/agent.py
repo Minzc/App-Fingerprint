@@ -9,7 +9,7 @@ from const.app_info import AppInfos
 VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName', 'CFBundleURLSchemes'}
 STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName'}
 class AgentClassifier(AbsClassifer):
-  def __init__(self, inferFrmData = True):
+  def __init__(self, inferFrmData = True, sampleRate=1):
     self.agentLabel = defaultdict(set)
     self.rules = defaultdict(dict)
     self.appFeatures = load_info_features(self._parse_xml)
@@ -143,7 +143,12 @@ class AgentClassifier(AbsClassifer):
           for regex in self._gen_regex(featureStr, app):
             regexObj = re.compile(regex, re.IGNORECASE)
             appFeatureRegex[app][regexObj.pattern] = regexObj
- 
+  
+  def _sample_app(self, agentTuples, sampleRate):
+    import random
+    agentTuples = {app: agents for app, agent in agentTuples.iteritems() if random.uniform(0, 1) <= sampleRate}
+    return agentTuples
+
   def train(self, trainSet, ruleType):
     agentTuples = defaultdict(set)
     appAgent = defaultdict(set)
@@ -151,8 +156,15 @@ class AgentClassifier(AbsClassifer):
       for pkg in pkgs:
         label = pkg.label
         agent = pkg.agent
-        agentTuples[label].add( agent)
+        agentTuples[label].add(agent)
         appAgent[label].add(agent)
+
+    '''
+    Sample Apps
+    '''
+    agentTuples = self._sample_app(agentTuples, self.sampleRate)
+    print 'Number of training apps', len(agentTuples)
+
     '''
     Compose regular expression
     '''
