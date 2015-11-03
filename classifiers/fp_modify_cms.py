@@ -137,7 +137,7 @@ class CMAR(AbsClassifer):
 
         if ifValidRule:
           interestedPathSegs[rule_type][pathSeg] = label
-          print '>>', pathSeg, commonStr, label
+          print '>>', pathSeg.encode('utf-8'), commonStr.encode('utf-8'), label
 
         if pathSeg in test_str:
           print 'Rule Type is', rule_type, ifValidRule, pathSeg 
