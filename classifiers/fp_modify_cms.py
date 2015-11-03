@@ -108,7 +108,7 @@ class CMAR(AbsClassifer):
         featureCategory[feature].add(appInfo.company)
     '''Only keep strings that are related to one category as features'''
     for label, features in self.fLib.iteritems():
-      self.fLib[label] = {f for f in features if len(featureCategory[f]) == 1}
+      self.fLib[label] = {f for f in features if len(featureCategory[f]) != 1}
 
 
   def train(self, records, rule_type):
@@ -137,6 +137,7 @@ class CMAR(AbsClassifer):
 
         if ifValidRule:
           interestedPathSegs[rule_type][pathSeg] = label
+          print '>>', pathSeg, commonStr, label
 
         if pathSeg in test_str:
           print 'Rule Type is', rule_type, ifValidRule, pathSeg 
