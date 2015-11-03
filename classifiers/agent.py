@@ -100,7 +100,8 @@ class AgentClassifier(AbsClassifer):
     appFeatureRegex = defaultdict(lambda : {})
     for app, features in self.appFeatures.items():
       for f in features.values():
-        _compile_regex()
+        if app in agentTuples:
+          _compile_regex()
 
     for app, agents in agentTuples.items():
       for agent in agents:
@@ -147,7 +148,7 @@ class AgentClassifier(AbsClassifer):
   
   def _sample_app(self, agentTuples, sampleRate):
     import random
-    agentTuples = {app: agents for app, agent in agentTuples.iteritems() if random.uniform(0, 1) <= sampleRate}
+    agentTuples = {app: agents for app, agents in agentTuples.iteritems() if random.uniform(0, 1) <= sampleRate}
     return agentTuples
 
   def train(self, trainSet, ruleType):
