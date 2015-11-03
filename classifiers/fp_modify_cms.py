@@ -16,6 +16,7 @@ class CMAR(AbsClassifer):
     self.tSupport = tSupport
     self.tConfidence = tConfidence
     self.pathLabel = defaultdict(set)
+    self.pathTable = defaultdict(set)
     self.substrCompany = defaultdict(set)
     self.appType = consts.IOS
     self.pathCmmStr = defaultdict(lambda : defaultdict(set))
@@ -51,15 +52,16 @@ class CMAR(AbsClassifer):
           self.substrCompany[commonStr].add(pkg.company)
           self.pathCmmStr[label][pathSeg].add(commonStr)
 
-    for pkgs in records.values():
+    for tbl, pkgs in records.iteritems():
       for pkg in pkgs:
         label = pkg.label
         appInfo = pkg.appInfo
         pathSegs = self._get_package_f(pkg)
         map(lambda pathSeg : self.pathLabel[pathSeg].add(label), pathSegs)
+        map(lambda pathSeg : self.pathTable[pathSeg].add(tbl), pathSegs)
 
     for pathSeg, labels in self.pathLabel.iteritems():
-      if len(labels) == 1:
+      if len(labels) == 1 and len(self.pathTable[pathSeg]) > 2:
         label = labels.pop()
         addCommonStr(pathSeg, self.fLib[label])
         labels.add(label)
