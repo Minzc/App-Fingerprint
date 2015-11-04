@@ -219,7 +219,7 @@ class KVClassifier(AbsClassifer):
     for tbl, pkg, k, v in self.iterate_traindata(trainData):
       apps.add(pkg.app)
     apps = {app for app in apps if random.uniform(0, 1) <= self.sampleRate}
-    for tbl, pkgs in trainData:
+    for tbl, pkgs in trainData.items():
       pkgs = [pkg for pkg in pkgs if pkg.app in apps]
       trainData[tbl] = pkgs
     return trainData
