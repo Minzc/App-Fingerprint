@@ -14,7 +14,7 @@ class KVClassifier(AbsClassifer):
     self.name = consts.KV_CLASSIFIER
     self.compressedDB = {}
     self.compressedDB[consts.APP_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
-    self.featureCompanyTbl = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
+    self.compressedDB[consts.COMPANY_RULE] = defaultdict(lambda : defaultdict( lambda : defaultdict( lambda : defaultdict(set))))
     self.valueAppCounter = defaultdict(set)
     self.valueCompanyCounter = defaultdict(set)
     self.appCompanyRelation = {}
@@ -231,8 +231,8 @@ class KVClassifier(AbsClassifer):
 
     highConfRules = set()
     for tbl, pkg, k, v in self.iterate_traindata(trainData):
-      self.featureAppTbl[pkg.secdomain][k][pkg.label][v].add(tbl)
-      self.featureCompanyTbl[pkg.secdomain][k][pkg.company][v].add(tbl)
+      self.compressedDB[consts.APP_RULE][pkg.secdomain][k][pkg.label][v].add(tbl)
+      self.compressedDB[consts.COMPANY_RULE][pkg.secdomain][k][pkg.company][v].add(tbl)
       self.valueAppCounter[v].add(pkg.label)
       self.valueCompanyCounter[v].add(pkg.company)
       self.appCompanyRelation[pkg.app] = pkg.company
@@ -242,8 +242,8 @@ class KVClassifier(AbsClassifer):
     ##################
     # Count
     ##################
-    appKeyScore = self._count(self.featureAppTbl, self.valueAppCounter)
-    companyKeyScore = self._count(self.featureCompanyTbl, self.valueCompanyCounter)
+    appKeyScore = self._count(self.compressedDB[consts.APP_RULE], self.valueAppCounter)
+    companyKeyScore = self._count(self.compressedDB[consts.COMPANY_RULE], self.valueCompanyCounter)
     #############################
     # Generate interesting keys
     #############################
