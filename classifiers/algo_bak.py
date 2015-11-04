@@ -21,7 +21,14 @@ class KVClassifier(AbsClassifer):
     self.companyAppRelation = defaultdict(set)
     self.rules = {}
     self.appType = appType
-    self.xmlFeatures = load_xml_features()
+    #self.xmlFeatures = load_xml_features()
+    xmlFeatures = load_xml_features()
+    self.xmlValueField = defaultdict(defaultdict(set))
+    self.xmlFieldValues = defaultdict(defaultdict(set))
+    for app in self.xmlFeatures:
+      for k,v in self.xmlFeatures[app]:
+        self.xmlFieldValues[app][k].add(v)
+        self.xmlValueField[app][v].add(k)
     self.inferFrmData = inferFrmData
     self.sampleRate = sampleRate
 
@@ -194,7 +201,7 @@ class KVClassifier(AbsClassifer):
     highConfRules = defaultdict(lambda : defaultdict(set))
     matchedHighConfRules = defaultdict(lambda : defaultdict(lambda : defaultdict(set)))
     for tbl, pkg, k, v in self.iterate_traindata(trainData):
-      if v in self.xmlFeatures[pkg.app].values() and if_version(v) == False:
+      if v in self.xmlValueField[pkg.app] and if_version(v) == False:
         highConfRules[(pkg.host, k)][v].add(pkg.app)
         matchedHighConfRules[(pkg.host, k)][v][pkg.app].add(tbl)
         highConfRules[(pkg.secdomain, k)][v].add(pkg.app)
