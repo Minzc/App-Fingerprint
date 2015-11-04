@@ -182,6 +182,7 @@ class KVClassifier(AbsClassifer):
   def _compare(self, matchedHighConfRules, specificRules):
     for rule in matchedHighConfRules:
       for v in matchedHighConfRules[rule]:
+        print v
         if if_version(v) == True:
           continue
         for app in matchedHighConfRules[rule][v].keys():
