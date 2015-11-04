@@ -184,7 +184,7 @@ class KVClassifier(AbsClassifer):
       for v in matchedHighConfRules[rule]:
         if if_version(v) == True:
           continue
-        for app in matchedHighConfRules[rule][v]:
+        for app in matchedHighConfRules[rule][v].keys():
           host, key = rule
           if app not in specificRules[host][key][v]:
             print '[NOT IN]', host, key, v, app
