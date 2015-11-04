@@ -186,7 +186,7 @@ class KVClassifier(AbsClassifer):
           host, key = rule
           secdomain = hostSec[host]
           labelNum = len(appKeyScore[secdomain][key][consts.LABEL])
-          score = keyScore[secdomain][key][consts.SCORE]
+          score = appKeyScore[secdomain][key][consts.SCORE]
           if app not in specificRules[host][key][v]:
             print '[NOT IN]', host, key, v, app, labelNum, score
 
