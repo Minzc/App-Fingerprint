@@ -308,40 +308,40 @@ def load_xml_features():
 def _parse_xml2(filePath):
   import plistlib
   plistObj = plistlib.readPlist(filePath)
-  def _flat(plistObj):
+  def _flat(plistObj, parent):
     values = set()
     if type(plistObj) == plistlib._InternalDict:
       for key, value in plistObj.items():
         if type(value) == list:
-          values |= _flat(value)
+          values |=  _flat( value, parent+'_'+key) 
         elif type(value) == plistlib._InternalDict:
-          values |= _flat(value)
+          values |=  _flat( value, parent+'_'+key) 
         elif type(value) == str:
           value = value.lower()
-          values.add(value)
+          values.add( (parent+'_'+key, value) )
         elif type(value) == unicode:
           value = value.encode('utf-8')
           value = value.lower()
-          values.add(value)
+          values.add( (parent+'_'+key, value) )
         else:
           pass
     elif type(plistObj) == list:
       for value in plistObj:
         if type(value) == list:
-          values |= _flat(value)
+          values |= _flat( value, parent)
         elif type(value) == plistlib._InternalDict:
-          values |= _flat(value)
+          values |= _flat( value, parent)
         elif type(value) == str:
           value = value.lower()
-          values.add(value)
+          values.add( (parent, value) )
         elif type(value) == unicode:
           value = value.encode('utf-8')
           value = value.lower()
-          values.add(value)
+          values.add( (parent, value) )
         else:
           pass
     return values
-  values = _flat(plistObj)
+  values = _flat(plistObj,'')
   return values
 
 def if_version(v):
