@@ -179,15 +179,16 @@ class KVClassifier(AbsClassifer):
     #           specificRules[consts.APP_RULE][host][key][value][';'.join(self.companyAppRelation[company])] = scores
     return specificRules
 
-  def _compare(self, matchedHighConfRules, specificRules):
+  def _compare(self, matchedHighConfRules, specificRules, hostSec, appKeyScore):
     for rule in matchedHighConfRules:
       for v in matchedHighConfRules[rule]:
-        if if_version(v) == True:
-          continue
         for app in matchedHighConfRules[rule][v].keys():
           host, key = rule
+          secdomain = hostSec[host]
+          labelNum = len(appKeyScore[secdomain][key][consts.LABEL])
+          score = keyScore[secdomain][key][consts.SCORE]
           if app not in specificRules[host][key][v]:
-            print '[NOT IN]', host, key, v, app
+            print '[NOT IN]', host, key, v, app, labelNum, score
 
   def iterate_traindata(self, trainData):
     for tbl in trainData.keys():
@@ -200,12 +201,14 @@ class KVClassifier(AbsClassifer):
   def _gen_high_confrules(self, trainData):
     highConfRules = defaultdict(lambda : defaultdict(set))
     matchedHighConfRules = defaultdict(lambda : defaultdict(lambda : defaultdict(set)))
+    hostSec = {}
     for tbl, pkg, k, v in self.iterate_traindata(trainData):
-      if v in self.xmlValueField[pkg.app] and if_version(v) == False:
+      if v in self.xmlValueField[pkg.app] and if_version(v) == False and len(self.valueAppCounter[v]) == 1:
         highConfRules[(pkg.host, k)][v].add(pkg.app)
         matchedHighConfRules[(pkg.host, k)][v][pkg.app].add(tbl)
         highConfRules[(pkg.secdomain, k)][v].add(pkg.app)
-    return highConfRules, matchedHighConfRules
+        hostSec[pkg.host] = pkg.secdomain
+    return highConfRules, matchedHighConfRules, hostSec
 
   def gen_specific_rules_xml(self, matchedHighConfRules, specificRules):
     '''
@@ -245,7 +248,7 @@ class KVClassifier(AbsClassifer):
       self.appCompanyRelation[pkg.app] = pkg.company
       self.companyAppRelation[pkg.company].add(pkg.app)
 
-    highConfRules, matchedHighConfRules = self._gen_high_confrules(trainData)
+    highConfRules, matchedHighConfRules, hostSec = self._gen_high_confrules(trainData)
     ##################
     # Count
     ##################
@@ -274,7 +277,7 @@ class KVClassifier(AbsClassifer):
     # Persist rules
     #############################
     self.persist(specificRules, rule_type)
-    self._compare(matchedHighConfRules, appSpecificRules)
+    self._compare(matchedHighConfRules, appSpecificRules, hostSec)
     self.__init__(self.appType)
     return self
 
