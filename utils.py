@@ -301,7 +301,7 @@ def load_xml_features():
       trackId = f[0:-4]
       app = AppInfos.get(consts.IOS, trackId).package
       features = _parse_xml2(filePath )
-      features.add(app)
+      features.add( ('PACKAGE_NAME', app) )
       appFeatures[app] = features
   return appFeatures
 
