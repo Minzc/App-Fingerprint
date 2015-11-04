@@ -23,8 +23,8 @@ class KVClassifier(AbsClassifer):
     self.appType = appType
     #self.xmlFeatures = load_xml_features()
     xmlFeatures = load_xml_features()
-    self.xmlValueField = defaultdict(defaultdict(set))
-    self.xmlFieldValues = defaultdict(defaultdict(set))
+    self.xmlValueField = defaultdict(lambda : defaultdict(set))
+    self.xmlFieldValues = defaultdict(lambda : defaultdict(set))
     for app in self.xmlFeatures:
       for k,v in self.xmlFeatures[app]:
         self.xmlFieldValues[app][k].add(v)
