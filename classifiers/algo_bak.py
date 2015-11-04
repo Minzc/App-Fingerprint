@@ -21,8 +21,8 @@ class KVClassifier(AbsClassifer):
     self.companyAppRelation = defaultdict(set)
     self.rules = {}
     self.appType = appType
-    #self.xmlFeatures = load_xml_features()
-    xmlFeatures = load_xml_features()
+    self.xmlFeatures = load_xml_features()
+    #xmlFeatures = load_xml_features()
     self.xmlValueField = defaultdict(lambda : defaultdict(set))
     self.xmlFieldValues = defaultdict(lambda : defaultdict(set))
     for app in self.xmlFeatures:
