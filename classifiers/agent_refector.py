@@ -1,3 +1,4 @@
+# -*- encoding = utf-8 -*-
 from utils import unescape, flatten, load_info_features
 from sqldao import SqlDao
 from collections import defaultdict
@@ -102,9 +103,9 @@ class AgentClassifier(AbsClassifer):
                 if len(matchStrs) > 0:
                     regexStr = r'^' + re.escape(matchStrs[0])
                     if regexStr not in appFeatureRegex[app]:
-                        regexObj = re.compile(regexStr, re.IGNORECASE)
                         try:
                             featureStr = matchStrs[0].encode('utf-8')
+                            regexObj = re.compile(regexStr, re.IGNORECASE)
                             appFeatureRegex[app][regexStr] = regexObj
                             self.regexfeatureStr[regexStr] = featureStr
                         except:
