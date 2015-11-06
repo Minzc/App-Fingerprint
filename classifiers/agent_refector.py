@@ -150,7 +150,7 @@ class AgentClassifier(AbsClassifer):
                 covered = set()
                 for predict, pattern, regexObj in fAppFeatureRegex:
                     featureStr = self.regexfeatureStr[pattern]
-                    if featureStr not in agent.decode('utf-8') and featureStr not in app:
+                    if featureStr not in agent and featureStr not in app:
                         print '[DEBUG]', self.regexfeatureStr[pattern], app
                         continue
                     if pattern in covered or regexObj.search(agent) or regexObj.search(app):
