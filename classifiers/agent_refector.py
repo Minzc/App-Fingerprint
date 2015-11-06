@@ -29,7 +29,7 @@ class AgentClassifier(AbsClassifer):
         features = {}
         for key in VALID_FEATURES:
             if key in plistObj:
-                value = unescape(plistObj[key].lower())
+                value = unescape(plistObj[key].lower().decode('utf-8'))
                 features[key] = value
         return features
 
