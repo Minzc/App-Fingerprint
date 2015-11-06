@@ -381,8 +381,8 @@ def if_version(v):
 def flatten(d):
     import collections
     '''
-  Flat nested dictionary to lists
-  '''
+    Flat nested dictionary to lists
+    '''
     items = []
     for k, v in d.items():
         if isinstance(v, collections.MutableMapping):

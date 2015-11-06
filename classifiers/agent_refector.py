@@ -29,7 +29,9 @@ class AgentClassifier(AbsClassifer):
         features = {}
         for key in VALID_FEATURES:
             if key in plistObj:
-                value = unescape(plistObj[key].lower().decode('utf-8'))
+                if type(plistObj[key]) !=  unicode:
+                    value = plistObj[key].decode('ascii')
+                value = unescape(value.lower())
                 features[key] = value
         return features
 
@@ -66,7 +68,6 @@ class AgentClassifier(AbsClassifer):
         """
         import urllib
         featureSet = set()
-        f = f.encode('utf-8')
         featureSet.add(f)
         featureSet.add(urllib.quote(f))
         featureSet.add(f.replace(' ', '%20'))
@@ -76,6 +77,8 @@ class AgentClassifier(AbsClassifer):
         return featureSet
 
     def _gen_regex(self, featureStr):
+        if featureStr == u'A4A Radar'.lower():
+            print featureStr
         regex = []
         regexStr1 = r'^' + re.escape(featureStr + '/')
         regexStr2 = r'\b' + re.escape(featureStr) + r' \b[vr]?[0-9.]+\b'
@@ -98,13 +101,15 @@ class AgentClassifier(AbsClassifer):
                     self.regexfeatureStr[regexStr] = featureStr
                     regexObj = re.compile(regexStr, re.IGNORECASE)
                     appFeatureRegex[app][regexStr] = regexObj
+                    if 'vuduplayer' in regexStr:
+                        print regexStr, regexStr in self.regexfeatureStr
             for agent in filter(lambda x: '/' in x, agents):
                 matchStrs = re.findall(r'^[a-zA-Z0-9][0-9a-zA-Z. _\-:&?\'%]+/', agent)
                 if len(matchStrs) > 0:
                     regexStr = r'^' + re.escape(matchStrs[0])
                     if regexStr not in appFeatureRegex[app]:
                         try:
-                            featureStr = matchStrs[0].encode('utf-8')
+                            featureStr = matchStrs[0]
                             regexObj = re.compile(regexStr, re.IGNORECASE)
                             appFeatureRegex[app][regexStr] = regexObj
                             self.regexfeatureStr[regexStr] = featureStr
@@ -130,7 +135,7 @@ class AgentClassifier(AbsClassifer):
         def sortPattern(regexTuples):
             _, f, _ = regexTuples
             if f in self.regexCover:
-                return len(self.regexCover)
+                return len(self.regexCover[f])
             else:
                 return 0
 
@@ -151,7 +156,6 @@ class AgentClassifier(AbsClassifer):
                 for predict, pattern, regexObj in fAppFeatureRegex:
                     featureStr = self.regexfeatureStr[pattern]
                     if featureStr not in agent and featureStr not in app:
-                        print '[DEBUG]', self.regexfeatureStr[pattern], app
                         continue
                     if pattern in covered or regexObj.search(agent) or regexObj.search(app):
                         regexApp[regexObj.pattern].add(app)
@@ -165,7 +169,8 @@ class AgentClassifier(AbsClassifer):
                 for featureStr in self._gen_features(f):
                     for regex in self._gen_regex(featureStr):
                         regexObj = re.compile(regex, re.IGNORECASE)
-                        appFeatureRegex[app][regexObj.pattern] = regexObj
+                        appFeatureRegex[app][regex] = regexObj
+                        self.regexfeatureStr[regex] = featureStr
 
     @staticmethod
     def _sample_app(agentTuples, sampleRate):
@@ -184,14 +189,14 @@ class AgentClassifier(AbsClassifer):
                 appAgent[label].add(agent)
 
         '''
-    Sample Apps
-    '''
+        Sample Apps
+        '''
         agentTuples = self._sample_app(agentTuples, self.sampleRate)
         print 'Number of training apps', len(agentTuples)
 
         '''
-    Compose regular expression
-    '''
+        Compose regular expression
+        '''
         appFeatureRegex = self._compose_regxobj(agentTuples)
 
         print 'Infer From Data Is', self.inferFrmData
@@ -199,8 +204,8 @@ class AgentClassifier(AbsClassifer):
             self._infer_from_xml(appFeatureRegex, agentTuples)
 
         '''
-    Count regex
-    '''
+        Count regex
+        '''
         regexApp = self._count(appFeatureRegex, appAgent)
 
         self.persist(regexApp, consts.APP_RULE)
