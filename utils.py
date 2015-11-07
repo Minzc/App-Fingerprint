@@ -213,10 +213,10 @@ def load_pkgs(DB, appType, limit, filterFunc=lambda x: True):
     for pkgid, app, add_header, path, refer, host, agent, dst, raw in sqldao.execute(QUERY):
         package = Package()
         package.set_app(app)
-        package.set_path(path)
+        package.set_path(path.decode('utf-8'))
         package.set_id(pkgid)
         package.set_add_header(add_header)
-        package.set_refer(refer)
+        package.set_refer(refer.decode('utf-8'))
         package.set_host(host)
         package.set_agent(agent.decode('utf-8'))
         package.set_dst(dst)
@@ -262,8 +262,8 @@ def load_exp_app():
 
 def suffix_tree(apps):
     """
-  Build app pkg names' suffix tree
-  """
+    Build app pkg names' suffix tree
+    """
 
     class node:
         def __init__(self, value):
@@ -324,7 +324,7 @@ def load_xml_features():
             trackId = f[0:-4]
             app = AppInfos.get(consts.IOS, trackId).package
             features = _parse_xml2(filePath)
-            features.add(('PACKAGE_NAME', app))
+            features.add((u'PACKAGE_NAME', app))
             appFeatures[app] = features
     return appFeatures
 
@@ -337,15 +337,18 @@ def _parse_xml2(filePath):
         values = set()
         if type(plistObj) == plistlib._InternalDict:
             for key, value in plistObj.items():
+                if type(key) != unicode:
+                    key = key.decode('ascii')
+
                 if type(value) == list:
                     values |= _flat(value, parent + '_' + key)
                 elif type(value) == plistlib._InternalDict:
                     values |= _flat(value, parent + '_' + key)
                 elif type(value) == str:
-                    value = value.lower()
+                    value = value.decode('ascii').lower()
                     values.add((parent + '_' + key, value))
                 elif type(value) == unicode:
-                    value = value.encode('utf-8')
+                    value = value
                     value = value.lower()
                     values.add((parent + '_' + key, value))
                 else:
@@ -360,7 +363,7 @@ def _parse_xml2(filePath):
                     value = value.lower()
                     values.add((parent, value))
                 elif type(value) == unicode:
-                    value = value.encode('utf-8')
+                    value = value
                     value = value.lower()
                     values.add((parent, value))
                 else:

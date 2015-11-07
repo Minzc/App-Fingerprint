@@ -66,6 +66,11 @@ class KVClassifier(AbsClassifer):
                 if ifKeepRule[0]:
                     rule = consts.Rule(host, iKey, ruleScores[(host, iKey)], ruleLabelNum[(host, iKey)])
                     prunedGenRules[host].append(rule)
+
+        for host, rules in prunedGenRules.items():
+            prunedGenRules[host] = sorted(rules, key = lambda x: x[2], reverse=True)
+            if len(prunedGenRules[host]) > 2:
+                prunedGenRules[host] = prunedGenRules[host][:2]
         return prunedGenRules
 
     @staticmethod
@@ -85,10 +90,6 @@ class KVClassifier(AbsClassifer):
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for secdomain, k, label, v, tbls in flatten(featureTbl):
             cleanedK = k.replace("\t", "")
-            if cleanedK == 'kt_v':
-                print if_version(v)
-                print len(valueLabelCounter[v])
-                print v
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 keyScore[secdomain][cleanedK][consts.SCORE] += \
                     (len(tbls) - 1) / float(len(featureTbl[secdomain][k][label]) * len(featureTbl[secdomain][k]))
@@ -121,7 +122,7 @@ class KVClassifier(AbsClassifer):
             for key in keyScore[secdomain]:
                 labelNum = len(keyScore[secdomain][key][consts.LABEL])
                 score = keyScore[secdomain][key][consts.SCORE]
-                if (labelNum == 1 and (secdomain, key) not in xmlGenRules) or score <= 0.5:
+                if labelNum == 1  or score <= 0.5:
                     continue
                 generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
         for secdomain in generalRules:
