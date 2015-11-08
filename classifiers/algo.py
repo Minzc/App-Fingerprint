@@ -49,7 +49,7 @@ class KVClassifier(AbsClassifer):
             for i in range(len(keyNcoveredIds)):
                 ifKeepRule = (True, None)
                 iKey, iCoveredIds = keyNcoveredIds[i]
-                if (host, iKey) not in xmlGenRules:
+                if (host, iKey) not in xmlGenRules and ruleScores[(host, iKey)] < 1:
                     ifKeepRule = (False, None, '3')
                 ''' Prune by coverage '''
                 for j in range(i + 1, len(keyNcoveredIds)):
@@ -57,6 +57,8 @@ class KVClassifier(AbsClassifer):
                     if ruleScores[(host, iKey)] < ruleScores[(host, jKey)]:
                         if iCoveredIds.issubset(jCoveredIds) and (host, iKey) not in xmlGenRules:
                             ifKeepRule = (False, jKey, '1')
+                if iKey == 'app_name':
+                    print ifKeepRule, host, ruleScores[(host, iKey)], ruleScores[(host, jKey)]
                 ''' Prune by believing xml rules'''
                 # for j in range(1, len(keyNcoveredIds)):
                 #     jKey, jCoveredIds = keyNcoveredIds[j]
@@ -105,12 +107,9 @@ class KVClassifier(AbsClassifer):
     #   return ifValid
 
     @staticmethod
-    def _generate_keys(keyScore, xmlGenRules):
+    def _generate_keys(keyScore):
         """
         Find interesting ( secdomain, key ) pairs
-        Input
-        :param keyScore : scores for ( secdomain, key ) pairs
-
         Output
         :return generalRules :
             Rule = ( secdomain, key, score, labelNum ) defined in consts/consts.py
@@ -285,8 +284,8 @@ class KVClassifier(AbsClassifer):
         #############################
         # Generate interesting keys
         #############################
-        appGeneralRules = self._generate_keys(appKeyScore, xmlGenRules)
-        companyGeneralRules = self._generate_keys(companyKeyScore, xmlGenRules)
+        appGeneralRules = self._generate_keys(appKeyScore)
+        companyGeneralRules = self._generate_keys(companyKeyScore)
         #############################
         # Pruning general rules
         #############################

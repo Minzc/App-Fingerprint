@@ -33,6 +33,7 @@ class HostApp(AbsClassifer):
         def addCommonStr(url, label, string):
             common_str = longest_common_substring(url.lower(), string.lower())
             common_str = common_str.strip('.')
+            print common_str, url, string, label
             if len(common_str) > 3:
                 self.substrCompany[common_str].add(label)
 
