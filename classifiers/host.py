@@ -48,9 +48,9 @@ class HostApp(AbsClassifer):
             print '>>>[HOST] ERROR app is', pkg.app
             return
 
-        self.labelAppInfo[pkg.label] = (pkg.app, pkg.company, pkg.category)
+        self.labelAppInfo[pkg.label] = (pkg.website)
         map(lambda url: self.urlLabel[url].add(pkg.label), [top_domain, host, refer_host, refer_top_domain])
-        map(lambda string: addCommonStr(host, pkg.label, string), [pkg.app, pkg.company, pkg.name, pkg.website])
+        map(lambda string: addCommonStr(host, pkg.label, string), [pkg.website])
 
     def checkCommonStr(self, label, url):
         for astr in self.labelAppInfo[label]:
@@ -181,22 +181,4 @@ class HostApp(AbsClassifer):
             rst[ruleType] = predict
             if predict.label != pkg.app and predict.label is not None:
                 print predict.evidence, pkg.app, predict.label
-        return rst
-
-    def classify2(self, pkg):
-        rst = {}
-        for ruleType in self.rules:
-            host = pkg.host.replace('-', '.')
-            secdomain = pkg.secdomain.replace('-', '.')
-            refer_host = pkg.refer_host
-            refer_top_domain = get_top_domain(refer_host)
-            predict = consts.NULLPrediction
-            for url in [host, secdomain, refer_host, refer_top_domain]:
-                labelNsupport = self.rules[ruleType].get(url, None)
-                if labelNsupport is not None:
-                    label, support = labelNsupport
-                    predict = consts.Prediction(label, 1, url)
-                    break
-
-            rst[ruleType] = predict
         return rst
