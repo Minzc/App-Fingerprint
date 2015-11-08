@@ -33,7 +33,7 @@ class HostApp(AbsClassifer):
         def addCommonStr(url, label, string):
             common_str = longest_common_substring(url.lower(), string.lower())
             common_str = common_str.strip('.')
-            if len(common_str) > 3 or (common_str in self.fLib[label] and len(common_str) > 1):
+            if len(common_str) > 3:
                 self.substrCompany[common_str].add(label)
 
         appInfo = pkg.appInfo
@@ -60,7 +60,7 @@ class HostApp(AbsClassifer):
                 print common_str, url
                 print self.substrCompany[common_str], url
             subCompanyLen = len(self.substrCompany[common_str])
-            strValid = True if common_str in self.fLib[label] and len(common_str) > 1 else False
+            strValid = True if len(common_str) > 1 else False
             companyValid = True if 5 > subCompanyLen > 0 else False
 
             if companyValid and strValid:

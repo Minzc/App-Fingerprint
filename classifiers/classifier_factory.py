@@ -17,7 +17,7 @@ def classifier_factory(names, appType):
     elif name == consts.CMAR_CLASSIFIER:
       classifier = CMAR(min_cover = 1)
     elif name == consts.KV_CLASSIFIER:
-      classifier = KVClassifier(appType, inferFrmData = False, sampleRate = 2)
+      classifier = KVClassifier(appType, inferFrmData = True, sampleRate = 0.5)
     classifiers.append((name, classifier))
   return classifiers
 
