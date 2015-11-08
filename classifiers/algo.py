@@ -241,6 +241,7 @@ class KVClassifier(AbsClassifer):
         return trainData, apps - sampledApps
 
     def _infer_from_xml(self, specificRules, xmlGenRules, rmApps):
+        print 'Start Infering'
         interestedXmlRules = defaultdict(set)
         for rule in xmlGenRules:
             host, key = rule
@@ -253,6 +254,7 @@ class KVClassifier(AbsClassifer):
                     value = self.xmlFeatures[app][fieldName]
                     for rule in interestedXmlRules[fieldName]:
                         host, key = rule
+                        print 'Infer One Rule', host, key, valye, app
                         specificRules[host][key][value][app][consts.SCORE] = 1.0
                         specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
         return specificRules
@@ -297,7 +299,7 @@ class KVClassifier(AbsClassifer):
         #############################
         appSpecificRules = self._generate_rules(trainData, appGeneralRules, self.valueLabelCounter[consts.APP_RULE],
                                                 consts.APP_RULE)
-        # appSpecificRules = self.gen_specific_rules_xml( xmlSpecificRules, appSpecificRules)
+        #appSpecificRules = self.gen_specific_rules_xml( xmlSpecificRules, appSpecificRules)
 
         print 'Infer from data', self.inferFrmData
 
