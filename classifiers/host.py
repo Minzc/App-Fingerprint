@@ -46,7 +46,7 @@ class HostApp(AbsClassifer):
             return
 
 
-        self.labelAppInfo[pkg.label] = (pkg.website)
+        self.labelAppInfo[pkg.label] = [pkg.website]
         map(lambda url: self.urlLabel[url].add(pkg.label), [top_domain, host, refer_host, refer_top_domain])
         map(lambda string: addCommonStr(host, pkg.label, string), [pkg.website])
 
@@ -55,7 +55,7 @@ class HostApp(AbsClassifer):
             common_str = longest_common_substring(url.lower(), astr.lower())
             common_str = common_str.strip('.')
             if url in test_str:
-                print common_str, url
+                print common_str, url,astr
                 print self.substrCompany[common_str], url
             subCompanyLen = len(self.substrCompany[common_str])
             strValid = True if len(common_str) > 1 else False
