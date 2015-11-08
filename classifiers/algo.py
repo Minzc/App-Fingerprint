@@ -93,8 +93,9 @@ class KVClassifier(AbsClassifer):
         for secdomain, k, label, v, tbls in flatten(featureTbl):
             cleanedK = k.replace("\t", "")
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
+                numOfValues = len(featureTbl[secdomain][k][label])
                 keyScore[secdomain][cleanedK][consts.SCORE] += \
-                    (len(tbls) - 1) / float(len(featureTbl[secdomain][k][label]) * len(featureTbl[secdomain][k]))
+                    (len(tbls) - 1) / float( numOfValues * numOfValues * len(featureTbl[secdomain][k]))
                 keyScore[secdomain][cleanedK][consts.LABEL].add(label)
 
         return keyScore

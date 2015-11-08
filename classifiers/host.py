@@ -6,7 +6,7 @@ from const.app_info import AppInfos
 from classifier import AbsClassifer
 import re
 
-test_str = {}
+test_str = {'edgerift', 'yogurt.land.com'}
 
 
 class HostApp(AbsClassifer):
@@ -33,11 +33,11 @@ class HostApp(AbsClassifer):
         def addCommonStr(url, label, string):
             common_str = longest_common_substring(url.lower(), string.lower())
             common_str = common_str.strip('.')
-            print common_str, url, string, label
-            if len(common_str) > 3:
-                self.substrCompany[common_str].add(label)
+            #print common_str, url, string, label
+            if len(common_str) >= 3:
+                self.substrCompany[common_str].add(pkg.label)
 
-        appInfo = pkg.appInfo
+
         host = url_clean(pkg.host)
         top_domain = get_top_domain(host)
         refer_host = pkg.refer_host
@@ -45,9 +45,6 @@ class HostApp(AbsClassifer):
         if not host or not top_domain:
             return
 
-        if not appInfo:
-            print '>>>[HOST] ERROR app is', pkg.app
-            return
 
         self.labelAppInfo[pkg.label] = (pkg.website)
         map(lambda url: self.urlLabel[url].add(pkg.label), [top_domain, host, refer_host, refer_top_domain])
