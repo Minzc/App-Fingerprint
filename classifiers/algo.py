@@ -180,9 +180,16 @@ class KVClassifier(AbsClassifer):
         :param trainData
         :param specificRules specific rules of app
         """
+        xmlValueField = defaultdict(lambda : defaultdict(set))
+        xmlFieldValues = defaultdict(lambda : defaultdict(set))
+        for app in self.xmlFeatures:
+          for k,v in self.xmlFeatures[app]:
+            xmlFieldValues[app][k].add(v)
+            xmlValueField[app][v].add(k)
         tmpRules = set()
         for tbl, pkg, k, v in self.iterate_traindata(trainData):
-            if v in self.xmlFeatures[pkg.app].values() and len(v) > 2:
+            app = pkg.app
+            if len(v) > 2 and if_version(v) == False and v in xmlValueField[app]:
                 tmpRules.add((pkg.host, k, v, pkg.app))
         for host, key, value, app in tmpRules:
             if app not in specificRules[consts.APP_RULE][host][key][value]:
@@ -312,7 +319,7 @@ class KVClassifier(AbsClassifer):
         # Persist rules
         #############################
         self.persist(specificRules, rule_type)
-        # self._compare(trainData, specificRules)
+        self.__compare(trainData, specificRules)
         self.__init__(self.appType)
         return self
 

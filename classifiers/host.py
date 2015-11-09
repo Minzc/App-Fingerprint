@@ -45,15 +45,12 @@ class HostApp(AbsClassifer):
 
 
         host = url_clean(pkg.host)
-        top_domain = get_top_domain(host)
         refer_host = pkg.refer_host
-        refer_top_domain = get_top_domain(refer_host)
-        if not host or not top_domain:
+        if not host:
             return
 
-
         self.labelAppInfo[pkg.label] = [pkg.website]
-        map(lambda url: self.urlLabel[url].add(pkg.label), [top_domain, host, refer_host, refer_top_domain])
+        map(lambda url: self.urlLabel[url].add(pkg.label), [host, refer_host])
         map(lambda string: addCommonStr(host, pkg.label, string), [pkg.website])
 
     def checkCommonStr(self, label, url):
@@ -64,7 +61,7 @@ class HostApp(AbsClassifer):
                 print common_str, url,astr
                 print self.substrCompany[common_str], url
             subCompanyLen = len(self.substrCompany[common_str])
-            strValid = True if len(common_str) > 1 else False
+            strValid = True if len(common_str) > 2 else False
             companyValid = True if 5 > subCompanyLen > 0 else False
 
             if companyValid and strValid:
@@ -137,16 +134,6 @@ class HostApp(AbsClassifer):
         print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
 
-    def load_rules2(self):
-        self.rules = {consts.APP_RULE: {}, consts.COMPANY_RULE: {}, consts.CATEGORY_RULE: {}}
-        QUERY = consts.SQL_SELECT_HOST_RULES
-        sqldao = SqlDao()
-        counter = 0
-        for host, label, ruleType, support in sqldao.execute(QUERY):
-            counter += 1
-            self.rules[ruleType][host] = (label, support)
-        print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
-        sqldao.close()
 
     def count_support(self, records):
         LABEL = 0
@@ -155,10 +142,8 @@ class HostApp(AbsClassifer):
             for pkg in pkgs:
                 for ruleType in self.rules:
                     host = url_clean(pkg.host)
-                    secdomain = get_top_domain(host)
                     refer_host = pkg.refer_host
-                    refer_top_domain = get_top_domain(refer_host)
-                    for url in [host, secdomain, refer_host, refer_top_domain]:
+                    for url in [host,  refer_host]:
                         if url in self.rules[ruleType]:
                             label = self.rules[ruleType][url][LABEL]
                             if label == pkg.label:
@@ -175,9 +160,10 @@ class HostApp(AbsClassifer):
             predict = consts.NULLPrediction
             for regexStr, ruleTuple in self.rules[ruleType].iteritems():
                 label, support, regexObj = ruleTuple
-                match = regexObj.search(pkg.host)
+                host = pkg.refer_host if pkg.refer_host else pkg.host
+                match = regexObj.search(host)
                 if match and predict.score < support:
-                    predict = consts.Prediction(label, support, (pkg.host, regexStr, support))
+                    predict = consts.Prediction(label, support, (host, regexStr, support))
                     # if pkg.app == 'com.logos.vyrso' and pkg.host == 'gsp1.apple.com':
                     #   print regexStr
                     # print match
