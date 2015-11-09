@@ -210,7 +210,7 @@ def load_pkgs(DB, appType, limit, filterFunc=lambda x: True):
         QUERY = consts.SQL_SELECT_HTTP_PKGS_LIMIT % (DB, limit)
     print QUERY
 
-    for pkgid, app, add_header, path, refer, host, agent, dst, raw in sqldao.execute(QUERY):
+    for pkgid, app, add_header, path, refer, host, agent, dst, method, raw in sqldao.execute(QUERY):
         package = Package()
         package.set_app(app)
         package.set_path(path.decode('utf-8'))
@@ -222,6 +222,7 @@ def load_pkgs(DB, appType, limit, filterFunc=lambda x: True):
         package.set_dst(dst)
         package.set_content(raw)
         package.set_tbl(DB)
+        package.set_method(method)
 
         if filterFunc(package):
             records.append(package)

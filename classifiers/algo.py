@@ -380,6 +380,7 @@ class KVClassifier(AbsClassifer):
             fatherScore = -1
             rst = consts.NULLPrediction
 
+            # if pkg.method != 'POST':
             for k, kRules in self.rules[ruleType].get(host, {}).iteritems():
                 for v in queries.get(k, []):
                     for label, scoreNcount in kRules.get(v, {}).iteritems():

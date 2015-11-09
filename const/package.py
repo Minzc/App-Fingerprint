@@ -4,9 +4,14 @@ import urllib
 import tldextract
 
 class Package:
+
+    def set_method(self, method):
+        self.method = method
+
     def __init__(self):
         self.json = None
         self.form = None
+        self.content = None
 
     def set_tbl(self, tbl):
         self.tbl = tbl
