@@ -174,7 +174,7 @@ class KVClassifier(AbsClassifer):
         #           specificRules[consts.APP_RULE][host][key][value][';'.join(self.companyAppRelation[company])] = scores
         return specificRules
 
-    def __compare(self, trainData, specificRules):
+    def __compare(self, trainData, specificRules, hostSecdomain, appKeyScore):
         """
         Compare xml rules and learned rules
         :param trainData
@@ -193,7 +193,11 @@ class KVClassifier(AbsClassifer):
                 tmpRules.add((pkg.host, k, v, pkg.app))
         for host, key, value, app in tmpRules:
             if app not in specificRules[consts.APP_RULE][host][key][value]:
-                print host, key, value, app
+                secdomain = hostSecdomain[host]
+                labelNum = len(appKeyScore[secdomain][key][consts.LABEL])
+                score = appKeyScore[secdomain][key][consts.SCORE]
+                print '[Host] %s [key] % [Value] %s [App] %s [Num] %s [Score] %s', \
+                    (host, key, value, app, labelNum, score)
 
     @staticmethod
     def iterate_traindata(trainData):
@@ -212,6 +216,7 @@ class KVClassifier(AbsClassifer):
         """
         xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
+        hostSecdomain = []
         for tbl, pkg, k, v in self.iterate_traindata(trainData):
             self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
             if if_version(v) == False and len(self.valueLabelCounter[consts.APP_RULE][v]) == 1:
@@ -219,7 +224,8 @@ class KVClassifier(AbsClassifer):
                 for fieldName in [name for name, value in self.xmlFeatures[pkg.app] if value == v]:
                     xmlGenRules[(pkg.secdomain, k)][v][fieldName] += 1
                     xmlGenRules[(pkg.host, k)][v][fieldName] += 1
-        return xmlGenRules, xmlSpecificRules
+                    hostSecdomain[pkg.host] = pkg.secdomain
+        return xmlGenRules, xmlSpecificRules, hostSecdomain
 
     @staticmethod
     def gen_specific_rules_xml(xmlSpecificRules, specificRules):
@@ -282,7 +288,7 @@ class KVClassifier(AbsClassifer):
             self.appCompanyRelation[pkg.app] = pkg.company
             self.companyAppRelation[pkg.company].add(pkg.app)
 
-        xmlGenRules, xmlSpecificRules = self._gen_xml_rules(trainData)
+        xmlGenRules, xmlSpecificRules, hostSecdomain = self._gen_xml_rules(trainData)
         ##################
         # Count
         ##################
@@ -319,7 +325,7 @@ class KVClassifier(AbsClassifer):
         # Persist rules
         #############################
         self.persist(specificRules, rule_type)
-        self.__compare(trainData, specificRules)
+        self.__compare(trainData, specificRules, hostSecdomain, appKeyScore)
         self.__init__(self.appType)
         return self
 

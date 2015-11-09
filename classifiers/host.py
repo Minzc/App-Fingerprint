@@ -161,6 +161,8 @@ class HostApp(AbsClassifer):
             for regexStr, ruleTuple in self.rules[ruleType].iteritems():
                 label, support, regexObj = ruleTuple
                 host = pkg.refer_host if pkg.refer_host else pkg.host
+                if pkg.app == 'com.idrudgereport.idrudgereportuniversal' and pkg.host == 'images.politico.com':
+                    print '>>>', host, pkg.refer_host, host
                 match = regexObj.search(host)
                 if match and predict.score < support:
                     predict = consts.Prediction(label, support, (host, regexStr, support))
