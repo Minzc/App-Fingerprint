@@ -228,6 +228,7 @@ class KVClassifier(AbsClassifer):
         :return xmlSpecificRules
         """
         xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+        xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
         hostSecdomain = {}
         for tbl, pkg, k, v in self.iterate_traindata(trainData):
             self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
@@ -236,8 +237,9 @@ class KVClassifier(AbsClassifer):
                 for fieldName in [name for name, value in self.xmlFeatures[pkg.app] if value == v]:
                     xmlGenRules[(pkg.secdomain, k)][v][fieldName] += 1
                     xmlGenRules[(pkg.host, k)][v][fieldName] += 1
+                    xmlSpecificRules[(pkg.host, k)][v][pkg.app].add(tbl)
 
-        return xmlGenRules, hostSecdomain
+        return xmlGenRules, xmlSpecificRules, hostSecdomain
 
     @staticmethod
     def gen_specific_rules_xml(xmlSpecificRules, specificRules):
@@ -301,7 +303,7 @@ class KVClassifier(AbsClassifer):
             self.appCompanyRelation[pkg.app] = pkg.company
             self.companyAppRelation[pkg.company].add(pkg.app)
 
-        xmlGenRules,  hostSecdomain = self._gen_xml_rules(trainData)
+        xmlGenRules, xmlSpecificRules, hostSecdomain = self._gen_xml_rules(trainData)
         ##################
         # Count
         ##################
@@ -325,12 +327,11 @@ class KVClassifier(AbsClassifer):
         #############################
         appSpecificRules = self._generate_rules(trainData, appGeneralRules, self.valueLabelCounter[consts.APP_RULE],
                                                 consts.APP_RULE)
-        #appSpecificRules = self.gen_specific_rules_xml( xmlSpecificRules, appSpecificRules)
-
         print 'Infer from data', self.inferFrmData
 
         if self.inferFrmData:
             appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, rmApps)
+        appSpecificRules = self.gen_specific_rules_xml( xmlSpecificRules, appSpecificRules)
         companySpecificRules = self._generate_rules(trainData, companyGeneralRules,
                                                     self.valueLabelCounter[consts.COMPANY_RULE], consts.COMPANY_RULE)
         specificRules = self._merge_result(appSpecificRules, companySpecificRules)
