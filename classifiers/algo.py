@@ -57,7 +57,7 @@ class KVClassifier(AbsClassifer):
                     if ruleScores[(host, iKey)] < ruleScores[(host, jKey)]:
                         if iCoveredIds.issubset(jCoveredIds) and (host, iKey) not in xmlGenRules:
                             ifKeepRule = (False, jKey, '1')
-                if iKey == 'app_name':
+                if iKey == 'devapp':
                     print ifKeepRule, host, ruleScores[(host, iKey)]
                 ''' Prune by believing xml rules'''
                 # for j in range(1, len(keyNcoveredIds)):

@@ -6,7 +6,7 @@ from const.app_info import AppInfos
 from classifier import AbsClassifer
 import re
 
-test_str = {'edgerift', 'yogurt.land.com'}
+test_str = {'stats.3sidedcube.com', 'redcross.com'}
 
 
 class HostApp(AbsClassifer):
@@ -34,8 +34,14 @@ class HostApp(AbsClassifer):
             common_str = longest_common_substring(url.lower(), string.lower())
             common_str = common_str.strip('.')
             #print common_str, url, string, label
-            if len(common_str) >= 3:
-                self.substrCompany[common_str].add(pkg.label)
+            if len(common_str) < 3:
+                return
+            for subStr in filter( lambda x: common_str in x, string.split('.')):
+                sPos = subStr.find(common_str)
+                ePos = sPos + len(common_str)
+                if sPos != 0 and ePos != len(subStr):
+                    return
+            self.substrCompany[common_str].add(pkg.label)
 
 
         host = url_clean(pkg.host)
@@ -178,5 +184,5 @@ class HostApp(AbsClassifer):
 
             rst[ruleType] = predict
             if predict.label != pkg.app and predict.label is not None:
-                print predict.evidence, pkg.app, predict.label
+                print 'Evidence:', predict.evidence, 'App:', pkg.app, 'Predict:', predict.label
         return rst

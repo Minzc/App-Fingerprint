@@ -104,3 +104,7 @@ class Package:
       if 'value' in line and ':' in line:
         items.append(':'.join(map(lambda seg: seg.strip(), line.split(':')[1:])))
     return items
+
+  @app.setter
+  def app(self, value):
+    self._app = value
