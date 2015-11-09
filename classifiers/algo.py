@@ -73,10 +73,10 @@ class KVClassifier(AbsClassifer):
             prunedGenRules[host] = sorted(rules, key = lambda x: x[2], reverse=True)
             tmp = []
             counter = 0
-            for rule in prunedGenRules[host]:
-                if counter == 1:
+            for index, rule in enumerate(prunedGenRules[host]):
+                if counter == 1 or prunedGenRules[host][index][2] - rule[2] >= 1:
                     break
-                if rule[2] < 1:
+                if rule[2] < 2:
                     counter += 1
                 tmp.append(rule)
             prunedGenRules[host] = tmp
@@ -108,6 +108,7 @@ class KVClassifier(AbsClassifer):
                 keyScore[secdomain][cleanedK][consts.SCORE] += \
                     (len(tbls) - 1) / float( numOfValues * numOfValues * len(featureTbl[secdomain][k]))
                 keyScore[secdomain][cleanedK][consts.LABEL].add(label)
+
 
         return keyScore
 
@@ -227,18 +228,16 @@ class KVClassifier(AbsClassifer):
         :return xmlSpecificRules
         """
         xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
-        xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
         hostSecdomain = {}
         for tbl, pkg, k, v in self.iterate_traindata(trainData):
             self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
             hostSecdomain[pkg.host] = pkg.secdomain
             if if_version(v) == False and len(self.valueLabelCounter[consts.APP_RULE][v]) == 1:
-                xmlSpecificRules[(pkg.host, k)][v][pkg.app].add(tbl)
                 for fieldName in [name for name, value in self.xmlFeatures[pkg.app] if value == v]:
                     xmlGenRules[(pkg.secdomain, k)][v][fieldName] += 1
                     xmlGenRules[(pkg.host, k)][v][fieldName] += 1
 
-        return xmlGenRules, xmlSpecificRules, hostSecdomain
+        return xmlGenRules, hostSecdomain
 
     @staticmethod
     def gen_specific_rules_xml(xmlSpecificRules, specificRules):
@@ -274,6 +273,7 @@ class KVClassifier(AbsClassifer):
             if len(specificRules[host][key]) != 0:
                 for fieldName in xmlGenRules[rule]:
                     interestedXmlRules[fieldName].add(rule)
+
         for fieldName in interestedXmlRules:
             for app in filter(lambda x: x in rmApps, self.xmlFeatures):
                 if fieldName in self.xmlFeatures[app]:
@@ -301,7 +301,7 @@ class KVClassifier(AbsClassifer):
             self.appCompanyRelation[pkg.app] = pkg.company
             self.companyAppRelation[pkg.company].add(pkg.app)
 
-        xmlGenRules, xmlSpecificRules, hostSecdomain = self._gen_xml_rules(trainData)
+        xmlGenRules,  hostSecdomain = self._gen_xml_rules(trainData)
         ##################
         # Count
         ##################
