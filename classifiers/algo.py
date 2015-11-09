@@ -71,8 +71,19 @@ class KVClassifier(AbsClassifer):
 
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key = lambda x: x[2], reverse=True)
-            if len(prunedGenRules[host]) > 2:
-                prunedGenRules[host] = prunedGenRules[host][:2]
+            tmp = []
+            counter = 0
+            for rule in prunedGenRules[host]:
+                if counter == 1:
+                    break
+                if rule[2] < 1:
+                    counter += 1
+                tmp.append(rule)
+            prunedGenRules[host] = tmp
+
+
+            # if len(prunedGenRules[host]) > 2:
+            #     prunedGenRules[host] = prunedGenRules[host][:2]
         return prunedGenRules
 
     @staticmethod
@@ -189,21 +200,22 @@ class KVClassifier(AbsClassifer):
         tmpRules = set()
         for tbl, pkg, k, v in self.iterate_traindata(trainData):
             app = pkg.app
-            if len(v) > 2 and if_version(v) == False and v in xmlValueField[app]:
+            if not if_version(v) and v in xmlValueField[app] and len(self.valueLabelCounter[consts.APP_RULE][v]) == 1:
                 tmpRules.add((pkg.host, k, v, pkg.app))
         for host, key, value, app in tmpRules:
             if app not in specificRules[consts.APP_RULE][host][key][value]:
                 secdomain = hostSecdomain[host]
                 labelNum = len(appKeyScore[secdomain][key][consts.LABEL])
                 score = appKeyScore[secdomain][key][consts.SCORE]
-                print '[Host] {0:s} [key] {1:s} [Value] {2:s} [App] {3:s} [Num] {4:s} [Score] {5:s}' \
+                print '[Host] {0:s} [key] {1:s} [Value] {2:s} [App] {3:s} [Num] {4:d} [Score] {5:f}' \
                     .format(host, key, value, app, labelNum, score)
 
     @staticmethod
     def iterate_traindata(trainData):
         for tbl in trainData.keys():
             for pkg in trainData[tbl]:
-                for k, vs in pkg.queries.items():
+                host, queries = pkg.host, pkg.queries
+                for k, vs in queries.items():
                     for v in vs:
                         yield (tbl, pkg, k, v)
 
@@ -219,12 +231,13 @@ class KVClassifier(AbsClassifer):
         hostSecdomain = {}
         for tbl, pkg, k, v in self.iterate_traindata(trainData):
             self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
+            hostSecdomain[pkg.host] = pkg.secdomain
             if if_version(v) == False and len(self.valueLabelCounter[consts.APP_RULE][v]) == 1:
                 xmlSpecificRules[(pkg.host, k)][v][pkg.app].add(tbl)
                 for fieldName in [name for name, value in self.xmlFeatures[pkg.app] if value == v]:
                     xmlGenRules[(pkg.secdomain, k)][v][fieldName] += 1
                     xmlGenRules[(pkg.host, k)][v][fieldName] += 1
-                    hostSecdomain[pkg.host] = pkg.secdomain
+
         return xmlGenRules, xmlSpecificRules, hostSecdomain
 
     @staticmethod
@@ -362,22 +375,22 @@ class KVClassifier(AbsClassifer):
     def classify(self, pkg):
         predictRst = {}
         for ruleType in self.rules:
-            for host, queries in [(pkg.host, pkg.queries)]:
-                fatherScore = -1
-                rst = consts.NULLPrediction
+            host, queries = (pkg.refer_host, pkg.refer_queries) if pkg.refer_host else (pkg.host, pkg.queries)
+            fatherScore = -1
+            rst = consts.NULLPrediction
 
-                for k, kRules in self.rules[ruleType].get(host, {}).iteritems():
-                    for v in queries.get(k, []):
-                        for label, scoreNcount in kRules.get(v, {}).iteritems():
-                            score, support, regexObj = scoreNcount[consts.SCORE], scoreNcount[consts.SUPPORT], \
-                                                       scoreNcount[consts.REGEX_OBJ]
+            for k, kRules in self.rules[ruleType].get(host, {}).iteritems():
+                for v in queries.get(k, []):
+                    for label, scoreNcount in kRules.get(v, {}).iteritems():
+                        score, support, regexObj = scoreNcount[consts.SCORE], scoreNcount[consts.SUPPORT], \
+                                                   scoreNcount[consts.REGEX_OBJ]
 
-                            if support > rst.score or (support == rst.score and score > fatherScore):
-                                fatherScore = score
-                                evidence = (k, v)
-                                rst = consts.Prediction(label, support, evidence)
+                        if support > rst.score or (support == rst.score and score > fatherScore):
+                            fatherScore = score
+                            evidence = (k, v)
+                            rst = consts.Prediction(label, support, evidence)
 
-                predictRst[ruleType] = rst
+            predictRst[ruleType] = rst
 
         if predictRst[consts.APP_RULE] != consts.NULLPrediction and predictRst[consts.APP_RULE].label != pkg.app:
             print predictRst[consts.APP_RULE].evidence, predictRst[consts.APP_RULE].label, pkg.app
