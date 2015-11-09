@@ -68,7 +68,7 @@ def name_clean(name):
 
 
 def url_clean(url):
-    url = url.replace('http://', '').replace('www.', '').replace('-', '.').split('/')[0].split(':')[0]
+    url = url.replace('http://', '').replace('www.', '').split('/')[0].split(':')[0]
     return url
 
 

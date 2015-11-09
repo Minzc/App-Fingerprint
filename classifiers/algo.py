@@ -196,8 +196,8 @@ class KVClassifier(AbsClassifer):
                 secdomain = hostSecdomain[host]
                 labelNum = len(appKeyScore[secdomain][key][consts.LABEL])
                 score = appKeyScore[secdomain][key][consts.SCORE]
-                print '[Host] %s [key] % [Value] %s [App] %s [Num] %s [Score] %s', \
-                    (host, key, value, app, labelNum, score)
+                print '[Host] {0:s} [key] {1:s} [Value] {2:s} [App] {3:s} [Num] {4:s} [Score] {5:s}' \
+                    .format(host, key, value, app, labelNum, score)
 
     @staticmethod
     def iterate_traindata(trainData):
@@ -216,7 +216,7 @@ class KVClassifier(AbsClassifer):
         """
         xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
-        hostSecdomain = []
+        hostSecdomain = {}
         for tbl, pkg, k, v in self.iterate_traindata(trainData):
             self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
             if if_version(v) == False and len(self.valueLabelCounter[consts.APP_RULE][v]) == 1:
@@ -267,7 +267,7 @@ class KVClassifier(AbsClassifer):
                     value = self.xmlFeatures[app][fieldName]
                     for rule in interestedXmlRules[fieldName]:
                         host, key = rule
-                        print 'Infer One Rule', host, key, valye, app
+                        print 'Infer One Rule', host, key, value, app
                         specificRules[host][key][value][app][consts.SCORE] = 1.0
                         specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
         return specificRules

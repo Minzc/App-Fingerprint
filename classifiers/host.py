@@ -95,6 +95,7 @@ class HostApp(AbsClassifer):
         for pkgs in records.values():
             for pkg in pkgs:
                 self.count(pkg)
+        self._recount(records)
         ########################
         # Generate Rules
         ########################
@@ -148,6 +149,14 @@ class HostApp(AbsClassifer):
                             label = self.rules[ruleType][url][LABEL]
                             if label == pkg.label:
                                 self.rules[ruleType][url][TBLSUPPORT].add(tbl)
+
+
+    def _recount(self, records):
+        for tbl, pkgs in records.items():
+            for pkg in pkgs:
+                for url, labels in self.urlLabel.iteritems():
+                    if len(labels) == 1 and (url in pkg.host or url in pkg.refer_host):
+                        self.urlLabel[url].add(pkg.label)
 
     def classify(self, pkg):
         """
