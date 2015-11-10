@@ -399,6 +399,7 @@ class KVClassifier(AbsClassifer):
             print '=' * 10
         return predictRst
 
+
     def persist(self, specificRules, rule_type):
         """
         :param rule_type:
