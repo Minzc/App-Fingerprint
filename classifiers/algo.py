@@ -265,6 +265,7 @@ class KVClassifier(AbsClassifer):
         for tbl, pkgs in trainData.items():
             pkgs = [pkg for pkg in pkgs if pkg.app in sampledApps]
             trainData[tbl] = pkgs
+        print 'Len of app', sampledApps, 'Len of rm', len(apps - sampledApps)
         return trainData, apps - sampledApps
 
     def _infer_from_xml(self, specificRules, xmlGenRules, rmApps):
@@ -276,9 +277,12 @@ class KVClassifier(AbsClassifer):
                 for fieldName in xmlGenRules[rule]:
                     interestedXmlRules[fieldName].add(rule)
 
+        print 'rm apps', len(rmApps)
         for fieldName in interestedXmlRules:
             for app in filter(lambda x: x in rmApps, self.xmlFeatures):
+                print 'app is', app, 'field is ', fieldName
                 if fieldName in self.xmlFeatures[app]:
+                    print 'field name in'
                     value = self.xmlFeatures[app][fieldName]
                     for rule in interestedXmlRules[fieldName]:
                         host, key = rule
