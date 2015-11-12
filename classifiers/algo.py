@@ -285,14 +285,15 @@ class KVClassifier(AbsClassifer):
 
         for fieldName, rules in interestedXmlRules.items():
             for app in rmApps:
-                for value in filter(lambda x: len(x) == 1, self.xmlFieldValues[app][fieldName]):
-                    rules = sorted(rules, key=lambda x: x[2], reverse=True)[:3]
-                    print rules
-                    for rule in rules:
-                        host, key, score = rule
-                        print 'Infer One Rule', host, key, value, app
-                        specificRules[host][key][value][app][consts.SCORE] = 1.0
-                        specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
+                if len(self.xmlFieldValues[app][fieldName]) == 1:
+                    for value in self.xmlFieldValues[app][fieldName]:
+                        rules = sorted(rules, key=lambda x: x[2], reverse=True)
+                        print rules
+                        for rule in rules:
+                            host, key, score = rule
+                            print 'Infer One Rule', host, key, value, app
+                            specificRules[host][key][value][app][consts.SCORE] = 1.0
+                            specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
         return specificRules
 
     def train(self, trainData, rule_type):
