@@ -291,11 +291,12 @@ class KVClassifier(AbsClassifer):
                     print 'field name in', fieldName, 'app is', app
                     values = self.xmlFieldValues[app][fieldName]
                     if len(values) == 1:
-                        for rule in rules:
-                            host, key = rule
-                            print 'Infer One Rule', host, key, values, app
-                            specificRules[host][key][values][app][consts.SCORE] = 1.0
-                            specificRules[host][key][values][app][consts.SUPPORT] = {1, 2, 3, 4}
+                        for value in values:
+                            for rule in rules:
+                                host, key = rule
+                                print 'Infer One Rule', host, key, values, app
+                                specificRules[host][key][value][app][consts.SCORE] = 1.0
+                                specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
         return specificRules
 
     def train(self, trainData, rule_type):
