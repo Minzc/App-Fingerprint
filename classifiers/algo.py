@@ -282,21 +282,17 @@ class KVClassifier(AbsClassifer):
             host, key = rule
             if len(specificRules[host][key]) != 0:
                 for _, fieldName, _ in flatten(xmlGenRules[rule]):
-                    interestedXmlRules[fieldName].add(rule)
+                    interestedXmlRules[fieldName].add((host, key, len(specificRules[host][key])))
 
-        print 'rm apps', len(rmApps)
         for fieldName, rules in interestedXmlRules.items():
             for app in rmApps:
-                if fieldName in self.xmlFieldValues[app]:
-                    print 'field name in', fieldName, 'app is', app
-                    values = self.xmlFieldValues[app][fieldName]
-                    if len(values) == 1:
-                        for value in values:
-                            for rule in rules:
-                                host, key = rule
-                                print 'Infer One Rule', host, key, values, app
-                                specificRules[host][key][value][app][consts.SCORE] = 1.0
-                                specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
+                for value in filter(lambda x: len(x) == 1, self.xmlFieldValues[app][fieldName]):
+                    rules = sorted(rules, key=lambda x: x[2], reverse=True)[:3]
+                    for rule in rules:
+                        host, key = rule
+                        print 'Infer One Rule', host, key, value, app
+                        specificRules[host][key][value][app][consts.SCORE] = 1.0
+                        specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
         return specificRules
 
     def train(self, trainData, rule_type):
