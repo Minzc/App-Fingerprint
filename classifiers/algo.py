@@ -272,10 +272,9 @@ class KVClassifier(AbsClassifer):
         for tbl, pkgs in trainData.items():
             pkgs = [pkg for pkg in pkgs if pkg.app in sampledApps]
             trainData[tbl] = pkgs
-        print 'Len of app', sampledApps, 'Len of rm', len(apps - sampledApps)
         return trainData, apps - sampledApps
 
-    def _infer_from_xml(self, specificRules, xmlGenRules, rmApps):
+    def _infer_from_xml(self, specificRules, xmlGenRules, rmApps, appKeyScore):
         print 'Start Infering'
         interestedXmlRules = defaultdict(set)
         for rule in xmlGenRules:
@@ -288,8 +287,9 @@ class KVClassifier(AbsClassifer):
             for app in rmApps:
                 for value in filter(lambda x: len(x) == 1, self.xmlFieldValues[app][fieldName]):
                     rules = sorted(rules, key=lambda x: x[2], reverse=True)[:3]
+                    print rules
                     for rule in rules:
-                        host, key = rule
+                        host, key, score = rule
                         print 'Infer One Rule', host, key, value, app
                         specificRules[host][key][value][app][consts.SCORE] = 1.0
                         specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
@@ -338,7 +338,7 @@ class KVClassifier(AbsClassifer):
         print 'Infer from data', self.inferFrmData
 
         if self.inferFrmData:
-            appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, rmApps)
+            appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, rmApps, appKeyScore)
         appSpecificRules = self.gen_specific_rules_xml( xmlSpecificRules, appSpecificRules)
         companySpecificRules = self._generate_rules(trainData, companyGeneralRules,
                                                     self.valueLabelCounter[consts.COMPANY_RULE], consts.COMPANY_RULE)
