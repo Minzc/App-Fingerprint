@@ -274,7 +274,7 @@ class KVClassifier(AbsClassifer):
         for rule in xmlGenRules:
             host, key = rule
             if len(specificRules[host][key]) != 0:
-                for fieldName in xmlGenRules[rule]:
+                for _, fieldName, _ in flatten(xmlGenRules[rule]):
                     interestedXmlRules[fieldName].add(rule)
 
         print 'rm apps', len(rmApps)
