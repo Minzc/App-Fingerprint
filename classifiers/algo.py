@@ -25,8 +25,10 @@ class KVClassifier(AbsClassifer):
         self.sampleRate = sampleRate
         self.xmlFieldValues = defaultdict(lambda : defaultdict(set))
         for app in self.xmlFeatures:
-          for k,v in self.xmlFeatures[app]:
-            self.xmlFieldValues[app][k].add(v)
+            for k,v in self.xmlFeatures[app]:
+                if len(v) == 0:
+                    print app, k, v
+                self.xmlFieldValues[app][k].add(v)
 
 
 
@@ -284,18 +286,18 @@ class KVClassifier(AbsClassifer):
                     interestedXmlRules[fieldName].add(rule)
 
         print 'rm apps', len(rmApps)
-        for fieldName in interestedXmlRules:
-            for app in filter(lambda x: x in rmApps, self.xmlFeatures):
+        for fieldName, rules in interestedXmlRules.items():
+            for app in rmApps:
                 print 'app is', app, 'field is ', fieldName
                 if fieldName in self.xmlFieldValues[app]:
-                    print 'field name in'
-                    value = self.xmlFieldValues[app][fieldName]
-                    if len(value) == 1:
-                        for rule in interestedXmlRules[fieldName]:
+                    print 'field name in', fieldName
+                    values = self.xmlFieldValues[app][fieldName]
+                    if len(values) == 1:
+                        for rule in rules:
                             host, key = rule
-                            print 'Infer One Rule', host, key, value, app
-                            specificRules[host][key][value][app][consts.SCORE] = 1.0
-                            specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
+                            print 'Infer One Rule', host, key, values, app
+                            specificRules[host][key][values][app][consts.SCORE] = 1.0
+                            specificRules[host][key][values][app][consts.SUPPORT] = {1, 2, 3, 4}
         return specificRules
 
     def train(self, trainData, rule_type):
