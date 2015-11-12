@@ -26,9 +26,8 @@ class KVClassifier(AbsClassifer):
         self.xmlFieldValues = defaultdict(lambda : defaultdict(set))
         for app in self.xmlFeatures:
             for k,v in self.xmlFeatures[app]:
-                if len(v) == 0:
-                    print app, k, v
-                self.xmlFieldValues[app][k].add(v)
+                if len(v) != 0:
+                    self.xmlFieldValues[app][k].add(v)
 
 
 
@@ -288,9 +287,8 @@ class KVClassifier(AbsClassifer):
         print 'rm apps', len(rmApps)
         for fieldName, rules in interestedXmlRules.items():
             for app in rmApps:
-                print 'app is', app, 'field is ', fieldName
                 if fieldName in self.xmlFieldValues[app]:
-                    print 'field name in', fieldName
+                    print 'field name in', fieldName, 'app is', app
                     values = self.xmlFieldValues[app][fieldName]
                     if len(values) == 1:
                         for rule in rules:
