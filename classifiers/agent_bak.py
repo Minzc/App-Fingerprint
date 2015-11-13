@@ -11,27 +11,16 @@ VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier',
 STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName'}
 
 
-class FRegex:
-    def __init__(self, featureStr, regexStr, rawF):
-        self.featureStr = featureStr
-        self.regexStr = regexStr
-        self.rawF = rawF
-        self.regexObj = re.compile(regexStr, re.IGNORECASE)
-        self.matchRecord = defaultdict(lambda: defaultdict(set))
-
-    def set_match_record(self, host, app, tbl):
-        self.matchRecord[host][app].add(tbl)
-
-
 class AgentClassifier(AbsClassifer):
     def __init__(self, inferFrmData=True, sampleRate=1):
+        self.agentLabel = defaultdict(set)
         self.rules = defaultdict(dict)
         self.appFeatures = load_info_features(self._parse_xml)
         self.inferFrmData = inferFrmData
         self.sampleRate = sampleRate
         '''Following variables are used to speed up the count step '''
         self.regexCover = defaultdict(set)
-        # self.regexfeatureStr = dict()
+        self.regexfeatureStr = dict()
 
     @staticmethod
     def _parse_xml(filePath):
@@ -40,8 +29,7 @@ class AgentClassifier(AbsClassifer):
         features = {}
         for key in VALID_FEATURES:
             if key in plistObj:
-                value = plistObj[key]
-                if type(plistObj[key]) != unicode:
+                if type(plistObj[key]) !=  unicode:
                     value = plistObj[key].decode('ascii')
                 value = unescape(value.lower())
                 features[key] = value
@@ -57,19 +45,21 @@ class AgentClassifier(AbsClassifer):
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_AGENT_RULES
         params = []
-        for fRegex, apps in patterns.iteritems():
+        for regex, apps in patterns.iteritems():
             if len(apps) == 1:
                 app = list(apps)[0]
-                params.append((app, 1, 1, fRegex.regexObj.pattern, consts.APP_RULE))
+                params.append((app, 1, 1, regex, consts.APP_RULE))
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
 
-    def _add_host(self, patterns, trainData):
-        for fRegex, apps in patterns.iteritems():
-            if len(apps) > 1 and fRegex.rawF is not None:
-                for host in fRegex.matchRecord:
-                    if len(fRegex.matchRecord[host]) == 1:
-                        print '[host]', host, fRegex.matchRecord[host]
+    def _prune(self):
+        for ruleType in self.rules:
+            prunedRules = {}
+            for agentFeatureA in self.rules[ruleType]:
+                ifAdd = False if agentFeatureA + '/' in self.rules[ruleType] else True
+                if ifAdd or '/' in agentFeatureA:
+                    prunedRules[agentFeatureA] = self.rules[ruleType][agentFeatureA]
+            self.rules[ruleType] = prunedRules
 
     @staticmethod
     def _gen_features(f):
@@ -106,10 +96,9 @@ class AgentClassifier(AbsClassifer):
         def _compile_regex():
             for featureStr in self._gen_features(f):
                 for regexStr in self._gen_regex(featureStr):
-                    # self.regexfeatureStr[regexStr] = featureStr
-                    # regexObj = re.compile(regexStr, re.IGNORECASE)
-                    # appFeatureRegex[app][regexStr] = regexObj
-                    appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
+                    self.regexfeatureStr[regexStr] = featureStr
+                    regexObj = re.compile(regexStr, re.IGNORECASE)
+                    appFeatureRegex[app][regexStr] = regexObj
             for agent in filter(lambda x: '/' in x, agents):
                 matchStrs = re.findall(r'^[a-zA-Z0-9][0-9a-zA-Z. _\-:&?\'%]+/', agent)
                 if len(matchStrs) > 0:
@@ -117,10 +106,9 @@ class AgentClassifier(AbsClassifer):
                     if regexStr not in appFeatureRegex[app]:
                         try:
                             featureStr = matchStrs[0]
-                            # regexObj = re.compile(regexStr, re.IGNORECASE)
-                            # appFeatureRegex[app][regexStr] = regexObj
-                            # self.regexfeatureStr[regexStr] = featureStr
-                            appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, None)
+                            regexObj = re.compile(regexStr, re.IGNORECASE)
+                            appFeatureRegex[app][regexStr] = regexObj
+                            self.regexfeatureStr[regexStr] = featureStr
                         except:
                             pass
 
@@ -150,25 +138,24 @@ class AgentClassifier(AbsClassifer):
         '''Flatten appFeature so that it's earsier to iterate'''
         fAppFeatureRegex = sorted(flatten(appFeatureRegex), key=sortPattern, reverse=True)
         '''
-        Some useful features are not detected due to data distribution
+        Some useful features are not detected due to data distritbuion
         Add prediction to relationships
         '''
         regexApp = defaultdict(set)
 
-        for predict, regexStr, fRegex in filter(lambda x: x[0] not in appAgent, fAppFeatureRegex):
-            regexApp[fRegex.regexObj.pattern].add(predict)
+        for predict, pattern, regexObj in filter(lambda x: x[0] not in appAgent, fAppFeatureRegex):
+            regexApp[regexObj.pattern].add(predict)
 
-        for app, agents, tbl in appAgent.items():
-            for agent, host in agents:
+        for app, agents in appAgent.items():
+            for agent in agents:
                 covered = set()
-                for predict, regexStr, fRegex in fAppFeatureRegex:
-                    featureStr = fRegex.featureStr
+                for predict, pattern, regexObj in fAppFeatureRegex:
+                    featureStr = self.regexfeatureStr[pattern]
                     if featureStr not in agent and featureStr not in app:
                         continue
-                    if regexStr in covered or fRegex.regexObj.search(agent) or fRegex.regexObj.search(app):
-                        regexApp[fRegex].add(app)
-                        fRegex.set_match_record(host, app, tbl)
-                        for regex in self.regexCover[regexStr]:
+                    if pattern in covered or regexObj.search(agent) or regexObj.search(app):
+                        regexApp[regexObj.pattern].add(app)
+                        for regex in self.regexCover[pattern]:
                             covered.add(regex)
         return regexApp
 
@@ -176,11 +163,10 @@ class AgentClassifier(AbsClassifer):
         for app, features in filter(lambda x: x[0] not in agentTuples, self.appFeatures.items()):
             for f in features.values():
                 for featureStr in self._gen_features(f):
-                    for regexStr in self._gen_regex(featureStr):
-                        regexObj = re.compile(regexStr, re.IGNORECASE)
-                        # appFeatureRegex[app][regex] = regexObj
-                        appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
-                        # self.regexfeatureStr[regexStr] = featureStr
+                    for regex in self._gen_regex(featureStr):
+                        regexObj = re.compile(regex, re.IGNORECASE)
+                        appFeatureRegex[app][regex] = regexObj
+                        self.regexfeatureStr[regex] = featureStr
 
     @staticmethod
     def _sample_app(agentTuples, sampleRate):
@@ -196,7 +182,7 @@ class AgentClassifier(AbsClassifer):
                 label = pkg.label
                 agent = pkg.agent
                 agentTuples[label].add(agent)
-                appAgent[label].add( (agent, pkg.host, tbl) )
+                appAgent[label].add(agent)
 
         '''
         Sample Apps
@@ -219,8 +205,6 @@ class AgentClassifier(AbsClassifer):
         regexApp = self._count(appFeatureRegex, appAgent)
 
         self.persist(regexApp, consts.APP_RULE)
-
-        self._add_host(regexApp, trainSet)
 
     def load_rules(self):
         self.rules = {consts.APP_RULE: {}, consts.COMPANY_RULE: {}, consts.CATEGORY_RULE: {}}
