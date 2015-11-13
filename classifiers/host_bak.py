@@ -34,13 +34,13 @@ class HostApp(AbsClassifer):
             common_str = longest_common_substring(url.lower(), string.lower())
             common_str = common_str.strip('.')
             #print common_str, url, string, label
-            if len(common_str) < 3:
+            if common_str not in self.fLib[label]:
                 return
-            for subStr in filter( lambda x: common_str in x, string.split('.')):
-                sPos = subStr.find(common_str)
-                ePos = sPos + len(common_str)
-                if sPos != 0 and ePos != len(subStr):
-                    return
+            # for subStr in filter( lambda x: common_str in x, string.split('.')):
+            #     sPos = subStr.find(common_str)
+            #     ePos = sPos + len(common_str)
+            #     if sPos != 0 and ePos != len(subStr):
+            #         return
             self.substrCompany[common_str].add(pkg.label)
 
 
@@ -83,7 +83,8 @@ class HostApp(AbsClassifer):
             appSegs = appInfo.package.split('.')
             companySegs = appInfo.company.split(' ')
             categorySegs = appInfo.category.split(' ')
-            wholeSegs = [appSegs, companySegs, categorySegs]
+            websiteSegs = url_clean(appInfo.website).split('.')
+            wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs]
             for segs in wholeSegs:
                 for seg in segs:
                     self.fLib[label].add(seg)

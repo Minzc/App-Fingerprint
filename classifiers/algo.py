@@ -26,7 +26,7 @@ class KVClassifier(AbsClassifer):
         self.xmlFieldValues = defaultdict(lambda : defaultdict(set))
         for app in self.xmlFeatures:
             for k,v in self.xmlFeatures[app]:
-                if len(v) != 0:
+                if len(v) != 0 and if_version(v) == False:
                     self.xmlFieldValues[app][k].add(v)
 
 
