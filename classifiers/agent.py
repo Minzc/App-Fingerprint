@@ -78,9 +78,11 @@ class AgentClassifier(AbsClassifer):
         """
         import urllib
         featureSet = set()
-        print f.encode('utf-8')
         featureSet.add(f)
-        featureSet.add(urllib.quote(f))
+        try:
+            featureSet.add(urllib.quote(f))
+        except:
+            pass
         featureSet.add(f.replace(' ', '%20'))
         featureSet.add(f.replace(' ', '-'))
         featureSet.add(f.replace(' ', '_'))
@@ -157,7 +159,7 @@ class AgentClassifier(AbsClassifer):
         regexApp = defaultdict(set)
 
         for predict, regexStr, fRegex in filter(lambda x: x[0] not in appAgent, fAppFeatureRegex):
-            regexApp[fRegex.regexObj.pattern].add(predict)
+            regexApp[fRegex].add(predict)
 
         for app, agents, tbl in appAgent.items():
             for agent, host in agents:

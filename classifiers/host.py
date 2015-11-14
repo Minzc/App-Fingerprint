@@ -84,6 +84,7 @@ class HostApp(AbsClassifer):
             companySegs = appInfo.company.split(' ')
             categorySegs = appInfo.category.split(' ')
             websiteSegs = url_clean(appInfo.website).split('.')
+            print websiteSegs
             wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs]
             for segs in wholeSegs:
                 for seg in segs:
