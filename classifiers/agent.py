@@ -78,6 +78,7 @@ class AgentClassifier(AbsClassifer):
         """
         import urllib
         featureSet = set()
+        print f.encode('utf-8')
         featureSet.add(f)
         featureSet.add(urllib.quote(f))
         featureSet.add(f.replace(' ', '%20'))
