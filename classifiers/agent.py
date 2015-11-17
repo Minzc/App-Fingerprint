@@ -249,6 +249,7 @@ class AgentClassifier(AbsClassifer):
                 label = pkg.label
                 agent = pkg.agent
                 agentTuples[label].add(agent)
+                cmprsDB[agent][label][pkg.host].add(tbl)
 
         '''
         Sample Apps
