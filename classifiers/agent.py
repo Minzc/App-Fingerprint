@@ -7,8 +7,6 @@ from classifier import AbsClassifer
 import re
 import urllib
 
-
-
 VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier',
                   'CFBundleDisplayName', 'CFBundleURLSchemes'}
 STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName'}
@@ -65,17 +63,17 @@ class AgentClassifier(AbsClassifer):
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_AGENT_RULES
         params = []
-        for fRegex, apps in filter(lambda item: len(item[1])==1, patterns.iteritems()):
+        for fRegex, apps in filter(lambda item: len(item[1]) == 1, patterns.iteritems()):
             app = list(apps)[0]
             params.append((app, 1, 1, fRegex.regexObj.pattern, consts.APP_RULE))
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
 
-    def _add_host(self, patterns):
+    def _add_host(self, patterns, hostCategory):
         for fRegex, apps in patterns.iteritems():
             if len(apps) > 1 and fRegex.rawF is not None:
                 for host in fRegex.matchRecord:
-                    if len(fRegex.matchRecord[host]) == 1:
+                    if len(fRegex.matchRecord[host]) == 1 and len(hostCategory[host]) == 1:
                         print '[host]', host, fRegex.matchRecord[host], fRegex.featureStr
 
     @staticmethod
@@ -148,6 +146,7 @@ class AgentClassifier(AbsClassifer):
         :param regexApp: FRegex -> apps
         :return:
         """
+
         def sortPattern(regexAppItem):
             fRgex, apps = regexAppItem
             f = fRgex.regexStr
@@ -155,6 +154,7 @@ class AgentClassifier(AbsClassifer):
                 return len(invRegexCover[f])
             else:
                 return 0
+
         invRegexCover = defaultdict(set)
         for regexStr, regexStrs in self.regexCover.items():
             for str in regexStrs:
@@ -169,10 +169,6 @@ class AgentClassifier(AbsClassifer):
             if fRegex.regexStr not in pruned[apps]:
                 rst[fRegex] = apps
         return rst
-
-
-
-
 
     def _count(self, appFeatureRegex, appAgent, trainapps):
         """
@@ -230,21 +226,23 @@ class AgentClassifier(AbsClassifer):
     def _sample_app(agentTuples, cmprsDB, sampleRate):
         import random
         agentTuples = {app: agents for app, agents in agentTuples.iteritems() if random.uniform(0, 1) <= sampleRate}
-        tmp = defaultdict(lambda : defaultdict(lambda : defaultdict(set)))
+        tmp = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
         for agent, values in cmprsDB.items():
-            for app in filter(lambda app : app in agentTuples ,values.keys()):
+            for app in filter(lambda app: app in agentTuples, values.keys()):
                 tmp[agent][app] = cmprsDB[agent][app]
         return agentTuples, cmprsDB
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
-        cmprsDB = defaultdict(lambda : defaultdict(lambda : defaultdict(set)))
+        cmprsDB = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
+        hostCategory = defaultdict(set)
         for tbl, pkgs in trainSet.items():
             for pkg in pkgs:
                 label = pkg.label
                 agent = pkg.agent
                 agentTuples[label].add(agent)
                 cmprsDB[agent][label][pkg.host].add(tbl)
+                hostCategory[pkg.host].add(pkg.category)
 
         '''
         Sample Apps
@@ -274,7 +272,7 @@ class AgentClassifier(AbsClassifer):
 
         self.persist(regexApp, consts.APP_RULE)
 
-        self._add_host(regexApp)
+        self._add_host(regexApp, hostCategory)
 
     def load_rules(self):
         self.rules = {consts.APP_RULE: {}, consts.COMPANY_RULE: {}, consts.CATEGORY_RULE: {}}
