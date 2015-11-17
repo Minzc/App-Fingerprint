@@ -163,13 +163,10 @@ class AgentClassifier(AbsClassifer):
         rst = defaultdict(set)
         pruned = defaultdict(set)
         for fRegex, apps in regexApp:
-            if len(apps) == 1:
-                app = list(apps)[0]
-                for regexStr in invRegexCover[fRegex.regexStr]:
-                    pruned[app].add(regexStr)
-                if fRegex.regexStr not in pruned[app]:
-                    rst[fRegex] = apps
-            else:
+            apps = frozenset(apps)
+            for regexStr in invRegexCover[fRegex.regexStr]:
+                pruned[apps].add(regexStr)
+            if fRegex.regexStr not in pruned[apps]:
                 rst[fRegex] = apps
         return rst
 
@@ -220,8 +217,6 @@ class AgentClassifier(AbsClassifer):
                     regexApp[fRegex].add(app)
                     for host in values[app]:
                         fRegex.set_match_record(host, app, values[app][host])
-
-
         return regexApp
 
     def _infer_from_xml(self, appFeatureRegex, agentTuples):
