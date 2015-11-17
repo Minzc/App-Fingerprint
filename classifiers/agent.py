@@ -5,6 +5,9 @@ from collections import defaultdict
 import const.consts as consts
 from classifier import AbsClassifer
 import re
+import urllib
+
+
 
 VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier',
                   'CFBundleDisplayName', 'CFBundleURLSchemes'}
@@ -47,8 +50,6 @@ class AgentClassifier(AbsClassifer):
                 value = plistObj[key]
                 if type(plistObj[key]) != unicode:
                     value = plistObj[key].decode('ascii')
-                else:
-                    print value.encode('utf-8')
 
                 value = unescape(value.lower())
                 features[key] = value
@@ -83,13 +84,14 @@ class AgentClassifier(AbsClassifer):
         """
         Generate different type of feature
         """
-        import urllib
+
         featureSet = set()
         featureSet.add(f)
         try:
             featureSet.add(urllib.quote(f))
         except:
-            pass
+            print 'Type is', f.encode('utf-8'), type(f)
+
         featureSet.add(f.replace(' ', '%20'))
         featureSet.add(f.replace(' ', '-'))
         featureSet.add(f.replace(' ', '_'))
@@ -143,6 +145,36 @@ class AgentClassifier(AbsClassifer):
                 _compile_regex()
 
         return appFeatureRegex
+
+    def _prune(self, regexApp):
+        def sortPattern(regexAppItem):
+            fRgex, apps = regexAppItem
+            f = fRgex.regexStr
+            if f in invRegexCover:
+                return len(invRegexCover[f])
+            else:
+                return 0
+        invRegexCover = defaultdict(set)
+        for regexStr, regexStrs in self.regexCover.items():
+            for str in regexStrs:
+                invRegexCover[regexStr].add(str)
+        regexApp = sorted(regexApp.items(), key=sortPattern, reverse=True)
+        rst = defaultdict(set)
+        pruned = defaultdict(set)
+        for fRegex, apps in regexApp.items():
+            if len(apps) == 1:
+                app = list(apps)[0]
+                for regexStr in invRegexCover[app][fRegex.featureStr]:
+                    pruned.add(regexStr)
+                if fRegex.featureStr not in pruned:
+                    rst[fRegex] = apps
+            else:
+                rst[fRegex] = apps
+        return rst
+
+
+
+
 
     def _count(self, appFeatureRegex, appAgent):
         """
@@ -226,6 +258,8 @@ class AgentClassifier(AbsClassifer):
         '''
         regexApp = self._count(appFeatureRegex, appAgent)
 
+        regexApp = self._prune(regexApp)
+        
         self.persist(regexApp, consts.APP_RULE)
 
         self._add_host(regexApp)
