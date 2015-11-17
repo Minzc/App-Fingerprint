@@ -89,7 +89,7 @@ class AgentClassifier(AbsClassifer):
         try:
             featureSet.add(urllib.quote(f))
         except:
-            print 'Type is', f.encode('utf-8'), type(f)
+            pass
 
         featureSet.add(f.replace(' ', '%20'))
         featureSet.add(f.replace(' ', '-'))
@@ -164,9 +164,9 @@ class AgentClassifier(AbsClassifer):
         for fRegex, apps in regexApp:
             if len(apps) == 1:
                 app = list(apps)[0]
-                for regexStr in invRegexCover[app][fRegex.featureStr]:
-                    pruned.add(regexStr)
-                if fRegex.featureStr not in pruned:
+                for regexStr in invRegexCover[fRegex.featureStr]:
+                    pruned[app].add(regexStr)
+                if fRegex.featureStr not in pruned[app]:
                     rst[fRegex] = apps
             else:
                 rst[fRegex] = apps
@@ -176,7 +176,7 @@ class AgentClassifier(AbsClassifer):
 
 
 
-    def _count(self, appFeatureRegex, appAgent):
+    def _count(self, appFeatureRegex, appAgent, trainapps):
         """
         Count regex
         :param appAgent: app -> (host, agent) -> tbls
@@ -197,21 +197,30 @@ class AgentClassifier(AbsClassifer):
         '''
         regexApp = defaultdict(set)
 
-        for predict, regexStr, fRegex in filter(lambda x: x[0] not in appAgent, fAppFeatureRegex):
+        for predict, regexStr, fRegex in filter(lambda x: x[0] not in trainapps, fAppFeatureRegex):
             regexApp[fRegex].add(predict)
 
-        for app, db in appAgent.items():
-            for agntHost, tbls in db.items():
-                agent, host = agntHost
-                covered = set()
-                for predict, regexStr, fRegex in fAppFeatureRegex:
-                    if fRegex.featureStr not in agent and fRegex.featureStr not in app:
-                        continue
-                    if regexStr in covered or fRegex.regexObj.search(agent) or fRegex.regexObj.search(app):
-                        regexApp[fRegex].add(app)
-                        fRegex.set_match_record(host, app, tbls)
-                        for regex in self.regexCover[regexStr]:
-                            covered.add(regex)
+        for agent, values in appAgent.items():
+            covered = set()
+            apps = set(values.keys())
+
+            for predict, regexStr, fRegex in fAppFeatureRegex:
+                if fRegex.featureStr not in agent and fRegex.featureStr not in apps:
+                    continue
+                if regexStr in covered or fRegex.regexObj.search(agent):
+                    regexApp[fRegex] |= apps
+                    for app in apps:
+                        for host in values[app]:
+                            fRegex.set_match_record(host, app, values[app][host])
+                    for regex in self.regexCover[regexStr]:
+                        covered.add(regex)
+                elif fRegex.featureStr in apps:
+                    app = fRegex.featureStr
+                    regexApp[fRegex].add(app)
+                    for host in values[app]:
+                        fRegex.set_match_record(host, app, values[app][host])
+
+
         return regexApp
 
     def _infer_from_xml(self, appFeatureRegex, agentTuples):
@@ -229,20 +238,27 @@ class AgentClassifier(AbsClassifer):
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
-        appAgent = defaultdict(lambda : defaultdict(set))
+        appAgent = defaultdict(lambda : defaultdict(lambda : defaultdict(set)))
         for tbl, pkgs in trainSet.items():
             for pkg in pkgs:
                 label = pkg.label
                 agent = pkg.agent
                 agentTuples[label].add(agent)
-                appAgent[label][(agent, pkg.host)].add(tbl)
-
 
         '''
         Sample Apps
         '''
         agentTuples = self._sample_app(agentTuples, self.sampleRate)
         print 'Number of training apps', len(agentTuples)
+
+        for tbl, pkgs in trainSet.items():
+            for pkg in [pkg for pkg in pkgs if pkg.label in agentTuples]:
+                label = pkg.label
+                agent = pkg.agent
+                appAgent[agent][label][pkg.host].add(tbl)
+
+
+
 
         '''
         Compose regular expression
@@ -256,7 +272,7 @@ class AgentClassifier(AbsClassifer):
         '''
         Count regex
         '''
-        regexApp = self._count(appFeatureRegex, appAgent)
+        regexApp = self._count(appFeatureRegex, appAgent, set(agentTuples.keys()))
 
         print "Finish Counter"
 
