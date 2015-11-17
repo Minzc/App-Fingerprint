@@ -36,7 +36,6 @@ class AgentClassifier(AbsClassifer):
         self.sampleRate = sampleRate
         '''Following variables are used to speed up the count step '''
         self.regexCover = defaultdict(set)
-        # self.regexfeatureStr = dict()
 
     @staticmethod
     def _parse_xml(filePath):
@@ -77,7 +76,7 @@ class AgentClassifier(AbsClassifer):
             if len(apps) > 1 and fRegex.rawF is not None:
                 for host in fRegex.matchRecord:
                     if len(fRegex.matchRecord[host]) == 1:
-                        print '[host]', host, fRegex.matchRecord[host], fRegex.pattern
+                        print '[host]', host, fRegex.matchRecord[host], fRegex.featureStr
 
     @staticmethod
     def _gen_features(f):
