@@ -167,7 +167,7 @@ class AgentClassifier(AbsClassifer):
                 app = list(apps)[0]
                 for regexStr in invRegexCover[fRegex.regexStr]:
                     pruned[app].add(regexStr)
-                if fRegex.featureStr not in pruned[app]:
+                if fRegex.regexStr not in pruned[app]:
                     rst[fRegex] = apps
             else:
                 rst[fRegex] = apps
