@@ -165,7 +165,7 @@ class AgentClassifier(AbsClassifer):
         for fRegex, apps in regexApp:
             if len(apps) == 1:
                 app = list(apps)[0]
-                for regexStr in invRegexCover[fRegex.featureStr]:
+                for regexStr in invRegexCover[fRegex.regexStr]:
                     pruned[app].add(regexStr)
                 if fRegex.featureStr not in pruned[app]:
                     rst[fRegex] = apps
@@ -198,15 +198,15 @@ class AgentClassifier(AbsClassifer):
         '''
         regexApp = defaultdict(set)
 
-        # for predict, regexStr, fRegex in filter(lambda x: x[0] not in trainapps, fAppFeatureRegex):
-        #     regexApp[fRegex].add(predict)
+        for predict, regexStr, fRegex in filter(lambda x: x[0] not in trainapps, fAppFeatureRegex):
+            regexApp[fRegex].add(predict)
 
         for agent, values in appAgent.items():
             covered = set()
             apps = set(values.keys())
 
             for predict, regexStr, fRegex in fAppFeatureRegex:
-                if fRegex.featureStr not in agent and fRegex.featureStr not in apps:
+                if fRegex.featureStr not in agent and fRegex.featureStr != predict:
                     continue
                 if regexStr in covered or fRegex.regexObj.search(agent):
                     regexApp[fRegex] |= apps
