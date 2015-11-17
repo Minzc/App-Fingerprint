@@ -18,9 +18,14 @@ class FRegex:
         self.rawF = rawF
         self.regexObj = re.compile(regexStr, re.IGNORECASE)
         self.matchRecord = defaultdict(lambda: defaultdict(set))
+        self.cover = set()
 
-    def set_match_record(self, host, app, tbl):
-        self.matchRecord[host][app].add(tbl)
+    def set_match_record(self, host, app, tbls):
+        for tbl in tbls:
+            self.matchRecord[host][app].add(tbl)
+
+    def set_cover(self, regexSet):
+        self.cover = regexSet
 
 
 class AgentClassifier(AbsClassifer):
@@ -43,6 +48,9 @@ class AgentClassifier(AbsClassifer):
                 value = plistObj[key]
                 if type(plistObj[key]) != unicode:
                     value = plistObj[key].decode('ascii')
+                else:
+                    print value.encode('utf-8')
+
                 value = unescape(value.lower())
                 features[key] = value
         return features
@@ -64,12 +72,12 @@ class AgentClassifier(AbsClassifer):
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
 
-    def _add_host(self, patterns, trainData):
+    def _add_host(self, patterns):
         for fRegex, apps in patterns.iteritems():
             if len(apps) > 1 and fRegex.rawF is not None:
                 for host in fRegex.matchRecord:
                     if len(fRegex.matchRecord[host]) == 1:
-                        print '[host]', host, fRegex.matchRecord[host]
+                        print '[host]', host, fRegex.matchRecord[host], fRegex.pattern
 
     @staticmethod
     def _gen_features(f):
@@ -108,11 +116,10 @@ class AgentClassifier(AbsClassifer):
     def _compose_regxobj(self, agentTuples):
         def _compile_regex():
             for featureStr in self._gen_features(f):
-                for regexStr in self._gen_regex(featureStr):
-                    # self.regexfeatureStr[regexStr] = featureStr
-                    # regexObj = re.compile(regexStr, re.IGNORECASE)
-                    # appFeatureRegex[app][regexStr] = regexObj
-                    appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
+                if len(filter(lambda agent: featureStr in agent, agents)) > 0:
+                    for regexStr in self._gen_regex(featureStr):
+                        appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
+
             for agent in filter(lambda x: '/' in x, agents):
                 matchStrs = re.findall(r'^[a-zA-Z0-9][0-9a-zA-Z. _\-:&?\'%]+/', agent)
                 if len(matchStrs) > 0:
@@ -141,6 +148,7 @@ class AgentClassifier(AbsClassifer):
     def _count(self, appFeatureRegex, appAgent):
         """
         Count regex
+        :param appAgent: app -> (host, agent) -> tbls
         """
 
         def sortPattern(regexTuples):
@@ -161,16 +169,16 @@ class AgentClassifier(AbsClassifer):
         for predict, regexStr, fRegex in filter(lambda x: x[0] not in appAgent, fAppFeatureRegex):
             regexApp[fRegex].add(predict)
 
-        for app, agents, tbl in appAgent.items():
-            for agent, host in agents:
+        for app, db in appAgent.items():
+            for agntHost, tbls in db.items():
+                agent, host = agntHost
                 covered = set()
                 for predict, regexStr, fRegex in fAppFeatureRegex:
-                    featureStr = fRegex.featureStr
-                    if featureStr not in agent and featureStr not in app:
+                    if fRegex.featureStr not in agent and fRegex.featureStr not in app:
                         continue
                     if regexStr in covered or fRegex.regexObj.search(agent) or fRegex.regexObj.search(app):
                         regexApp[fRegex].add(app)
-                        fRegex.set_match_record(host, app, tbl)
+                        fRegex.set_match_record(host, app, tbls)
                         for regex in self.regexCover[regexStr]:
                             covered.add(regex)
         return regexApp
@@ -180,10 +188,7 @@ class AgentClassifier(AbsClassifer):
             for f in features.values():
                 for featureStr in self._gen_features(f):
                     for regexStr in self._gen_regex(featureStr):
-                        regexObj = re.compile(regexStr, re.IGNORECASE)
-                        # appFeatureRegex[app][regex] = regexObj
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
-                        # self.regexfeatureStr[regexStr] = featureStr
 
     @staticmethod
     def _sample_app(agentTuples, sampleRate):
@@ -193,13 +198,14 @@ class AgentClassifier(AbsClassifer):
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
-        appAgent = defaultdict(set)
+        appAgent = defaultdict(lambda : defaultdict(set))
         for tbl, pkgs in trainSet.items():
             for pkg in pkgs:
                 label = pkg.label
                 agent = pkg.agent
                 agentTuples[label].add(agent)
-                appAgent[label].add( (agent, pkg.host, tbl) )
+                appAgent[label][(agent, pkg.host)].add(tbl)
+
 
         '''
         Sample Apps
@@ -223,7 +229,7 @@ class AgentClassifier(AbsClassifer):
 
         self.persist(regexApp, consts.APP_RULE)
 
-        self._add_host(regexApp, trainSet)
+        self._add_host(regexApp)
 
     def load_rules(self):
         self.rules = {consts.APP_RULE: {}, consts.COMPANY_RULE: {}, consts.CATEGORY_RULE: {}}
