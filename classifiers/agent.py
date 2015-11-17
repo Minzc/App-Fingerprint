@@ -65,10 +65,9 @@ class AgentClassifier(AbsClassifer):
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_AGENT_RULES
         params = []
-        for fRegex, apps in patterns.iteritems():
-            if len(apps) == 1:
-                app = list(apps)[0]
-                params.append((app, 1, 1, fRegex.regexObj.pattern, consts.APP_RULE))
+        for fRegex, apps in filter(lambda item: len(item[1])==1, patterns.iteritems()):
+            app = list(apps)[0]
+            params.append((app, 1, 1, fRegex.regexObj.pattern, consts.APP_RULE))
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
 
@@ -117,7 +116,7 @@ class AgentClassifier(AbsClassifer):
     def _compose_regxobj(self, agentTuples):
         def _compile_regex():
             for featureStr in self._gen_features(f):
-                if len(filter(lambda agent: featureStr in agent, agents)) > 0:
+                if len(filter(lambda agent: featureStr in agent, agents)) > 0 or app in featureStr:
                     for regexStr in self._gen_regex(featureStr):
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
@@ -128,9 +127,6 @@ class AgentClassifier(AbsClassifer):
                     if regexStr not in appFeatureRegex[app]:
                         try:
                             featureStr = matchStrs[0]
-                            # regexObj = re.compile(regexStr, re.IGNORECASE)
-                            # appFeatureRegex[app][regexStr] = regexObj
-                            # self.regexfeatureStr[regexStr] = featureStr
                             appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, None)
                         except:
                             pass
@@ -147,6 +143,10 @@ class AgentClassifier(AbsClassifer):
         return appFeatureRegex
 
     def _prune(self, regexApp):
+        """
+        :param regexApp: FRegex -> apps
+        :return:
+        """
         def sortPattern(regexAppItem):
             fRgex, apps = regexAppItem
             f = fRgex.regexStr
@@ -161,7 +161,7 @@ class AgentClassifier(AbsClassifer):
         regexApp = sorted(regexApp.items(), key=sortPattern, reverse=True)
         rst = defaultdict(set)
         pruned = defaultdict(set)
-        for fRegex, apps in regexApp.items():
+        for fRegex, apps in regexApp:
             if len(apps) == 1:
                 app = list(apps)[0]
                 for regexStr in invRegexCover[app][fRegex.featureStr]:
@@ -258,8 +258,12 @@ class AgentClassifier(AbsClassifer):
         '''
         regexApp = self._count(appFeatureRegex, appAgent)
 
+        print "Finish Counter"
+
         regexApp = self._prune(regexApp)
-        
+
+        print "Finish Pruning"
+
         self.persist(regexApp, consts.APP_RULE)
 
         self._add_host(regexApp)
