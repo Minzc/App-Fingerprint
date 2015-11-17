@@ -116,6 +116,7 @@ class AgentClassifier(AbsClassifer):
     def _compose_regxobj(self, agentTuples):
         def _compile_regex():
             for featureStr in self._gen_features(f):
+                '''1. featureStr in agent. 2. featureStr is app'''
                 if len(filter(lambda agent: featureStr in agent, agents)) > 0 or app in featureStr:
                     for regexStr in self._gen_regex(featureStr):
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
@@ -197,8 +198,8 @@ class AgentClassifier(AbsClassifer):
         '''
         regexApp = defaultdict(set)
 
-        for predict, regexStr, fRegex in filter(lambda x: x[0] not in trainapps, fAppFeatureRegex):
-            regexApp[fRegex].add(predict)
+        # for predict, regexStr, fRegex in filter(lambda x: x[0] not in trainapps, fAppFeatureRegex):
+        #     regexApp[fRegex].add(predict)
 
         for agent, values in appAgent.items():
             covered = set()
@@ -231,14 +232,18 @@ class AgentClassifier(AbsClassifer):
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
     @staticmethod
-    def _sample_app(agentTuples, sampleRate):
+    def _sample_app(agentTuples, cmprsDB, sampleRate):
         import random
         agentTuples = {app: agents for app, agents in agentTuples.iteritems() if random.uniform(0, 1) <= sampleRate}
-        return agentTuples
+        tmp = defaultdict(lambda : defaultdict(lambda : defaultdict(set)))
+        for agent, values in cmprsDB.items():
+            for app in filter(lambda app : app in agentTuples ,values.keys()):
+                tmp[agent][app] = cmprsDB[agent][app]
+        return agentTuples, cmprsDB
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
-        appAgent = defaultdict(lambda : defaultdict(lambda : defaultdict(set)))
+        cmprsDB = defaultdict(lambda : defaultdict(lambda : defaultdict(set)))
         for tbl, pkgs in trainSet.items():
             for pkg in pkgs:
                 label = pkg.label
@@ -248,17 +253,8 @@ class AgentClassifier(AbsClassifer):
         '''
         Sample Apps
         '''
-        agentTuples = self._sample_app(agentTuples, self.sampleRate)
+        agentTuples, cmprsDB = self._sample_app(agentTuples, cmprsDB, self.sampleRate)
         print 'Number of training apps', len(agentTuples)
-
-        for tbl, pkgs in trainSet.items():
-            for pkg in [pkg for pkg in pkgs if pkg.label in agentTuples]:
-                label = pkg.label
-                agent = pkg.agent
-                appAgent[agent][label][pkg.host].add(tbl)
-
-
-
 
         '''
         Compose regular expression
@@ -272,7 +268,7 @@ class AgentClassifier(AbsClassifer):
         '''
         Count regex
         '''
-        regexApp = self._count(appFeatureRegex, appAgent, set(agentTuples.keys()))
+        regexApp = self._count(appFeatureRegex, cmprsDB, set(agentTuples.keys()))
 
         print "Finish Counter"
 
