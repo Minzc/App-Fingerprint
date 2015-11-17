@@ -158,7 +158,7 @@ class AgentClassifier(AbsClassifer):
         invRegexCover = defaultdict(set)
         for regexStr, regexStrs in self.regexCover.items():
             for str in regexStrs:
-                invRegexCover[regexStr].add(str)
+                invRegexCover[str].add(regexStr)
         regexApp = sorted(regexApp.items(), key=sortPattern, reverse=True)
         rst = defaultdict(set)
         pruned = defaultdict(set)
