@@ -347,7 +347,6 @@ class KVClassifier(AbsClassifer):
         # Persist rules
         #############################
         self.persist(specificRules, rule_type)
-        self.__compare(trainData, specificRules, hostSecdomain, appKeyScore)
         self.__init__(self.appType)
         return self
 

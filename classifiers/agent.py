@@ -131,16 +131,11 @@ class AgentClassifier(AbsClassifer):
         def _compile_regex():
             for featureStr in self._gen_features(f):
 
-                if f == "Dunkin'".lower():
-                    print '[COMPOST]', featureStr
-
                 '''1. featureStr in agent. 2. featureStr is app'''
                 if len(filter(lambda agent: featureStr in agent, agents)) > 0 or app in featureStr:
 
                     for regexStr in self._gen_regex(featureStr):
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
-                        if 'dunkin'.lower() in featureStr:
-                            print '[COMPOST] dunkin in', featureStr, regexStr
 
             for agent in filter(lambda x: '/' in x, agents):
                 matchStrs = re.findall(r'^[a-zA-Z0-9][0-9a-zA-Z. _\-:&?\'%]+/', agent)
@@ -222,9 +217,6 @@ class AgentClassifier(AbsClassifer):
             apps = set(values.keys())
 
             for predict, regexStr, fRegex in fAppFeatureRegex:
-                if 'dunkin'.lower() in fRegex.featureStr:
-                    print '[218]'
-
                 if fRegex.featureStr not in agent and fRegex.featureStr != predict:
                     continue
                 if regexStr in covered or fRegex.regexObj.search(agent):

@@ -11,7 +11,7 @@ def classifier_factory(names, appType):
     if name == consts.HEAD_CLASSIFIER:
       classifier = HeaderClassifier()
     elif name == consts.AGENT_CLASSIFIER:
-      classifier = AgentClassifier(inferFrmData = True, sampleRate = 0.5)
+      classifier = AgentClassifier(inferFrmData = True, sampleRate = 1)
     elif name == consts.HOST_CLASSIFIER:
       classifier = HostApp(appType)
     elif name == consts.CMAR_CLASSIFIER:
