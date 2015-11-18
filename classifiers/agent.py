@@ -18,15 +18,18 @@ class FRegex:
         self.regexStr = regexStr
         self.rawF = rawF
         self.regexObj = re.compile(regexStr, re.IGNORECASE)
-        self.matchRecord = defaultdict(lambda: defaultdict(set))
+        self.matchRecord =  defaultdict(lambda: defaultdict(set))
+        self.matchCategory = set()
         self.cover = set()
 
-    def set_match_record(self, host, app, tbls):
+    def set_match_record(self, host, app, tbls, category):
         for tbl in tbls:
             self.matchRecord[host][app].add(tbl)
+        self.matchCategory.add(category)
 
     def set_cover(self, regexSet):
         self.cover = regexSet
+
 
 
 class AgentClassifier(AbsClassifer):
@@ -77,7 +80,7 @@ class AgentClassifier(AbsClassifer):
     def _add_host(self, patterns, hostCategory):
         rst = {}
         for fRegex, apps in patterns.iteritems():
-            if len(apps) > 1 and fRegex.rawF is not None:
+            if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCategory) == 1:
                 for host in fRegex.matchRecord:
                     if len(fRegex.matchRecord[host]) == 1 and len(hostCategory[host]) == 1:
                         rst[(host, fRegex.regexObj.pattern)] = list(fRegex.matchRecord[host])[0]
@@ -108,7 +111,7 @@ class AgentClassifier(AbsClassifer):
             featureStr = featureStr[:-1]
         if featureStr[0].isalnum() == False:
             featureStr = featureStr[1:]
-        
+
         regex = []
         regexStr1 = r'^' + re.escape(featureStr + '/')
         regexStr2 = r'\b' + re.escape(featureStr) + r' \b[vr]?[0-9.]+\b'
@@ -190,7 +193,7 @@ class AgentClassifier(AbsClassifer):
                 rst[fRegex] = apps
         return rst
 
-    def _count(self, appFeatureRegex, appAgent, trainapps):
+    def _count(self, appFeatureRegex, appAgent, trainapps, appCategory):
         """
         Count regex
         :param appAgent: app -> (host, agent) -> tbls
@@ -228,14 +231,14 @@ class AgentClassifier(AbsClassifer):
                     regexApp[fRegex] |= apps
                     for app in apps:
                         for host in values[app]:
-                            fRegex.set_match_record(host, app, values[app][host])
+                            fRegex.set_match_record(host, app, values[app][host], appCategory[app])
                     for regex in self.regexCover[regexStr]:
                         covered.add(regex)
                 elif fRegex.featureStr in apps:
                     app = fRegex.featureStr
                     regexApp[fRegex].add(app)
                     for host in values[app]:
-                        fRegex.set_match_record(host, app, values[app][host])
+                        fRegex.set_match_record(host, app, values[app][host], appCategory[app])
         return regexApp
 
     def _infer_from_xml(self, appFeatureRegex, agentTuples):
@@ -259,6 +262,7 @@ class AgentClassifier(AbsClassifer):
         agentTuples = defaultdict(set)
         cmprsDB = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
         hostCategory = defaultdict(set)
+        appCategory = dict()
         for tbl, pkgs in trainSet.items():
             for pkg in pkgs:
                 label = pkg.label
@@ -266,6 +270,7 @@ class AgentClassifier(AbsClassifer):
                 agentTuples[label].add(agent)
                 cmprsDB[agent][label][pkg.host].add(tbl)
                 hostCategory[pkg.host].add(pkg.category)
+                appCategory[label] = pkg.category
 
         '''
         Sample Apps
@@ -285,7 +290,7 @@ class AgentClassifier(AbsClassifer):
         '''
         Count regex
         '''
-        regexApp = self._count(appFeatureRegex, cmprsDB, set(agentTuples.keys()))
+        regexApp = self._count(appFeatureRegex, cmprsDB, set(agentTuples.keys()), appCategory)
 
         print "Finish Counter"
 
