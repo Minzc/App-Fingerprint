@@ -53,11 +53,12 @@ class AgentClassifier(AbsClassifer):
                 features[key] = value
         return features
 
-    def persist(self, patterns, ruleType):
+    def persist(self, patterns, hostAgent, ruleType):
         """
         Input
         :param patterns : {regex: {app1, app2}}
         :param ruleType : type of rules (App, Company, Category)
+        :param hostAgent: (host, regex) -> label
         """
         self.clean_db(ruleType, consts.SQL_DELETE_AGENT_RULES)
         sqldao = SqlDao()
@@ -65,16 +66,23 @@ class AgentClassifier(AbsClassifer):
         params = []
         for fRegex, apps in filter(lambda item: len(item[1]) == 1, patterns.iteritems()):
             app = list(apps)[0]
-            params.append((app, 1, 1, fRegex.regexObj.pattern, consts.APP_RULE))
+            params.append((app, 1, 1,fRegex.regexObj.pattern, '', consts.APP_RULE))
+        for rule, app in hostAgent.items():
+            host, agentRegex = rule
+            params.append((app, 1, 1, agentRegex, host, consts.APP_RULE))
+
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
 
     def _add_host(self, patterns, hostCategory):
+        rst = {}
         for fRegex, apps in patterns.iteritems():
             if len(apps) > 1 and fRegex.rawF is not None:
                 for host in fRegex.matchRecord:
                     if len(fRegex.matchRecord[host]) == 1 and len(hostCategory[host]) == 1:
+                        rst[(host, fRegex.regexObj.pattern)] = list(fRegex.matchRecord[host])[0]
                         print '[host]', host, fRegex.matchRecord[host], fRegex.featureStr
+        return rst
 
     @staticmethod
     def _gen_features(f):
@@ -114,10 +122,17 @@ class AgentClassifier(AbsClassifer):
     def _compose_regxobj(self, agentTuples):
         def _compile_regex():
             for featureStr in self._gen_features(f):
+
+                if f == "Dunkin'".lower():
+                    print '[COMPOST]', featureStr
+
                 '''1. featureStr in agent. 2. featureStr is app'''
                 if len(filter(lambda agent: featureStr in agent, agents)) > 0 or app in featureStr:
+
                     for regexStr in self._gen_regex(featureStr):
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
+                        if 'dunkin'.lower() in featureStr:
+                            print '[COMPOST] dunkin in', featureStr, regexStr
 
             for agent in filter(lambda x: '/' in x, agents):
                 matchStrs = re.findall(r'^[a-zA-Z0-9][0-9a-zA-Z. _\-:&?\'%]+/', agent)
@@ -199,6 +214,9 @@ class AgentClassifier(AbsClassifer):
             apps = set(values.keys())
 
             for predict, regexStr, fRegex in fAppFeatureRegex:
+                if 'dunkin'.lower() in fRegex.featureStr:
+                    print '[218]'
+
                 if fRegex.featureStr not in agent and fRegex.featureStr != predict:
                     continue
                 if regexStr in covered or fRegex.regexObj.search(agent):
@@ -270,18 +288,26 @@ class AgentClassifier(AbsClassifer):
 
         print "Finish Pruning"
 
-        self.persist(regexApp, consts.APP_RULE)
+        hostAgent = self._add_host(regexApp, hostCategory)
 
-        self._add_host(regexApp, hostCategory)
+        self.persist(regexApp, hostAgent, consts.APP_RULE)
+
+
 
     def load_rules(self):
         self.rules = {consts.APP_RULE: {}, consts.COMPANY_RULE: {}, consts.CATEGORY_RULE: {}}
+        self.rulesHost = {consts.APP_RULE: defaultdict(dict),
+                          consts.COMPANY_RULE: defaultdict(dict),
+                          consts.CATEGORY_RULE: defaultdict(dict)}
         QUERY = consts.SQL_SELECT_AGENT_RULES
         sqldao = SqlDao()
         counter = 0
-        for agentF, label, ruleType in sqldao.execute(QUERY):
+        for host, agentF, label, ruleType in sqldao.execute(QUERY):
             counter += 1
-            self.rules[ruleType][agentF] = (re.compile(agentF), label)
+            if host == '':
+                self.rules[ruleType][agentF] = (re.compile(agentF), label)
+            else:
+                self.rulesHost[ruleType][host][agentF] = (re.compile(agentF), label)
         print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
 
@@ -295,6 +321,12 @@ class AgentClassifier(AbsClassifer):
                 if regex.search(pkg.agent) and len(longestWord) < len(agentF):
                     rstLabel = label
                     longestWord = agentF
+
+            # for agentF, regxNlabel in self.rulesHost[ruleType][pkg.host].items():
+            #     regex, label = regxNlabel
+            #     if regex.search(pkg.agent) and len(longestWord) < len(agentF):
+            #         rstLabel = label
+            #         longestWord = agentF
 
             rst[ruleType] = consts.Prediction(rstLabel, 1.0, longestWord) if rstLabel else consts.NULLPrediction
 

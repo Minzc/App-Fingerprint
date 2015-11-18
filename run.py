@@ -7,7 +7,7 @@ import argparse
 from rules.rule_manager import RuleManager
 from classifiers.classifier_factory import classifier_factory
 
-LIMIT = 100
+LIMIT = None
 INSERT = False
 PRUNE = False
 
