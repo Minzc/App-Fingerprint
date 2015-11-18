@@ -104,6 +104,11 @@ class AgentClassifier(AbsClassifer):
         return featureSet
 
     def _gen_regex(self, featureStr):
+        if featureStr[-1].isalnum() == False:
+            featureStr = featureStr[:-1]
+        if featureStr[0].isalnum() == False:
+            featureStr = featureStr[1:]
+        
         regex = []
         regexStr1 = r'^' + re.escape(featureStr + '/')
         regexStr2 = r'\b' + re.escape(featureStr) + r' \b[vr]?[0-9.]+\b'
