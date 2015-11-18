@@ -332,11 +332,11 @@ class AgentClassifier(AbsClassifer):
                     rstLabel = label
                     longestWord = agentF
 
-            # for agentF, regxNlabel in self.rulesHost[ruleType][pkg.host].items():
-            #     regex, label = regxNlabel
-            #     if regex.search(pkg.agent) and len(longestWord) < len(agentF):
-            #         rstLabel = label
-            #         longestWord = agentF
+            for agentF, regxNlabel in self.rulesHost[ruleType][pkg.host].items():
+                regex, label = regxNlabel
+                if regex.search(pkg.agent) and len(longestWord) < len(agentF):
+                    rstLabel = label
+                    longestWord = agentF
 
             rst[ruleType] = consts.Prediction(rstLabel, 1.0, longestWord) if rstLabel else consts.NULLPrediction
 
