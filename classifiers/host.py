@@ -40,7 +40,6 @@ class HostApp(AbsClassifer):
         return True
 
     def count(self, pkg):
-
         host = url_clean(pkg.host)
         refer_host = pkg.refer_host
         if not host:
@@ -93,6 +92,7 @@ class HostApp(AbsClassifer):
             if len(labels) == 1:
                 label = list(labels)[0]
                 ifValidRule = self._check(url, label, expApp[label].website)
+                ifValidRule = ifValidRule | self._check(url, label, label)
 
                 if ifValidRule:
                     self.rules[rule_type][url] = (label, set())
@@ -151,9 +151,8 @@ class HostApp(AbsClassifer):
             predict = consts.NULLPrediction
             for regexStr, ruleTuple in self.rules[ruleType].iteritems():
                 label, support, regexObj = ruleTuple
-                host = pkg.refer_host if pkg.refer_host else pkg.host
-                if pkg.app == 'com.idrudgereport.idrudgereportuniversal' and pkg.host == 'images.politico.com':
-                    print '>>>', host, pkg.refer_host, host
+                #host = pkg.refer_host if pkg.refer_host else pkg.host
+                host = pkg.host
                 match = regexObj.search(host)
                 if match and predict.score < support:
                     predict = consts.Prediction(label, support, (host, regexStr, support))
