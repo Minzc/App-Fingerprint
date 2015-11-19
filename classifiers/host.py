@@ -161,8 +161,6 @@ class HostApp(AbsClassifer):
                 if match and predict.score < support:
                     if match.start() == 0:
                         predict = consts.Prediction(label, support, (host, regexStr, support))
-                    else:
-                        print pkg.rawHost, regexObj.pattern
 
                     # if pkg.app == 'com.logos.vyrso' and pkg.host == 'gsp1.apple.com':
                     #   print regexStr
