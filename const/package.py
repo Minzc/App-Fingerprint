@@ -57,7 +57,8 @@ class Package:
         query = urlparse.parse_qs(urlparse.urlparse(url).query, True)
         host = parsed_url.netloc
         # path = parsed_url.path
-        self.refer_host = host.replace('http://', '').replace('www.', '').split(':')[0]
+        self.refer_rawHost = host.replace('http://', '').split('/')[0].split(':')[0]
+        self.refer_host = self.refer_rawHost.replace('www.', '')
         self.refer_queries = query
 
         extracted = tldextract.extract(self.refer_host)

@@ -82,6 +82,7 @@ class HostApp(AbsClassifer):
             for pkg in pkgs:
                 self.count(pkg)
                 rawHosts[pkg.host] = pkg.rawHost
+                rawHosts[pkg.refer_host] = pkg.refer_rawHost
         ########################
         # Generate Rules
         ########################
