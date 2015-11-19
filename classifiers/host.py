@@ -29,21 +29,18 @@ class HostApp(AbsClassifer):
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
 
+    def _check(self, url, label, string):
+        urlSegs = set(url.split('.'))
+        strSegs = set(string.split('.'))
+        commonStrs = urlSegs.intersection(strSegs)
+        if label == 'net.ohmychef.startup':
+            print commonStrs
+        if len(commonStrs.intersection(self.fLib[label])) == 0:
+            return False
+        return True
+
     def count(self, pkg):
-        def addCommonStr(url, label, str):
-            urlSegs = set(url.split('.'))
-            strSegs = set(str.split('.'))
-            commonStrs = urlSegs.intersection(strSegs)
-            if label == 'net.ohmychef.startup':
-                print commonStrs
-            if len(commonStrs.intersection(self.fLib[label])) == 0:
-                return
-            candidates.add((label, url))
 
-
-
-
-        candidates = set()
         host = url_clean(pkg.host)
         refer_host = pkg.refer_host
         if not host:
@@ -51,8 +48,6 @@ class HostApp(AbsClassifer):
 
         self.labelAppInfo[pkg.label] = [pkg.website]
         map(lambda url: self.urlLabel[url].add(pkg.label), [host, refer_host])
-        map(lambda string: addCommonStr(host, pkg.label, string), [pkg.website])
-
 
     @staticmethod
     def _clean_db(rule_type):
@@ -77,7 +72,6 @@ class HostApp(AbsClassifer):
         for label, segs in self.fLib.items():
             self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1}
 
-
     def train(self, records, rule_type):
         expApp = load_exp_app()[self.appType]
         expApp = {label: AppInfos.get(self.appType, label) for label in expApp}
@@ -97,7 +91,7 @@ class HostApp(AbsClassifer):
 
             if len(labels) == 1:
                 label = list(labels)[0]
-                ifValidRule = True
+                ifValidRule = self._check(url, pkg.label, pkg.website)
 
                 if ifValidRule:
                     self.rules[rule_type][url] = (label, set())
@@ -124,7 +118,6 @@ class HostApp(AbsClassifer):
         print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
 
-
     def count_support(self, records):
         LABEL = 0
         TBLSUPPORT = 1
@@ -133,12 +126,11 @@ class HostApp(AbsClassifer):
                 for ruleType in self.rules:
                     host = url_clean(pkg.host)
                     refer_host = pkg.refer_host
-                    for url in [host,  refer_host]:
+                    for url in [host, refer_host]:
                         if url in self.rules[ruleType]:
                             label = self.rules[ruleType][url][LABEL]
                             if label == pkg.label:
                                 self.rules[ruleType][url][TBLSUPPORT].add(tbl)
-
 
     def _recount(self, records):
         for tbl, pkgs in records.items():
