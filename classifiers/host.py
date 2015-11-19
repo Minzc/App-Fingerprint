@@ -155,7 +155,7 @@ class HostApp(AbsClassifer):
             for regexStr, ruleTuple in self.rules[ruleType].iteritems():
                 label, support, regexObj = ruleTuple
                 #host = pkg.refer_host if pkg.refer_host else pkg.host
-                host = pkg.host
+                host = pkg.rawHost
                 match = regexObj.search(host)
                 if match and predict.score < support:
                     predict = consts.Prediction(label, support, (host, regexStr, support))
