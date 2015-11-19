@@ -72,6 +72,7 @@ class HostApp(AbsClassifer):
         for label, segs in self.fLib.items():
             self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1}
 
+
     def train(self, records, rule_type):
         expApp = load_exp_app()[self.appType]
         expApp = {label: AppInfos.get(self.appType, label) for label in expApp}
@@ -91,7 +92,7 @@ class HostApp(AbsClassifer):
 
             if len(labels) == 1:
                 label = list(labels)[0]
-                ifValidRule = self._check(url, pkg.label, pkg.website)
+                ifValidRule = self._check(url, label, expApp[label].website)
 
                 if ifValidRule:
                     self.rules[rule_type][url] = (label, set())
