@@ -17,7 +17,7 @@ class HostApp(AbsClassifer):
         self.labelAppInfo = {}
         self.rules = defaultdict(dict)
 
-    def persist(self, patterns, rule_type):
+    def persist(self, patterns, rawHosts, rule_type):
         self._clean_db(rule_type)
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_HOST_RULES
@@ -25,6 +25,7 @@ class HostApp(AbsClassifer):
         for ruleType in patterns:
             for url, labelNsupport in patterns[ruleType].iteritems():
                 label, support = labelNsupport
+                url = rawHosts[url]
                 params.append((label, len(support), 1, url, ruleType))
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
@@ -76,9 +77,11 @@ class HostApp(AbsClassifer):
         expApp = load_exp_app()[self.appType]
         expApp = {label: AppInfos.get(self.appType, label) for label in expApp}
         self._feature_lib(expApp)
+        rawHosts = {}
         for pkgs in records.values():
             for pkg in pkgs:
                 self.count(pkg)
+                rawHosts[pkg.host] = pkg.rawHost
         ########################
         # Generate Rules
         ########################
@@ -103,7 +106,7 @@ class HostApp(AbsClassifer):
         print 'number of rule', len(self.rules[consts.APP_RULE])
 
         self.count_support(records)
-        self.persist(self.rules, rule_type)
+        self.persist(self.rules, rawHosts, rule_type)
         self.__init__(self.appType)
         return self
 
