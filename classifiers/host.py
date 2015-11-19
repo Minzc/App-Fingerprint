@@ -30,20 +30,20 @@ class HostApp(AbsClassifer):
         sqldao.close()
 
     def count(self, pkg):
-        def addCommonStr(url, label, string):
-            common_str = longest_common_substring(url.lower(), string.lower())
-            common_str = common_str.strip('.')
-            #print common_str, url, string, label
-            if common_str not in self.fLib[label]:
+        def addCommonStr(url, label, str):
+            urlSegs = set(url.split('.'))
+            strSegs = set(str.split('.'))
+            commonStrs = urlSegs.intersection(strSegs)
+            if label == 'net.ohmychef.startup':
+                print commonStrs
+            if len(commonStrs.intersection(self.fLib[label])) == 0:
                 return
-            # for subStr in filter( lambda x: common_str in x, string.split('.')):
-            #     sPos = subStr.find(common_str)
-            #     ePos = sPos + len(common_str)
-            #     if sPos != 0 and ePos != len(subStr):
-            #         return
-            self.substrCompany[common_str].add(pkg.label)
+            candidates.add((label, url))
 
 
+
+
+        candidates = set()
         host = url_clean(pkg.host)
         refer_host = pkg.refer_host
         if not host:
@@ -53,22 +53,6 @@ class HostApp(AbsClassifer):
         map(lambda url: self.urlLabel[url].add(pkg.label), [host, refer_host])
         map(lambda string: addCommonStr(host, pkg.label, string), [pkg.website])
 
-    def checkCommonStr(self, label, url):
-        for astr in self.labelAppInfo[label]:
-            common_str = longest_common_substring(url.lower(), astr.lower())
-            common_str = common_str.strip('.')
-            if url in test_str:
-                print common_str, url,astr
-                print self.substrCompany[common_str], url
-            subCompanyLen = len(self.substrCompany[common_str])
-            strValid = True if len(common_str) > 2 else False
-            companyValid = True if 5 > subCompanyLen > 0 else False
-
-            if companyValid and strValid:
-                if url in test_str:
-                    print 'INNNNNNNNNNNN', url, label, common_str
-                return True
-        return False
 
     @staticmethod
     def _clean_db(rule_type):
@@ -79,16 +63,20 @@ class HostApp(AbsClassifer):
 
     def _feature_lib(self, expApp):
         self.fLib = defaultdict(set)
+        segApps = defaultdict(set)
         for label, appInfo in expApp.iteritems():
             appSegs = appInfo.package.split('.')
             companySegs = appInfo.company.split(' ')
             categorySegs = appInfo.category.split(' ')
             websiteSegs = url_clean(appInfo.website).split('.')
-            print websiteSegs
             wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs]
             for segs in wholeSegs:
                 for seg in segs:
                     self.fLib[label].add(seg)
+                    segApps[seg].add(label)
+        for label, segs in self.fLib.items():
+            self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1}
+
 
     def train(self, records, rule_type):
         expApp = load_exp_app()[self.appType]
@@ -97,7 +85,6 @@ class HostApp(AbsClassifer):
         for pkgs in records.values():
             for pkg in pkgs:
                 self.count(pkg)
-        self._recount(records)
         ########################
         # Generate Rules
         ########################
@@ -109,8 +96,8 @@ class HostApp(AbsClassifer):
                 print url
 
             if len(labels) == 1:
-                label = labels.pop()
-                ifValidRule = True if self.checkCommonStr(label, url) else False
+                label = list(labels)[0]
+                ifValidRule = True
 
                 if ifValidRule:
                     self.rules[rule_type][url] = (label, set())

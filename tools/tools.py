@@ -342,8 +342,6 @@ if __name__ == '__main__':
   elif sys.argv[1] == 'company':
     print 'stat'
     statCompany()
-  elif sys.argv[1] == 'suffix':
-    test_suffix_tree()
   elif sys.argv[1] == 'expids':
     getExpAppList(sys.argv[2])
   elif sys.argv[1] == 'select':

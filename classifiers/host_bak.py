@@ -33,6 +33,8 @@ class HostApp(AbsClassifer):
         def addCommonStr(url, label, string):
             common_str = longest_common_substring(url.lower(), string.lower())
             common_str = common_str.strip('.')
+            if label == 'net.ohmychef.startup':
+                print common_str, common_str not in self.fLib[label]
             #print common_str, url, string, label
             if common_str not in self.fLib[label]:
                 return

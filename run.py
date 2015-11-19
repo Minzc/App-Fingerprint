@@ -20,8 +20,8 @@ TRAIN_LABEL = {
 
 USED_CLASSIFIERS = [
   # consts.HEAD_CLASSIFIER,
-  consts.AGENT_CLASSIFIER,
-  #  consts.HOST_CLASSIFIER,
+  #consts.AGENT_CLASSIFIER,
+    consts.HOST_CLASSIFIER,
   # consts.CMAR_CLASSIFIER,
    # consts.KV_CLASSIFIER,
 ]
@@ -193,7 +193,7 @@ def _insert_rst(testSet, DB, inforTrack):
     detectedApps = {app for app, _ in inforTrack[consts.DISCOVERED_APP_LIST]}
     for pkgId, pkg in testSet.iteritems():
         if pkg.app not in detectedApps:
-            params.append((3, pkgId));
+            params.append((3, pkgId))
 
     sqldao.executeBatch(QUERY, params)
     sqldao.close()
