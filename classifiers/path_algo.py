@@ -279,16 +279,21 @@ class PathApp(AbsClassifer):
         return self
 
     def load_rules(self):
-        self.rules = {consts.APP_RULE: {}, consts.COMPANY_RULE: {}, consts.CATEGORY_RULE: {}}
-        QUERY = consts.SQL_SELECT_HOST_RULES
+        self.rules = {}
+        self.rules[consts.APP_RULE] = defaultdict(lambda: defaultdict())
+        self.rules[consts.COMPANY_RULE] = defaultdict(lambda: defaultdict())
+        self.rules[consts.CATEGORY_RULE] = defaultdict(lambda: defaultdict())
         sqldao = SqlDao()
         counter = 0
-        for host, label, ruleType, support in sqldao.execute(QUERY):
+        SQL = consts.SQL_SELECT_CMAR_RULES
+        for label, patterns, host, ruleType, support in sqldao.execute(SQL):
             counter += 1
-            regexObj = re.compile(r'\b' + re.escape(host) + r'\b')
-            self.rules[ruleType][host] = (label, support, regexObj)
-        print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
+            patterns = frozenset(map(lambda x: x.strip(), patterns.split(",")))
+            self.rules[ruleType][host][patterns] = (label, support)
         sqldao.close()
+        print '>>>[CMAR] Totaly number of rules is', counter
+        for ruleType in self.rules:
+            print '>>>[CMAR] Rule Type %s Number of Rules %s' % (ruleType, len(self.rules[ruleType]))
 
     def count_support(self, rules, records):
         for tbl, pkgs in records.items():
@@ -307,31 +312,26 @@ class PathApp(AbsClassifer):
                     if len(labels) == 1 and (url in pkg.host or url in pkg.refer_host):
                         self.pathLabel[url].add(pkg.label)
 
-    def classify(self, pkg):
-        """
-        Input
-        - self.rules : {ruleType: {host : (label, support, regexObj)}}
-        :param pkg: http packet
-        """
-        rst = {}
-        for ruleType in self.rules:
-            predict = consts.NULLPrediction
-            for regexStr, ruleTuple in self.rules[ruleType].iteritems():
-                label, support, regexObj = ruleTuple
-                # host = pkg.refer_host if pkg.refer_host else pkg.host
-                host = pkg.rawHost
-                match = regexObj.search(host)
-                if match and predict.score < support:
-                    if match.start() == 0:
-                        predict = consts.Prediction(label, support, (host, regexStr, support))
+    def classify(self, package):
+        '''
+    Return {type:[(label, confidence)]}
+    '''
+        labelRsts = {}
+        features = self._get_package_f(package)
+        for rule_type, rules in self.rules.iteritems():
+            rst = consts.NULLPrediction
+            max_confidence = 0
+            if package.host in rules.keys():
+                for rule, label_confidence in rules[package.host].iteritems():
+                    label, confidence = label_confidence
+                    if rule.issubset(features):  # and confidence > max_confidence:
+                        max_confidence = confidence
+                        rst = consts.Prediction(label, confidence, rule)
 
-                        # if pkg.app == 'com.logos.vyrso' and pkg.host == 'gsp1.apple.com':
-                        #   print regexStr
-                        # print match
-
-            rst[ruleType] = predict
-            if predict.label != pkg.app and predict.label is not None:
-                print 'Evidence:', predict.evidence, 'App:', pkg.app, 'Predict:', predict.label
-        return rst
+            labelRsts[rule_type] = rst
+            if rule_type == consts.APP_RULE and rst != consts.NULLPrediction and rst.label != package.app:
+                print rst, package.app
+                print '=' * 10
+        return labelRsts
 
 
