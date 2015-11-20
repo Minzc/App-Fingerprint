@@ -16,18 +16,18 @@ class KVClassifier(AbsClassifer):
         self.name = consts.KV_CLASSIFIER
         self.compressedDB = {consts.APP_RULE: __create_dict(), consts.COMPANY_RULE: __create_dict()}
         self.valueLabelCounter = {consts.APP_RULE: defaultdict(set), consts.COMPANY_RULE: defaultdict(set)}
-        self.appCompanyRelation = {}
-        self.companyAppRelation = defaultdict(set)
+        #self.appCompanyRelation = {}
+        #self.companyAppRelation = defaultdict(set)
         self.rules = {}
         self.appType = appType
         self.xmlFeatures = load_xml_features()
         self.inferFrmData = inferFrmData
         self.sampleRate = sampleRate
-        self.xmlFieldValues = defaultdict(lambda : defaultdict(set))
-        for app in self.xmlFeatures:
-            for k,v in self.xmlFeatures[app]:
-                if len(v) != 0 and if_version(v) == False:
-                    self.xmlFieldValues[app][k].add(v)
+        # self.xmlFieldValues = defaultdict(lambda : defaultdict(set))
+        # for app in self.xmlFeatures:
+        #     for k,v in self.xmlFeatures[app]:
+        #         if len(v) != 0 and if_version(v) == False:
+        #             self.xmlFieldValues[app][k].add(v)
 
 
 
@@ -118,13 +118,6 @@ class KVClassifier(AbsClassifer):
 
 
         return keyScore
-
-    # def _check_high_confrule(self, valueApps):
-    #   ifValid = True
-    #   for value, apps in valueApps.items():
-    #     if len(apps) > 1:
-    #       ifValid = False
-    #   return ifValid
 
     @staticmethod
     def _generate_keys(keyScore):
@@ -276,6 +269,11 @@ class KVClassifier(AbsClassifer):
 
     def _infer_from_xml(self, specificRules, xmlGenRules, rmApps, appKeyScore):
         print 'Start Infering'
+        xmlFieldValues = defaultdict(lambda : defaultdict(set))
+        for app in self.xmlFeatures:
+            for k,v in self.xmlFeatures[app]:
+                if len(v) != 0 and if_version(v) == False:
+                    xmlFieldValues[app][k].add(v)
         interestedXmlRules = defaultdict(set)
         for rule in xmlGenRules:
             host, key = rule
@@ -285,8 +283,8 @@ class KVClassifier(AbsClassifer):
 
         for fieldName, rules in interestedXmlRules.items():
             for app in rmApps:
-                if len(self.xmlFieldValues[app][fieldName]) == 1:
-                    for value in self.xmlFieldValues[app][fieldName]:
+                if len(xmlFieldValues[app][fieldName]) == 1:
+                    for value in xmlFieldValues[app][fieldName]:
                         rules = sorted(rules, key=lambda x: x[2], reverse=True)[:3]
                         for rule in rules:
                             host, key, score = rule
@@ -308,8 +306,8 @@ class KVClassifier(AbsClassifer):
             self.compressedDB[consts.COMPANY_RULE][pkg.secdomain][k][pkg.company][v].add(tbl)
             self.valueLabelCounter[consts.APP_RULE][v].add(pkg.label)
             self.valueLabelCounter[consts.COMPANY_RULE][v].add(pkg.company)
-            self.appCompanyRelation[pkg.app] = pkg.company
-            self.companyAppRelation[pkg.company].add(pkg.app)
+            #self.appCompanyRelation[pkg.app] = pkg.company
+            #self.companyAppRelation[pkg.company].add(pkg.app)
 
         xmlGenRules, xmlSpecificRules, hostSecdomain = self._gen_xml_rules(trainData)
         ##################
@@ -347,6 +345,7 @@ class KVClassifier(AbsClassifer):
         # Persist rules
         #############################
         self.persist(specificRules, rule_type)
+        self.__compare(trainData, specificRules, hostSecdomain, appKeyScore)
         self.__init__(self.appType)
         return self
 

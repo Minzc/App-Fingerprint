@@ -191,10 +191,15 @@ class PathApp(AbsClassifer):
     def _check(self, url, label):
         for featureSet in self.fLib[label]:
             ifIn = True
-            for feature in featureSet:
-                if feature not in url:
-                     ifIn = False
-            if ifIn == True:
+
+            if type(featureSet) == tuple:
+                for feature in featureSet:
+                    if feature not in url:
+                         ifIn = False
+            else:
+                ifIn = featureSet in url
+
+            if ifIn == True > 0:
                 return True
         return False
 
@@ -212,20 +217,22 @@ class PathApp(AbsClassifer):
         sqldao.close()
 
     def _feature_lib(self, expApp):
-        def _get2itemset(fSet):
-            return [(fSet[i], fSet[i+1]) for i in range(0, len(fSet)-1)]
+        def _getitemset(fSet):
+            itemset = map(lambda x: (x), fSet)
+            itemset += [(fSet[i], fSet[i+1]) for i in range(0, len(fSet)-1)]
+            return itemset
 
         self.fLib = defaultdict(set)
         segApps = defaultdict(set)
         for label, appInfo in expApp.iteritems():
             appSegs = appInfo.package.split('.')
-            appSegs += _get2itemset(appSegs)
+            appSegs = _getitemset(appSegs)
 
             companySegs = appInfo.company.split(' ')
-            companySegs += _get2itemset(companySegs)
+            companySegs = _getitemset(companySegs)
 
             nameSegs = appInfo.name.split(' ')
-            nameSegs += _get2itemset(nameSegs)
+            nameSegs = _getitemset(nameSegs)
 
             categorySegs = appInfo.category.split(' ')
 
@@ -241,7 +248,7 @@ class PathApp(AbsClassifer):
                 for seg in segs:
                     self.fLib[label].add(seg)
                     segApps[seg].add(label)
-        # print self.fLib['com.dci.blackenterprise']
+        print self.fLib['com.kidbabytoddler.fairycolors']
 
         for label, segs in self.fLib.items():
             self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1}
