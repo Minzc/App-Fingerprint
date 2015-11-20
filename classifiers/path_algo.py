@@ -163,7 +163,7 @@ import re
 
 
 
-test_str = {'stats.3sidedcube.com', 'redcross.com'}
+test_str = {'hyatt'}
 
 
 class PathApp(AbsClassifer):
@@ -186,7 +186,7 @@ class PathApp(AbsClassifer):
                     params.append((label, pathSeg, 1, len(tbls), host, ruleType))
             sqldao.executeBatch(QUERY, params)
             sqldao.close()
-            print "Total Number of Rules is", len(rules)
+            print "Total Number of Rules is", len(rules[ruleType])
 
     def _check(self, url, label):
         for feature in self.fLib[label]:
@@ -295,6 +295,8 @@ class PathApp(AbsClassifer):
                     for feature in self._get_package_f(pkg):
                         if feature in rules[ruleType] and pkg.app == rules[ruleType][feature]:
                             self.rules[ruleType][feature][pkg.app][pkg.host].add(tbl)
+                        elif feature in rules[ruleType] and pkg.app != rules[ruleType][feature]:
+                            print rules[ruleType][feature]
 
 
     def _recount(self, records):
