@@ -172,7 +172,7 @@ class PathApp(AbsClassifer):
         self.pathLabel = defaultdict(set)
         self.substrCompany = defaultdict(set)
         self.labelAppInfo = {}
-        self.rules = defaultdict(lambda : defaultdict(lambda x : defaultdict( lambda x: defaultdict(set))))
+        self.rules = defaultdict(lambda : defaultdict(lambda : defaultdict( lambda : defaultdict(set))))
         self.xmlFeatures = load_xml_features()
 
     def _persist(self, rules, rule_type):
@@ -216,8 +216,8 @@ class PathApp(AbsClassifer):
             categorySegs = appInfo.category.split(' ')
             websiteSegs = url_clean(appInfo.website).split('.')
             valueSegs = set()
-            for _, value in self.xmlFeatures[label].items():
-                valueSegs |= value.split(' ')
+            for _, value in self.xmlFeatures[label]:
+                valueSegs |= set(value.split(' '))
 
             wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs, valueSegs]
 
@@ -244,6 +244,8 @@ class PathApp(AbsClassifer):
         # Generate Rules
         ########################
 
+        rules = defaultdict(lambda : defaultdict())
+
         for pathSeg, labels in self.pathLabel.iteritems():
             if pathSeg in test_str:
                 print '#', len(labels)
@@ -255,14 +257,14 @@ class PathApp(AbsClassifer):
                 ifValidRule = self._check(pathSeg, label)
 
                 if ifValidRule:
-                    self.rules[rule_type][pathSeg][label] = defaultdict(set)
+                    rules[rule_type][pathSeg] = label
 
                 if pathSeg in test_str:
                     print 'Rule Type is', rule_type, ifValidRule, pathSeg
 
         print 'number of rule', len(self.rules[consts.APP_RULE])
 
-        self.count_support(records)
+        self.count_support(rules, records)
         self._persist(self.rules,  rule_type)
         self.__init__(self.appType)
         return self
@@ -279,12 +281,12 @@ class PathApp(AbsClassifer):
         print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
 
-    def count_support(self, records):
+    def count_support(self, rules, records):
         for tbl, pkgs in records.items():
             for pkg in pkgs:
-                for ruleType in self.rules:
+                for ruleType in rules:
                     for feature in self._get_package_f(pkg):
-                        if feature in self.rules[ruleType] and pkg.app in self.rules[ruleType][feature]:
+                        if feature in rules[ruleType] and pkg.app in rules[ruleType][feature]:
                             self.rules[ruleType][feature][pkg.app][pkg.host].add(tbl)
 
 

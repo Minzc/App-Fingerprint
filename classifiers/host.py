@@ -169,4 +169,5 @@ class HostApp(AbsClassifer):
             rst[ruleType] = predict
             if predict.label != pkg.app and predict.label is not None:
                 print 'Evidence:', predict.evidence, 'App:', pkg.app, 'Predict:', predict.label
+                print pkg.rawHost, pkg.host
         return rst
