@@ -189,7 +189,7 @@ class PathApp(AbsClassifer):
             print "Total Number of Rules is", len(rules)
 
     def _check(self, url, label):
-        for _, feature in self.fLib[label]:
+        for feature in self.fLib[label]:
             if feature in url:
                 return True
         return False
@@ -227,10 +227,14 @@ class PathApp(AbsClassifer):
                     segApps[seg].add(label)
         for label, segs in self.fLib.items():
             self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1}
+        print self.fLib['com.iphonehyatt.prod']
+        print 'hyatt' in self.fLib['com.iphonehyatt.prod']
 
     def _get_package_f(self, package):
         """Get package features"""
         features = filter(None, map(lambda x: x.strip(), package.path.split('/')))
+        if package.id == 257802 and package.label == 'com.iphonehyatt.prod':
+            print features
         return features
 
     def train(self, records, rule_type):
@@ -255,6 +259,9 @@ class PathApp(AbsClassifer):
             if len(labels) == 1:
                 label = list(labels)[0]
                 ifValidRule = self._check(pathSeg, label)
+
+                if pathSeg == 'hyatt':
+                    print ifValidRule, 'hyatt' in self.fLib[label], label
 
                 if ifValidRule:
                     rules[rule_type][pathSeg] = label
