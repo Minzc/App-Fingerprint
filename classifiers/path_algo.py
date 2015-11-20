@@ -1,6 +1,6 @@
-from utils import  flatten
+from utils import flatten
 from utils import load_xml_features
-from utils import  url_clean, load_exp_app
+from utils import url_clean, load_exp_app
 from sqldao import SqlDao
 from collections import defaultdict
 import const.consts as consts
@@ -172,7 +172,7 @@ class PathApp(AbsClassifer):
         self.pathLabel = defaultdict(set)
         self.substrCompany = defaultdict(set)
         self.labelAppInfo = {}
-        self.rules = defaultdict(lambda : defaultdict(lambda : defaultdict( lambda : defaultdict(set))))
+        self.rules = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(set))))
         self.xmlFeatures = load_xml_features()
 
     def _persist(self, rules, rule_type):
@@ -181,9 +181,9 @@ class PathApp(AbsClassifer):
         QUERY = consts.SQL_INSERT_CMAR_RULES
         params = []
         for ruleType in rules:
+            print 'Length is', len(rules[ruleType])
             for pathSeg, label, host, tbls in flatten(rules[ruleType]):
-                for label, scores in rules[ruleType][host][pathSeg].items():
-                    params.append((label, pathSeg, 1, len(tbls), host, ruleType))
+                params.append((label, pathSeg, 1, len(tbls), host, ruleType))
             sqldao.executeBatch(QUERY, params)
             sqldao.close()
             print "Total Number of Rules is", len(rules[ruleType])
@@ -230,7 +230,8 @@ class PathApp(AbsClassifer):
         print self.fLib['com.iphonehyatt.prod']
         print 'hyatt' in self.fLib['com.iphonehyatt.prod']
 
-    def _get_package_f(self, package):
+    @staticmethod
+    def _get_package_f(package):
         """Get package features"""
         features = filter(None, map(lambda x: x.strip(), package.path.split('/')))
         if package.id == 257802 and package.label == 'com.iphonehyatt.prod':
@@ -248,7 +249,7 @@ class PathApp(AbsClassifer):
         # Generate Rules
         ########################
 
-        rules = defaultdict(lambda : defaultdict())
+        rules = defaultdict(dict)
 
         for pathSeg, labels in self.pathLabel.iteritems():
             if pathSeg in test_str:
@@ -271,8 +272,9 @@ class PathApp(AbsClassifer):
 
         print 'number of rule', len(rules[consts.APP_RULE])
 
+        print rules
         self.count_support(rules, records)
-        self._persist(self.rules,  rule_type)
+        self._persist(self.rules, rule_type)
         self.__init__(self.appType)
         return self
 
@@ -298,7 +300,6 @@ class PathApp(AbsClassifer):
                         elif feature in rules[ruleType] and pkg.app != rules[ruleType][feature]:
                             print rules[ruleType][feature]
 
-
     def _recount(self, records):
         for tbl, pkgs in records.items():
             for pkg in pkgs:
@@ -317,21 +318,20 @@ class PathApp(AbsClassifer):
             predict = consts.NULLPrediction
             for regexStr, ruleTuple in self.rules[ruleType].iteritems():
                 label, support, regexObj = ruleTuple
-                #host = pkg.refer_host if pkg.refer_host else pkg.host
+                # host = pkg.refer_host if pkg.refer_host else pkg.host
                 host = pkg.rawHost
                 match = regexObj.search(host)
                 if match and predict.score < support:
                     if match.start() == 0:
                         predict = consts.Prediction(label, support, (host, regexStr, support))
 
-                    # if pkg.app == 'com.logos.vyrso' and pkg.host == 'gsp1.apple.com':
-                    #   print regexStr
-                    # print match
+                        # if pkg.app == 'com.logos.vyrso' and pkg.host == 'gsp1.apple.com':
+                        #   print regexStr
+                        # print match
 
             rst[ruleType] = predict
             if predict.label != pkg.app and predict.label is not None:
                 print 'Evidence:', predict.evidence, 'App:', pkg.app, 'Predict:', predict.label
         return rst
 
-if __name__ == '__main__':
-    host_tree()
+
