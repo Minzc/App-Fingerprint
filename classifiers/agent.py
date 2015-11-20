@@ -138,7 +138,7 @@ class AgentClassifier(AbsClassifer):
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
             for agent in filter(lambda x: '/' in x, agents):
-                matchStrs = re.findall(r'^[a-zA-Z0-9][0-9a-zA-Z. _\-:&?\'%]+/', agent)
+                matchStrs = re.findall(r'^[a-zA-Z0-9][0-9a-zA-Z. _\-:&?\'%!]+/', agent)
                 if len(matchStrs) > 0:
                     regexStr = r'^' + re.escape(matchStrs[0])
                     if regexStr not in appFeatureRegex[app]:

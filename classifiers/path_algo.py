@@ -163,7 +163,7 @@ import re
 
 
 
-test_str = {'hyatt'}
+test_str = {'Black%20Enterprise'.lower()}
 
 
 class PathApp(AbsClassifer):
@@ -189,8 +189,12 @@ class PathApp(AbsClassifer):
             print "Total Number of Rules is", len(rules[ruleType])
 
     def _check(self, url, label):
-        for feature in self.fLib[label]:
-            if feature in url:
+        for featureSet in self.fLib[label]:
+            ifIn = True
+            for feature in featureSet:
+                if feature not in url:
+                     ifIn = False
+            if ifIn == True:
                 return True
         return False
 
@@ -208,27 +212,42 @@ class PathApp(AbsClassifer):
         sqldao.close()
 
     def _feature_lib(self, expApp):
+        def _get2itemset(fSet):
+            return [(fSet[i], fSet[i+1]) for i in range(0, len(fSet)-1)]
+
         self.fLib = defaultdict(set)
         segApps = defaultdict(set)
         for label, appInfo in expApp.iteritems():
             appSegs = appInfo.package.split('.')
+            appSegs += _get2itemset(appSegs)
+
             companySegs = appInfo.company.split(' ')
+            companySegs += _get2itemset(companySegs)
+
+            nameSegs = appInfo.name.split(' ')
+            nameSegs += _get2itemset(nameSegs)
+
             categorySegs = appInfo.category.split(' ')
+
             websiteSegs = url_clean(appInfo.website).split('.')
+
             valueSegs = set()
             for _, value in self.xmlFeatures[label]:
                 valueSegs |= set(value.split(' '))
 
-            wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs, valueSegs]
+            wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs, valueSegs, nameSegs]
 
             for segs in wholeSegs:
                 for seg in segs:
                     self.fLib[label].add(seg)
                     segApps[seg].add(label)
+        # print self.fLib['com.dci.blackenterprise']
+
         for label, segs in self.fLib.items():
             self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1}
-        print self.fLib['com.iphonehyatt.prod']
-        print 'hyatt' in self.fLib['com.iphonehyatt.prod']
+
+        # print self.fLib['com.dci.blackenterprise']
+        # print 'Enterprise'.lower() in self.fLib['com.iphonehyatt.prod']
 
     @staticmethod
     def _get_package_f(package):
@@ -259,8 +278,8 @@ class PathApp(AbsClassifer):
                 label = list(labels)[0]
                 ifValidRule = self._check(pathSeg, label)
 
-                if pathSeg == 'hyatt':
-                    print ifValidRule, 'hyatt' in self.fLib[label], label
+                if pathSeg in test_str:
+                    print ifValidRule, pathSeg in self.fLib[label], label
 
                 if ifValidRule:
                     rules[rule_type][pathSeg] = label

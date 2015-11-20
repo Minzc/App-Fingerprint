@@ -64,7 +64,8 @@ class HostApp(AbsClassifer):
             companySegs = appInfo.company.split(' ')
             categorySegs = appInfo.category.split(' ')
             websiteSegs = url_clean(appInfo.website).split('.')
-            wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs]
+            nameSegs = appInfo.name.split(' ')
+            wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs, nameSegs]
             for segs in wholeSegs:
                 for seg in segs:
                     self.fLib[label].add(seg)
