@@ -189,7 +189,7 @@ class PathApp(AbsClassifer):
             print "Total Number of Rules is", len(rules)
 
     def _check(self, url, label):
-        for feature in self.fLib[label]:
+        for _, feature in self.fLib[label]:
             if feature in url:
                 return True
         return False
