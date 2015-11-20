@@ -234,8 +234,6 @@ class PathApp(AbsClassifer):
     def _get_package_f(package):
         """Get package features"""
         features = filter(None, map(lambda x: x.strip(), package.path.split('/')))
-        if package.id == 257802 and package.label == 'com.iphonehyatt.prod':
-            print features
         return features
 
     def train(self, records, rule_type):
@@ -314,8 +312,8 @@ class PathApp(AbsClassifer):
 
     def classify(self, package):
         '''
-    Return {type:[(label, confidence)]}
-    '''
+        Return {type:[(label, confidence)]}
+        '''
         labelRsts = {}
         features = self._get_package_f(package)
         for rule_type, rules in self.rules.iteritems():
