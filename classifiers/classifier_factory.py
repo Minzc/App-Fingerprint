@@ -3,6 +3,7 @@ from classifiers.algo import KVClassifier
 from classifiers.head import HeaderClassifier
 from classifiers.host import HostApp
 from classifiers.fp_modify import CMAR
+from classifiers.path_algo import PathApp
 import const.consts as consts
 
 def classifier_factory(names, appType):
@@ -15,7 +16,8 @@ def classifier_factory(names, appType):
     elif name == consts.HOST_CLASSIFIER:
       classifier = HostApp(appType)
     elif name == consts.CMAR_CLASSIFIER:
-      classifier = CMAR(min_cover = 1)
+      # classifier = CMAR(min_cover = 1)
+      classifier = PathApp(appType)
     elif name == consts.KV_CLASSIFIER:
       classifier = KVClassifier(appType, inferFrmData = True, sampleRate = 1)
     classifiers.append((name, classifier))
