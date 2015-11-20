@@ -153,18 +153,15 @@ class HostApp(AbsClassifer):
         rst = {}
         for ruleType in self.rules:
             predict = consts.NULLPrediction
-            for regexStr, ruleTuple in self.rules[ruleType].iteritems():
-                label, support, regexObj = ruleTuple
-                #host = pkg.refer_host if pkg.refer_host else pkg.host
-                host = pkg.rawHost
-                match = regexObj.search(host)
-                if match and predict.score < support:
-                    if match.start() == 0:
-                        predict = consts.Prediction(label, support, (host, regexStr, support))
+            if pkg.refer_rawHost == '':
+                for regexStr, ruleTuple in self.rules[ruleType].iteritems():
+                    label, support, regexObj = ruleTuple
+                    host = pkg.rawHost
+                    match = regexObj.search(host)
+                    if match and predict.score < support:
+                        if match.start() == 0:
+                            predict = consts.Prediction(label, support, (host, regexStr, support))
 
-                    # if pkg.app == 'com.logos.vyrso' and pkg.host == 'gsp1.apple.com':
-                    #   print regexStr
-                    # print match
 
             rst[ruleType] = predict
             if predict.label != pkg.app and predict.label is not None:
