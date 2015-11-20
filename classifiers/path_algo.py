@@ -1,7 +1,14 @@
 from sqldao import SqlDao
 from nltk import FreqDist
-from utils import app_clean
-
+from utils import app_clean, flatten
+from utils import load_xml_features
+from utils import  url_clean, load_exp_app
+from sqldao import SqlDao
+from collections import defaultdict
+import const.consts as consts
+from const.app_info import AppInfos
+from classifier import AbsClassifer
+import re
 
 class TreeNode:
     def __init__(self, father, value):
@@ -155,6 +162,167 @@ def pathtree(records, tfidf):
                 queue.append(child)
     return rules
 
+
+
+
+test_str = {'stats.3sidedcube.com', 'redcross.com'}
+
+
+class PathApp(AbsClassifer):
+    def __init__(self, appType):
+        self.appType = appType
+        self.pathLabel = defaultdict(set)
+        self.substrCompany = defaultdict(set)
+        self.labelAppInfo = {}
+        self.rules = defaultdict(lambda : defaultdict(lambda x : defaultdict( lambda x: defaultdict(set))))
+        self.xmlFeatures = load_xml_features()
+
+    def _persist(self, rules, rule_type):
+        '''specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support'''
+        sqldao = SqlDao()
+        QUERY = consts.SQL_INSERT_CMAR_RULES
+        params = []
+        for ruleType in rules:
+            for pathSeg, label, host, tbls in flatten(rules[ruleType]):
+                for label, scores in rules[ruleType][host][pathSeg].items():
+                    params.append((label, pathSeg, 1, len(tbls), host, ruleType))
+            sqldao.executeBatch(QUERY, params)
+            sqldao.close()
+            print "Total Number of Rules is", len(rules)
+
+    def _check(self, url, label):
+        for feature in self.fLib[label]:
+            if feature in url:
+                return True
+        return False
+
+    def count(self, pkg):
+        features = self._get_package_f(pkg)
+
+        self.labelAppInfo[pkg.label] = [pkg.website]
+        map(lambda pathSeg: self.pathLabel[pathSeg].add(pkg.label), features)
+
+    @staticmethod
+    def _clean_db(rule_type):
+        QUERY = consts.SQL_DELETE_HOST_RULES
+        sqldao = SqlDao()
+        sqldao.execute(QUERY % rule_type)
+        sqldao.close()
+
+    def _feature_lib(self, expApp):
+        self.fLib = defaultdict(set)
+        segApps = defaultdict(set)
+        for label, appInfo in expApp.iteritems():
+            appSegs = appInfo.package.split('.')
+            companySegs = appInfo.company.split(' ')
+            categorySegs = appInfo.category.split(' ')
+            websiteSegs = url_clean(appInfo.website).split('.')
+            valueSegs = set()
+            for _, value in self.xmlFeatures[label].items():
+                valueSegs |= value.split(' ')
+
+            wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs, valueSegs]
+
+            for segs in wholeSegs:
+                for seg in segs:
+                    self.fLib[label].add(seg)
+                    segApps[seg].add(label)
+        for label, segs in self.fLib.items():
+            self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1}
+
+    def _get_package_f(self, package):
+        """Get package features"""
+        features = filter(None, map(lambda x: x.strip(), package.path.split('/')))
+        return features
+
+    def train(self, records, rule_type):
+        expApp = load_exp_app()[self.appType]
+        expApp = {label: AppInfos.get(self.appType, label) for label in expApp}
+        self._feature_lib(expApp)
+        for pkgs in records.values():
+            for pkg in pkgs:
+                self.count(pkg)
+        ########################
+        # Generate Rules
+        ########################
+
+        for pathSeg, labels in self.pathLabel.iteritems():
+            if pathSeg in test_str:
+                print '#', len(labels)
+                print labels
+                print pathSeg
+
+            if len(labels) == 1:
+                label = list(labels)[0]
+                ifValidRule = self._check(pathSeg, label)
+
+                if ifValidRule:
+                    self.rules[rule_type][pathSeg][label] = defaultdict(set)
+
+                if pathSeg in test_str:
+                    print 'Rule Type is', rule_type, ifValidRule, pathSeg
+
+        print 'number of rule', len(self.rules[consts.APP_RULE])
+
+        self.count_support(records)
+        self._persist(self.rules,  rule_type)
+        self.__init__(self.appType)
+        return self
+
+    def load_rules(self):
+        self.rules = {consts.APP_RULE: {}, consts.COMPANY_RULE: {}, consts.CATEGORY_RULE: {}}
+        QUERY = consts.SQL_SELECT_HOST_RULES
+        sqldao = SqlDao()
+        counter = 0
+        for host, label, ruleType, support in sqldao.execute(QUERY):
+            counter += 1
+            regexObj = re.compile(r'\b' + re.escape(host) + r'\b')
+            self.rules[ruleType][host] = (label, support, regexObj)
+        print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
+        sqldao.close()
+
+    def count_support(self, records):
+        for tbl, pkgs in records.items():
+            for pkg in pkgs:
+                for ruleType in self.rules:
+                    for feature in self._get_package_f(pkg):
+                        if feature in self.rules[ruleType] and pkg.app in self.rules[ruleType][feature]:
+                            self.rules[ruleType][feature][pkg.app][pkg.host].add(tbl)
+
+
+    def _recount(self, records):
+        for tbl, pkgs in records.items():
+            for pkg in pkgs:
+                for url, labels in self.pathLabel.iteritems():
+                    if len(labels) == 1 and (url in pkg.host or url in pkg.refer_host):
+                        self.pathLabel[url].add(pkg.label)
+
+    def classify(self, pkg):
+        """
+        Input
+        - self.rules : {ruleType: {host : (label, support, regexObj)}}
+        :param pkg: http packet
+        """
+        rst = {}
+        for ruleType in self.rules:
+            predict = consts.NULLPrediction
+            for regexStr, ruleTuple in self.rules[ruleType].iteritems():
+                label, support, regexObj = ruleTuple
+                #host = pkg.refer_host if pkg.refer_host else pkg.host
+                host = pkg.rawHost
+                match = regexObj.search(host)
+                if match and predict.score < support:
+                    if match.start() == 0:
+                        predict = consts.Prediction(label, support, (host, regexStr, support))
+
+                    # if pkg.app == 'com.logos.vyrso' and pkg.host == 'gsp1.apple.com':
+                    #   print regexStr
+                    # print match
+
+            rst[ruleType] = predict
+            if predict.label != pkg.app and predict.label is not None:
+                print 'Evidence:', predict.evidence, 'App:', pkg.app, 'Predict:', predict.label
+        return rst
 
 if __name__ == '__main__':
     host_tree()
