@@ -211,6 +211,12 @@ def load_pkgs(DB, appType, limit, filterFunc=lambda x: True):
     print QUERY
 
     for pkgid, app, add_header, path, refer, host, agent, dst, method, raw in sqldao.execute(QUERY):
+        if pkgid == 558126:
+            print QUERY
+            print app
+            print path
+            print host
+            
         package = Package()
         package.set_app(app)
         package.set_path(path.decode('utf-8'))
