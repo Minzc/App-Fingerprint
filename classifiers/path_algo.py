@@ -269,7 +269,7 @@ class PathApp(AbsClassifer):
                 if pathSeg in test_str:
                     print 'Rule Type is', rule_type, ifValidRule, pathSeg
 
-        print 'number of rule', len(self.rules[consts.APP_RULE])
+        print 'number of rule', len(rules[consts.APP_RULE])
 
         self.count_support(rules, records)
         self._persist(self.rules,  rule_type)
@@ -293,7 +293,7 @@ class PathApp(AbsClassifer):
             for pkg in pkgs:
                 for ruleType in rules:
                     for feature in self._get_package_f(pkg):
-                        if feature in rules[ruleType] and pkg.app in rules[ruleType][feature]:
+                        if feature in rules[ruleType] and pkg.app == rules[ruleType][feature]:
                             self.rules[ruleType][feature][pkg.app][pkg.host].add(tbl)
 
 
