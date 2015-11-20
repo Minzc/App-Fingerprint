@@ -1,6 +1,4 @@
-from sqldao import SqlDao
-from nltk import FreqDist
-from utils import app_clean, flatten
+from utils import  flatten
 from utils import load_xml_features
 from utils import  url_clean, load_exp_app
 from sqldao import SqlDao
