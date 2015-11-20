@@ -163,7 +163,7 @@ import re
 
 
 
-test_str = {'Black%20Enterprise'.lower()}
+test_str = {'cb743afc-f5ab-9835-5e2d-de8b3667396f'.lower()}
 
 
 class PathApp(AbsClassifer):
@@ -196,6 +196,8 @@ class PathApp(AbsClassifer):
                 for feature in featureSet:
                     if feature not in url:
                          ifIn = False
+                    elif url in test_str:
+                        print featureSet, url
             else:
                 ifIn = featureSet in url
 
@@ -218,8 +220,8 @@ class PathApp(AbsClassifer):
 
     def _feature_lib(self, expApp):
         def _getitemset(fSet):
-            itemset = map(lambda x: (x), fSet)
-            itemset += [(fSet[i], fSet[i+1]) for i in range(0, len(fSet)-1)]
+            itemset = filter(lambda x: len(x)> 1, fSet)
+            itemset += [(itemset[i], itemset[i+1]) for i in range(0, len(itemset)-1)]
             return itemset
 
         self.fLib = defaultdict(set)
@@ -251,7 +253,7 @@ class PathApp(AbsClassifer):
         print self.fLib['com.kidbabytoddler.fairycolors']
 
         for label, segs in self.fLib.items():
-            self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1}
+            self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1 and len(seg) > 1}
 
         # print self.fLib['com.dci.blackenterprise']
         # print 'Enterprise'.lower() in self.fLib['com.iphonehyatt.prod']
