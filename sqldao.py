@@ -1,11 +1,12 @@
-import mysql.connector
+#import mysql.connector
+import pymysql.cursors
 class SqlDao:
     def __init__(self):
       try:
-        self.cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
+        self.cnx=pymysql.connect(user='root',password='123',host='127.0.0.1',db='fortinet')
         self.cursor = self.cnx.cursor()
       except:
-        self.cnx=mysql.connector.connect(user='root',password='123',host='127.0.0.1',database='fortinet')
+        self.cnx=pymysql.connect(user='root',password='123',host='127.0.0.1',db='fortinet')
         self.cursor = self.cnx.cursor()
     
     def executeBatch(self, query, params):
@@ -30,6 +31,7 @@ class SqlDao:
       self.cnx.commit()
 
     def close(self):
+        self.cursor.close()
         self.cnx.commit()
         self.cnx.close()
-        self.cursor.close()
+
