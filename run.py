@@ -4,7 +4,7 @@ from utils import load_pkgs, load_exp_app
 from collections import defaultdict
 import const.consts as consts
 import argparse
-from rules.rule_manager import RuleManager
+from const.dataset import DataSetFactory as DataSetFactory
 from classifiers.classifier_factory import classifier_factory
 
 LIMIT = None
@@ -69,24 +69,14 @@ def train(trainTbls, appType):
     :param trainTbls: A list of tables used to train classifiers
     :parm appType: android or ios
     """
-    trainSet = load_data_set(trainTbls, appType)
-    ruleDict = {}
+    trainSet = DataSetFactory.get_traindata(tbls=trainTbls, sampleRate=1.0, appType=appType, LIMIT=LIMIT)
     for ruleType in TRAIN_LABEL:
-        for tbl in trainSet:
-            for pkg in trainSet[tbl]:
-                if ruleType == consts.APP_RULE:
-                    pkg.set_label(pkg.app)
-                elif ruleType == consts.COMPANY_RULE:
-                    pkg.set_label(pkg.company)
-                elif ruleType == consts.CATEGORY_RULE:
-                    pkg.set_label(pkg.category)
-
+        trainSet.set_label(ruleType)
         classifiers = classifier_factory(USED_CLASSIFIERS, appType)
         for name, classifier in classifiers:
             classifier.set_name(name)
             print ">>> [train#%s] " % name
             classifier.train(trainSet, ruleType)
-    trainSet = None  # To release memory
 
     print '>>> Finish training all classifiers'
 

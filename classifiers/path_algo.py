@@ -6,6 +6,7 @@ from collections import defaultdict
 import const.consts as consts
 from const.app_info import AppInfos
 from classifier import AbsClassifer
+from const.dataset import DataSetIter as DataSetIter
 import re
 
 # class TreeNode:
@@ -269,13 +270,12 @@ class PathApp(AbsClassifer):
                 print 'OK!!!'
         return features
 
-    def train(self, records, rule_type):
+    def train(self, trainData, rule_type):
         expApp = load_exp_app()[self.appType]
         expApp = {label: AppInfos.get(self.appType, label) for label in expApp}
         self._feature_lib(expApp)
-        for tbl, pkgs in records.items():
-            for pkg in pkgs:
-                self.count(pkg)
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            self.count(pkg)
         ########################
         # Generate Rules
         ########################
@@ -304,7 +304,7 @@ class PathApp(AbsClassifer):
         print 'number of rule', len(rules[consts.APP_RULE])
 
         print rules
-        self.count_support(rules, records)
+        self.count_support(rules, trainData)
         self._persist(self.rules, rule_type)
         self.__init__(self.appType)
         return self
@@ -326,22 +326,15 @@ class PathApp(AbsClassifer):
         for ruleType in self.rules:
             print '>>>[CMAR] Rule Type %s Number of Rules %s' % (ruleType, len(self.rules[ruleType]))
 
-    def count_support(self, rules, records):
-        for tbl, pkgs in records.items():
-            for pkg in pkgs:
-                for ruleType in rules:
-                    for feature in self._get_package_f(pkg):
-                        if feature in rules[ruleType] and pkg.app == rules[ruleType][feature]:
-                            self.rules[ruleType][feature][pkg.app][pkg.host].add(tbl)
-                        elif feature in rules[ruleType] and pkg.app != rules[ruleType][feature]:
-                            print rules[ruleType][feature]
+    def count_support(self, rules, trainData):
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            for ruleType in rules:
+                for feature in self._get_package_f(pkg):
+                    if feature in rules[ruleType] and pkg.app == rules[ruleType][feature]:
+                        self.rules[ruleType][feature][pkg.app][pkg.host].add(tbl)
+                    elif feature in rules[ruleType] and pkg.app != rules[ruleType][feature]:
+                        print rules[ruleType][feature]
 
-    def _recount(self, records):
-        for tbl, pkgs in records.items():
-            for pkg in pkgs:
-                for url, labels in self.pathLabel.iteritems():
-                    if len(labels) == 1 and (url in pkg.host or url in pkg.refer_host):
-                        self.pathLabel[url].add(pkg.label)
 
     def classify(self, package):
         '''

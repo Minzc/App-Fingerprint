@@ -6,6 +6,7 @@ import const.consts as consts
 from classifier import AbsClassifer
 import re
 import urllib
+from const.dataset import DataSetIter as DataSetIter
 
 VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier',
                   'CFBundleDisplayName', 'CFBundleURLSchemes'}
@@ -254,14 +255,12 @@ class AgentClassifier(AbsClassifer):
         cmprsDB = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
         hostCategory = defaultdict(set)
         appCategory = dict()
-        for tbl, pkgs in trainSet.items():
-            for pkg in pkgs:
-                label = pkg.label
-                agent = pkg.agent
-                agentTuples[label].add(agent)
-                cmprsDB[agent][label][pkg.host].add(tbl)
-                hostCategory[pkg.host].add(pkg.category)
-                appCategory[label] = pkg.category
+        for tbl, pkg in DataSetIter.iter_pkg(trainSet):
+            label, agent = pkg.label, pkg.agent
+            agentTuples[label].add(agent)
+            cmprsDB[agent][label][pkg.host].add(tbl)
+            hostCategory[pkg.host].add(pkg.category)
+            appCategory[label] = pkg.category
 
         '''
         Sample Apps

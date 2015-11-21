@@ -5,6 +5,7 @@ import const.consts as consts
 from const.app_info import AppInfos
 from classifier import AbsClassifer
 import re
+from const.dataset import DataSetIter as DataSetIter
 
 test_str = {'stats.3sidedcube.com', 'redcross.com'}
 
@@ -74,16 +75,15 @@ class HostApp(AbsClassifer):
             self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1}
 
 
-    def train(self, records, rule_type):
+    def train(self, trainData, rule_type):
         expApp = load_exp_app()[self.appType]
         expApp = {label: AppInfos.get(self.appType, label) for label in expApp}
         self._feature_lib(expApp)
         rawHosts = {}
-        for pkgs in records.values():
-            for pkg in pkgs:
-                self.count(pkg)
-                rawHosts[pkg.host] = pkg.rawHost
-                rawHosts[pkg.refer_host] = pkg.refer_rawHost
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            self.count(pkg)
+            rawHosts[pkg.host] = pkg.rawHost
+            rawHosts[pkg.refer_host] = pkg.refer_rawHost
         ########################
         # Generate Rules
         ########################
@@ -107,7 +107,7 @@ class HostApp(AbsClassifer):
 
         print 'number of rule', len(self.rules[consts.APP_RULE])
 
-        self.count_support(records)
+        self.count_support(trainData)
         self.persist(self.rules, rawHosts, rule_type)
         self.__init__(self.appType)
         return self
@@ -124,19 +124,18 @@ class HostApp(AbsClassifer):
         print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
 
-    def count_support(self, records):
+    def count_support(self, trainData):
         LABEL = 0
         TBLSUPPORT = 1
-        for tbl, pkgs in records.items():
-            for pkg in pkgs:
-                for ruleType in self.rules:
-                    host = url_clean(pkg.host)
-                    refer_host = pkg.refer_host
-                    for url in [host, refer_host]:
-                        if url in self.rules[ruleType]:
-                            label = self.rules[ruleType][url][LABEL]
-                            if label == pkg.label:
-                                self.rules[ruleType][url][TBLSUPPORT].add(tbl)
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            for ruleType in self.rules:
+                host = url_clean(pkg.host)
+                refer_host = pkg.refer_host
+                for url in [host, refer_host]:
+                    if url in self.rules[ruleType]:
+                        label = self.rules[ruleType][url][LABEL]
+                        if label == pkg.label:
+                            self.rules[ruleType][url][TBLSUPPORT].add(tbl)
 
     def _recount(self, records):
         for tbl, pkgs in records.items():

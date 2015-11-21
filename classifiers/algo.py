@@ -4,6 +4,7 @@ from sqldao import SqlDao
 from utils import load_xml_features, if_version, flatten
 from collections import defaultdict
 from classifier import AbsClassifer
+from const.dataset import DataSetIter as DataSetIter
 
 DEBUG = False
 
@@ -22,8 +23,6 @@ class KVClassifier(AbsClassifer):
         self.inferFrmData = inferFrmData
         self.sampleRate = sampleRate
 
-
-
     def _prune_general_rules(self, generalRules, trainData, xmlGenRules):
         """
         1. PK by coverage
@@ -36,7 +35,7 @@ class KVClassifier(AbsClassifer):
         ruleCoverage = defaultdict(lambda: defaultdict(set))
         ruleScores = {}
         ruleLabelNum = {}
-        for tbl, pkg, key, value in self.iterate_traindata(trainData):
+        for tbl, pkg, key, value in DataSetIter.iter_kv(trainData):
             for rule in [r for r in generalRules[pkg.secdomain] if r.key == key]:
                 ruleCoverage[pkg.host][rule.key].add(tbl + '#' + str(pkg.id))
                 ruleScores[(pkg.host, rule.key)] = rule.score
@@ -151,7 +150,7 @@ class KVClassifier(AbsClassifer):
         specificRules = defaultdict(lambda: defaultdict(
             lambda: defaultdict(lambda: defaultdict(lambda: {consts.SCORE: 0, consts.SUPPORT: set()}))))
 
-        for tbl, pkg, key, value in self.iterate_traindata(trainData):
+        for tbl, pkg, key, value in DataSetIter.iter_kv(trainData):
             for rule in [r for r in generalRules[pkg.host] if r.key == key]:
                 value = value.strip()
                 if len(valueLabelCounter[value]) == 1 and len(value) != 1:
@@ -192,7 +191,7 @@ class KVClassifier(AbsClassifer):
             xmlFieldValues[app][k].add(v)
             xmlValueField[app][v].add(k)
         tmpRules = set()
-        for tbl, pkg, k, v in self.iterate_traindata(trainData):
+        for tbl, pkg, k, v in DataSetIter.iter_kv(trainData):
             app = pkg.app
             if not if_version(v) and v in xmlValueField[app] and len(self.valueLabelCounter[consts.APP_RULE][v]) == 1:
                 tmpRules.add((pkg.host, k, v, pkg.app))
@@ -204,14 +203,7 @@ class KVClassifier(AbsClassifer):
                 print '[Host] {0:s} [key] {1:s} [Value] {2:s} [App] {3:s} [Num] {4:d} [Score] {5:f}' \
                     .format(host, key, value, app, labelNum, score)
 
-    @staticmethod
-    def iterate_traindata(trainData):
-        for tbl in trainData.keys():
-            for pkg in trainData[tbl]:
-                host, queries = pkg.host, pkg.queries
-                for k, vs in queries.items():
-                    for v in vs:
-                        yield (tbl, pkg, k, v)
+
 
     def _gen_xml_rules(self, trainData):
         """
@@ -223,7 +215,7 @@ class KVClassifier(AbsClassifer):
         xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
         hostSecdomain = {}
-        for tbl, pkg, k, v in self.iterate_traindata(trainData):
+        for tbl, pkg, k, v in DataSetIter.iter_kv(trainData):
             self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
             hostSecdomain[pkg.host] = pkg.secdomain
             if if_version(v) == False and len(self.valueLabelCounter[consts.APP_RULE][v]) == 1:
@@ -249,17 +241,6 @@ class KVClassifier(AbsClassifer):
             specificRules[host][key][v][app][consts.SUPPORT] = tbls
         return specificRules
 
-    def _sample_apps(self, trainData):
-        import random
-        apps = set()
-        sampledTrain = {}
-        for tbl, pkg, k, v in self.iterate_traindata(trainData):
-            apps.add(pkg.app)
-        sampledApps = {app for app in apps if random.uniform(0, 1) <= self.sampleRate}
-        for tbl, pkgs in trainData.items():
-            pkgs = [pkg for pkg in pkgs if pkg.app in sampledApps]
-            sampledTrain[tbl] = pkgs
-        return sampledTrain, apps - sampledApps
 
     def _infer_from_xml(self, specificRules, xmlGenRules, rmApps, appKeyScore):
         print 'Start Infering'
@@ -293,10 +274,9 @@ class KVClassifier(AbsClassifer):
         :param rule_type:
         :param trainData:
         """
-        trainData, rmApps = self._sample_apps(trainData)
 
         trackIds = {}
-        for tbl, pkg, k, v in self.iterate_traindata(trainData):
+        for tbl, pkg, k, v in DataSetIter.iter_kv(trainData):
             self.compressedDB[consts.APP_RULE][pkg.secdomain][k][pkg.label][v].add(tbl)
             self.compressedDB[consts.COMPANY_RULE][pkg.secdomain][k][pkg.company][v].add(tbl)
             self.valueLabelCounter[consts.APP_RULE][v].add(pkg.label)
