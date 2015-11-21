@@ -210,8 +210,6 @@ class PathApp(AbsClassifer):
 
     def count(self, pkg):
         features = self._get_package_f(pkg)
-
-        self.labelAppInfo[pkg.label] = [pkg.website]
         map(lambda pathSeg: self.pathLabel[pathSeg].add(pkg.label), features)
 
     @staticmethod
@@ -275,7 +273,7 @@ class PathApp(AbsClassifer):
         expApp = load_exp_app()[self.appType]
         expApp = {label: AppInfos.get(self.appType, label) for label in expApp}
         self._feature_lib(expApp)
-        for pkgs in records.values():
+        for tbl, pkgs in records.items():
             for pkg in pkgs:
                 self.count(pkg)
         ########################

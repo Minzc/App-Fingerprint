@@ -252,13 +252,14 @@ class KVClassifier(AbsClassifer):
     def _sample_apps(self, trainData):
         import random
         apps = set()
+        sampledTrain = {}
         for tbl, pkg, k, v in self.iterate_traindata(trainData):
             apps.add(pkg.app)
         sampledApps = {app for app in apps if random.uniform(0, 1) <= self.sampleRate}
         for tbl, pkgs in trainData.items():
             pkgs = [pkg for pkg in pkgs if pkg.app in sampledApps]
-            trainData[tbl] = pkgs
-        return trainData, apps - sampledApps
+            sampledTrain[tbl] = pkgs
+        return sampledTrain, apps - sampledApps
 
     def _infer_from_xml(self, specificRules, xmlGenRules, rmApps, appKeyScore):
         print 'Start Infering'
