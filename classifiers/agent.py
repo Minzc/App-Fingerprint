@@ -84,7 +84,6 @@ class AgentClassifier(AbsClassifer):
                 for host in fRegex.matchRecord:
                     if len(fRegex.matchRecord[host]) == 1 and len(hostCategory[host]) == 1:
                         rst[(host, fRegex.regexObj.pattern)] = list(fRegex.matchRecord[host])[0]
-                        print '[host]', host, fRegex.matchRecord[host], fRegex.featureStr
         return rst
 
     @staticmethod

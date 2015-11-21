@@ -163,7 +163,7 @@ import re
 
 
 
-test_str = {'cb743afc-f5ab-9835-5e2d-de8b3667396f'.lower()}
+test_str = {'paint_sparkles_android_114_2971293223.jpg'.lower()}
 
 
 class PathApp(AbsClassifer):
@@ -201,7 +201,10 @@ class PathApp(AbsClassifer):
             else:
                 ifIn = featureSet in url
 
-            if ifIn == True > 0:
+            if ifIn == True:
+                if url in test_str:
+                    print featureSet
+
                 return True
         return False
 
@@ -250,11 +253,12 @@ class PathApp(AbsClassifer):
                 for seg in segs:
                     self.fLib[label].add(seg)
                     segApps[seg].add(label)
-        print self.fLib['com.kidbabytoddler.fairycolors']
+
 
         for label, segs in self.fLib.items():
             self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1 and len(seg) > 1}
 
+        print self.fLib['jp.gocro.smartnews']
         # print self.fLib['com.dci.blackenterprise']
         # print 'Enterprise'.lower() in self.fLib['com.iphonehyatt.prod']
 

@@ -48,6 +48,10 @@ class Package:
     def website(self):
         return self.appInfo.website
 
+    @property
+    def trackId(self):
+        return self.appInfo.trackId
+
     def set_app(self, app):
         self.app = app.lower()
 

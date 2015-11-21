@@ -16,18 +16,11 @@ class KVClassifier(AbsClassifer):
         self.name = consts.KV_CLASSIFIER
         self.compressedDB = {consts.APP_RULE: __create_dict(), consts.COMPANY_RULE: __create_dict()}
         self.valueLabelCounter = {consts.APP_RULE: defaultdict(set), consts.COMPANY_RULE: defaultdict(set)}
-        #self.appCompanyRelation = {}
-        #self.companyAppRelation = defaultdict(set)
         self.rules = {}
         self.appType = appType
         self.xmlFeatures = load_xml_features()
         self.inferFrmData = inferFrmData
         self.sampleRate = sampleRate
-        # self.xmlFieldValues = defaultdict(lambda : defaultdict(set))
-        # for app in self.xmlFeatures:
-        #     for k,v in self.xmlFeatures[app]:
-        #         if len(v) != 0 and if_version(v) == False:
-        #             self.xmlFieldValues[app][k].add(v)
 
 
 
@@ -242,14 +235,14 @@ class KVClassifier(AbsClassifer):
         return xmlGenRules, xmlSpecificRules, hostSecdomain
 
     @staticmethod
-    def gen_specific_rules_xml(xmlSpecificRules, specificRules):
+    def gen_specific_rules_xml(xmlSpecificRules, specificRules, trackIds):
         """
         :param xmlSpecificRules:
         :param specificRules : specific rules for apps
              host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
         """
         for rule, v, app, tbls in flatten(xmlSpecificRules):
-            if len(re.sub('[0-9]', '', v)) < 2:
+            if v not in trackIds and len(re.sub('[0-9]', '', v)) < 2:
                 continue
             host, key = rule
             specificRules[host][key][v][app][consts.SCORE] = 1.0
@@ -301,13 +294,13 @@ class KVClassifier(AbsClassifer):
         """
         trainData, rmApps = self._sample_apps(trainData)
 
+        trackIds = {}
         for tbl, pkg, k, v in self.iterate_traindata(trainData):
             self.compressedDB[consts.APP_RULE][pkg.secdomain][k][pkg.label][v].add(tbl)
             self.compressedDB[consts.COMPANY_RULE][pkg.secdomain][k][pkg.company][v].add(tbl)
             self.valueLabelCounter[consts.APP_RULE][v].add(pkg.label)
             self.valueLabelCounter[consts.COMPANY_RULE][v].add(pkg.company)
-            #self.appCompanyRelation[pkg.app] = pkg.company
-            #self.companyAppRelation[pkg.company].add(pkg.app)
+            trackIds[pkg.trackId] = pkg.app
 
         xmlGenRules, xmlSpecificRules, hostSecdomain = self._gen_xml_rules(trainData)
         ##################
@@ -337,7 +330,7 @@ class KVClassifier(AbsClassifer):
 
         if self.inferFrmData:
             appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, rmApps, appKeyScore)
-        appSpecificRules = self.gen_specific_rules_xml( xmlSpecificRules, appSpecificRules)
+        appSpecificRules = self.gen_specific_rules_xml( xmlSpecificRules, appSpecificRules, trackIds)
         companySpecificRules = self._generate_rules(trainData, companyGeneralRules,
                                                     self.valueLabelCounter[consts.COMPANY_RULE], consts.COMPANY_RULE)
         specificRules = self._merge_result(appSpecificRules, companySpecificRules)
