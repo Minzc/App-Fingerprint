@@ -266,6 +266,9 @@ class PathApp(AbsClassifer):
     def _get_package_f(package):
         """Get package features"""
         features = filter(None, map(lambda x: x.strip(), package.path.split('/')))
+        for feature in features:
+            if feature in test_str:
+                print 'OK!!!'
         return features
 
     def train(self, records, rule_type):
