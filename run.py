@@ -19,11 +19,11 @@ TRAIN_LABEL = {
 }
 
 USED_CLASSIFIERS = [
-  # consts.HEAD_CLASSIFIER,
-   # consts.AGENT_CLASSIFIER,
-   # consts.KV_CLASSIFIER,
+    # consts.HEAD_CLASSIFIER,
+    consts.AGENT_CLASSIFIER,
+    consts.KV_CLASSIFIER,
     consts.CMAR_CLASSIFIER,
-    #consts.HOST_CLASSIFIER,
+    consts.HOST_CLASSIFIER,
 
 ]
 
@@ -89,16 +89,6 @@ def train(trainTbls, appType):
     trainSet = None  # To release memory
 
     print '>>> Finish training all classifiers'
-    if PRUNE:
-        print '>>> Start rule pruning'
-        ruleManager = RuleManager()
-        if consts.CMAR_CLASSIFIER in USED_CLASSIFIERS:
-            classifiers["CMAR Rule"].rules = ruleManager.pruneCMARRules(ruleDict['CMAR Rule'], ruleDict['Host Rule'])
-            classifiers["CMAR Rule"].persist()
-        if 'KV Rule' in classifiers:
-            pass
-            #classifierDict["KV Rule"].rules = ruleManager.pruneKVRules(ruleDict['KV Rule'], ruleDict['Host Rule'])
-            #classifierDict["KV Rule"].persist()
 
 
 def evaluate(rst, testSet, testApps):

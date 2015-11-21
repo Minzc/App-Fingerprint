@@ -163,7 +163,7 @@ import re
 
 
 
-test_str = {'paint_sparkles_android_114_2971293223.jpg'.lower()}
+test_str = {'Market_RoyalFarms_001'.lower()}
 
 
 class PathApp(AbsClassifer):
@@ -258,7 +258,7 @@ class PathApp(AbsClassifer):
         for label, segs in self.fLib.items():
             self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1 and len(seg) > 1}
 
-        print self.fLib['jp.gocro.smartnews']
+        print self.fLib['com.vergeretail.marketroyalfarms']
         # print self.fLib['com.dci.blackenterprise']
         # print 'Enterprise'.lower() in self.fLib['com.iphonehyatt.prod']
 
