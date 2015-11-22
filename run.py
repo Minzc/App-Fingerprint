@@ -196,7 +196,7 @@ def test(testTbl, appType):
     testSet = DataSetFactory.get_traindata(tbls=[testTbl], sampleRate=1.0, appType=appType, LIMIT=LIMIT)
     testApps = testSet.apps
 
-    testSize = len(testSet.get_size()[testTbl])
+    testSize = testSet.get_size()[testTbl]
 
     rst = {}
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)

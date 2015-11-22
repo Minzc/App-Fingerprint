@@ -310,7 +310,7 @@ class KVClassifier(AbsClassifer):
         print 'Infer from data', self.inferFrmData
 
         if self.inferFrmData:
-            appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, rmApps, appKeyScore)
+            appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, trainData.rmapp, appKeyScore)
         appSpecificRules = self.gen_specific_rules_xml( xmlSpecificRules, appSpecificRules, trackIds)
         companySpecificRules = self._generate_rules(trainData, companyGeneralRules,
                                                     self.valueLabelCounter[consts.COMPANY_RULE], consts.COMPANY_RULE)
