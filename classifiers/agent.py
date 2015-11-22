@@ -263,12 +263,6 @@ class AgentClassifier(AbsClassifer):
             appCategory[label] = pkg.category
 
         '''
-        Sample Apps
-        '''
-        agentTuples, cmprsDB = self._sample_app(agentTuples, cmprsDB, self.sampleRate)
-        print 'Number of training apps', len(agentTuples)
-
-        '''
         Compose regular expression
         '''
         appFeatureRegex = self._compose_regxobj(agentTuples)
@@ -311,26 +305,48 @@ class AgentClassifier(AbsClassifer):
         print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
 
-    def classify(self, pkg):
+    def classify(self, testSet):
+        def wrap_predict(predicts):
+            wrapPredicts = {}
+            for ruleType, predict in predicts.items():
+                label, evidence = predict
+                wrapPredicts[ruleType] = consts.Prediction(label, 1.0, evidence) if label else consts.NULLPrediction
+            return wrapPredicts
+
+        compressed = defaultdict(lambda : defaultdict(set))
+        for tbl, pkg in DataSetIter.iter_pkg(testSet):
+            compressed[pkg.agent][pkg.host].add(pkg)
+
+        batchPredicts = {}
+        for agent, host, pkgs in flatten(compressed):
+            assert(type(pkgs) == set, "Type of pkgs is not correct" + str(type(pkgs)))
+            predict = wrap_predict(self.__classify(agent, host))
+            for pkg in pkgs:
+                batchPredicts[pkg.id] = predict
+                l = predict[consts.APP_RULE].label
+                if l is not None and l != pkg.app:
+                    print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', predict[consts.APP_RULE]
+
+    def __classify(self, agent, host):
         rst = {}
         for ruleType in self.rules:
             longestWord = ''
             rstLabel = None
             for agentF, regxNlabel in self.rules[ruleType].items():
                 regex, label = regxNlabel
-                if regex.search(pkg.agent) and len(longestWord) < len(agentF):
+                if regex.search(agent) and len(longestWord) < len(agentF):
                     rstLabel = label
                     longestWord = agentF
 
-            for agentF, regxNlabel in self.rulesHost[ruleType][pkg.host].items():
+            for agentF, regxNlabel in self.rulesHost[ruleType][host].items():
                 regex, label = regxNlabel
-                if regex.search(pkg.agent) and len(longestWord) < len(agentF):
+                if regex.search(agent) and len(longestWord) < len(agentF):
                     rstLabel = label
                     longestWord = agentF
+            rst[ruleType] = (rstLabel, longestWord)
 
-            rst[ruleType] = consts.Prediction(rstLabel, 1.0, longestWord) if rstLabel else consts.NULLPrediction
 
-            if rstLabel is not None and rstLabel != pkg.app and ruleType == consts.APP_RULE:
-                print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', rstLabel, \
-                    'Longestword:', longestWord
+            # if rstLabel is not None and rstLabel != pkg.app and ruleType == consts.APP_RULE:
+            #     print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', rstLabel, \
+            #         'Longestword:', longestWord
         return rst

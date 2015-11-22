@@ -302,22 +302,6 @@ def select_field(fieldName):
   for app, fields in records.iteritems():
     print app, fields
 
-def compare_xml_with_pkg(folder):
-  from os import listdir
-  from os.path import isfile, join
-  import re
-  
-  regxObj = re.compile('(Raw: "(.)")')
-  trainData = load_data_set([''], consts.ANDROID)
-  counter = 0
-  xmlValues = defaultdict(set)
-  for f in listdir(folder):
-    file_path = join(folder, f)
-    if isfile(file_path):
-      app_name = f[0:-4]
-      fr = open(file_path)
-      for ln in fr:
-        ln = ln.strip()
 
 if __name__ == '__main__':
   if len(sys.argv) < 2:

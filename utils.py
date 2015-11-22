@@ -179,28 +179,6 @@ def add_appinfo(packages, app_type):
     return packages
 
 
-def load_data_set(trainTbls, appType):
-    """
-    Load data from given table
-    Input
-    :param trainTbls : a list of tables
-    :param appType : IOS or ANDROID
-    Output
-    - record : {table_name : [list of packages]}
-    """
-    print 'Loading data set', trainTbls
-    expApp = load_exp_app()
-
-    def _keep_exp_app(package):
-        return package.app in expApp[appType]
-
-    records = {}
-    for tbl in trainTbls:
-        records[tbl] = load_pkgs(filterFunc=_keep_exp_app, DB=tbl, appType=appType)
-
-    return records
-
-
 def load_pkgs(DB, appType, limit, filterFunc=lambda x: True):
     records = []
     sqldao = SqlDao()
@@ -208,7 +186,7 @@ def load_pkgs(DB, appType, limit, filterFunc=lambda x: True):
         QUERY = consts.SQL_SELECT_HTTP_PKGS % DB
     else:
         QUERY = consts.SQL_SELECT_HTTP_PKGS_LIMIT % (DB, limit)
-    print QUERY
+    print '[UTILS]', QUERY
 
     for pkgid, app, add_header, path, refer, host, agent, dst, method, raw in sqldao.execute(QUERY):
         package = Package()

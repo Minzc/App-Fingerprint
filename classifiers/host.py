@@ -1,4 +1,4 @@
-from utils import longest_common_substring, get_top_domain, url_clean, load_exp_app
+from utils import  url_clean, load_exp_app
 from sqldao import SqlDao
 from collections import defaultdict
 import const.consts as consts

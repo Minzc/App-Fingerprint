@@ -53,6 +53,9 @@ class DataSet:
     def get_data(self):
         return self.__data
 
+    def get_size(self):
+        return {k:len(v) for k, v in self.__data.items()}
+
 
 class DataSetFactory:
     def __init__(self):

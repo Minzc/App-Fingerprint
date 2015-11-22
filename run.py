@@ -5,6 +5,7 @@ from collections import defaultdict
 import const.consts as consts
 import argparse
 from const.dataset import DataSetFactory as DataSetFactory
+from const.dataset import DataSetIter as DataSetIter
 from classifiers.classifier_factory import classifier_factory
 
 LIMIT = None
@@ -20,10 +21,10 @@ TRAIN_LABEL = {
 
 USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
-    #consts.AGENT_CLASSIFIER,
-    #consts.KV_CLASSIFIER,
+    consts.AGENT_CLASSIFIER,
+    consts.KV_CLASSIFIER,
     consts.CMAR_CLASSIFIER,
-    #consts.HOST_CLASSIFIER,
+    consts.HOST_CLASSIFIER,
 
 ]
 
@@ -97,26 +98,27 @@ def evaluate(rst, testSet, testApps):
     correctApp = set()
     wrongApp = set()
     detectedApp = set()
-    for pkgId, predictions in rst.items():
+    for tbl, pkg in DataSetIter.iter_pkg(testSet):
+        predictions = rst[pkg.id]
         predictApp = predictions[consts.APP_RULE].label
         predictCompany = predictions[consts.COMPANY_RULE].label
         predictCategory = predictions[consts.CATEGORY_RULE].label
         ifCorrect = True
-        if predictApp is not None and predictApp != testSet[pkgId].app:
+        if predictApp and predictApp != pkg.app:
             ifCorrect = False
-        if predictCompany is not None and predictCompany != testSet[pkgId].company:
+        if predictCompany and predictCompany != pkg.company:
             ifCorrect = False
-        if predictCategory is not None and predictCategory != testSet[pkgId].category:
+        if predictCategory and predictCategory != pkg.category:
             ifCorrect = False
 
         if sum([1 for value in predictions.values() if value != consts.NULLPrediction]) > 0:
             recall += 1
-            detectedApp.add((testSet[pkgId].app, testSet[pkgId].appInfo.trackId))
+            detectedApp.add((pkg.app, pkg.appInfo.trackId))
             if ifCorrect:
                 correct += 1
-                correctApp.add((testSet[pkgId].app, testSet[pkgId].appInfo.trackId))
+                correctApp.add((pkg.app, pkg.appInfo.trackId))
             else:
-                wrongApp.add((testSet[pkgId].app, testSet[pkgId].appInfo.trackId))
+                wrongApp.add((pkg.app, pkg.appInfo.trackId))
 
     print '[TEST] Total:', len(testSet)
     print '[TEST] Recall:', recall
@@ -139,22 +141,24 @@ def evaluate(rst, testSet, testApps):
 
 def _use_classifier(classifier, testSet):
     """
-  Use trained classifer on the given test data set
-  Input
-  - classifier : classifier used on the data set
-  - testSet : testData set {pkgId : package}
-  """
-    rst = defaultdict(dict)
+    Use trained classifer on the given test data set
+    Input
+    - classifier : classifier used on the data set
+    - testSet : testData set {pkgId : package}
+    """
     wrongApp = set()
-    for pkg_id, record in testSet.items():
-        # predict
-        labelDists = classifier.classify(record)
-        for labelType, prediction in labelDists.iteritems():
-            # TODO need to do result selection
-            if labelType in VALID_LABEL:
-                rst[pkg_id][labelType] = prediction
-                if prediction.label is not None and prediction.label != record.app and labelType == consts.APP_RULE:
-                    wrongApp.add(record.app)
+    batchPredicts = classifier.classify(testSet)
+    rst = defaultdict(dict)
+
+    for pkgId, predicts in batchPredicts.items():
+        for ruleType, predict in filter(lambda x: x[0] in VALID_LABEL, predicts.items()):
+            rst[pkgId][ruleType] = predict
+
+    for tbl, pkg in DataSetIter.iter_pkg(testSet):
+        predict = rst[pkg.id][consts.APP_RULE]
+        if predict.label is not None and predict.label != pkg.app:
+            wrongApp.add(pkg.app)
+
     print '====', classifier.name, '====', '[WRONG]', len(wrongApp)
     return rst
 
@@ -172,9 +176,9 @@ def _insert_rst(testSet, DB, inforTrack):
     sqldao = SqlDao()
     params = []
     detectedApps = {app for app, _ in inforTrack[consts.DISCOVERED_APP_LIST]}
-    for pkgId, pkg in testSet.iteritems():
+    for tbl, pkg in DataSetIter.iter_pkg(test()):
         if pkg.app not in detectedApps:
-            params.append((3, pkgId))
+            params.append((3, pkg.id))
 
     sqldao.executeBatch(QUERY, params)
     sqldao.close()
@@ -189,13 +193,11 @@ def _clean_up():
 
 
 def test(testTbl, appType):
-    testSet = {}
-    testApps = set()
-    for record in load_data_set([testTbl], appType).values()[0]:
-        testSet[record.id] = record
-        testApps.add(record.app)
+    testSet = DataSetFactory.get_traindata(tbls=[testTbl], sampleRate=1.0, appType=appType, LIMIT=LIMIT)
+    testApps = testSet.apps
 
-    testSize = len(testSet)
+    testSize = len(testSet.get_size()[testTbl])
+
     rst = {}
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
     for name, classifier in classifiers:
