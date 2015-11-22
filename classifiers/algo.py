@@ -354,6 +354,7 @@ class KVClassifier(AbsClassifer):
         sqldao.close()
 
     def __classify(self, pkg):
+        print '[ALGO] Classify'
         predictRst = {}
         for ruleType in self.rules:
             host, queries = (pkg.refer_host, pkg.refer_queries) if pkg.refer_host else (pkg.host, pkg.queries)

@@ -25,7 +25,8 @@ class AbsClassifer:
     @abstractmethod
     def load_rules(self): pass
 
-    def __classify(self, pkg): pass
+    def __classify(self, pkg):
+        print 'Should not be used!!'
 
     def set_name(self, name):
       self.name = name
