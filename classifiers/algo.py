@@ -373,19 +373,6 @@ class KVClassifier(AbsClassifer):
             predictRst[ruleType] = rst
         return predictRst
 
-    def classify(self, testSet):
-        batchPredicts = {}
-        for tbl, pkg in DataSetIter.iter_pkg(testSet):
-            predictRst = self.__classify(pkg)
-            batchPredicts[pkg.id] = predictRst
-
-
-
-        if predictRst[consts.APP_RULE] != consts.NULLPrediction and predictRst[consts.APP_RULE].label != pkg.app:
-            print predictRst[consts.APP_RULE].evidence, predictRst[consts.APP_RULE].label, pkg.app
-            print '=' * 10
-        return predictRst
-
 
     def persist(self, specificRules, rule_type):
         """

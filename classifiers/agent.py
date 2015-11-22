@@ -345,5 +345,4 @@ class AgentClassifier(AbsClassifer):
                     rstLabel = label
                     longestWord = agentF
             rst[ruleType] = (rstLabel, longestWord)
-
         return rst

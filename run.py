@@ -120,7 +120,7 @@ def evaluate(rst, testSet, testApps):
             else:
                 wrongApp.add((pkg.app, pkg.appInfo.trackId))
 
-    print '[TEST] Total:', len(testSet)
+    print '[TEST] Total:', testSet.get_size().values()[0]
     print '[TEST] Recall:', recall
     print '[TEST] Correct:', correct
     print '[TEST] Correct Number of App:', len(correctApp)
@@ -129,7 +129,7 @@ def evaluate(rst, testSet, testApps):
     print '[TEST] Total Number of App:', len(testApps)
 
     precision = correct * 1.0 / recall
-    recall = recall * 1.0 / len(testSet)
+    recall = recall * 1.0 / testSet.get_size().values()[0]
     f1Score = 2.0 * precision * recall / (precision + recall)
     inforTrack[consts.DISCOVERED_APP] = len(correctApp.difference(wrongApp)) * 1.0 / len(testApps)
     inforTrack[consts.PRECISION] = precision

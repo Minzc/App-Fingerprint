@@ -144,7 +144,8 @@ class HostApp(AbsClassifer):
                     if len(labels) == 1 and (url in pkg.host or url in pkg.refer_host):
                         self.urlLabel[url].add(pkg.label)
 
-    def classify(self, pkg):
+
+    def __classify(self, pkg):
         """
         Input
         - self.rules : {ruleType: {host : (label, support, regexObj)}}
@@ -164,7 +165,4 @@ class HostApp(AbsClassifer):
 
 
             rst[ruleType] = predict
-            if predict.label != pkg.app and predict.label is not None:
-                print 'Evidence:', predict.evidence, 'App:', pkg.app, 'Predict:', predict.label
-                print pkg.id, pkg.agent
         return rst
