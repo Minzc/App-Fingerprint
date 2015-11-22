@@ -8,7 +8,7 @@ class AbsClassifer:
     def classify(self, testSet):
         batchPredicts = {}
         for tbl, pkg in DataSetIter.iter_pkg(testSet):
-            predictRst = self.__classify(pkg)
+            predictRst = self.c(pkg)
             batchPredicts[pkg.id] = predictRst
 
         for tbl, pkg in DataSetIter.iter_pkg(testSet):
@@ -27,7 +27,7 @@ class AbsClassifer:
         return
 
     @abstractmethod
-    def __classify(self, pkg):
+    def c(self, pkg):
         return
 
     def set_name(self, name):

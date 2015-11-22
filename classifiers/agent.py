@@ -320,7 +320,7 @@ class AgentClassifier(AbsClassifer):
         batchPredicts = {}
         for agent, host, pkgs in flatten(compressed):
             assert(type(pkgs) == set, "Type of pkgs is not correct" + str(type(pkgs)))
-            predict = wrap_predict(self.__classify((agent, host)))
+            predict = wrap_predict(self.c((agent, host)))
             for pkg in pkgs:
                 batchPredicts[pkg.id] = predict
                 l = predict[consts.APP_RULE].label
@@ -328,7 +328,7 @@ class AgentClassifier(AbsClassifer):
                     print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', predict[consts.APP_RULE]
         return batchPredicts
 
-    def __classify(self, pkgInfo):
+    def c(self, pkgInfo):
         agent, host = pkgInfo
         rst = {}
         for ruleType in self.rules:

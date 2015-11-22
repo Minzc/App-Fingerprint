@@ -353,7 +353,7 @@ class KVClassifier(AbsClassifer):
         print '>>> [KV Rules#Load Rules] total number of rules is', counter
         sqldao.close()
 
-    def __classify(self, pkg):
+    def c(self, pkg):
         print '[ALGO] Classify'
         predictRst = {}
         for ruleType in self.rules:

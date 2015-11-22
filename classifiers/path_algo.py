@@ -331,7 +331,7 @@ class PathApp(AbsClassifer):
                         print rules[ruleType][feature]
 
 
-    def __classify(self, package):
+    def c(self, package):
         '''
         Return {type:[(label, confidence)]}
         '''
