@@ -176,7 +176,7 @@ def _insert_rst(testSet, DB, inforTrack):
     sqldao = SqlDao()
     params = []
     detectedApps = {app for app, _ in inforTrack[consts.DISCOVERED_APP_LIST]}
-    for tbl, pkg in DataSetIter.iter_pkg(test()):
+    for tbl, pkg in DataSetIter.iter_pkg(testSet):
         if pkg.app not in detectedApps:
             params.append((3, pkg.id))
 

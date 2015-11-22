@@ -25,7 +25,6 @@ class AbsClassifer:
     @abstractmethod
     def load_rules(self): pass
 
-    @abstractmethod
     def __classify(self, pkg): pass
 
     def set_name(self, name):

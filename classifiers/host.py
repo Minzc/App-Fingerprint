@@ -144,7 +144,6 @@ class HostApp(AbsClassifer):
                     if len(labels) == 1 and (url in pkg.host or url in pkg.refer_host):
                         self.urlLabel[url].add(pkg.label)
 
-
     def __classify(self, pkg):
         """
         Input

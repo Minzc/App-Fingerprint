@@ -265,9 +265,9 @@ class PathApp(AbsClassifer):
     def _get_package_f(package):
         """Get package features"""
         features = filter(None, map(lambda x: x.strip(), package.path.split('/')))
-        for feature in features:
-            if feature in test_str:
-                print 'OK!!!'
+        # for feature in features:
+        #     if feature in test_str:
+        #         print 'OK!!!'
         return features
 
     def train(self, trainData, rule_type):
@@ -284,26 +284,21 @@ class PathApp(AbsClassifer):
 
         for pathSeg, labels in self.pathLabel.iteritems():
             if pathSeg in test_str:
-                print '#', len(labels)
-                print labels
-                print pathSeg
+                print '[PATH] %s %s %s' % (pathSeg, len(labels), labels)
 
             if len(labels) == 1:
                 label = list(labels)[0]
                 ifValidRule = self._check(pathSeg, label)
 
                 if pathSeg in test_str:
-                    print ifValidRule, pathSeg in self.fLib[label], label
+                    print '[PATH] %s If Valid: %s  Label: %s' % (pathSeg, ifValidRule, label)
 
                 if ifValidRule:
                     rules[rule_type][pathSeg] = label
 
-                if pathSeg in test_str:
-                    print 'Rule Type is', rule_type, ifValidRule, pathSeg
 
         print 'number of rule', len(rules[consts.APP_RULE])
 
-        print rules
         self.count_support(rules, trainData)
         self._persist(self.rules, rule_type)
         self.__init__(self.appType)
@@ -336,7 +331,7 @@ class PathApp(AbsClassifer):
                         print rules[ruleType][feature]
 
 
-    def classify(self, package):
+    def __classify(self, package):
         '''
         Return {type:[(label, confidence)]}
         '''
@@ -344,18 +339,13 @@ class PathApp(AbsClassifer):
         features = self._get_package_f(package)
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
-            max_confidence = 0
             if package.host in rules.keys():
                 for rule, label_confidence in rules[package.host].iteritems():
                     label, confidence = label_confidence
-                    if rule.issubset(features):  # and confidence > max_confidence:
-                        max_confidence = confidence
+                    if rule.issubset(features):
                         rst = consts.Prediction(label, confidence, rule)
 
             labelRsts[rule_type] = rst
-            if rule_type == consts.APP_RULE and rst != consts.NULLPrediction and rst.label != package.app:
-                print rst, package.app
-                print '=' * 10
         return labelRsts
 
 
