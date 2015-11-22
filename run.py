@@ -23,8 +23,8 @@ USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
     #consts.AGENT_CLASSIFIER,
     consts.KV_CLASSIFIER,
-    #consts.CMAR_CLASSIFIER,
-    #consts.HOST_CLASSIFIER,
+    consts.CMAR_CLASSIFIER,
+    consts.HOST_CLASSIFIER,
 
 ]
 
@@ -178,7 +178,7 @@ def _insert_rst(testSet, DB, inforTrack):
     detectedApps = {app for app, _ in inforTrack[consts.DISCOVERED_APP_LIST]}
     for tbl, pkg in DataSetIter.iter_pkg(testSet):
         if pkg.app not in detectedApps:
-            params.append((DB, 3, pkg.id))
+            params.append(( 3, pkg.id))
 
     sqldao.executeBatch(QUERY, params)
     sqldao.close()
