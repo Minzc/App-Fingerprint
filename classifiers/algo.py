@@ -353,14 +353,12 @@ class KVClassifier(AbsClassifer):
         print '>>> [KV Rules#Load Rules] total number of rules is', counter
         sqldao.close()
 
-    def classify(self, pkg):
+    def __classify(self, pkg):
         predictRst = {}
         for ruleType in self.rules:
             host, queries = (pkg.refer_host, pkg.refer_queries) if pkg.refer_host else (pkg.host, pkg.queries)
             fatherScore = -1
             rst = consts.NULLPrediction
-
-            # if pkg.method != 'POST':
             for k, kRules in self.rules[ruleType].get(host, {}).iteritems():
                 for v in queries.get(k, []):
                     for label, scoreNcount in kRules.get(v, {}).iteritems():
@@ -373,6 +371,15 @@ class KVClassifier(AbsClassifer):
                             rst = consts.Prediction(label, support, evidence)
 
             predictRst[ruleType] = rst
+        return predictRst
+
+    def classify(self, testSet):
+        batchPredicts = {}
+        for tbl, pkg in DataSetIter.iter_pkg(testSet):
+            predictRst = self.__classify(pkg)
+            batchPredicts[pkg.id] = predictRst
+
+
 
         if predictRst[consts.APP_RULE] != consts.NULLPrediction and predictRst[consts.APP_RULE].label != pkg.app:
             print predictRst[consts.APP_RULE].evidence, predictRst[consts.APP_RULE].label, pkg.app

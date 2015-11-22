@@ -326,6 +326,7 @@ class AgentClassifier(AbsClassifer):
                 l = predict[consts.APP_RULE].label
                 if l is not None and l != pkg.app:
                     print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', predict[consts.APP_RULE]
+        return batchPredicts
 
     def __classify(self, agent, host):
         rst = {}
