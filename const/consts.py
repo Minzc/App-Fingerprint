@@ -41,6 +41,8 @@ SQL_SELECT_KV_RULES = 'SELECT paramkey, paramvalue, host, label, confidence, rul
 SQL_INSERT_AGENT_RULES = 'INSERT INTO patterns (label, support, confidence, agent, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
 SQL_DELETE_AGENT_RULES = 'DELETE FROM patterns WHERE agent IS NOT NULL and rule_type=%s'
 SQL_SELECT_AGENT_RULES = 'SELECT host, agent , label, rule_type FROM patterns WHERE agent IS NOT NULL'
+
+SQL_UPDATE_PKG = "UPDATE %s SET classified = %s WHERE id = %s"
 #############CLASSIFIER NAMES###############
 HEAD_CLASSIFIER = "Header Rule"
 KV_CLASSIFIER = "KV Rule"
