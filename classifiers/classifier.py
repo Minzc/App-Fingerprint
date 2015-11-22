@@ -5,7 +5,6 @@ from const.dataset import DataSetIter as DataSetIter
 
 class AbsClassifer:
     __metaclass__ = ABCMeta
-
     def classify(self, testSet):
         batchPredicts = {}
         for tbl, pkg in DataSetIter.iter_pkg(testSet):
@@ -20,13 +19,16 @@ class AbsClassifer:
         return batchPredicts
   
     @abstractmethod
-    def train(self, train_set, rule_type): pass
+    def train(self, train_set, rule_type):
+        return
 
     @abstractmethod
-    def load_rules(self): pass
+    def load_rules(self):
+        return
 
+    @abstractmethod
     def __classify(self, pkg):
-        print 'Should not be used!!'
+        return
 
     def set_name(self, name):
       self.name = name

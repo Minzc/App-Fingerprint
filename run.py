@@ -21,8 +21,8 @@ TRAIN_LABEL = {
 
 USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
-    consts.AGENT_CLASSIFIER,
-    #consts.KV_CLASSIFIER,
+    #consts.AGENT_CLASSIFIER,
+    consts.KV_CLASSIFIER,
     #consts.CMAR_CLASSIFIER,
     #consts.HOST_CLASSIFIER,
 
