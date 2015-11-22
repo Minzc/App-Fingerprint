@@ -174,12 +174,13 @@ def _insert_rst(testSet, DB, inforTrack):
     print 'Start inserting results'
     sqldao = SqlDao()
     params = []
+    QUERY = 'UPDATE ' + DB + ' SET classified = %s WHERE id = %s'
     detectedApps = {app for app, _ in inforTrack[consts.DISCOVERED_APP_LIST]}
     for tbl, pkg in DataSetIter.iter_pkg(testSet):
         if pkg.app not in detectedApps:
             params.append((DB, 3, pkg.id))
 
-    sqldao.executeBatch(consts.SQL_UPDATE_PKG, params)
+    sqldao.executeBatch(QUERY, params)
     sqldao.close()
     print 'Finish inserting %s items' % len(params)
 
