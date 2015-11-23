@@ -223,7 +223,8 @@ class PathApp(AbsClassifer):
     def _feature_lib(self, expApp):
         def _getitemset(fSet):
             itemset = filter(lambda x: len(x)> 1, fSet)
-            itemset += [(itemset[i], itemset[i+1]) for i in range(0, len(itemset)-1)]
+            itemset += [(itemset[i], itemset[j]) for i in range(0, len(itemset)-1)
+                        for j in range(i, len(itemset)-1)]
             return itemset
 
         self.fLib = defaultdict(set)
@@ -314,7 +315,7 @@ class PathApp(AbsClassifer):
         SQL = consts.SQL_SELECT_CMAR_RULES
         for label, patterns, host, ruleType, support in sqldao.execute(SQL):
             counter += 1
-            patterns = frozenset(map(lambda x: x.strip(), patterns.split(",")))
+            patterns = frozenset(map(lambda x: x.strip(), patterns))
             self.rules[ruleType][host][patterns] = (label, support)
         sqldao.close()
         print '>>>[CMAR] Totaly number of rules is', counter
