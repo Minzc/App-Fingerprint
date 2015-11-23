@@ -7,7 +7,6 @@ import const.consts as consts
 from const.app_info import AppInfos
 from classifier import AbsClassifer
 from const.dataset import DataSetIter as DataSetIter
-import re
 
 # class TreeNode:
 #     def __init__(self, father, value):
@@ -327,9 +326,7 @@ class PathApp(AbsClassifer):
             for ruleType in rules:
                 for feature in self._get_package_f(pkg):
                     if feature in rules[ruleType] and pkg.app == rules[ruleType][feature]:
-                        self.rules[ruleType][feature][pkg.app][pkg.host].add(tbl)
-                    elif feature in rules[ruleType] and pkg.app != rules[ruleType][feature]:
-                        print rules[ruleType][feature]
+                        self.rules[ruleType][feature][pkg.app][pkg.rawHost].add(tbl)
 
 
     def c(self, package):
@@ -340,8 +337,8 @@ class PathApp(AbsClassifer):
         features = self._get_package_f(package)
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
-            if package.host in rules.keys():
-                for rule, label_confidence in rules[package.host].iteritems():
+            if package.rawHost in rules.keys():
+                for rule, label_confidence in rules[package.rawHost].iteritems():
                     label, confidence = label_confidence
                     if rule.issubset(features):
                         rst = consts.Prediction(label, confidence, rule)

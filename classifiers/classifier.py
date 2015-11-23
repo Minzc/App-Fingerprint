@@ -39,3 +39,4 @@ class AbsClassifer:
         sqldao.execute(QUERY % (ruleType))
         sqldao.close()
 
+

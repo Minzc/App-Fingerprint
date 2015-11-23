@@ -283,6 +283,7 @@ class AgentClassifier(AbsClassifer):
         print "Finish Pruning"
 
         hostAgent = self._add_host(regexApp, hostCategory)
+        hostAgent = self.change_raw(hostAgent, trainSet)
 
         self.persist(regexApp, hostAgent, consts.APP_RULE)
 
@@ -315,7 +316,7 @@ class AgentClassifier(AbsClassifer):
 
         compressed = defaultdict(lambda : defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(testSet):
-            compressed[pkg.agent][pkg.host].add(pkg)
+            compressed[pkg.agent][pkg.rawHost].add(pkg)
 
         batchPredicts = {}
         for agent, host, pkgs in flatten(compressed):
@@ -347,3 +348,19 @@ class AgentClassifier(AbsClassifer):
                     longestWord = agentF
             rst[ruleType] = (rstLabel, longestWord)
         return rst
+
+    def change_raw(self, rules, trainSet):
+        tmpRules = {}
+        hostDict = {}
+        for rule, app in rules.items():
+            hostDict[rule[0]] = set()
+
+        for tbl, pkg in DataSetIter.iter_pkg(trainSet):
+            if pkg.host in hostDict:
+                hostDict[pkg.host].add(pkg.rawHost)
+
+        for rule, app in rules.items():
+            host, regexObj = rule
+            for rawHost in hostDict[host]:
+                tmpRules[(rawHost, regexObj)] = app
+        return tmpRules

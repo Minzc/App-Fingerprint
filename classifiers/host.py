@@ -18,8 +18,7 @@ class HostApp(AbsClassifer):
         self.labelAppInfo = {}
         self.rules = defaultdict(dict)
 
-    def persist(self, patterns, rawHosts, rule_type):
-        self._clean_db(rule_type)
+    def persist(self, patterns, rawHosts):
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_HOST_RULES
         params = []
@@ -59,7 +58,7 @@ class HostApp(AbsClassifer):
 
     def _feature_lib(self, expApp):
         self.fLib = defaultdict(set)
-        segApps = defaultdict(set)
+        segCategory = defaultdict(set)
         for label, appInfo in expApp.iteritems():
             appSegs = appInfo.package.split('.')
             companySegs = appInfo.company.split(' ')
@@ -70,9 +69,9 @@ class HostApp(AbsClassifer):
             for segs in wholeSegs:
                 for seg in segs:
                     self.fLib[label].add(seg)
-                    segApps[seg].add(label)
+                    segCategory[seg].add(appInfo.category)
         for label, segs in self.fLib.items():
-            self.fLib[label] = {seg for seg in segs if len(segApps[seg]) == 1}
+            self.fLib[label] = {seg for seg in segs if len(segCategory[seg]) == 1}
 
 
     def train(self, trainData, rule_type):
@@ -108,7 +107,7 @@ class HostApp(AbsClassifer):
         print 'number of rule', len(self.rules[consts.APP_RULE])
 
         self.count_support(trainData)
-        self.persist(self.rules, rawHosts, rule_type)
+        self.persist(self.rules, rawHosts)
         self.__init__(self.appType)
         return self
 
