@@ -21,12 +21,14 @@ class FRegex:
         self.regexObj = re.compile(regexStr, re.IGNORECASE)
         self.matchRecord =  defaultdict(lambda: defaultdict(set))
         self.matchCategory = set()
+        self.matchCompany = set()
         self.cover = set()
 
-    def set_match_record(self, host, app, tbls, category):
+    def set_match_record(self, host, app, tbls, category, company):
         for tbl in tbls:
             self.matchRecord[host][app].add(tbl)
         self.matchCategory.add(category)
+        self.matchCompany.add(company)
 
     def set_cover(self, regexSet):
         self.cover = regexSet
@@ -57,10 +59,10 @@ class AgentClassifier(AbsClassifer):
                 features[key] = value
         return features
 
-    def persist(self, patterns, hostAgent, ruleType):
+    def persist(self, appRule, companyRule, hostAgent, ruleType):
         """
         Input
-        :param patterns : {regex: {app1, app2}}
+        :param appRule : {regex: {app1, app2}}
         :param ruleType : type of rules (App, Company, Category)
         :param hostAgent: (host, regex) -> label
         """
@@ -68,9 +70,14 @@ class AgentClassifier(AbsClassifer):
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_AGENT_RULES
         params = []
-        for fRegex, apps in filter(lambda item: len(item[1]) == 1, patterns.iteritems()):
+        for fRegex, apps in filter(lambda item: len(item[1]) == 1, appRule.iteritems()):
             app = list(apps)[0]
             params.append((app, 1, 1,fRegex.regexObj.pattern, '', consts.APP_RULE))
+
+        for fRegex, companies in filter(lambda item: len(item[1]) == 1, companyRule.iteritems()):
+            company = list(companies)[0]
+            params.append((company, 1, 1,fRegex.regexObj.pattern, '', consts.COMPANY_RULE))
+
         for rule, app in hostAgent.items():
             host, agentRegex = rule
             params.append((app, 1, 1, agentRegex, host, consts.APP_RULE))
@@ -79,13 +86,22 @@ class AgentClassifier(AbsClassifer):
         sqldao.close()
 
     def _add_host(self, patterns, hostCategory):
-        rst = {}
+        hostAgentRule = {}
         for fRegex, apps in patterns.iteritems():
             if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCategory) == 1:
                 for host in fRegex.matchRecord:
                     if len(fRegex.matchRecord[host]) == 1 and len(hostCategory[host]) == 1:
-                        rst[(host, fRegex.regexObj.pattern)] = list(fRegex.matchRecord[host])[0]
-        return rst
+                        hostAgentRule[(host, fRegex.regexObj.pattern)] = list(fRegex.matchRecord[host])[0]
+
+        return hostAgentRule
+
+    def _company(self, patterns):
+        companyRule = {}
+        for fRegex, apps in patterns.iteritems():
+            if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCompany) == 1:
+                companyRule[fRegex] = list(fRegex.matchCompany)[0]
+
+        return companyRule
 
     @staticmethod
     def _gen_features(f):
@@ -159,9 +175,9 @@ class AgentClassifier(AbsClassifer):
 
         return appFeatureRegex
 
-    def _prune(self, regexApp):
+    def _prune(self, regexLabel):
         """
-        :param regexApp: FRegex -> apps
+        :param regexLabel: FRegex -> apps
         :return:
         """
 
@@ -177,10 +193,10 @@ class AgentClassifier(AbsClassifer):
         for regexStr, regexStrs in self.regexCover.items():
             for str in regexStrs:
                 invRegexCover[str].add(regexStr)
-        regexApp = sorted(regexApp.items(), key=sortPattern, reverse=True)
+        regexLabel = sorted(regexLabel.items(), key=sortPattern, reverse=True)
         rst = defaultdict(set)
         pruned = defaultdict(set)
-        for fRegex, apps in regexApp:
+        for fRegex, apps in regexLabel:
             apps = frozenset(apps)
             for regexStr in invRegexCover[fRegex.regexStr]:
                 pruned[apps].add(regexStr)
@@ -278,14 +294,17 @@ class AgentClassifier(AbsClassifer):
 
         print "Finish Counter"
 
+        companyRule = self._prune(self._company(regexApp))
         regexApp = self._prune(regexApp)
 
         print "Finish Pruning"
 
+
+
         hostAgent = self._add_host(regexApp, hostCategory)
         hostAgent = self.change_raw(hostAgent, trainSet)
 
-        self.persist(regexApp, hostAgent, consts.APP_RULE)
+        self.persist(regexApp, companyRule, hostAgent, consts.APP_RULE)
 
 
 
