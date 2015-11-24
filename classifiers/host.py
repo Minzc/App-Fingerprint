@@ -90,7 +90,7 @@ class HostApp(AbsClassifer):
 
         rules = defaultdict(lambda : defaultdict(set))
 
-        for host in filter(lambda host: len(hostLabel[host]) == 1,tmpRst):
+        for host in filter(lambda host: len(hostLabel[host]) == 1 and host in tmpRst,tmpRst):
             rules[rawHost[host]] = tmpRst[host]
         return rules
 
