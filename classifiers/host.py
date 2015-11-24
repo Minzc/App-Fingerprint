@@ -93,13 +93,13 @@ class HostApp(AbsClassifer):
         return rules
 
     def _count_company(self, trainData):
-        get_feature = lambda pkg : self.fLib[pkg.app]
+        get_feature = lambda pkg, url : self.fLib[pkg.app]
         get_label = lambda pkg : pkg.company
         rules = self._count(get_feature, get_label, trainData)
         return rules
 
     def _count_app(self, trainData):
-        get_feature = lambda pkg : set(pkg.app.split('.')) | set(pkg.website.split('.'))
+        get_feature = lambda pkg, url : set(pkg.app.split('.')) | set(pkg.website.split('.'))
         get_label = lambda pkg : pkg.app
         rules = self._count(get_feature, get_label, trainData)
         return rules
