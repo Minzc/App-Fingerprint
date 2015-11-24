@@ -90,7 +90,7 @@ class HostApp(AbsClassifer):
 
         rules = defaultdict(lambda : defaultdict(set))
 
-        for host in filter(lambda host: len(hostLabel[host]) == 1 and host in tmpRst,tmpRst):
+        for host in filter(lambda host: len(hostLabel[host]) == 1 and host in tmpRst, tmpRst):
             rules[rawHost[host]] = tmpRst[host]
         return rules
 
@@ -115,12 +115,12 @@ class HostApp(AbsClassifer):
         ########################
         appRule = self._count_app(trainData)
         companyRule = self._count_company(trainData)
+
         self.rules[consts.APP_RULE] = appRule
         self.rules[consts.COMPANY_RULE] = companyRule
 
         print 'number of rule', len(self.rules[consts.APP_RULE])
 
-        self.count_support(trainData)
         self.persist(self.rules)
         self.__init__(self.appType)
         return self
