@@ -93,6 +93,15 @@ def evaluate(rst, testSet, testApps):
   - InforTrack : contains evaluation information
   """
     # app_rst, record_id
+    def get_label(pkg, ruleType):
+        if ruleType == consts.APP_RULE:
+            return pkg.app
+        elif ruleType == consts.COMPANY_RULE:
+            return pkg.company
+        elif ruleType == consts.CATEGORY_RULE:
+            return pkg.category
+        else:
+            assert "Rule Type Error"
     inforTrack = {consts.DISCOVERED_APP: 0.0, consts.PRECISION: 0.0, consts.RECALL: 0.0}
     correct, recall = 0, 0
     correctApp = set()
@@ -106,32 +115,28 @@ def evaluate(rst, testSet, testApps):
         ifCorrect = True
         for pkg in pkgs:
             predictions = rst[pkg.id]
-            predictApp = predictions[consts.APP_RULE].label
-            predictCompany = predictions[consts.COMPANY_RULE].label
-            predictCategory = predictions[consts.CATEGORY_RULE].label
-            ifCorrect = [0,0,0]
+            correct = [0,0,0]
+
             ifPredict = False
-            if predictApp:
-                ifPredict = True
-                if predictApp == pkg.app:
-                    ifCorrect[consts.APP_RULE] = 1
-            elif predictCompany:
-                ifPredict = True
-                if predictCompany == pkg.company:
-                    ifCorrect[consts.COMPANY_RULE] = 1
-            elif predictCategory:
-                ifPredict = True
-                if predictCategory == pkg.category:
-                    ifCorrect[consts.CATEGORY_RULE] = 1
+            for ruleType in [consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE]:
+                label = predictions[ruleType].label
+                predict = get_label(pkg, ruleType)
+                ifPredict |= predict is not None
+                if label == predict:
+                    correct[ruleType] = 1
+                if ifPredict:
+                    ifCorrect &= sum(correct) > 0
+                    break
 
             if ifPredict:
                 recall += 1
                 detectedApp.add((pkg.app, pkg.appInfo.trackId))
-                if sum(ifCorrect) > 0:
-                    correct += 1
-                    correctApp.add((pkg.app, pkg.appInfo.trackId))
-                else:
-                    wrongApp.add((pkg.app, pkg.appInfo.trackId))
+        if ifCorrect:
+            correctApp.add((pkg.app, pkgs[0].appInfo.trackId))
+        else:
+            wrongApp.add((pkg.app, pkgs[0].appInfo.trackId))
+
+
 
     print '[TEST] Total:', testSet.get_size().values()[0]
     print '[TEST] Recall:', recall
