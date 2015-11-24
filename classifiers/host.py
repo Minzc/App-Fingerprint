@@ -1,4 +1,4 @@
-from utils import  url_clean, load_exp_app,flatten
+from utils import url_clean, load_exp_app, flatten
 from sqldao import SqlDao
 from collections import defaultdict
 import const.consts as consts
@@ -18,7 +18,8 @@ class HostApp(AbsClassifer):
         self.labelAppInfo = {}
         self.rules = defaultdict(dict)
 
-    def persist(self, patterns):
+    @staticmethod
+    def persist(patterns):
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_HOST_RULES
         params = []
@@ -71,10 +72,9 @@ class HostApp(AbsClassifer):
         for label, segs in self.fLib.items():
             self.fLib[label] = {seg for seg in segs if len(segCompany[seg]) == 1}
 
-
     def _count(self, get_feature, get_label, trainData):
         rawHost = {}
-        tmpRst = defaultdict(lambda : defaultdict(set))
+        tmpRst = defaultdict(lambda: defaultdict(set))
         hostLabel = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             rawHost[pkg.host] = pkg.rawHost
@@ -89,21 +89,21 @@ class HostApp(AbsClassifer):
                     if rawHost[url] == 'ui.bamstatic.com':
                         print 'ERROR', pkg.app, pkg.company, self.fLib[pkg.app].intersection(features)
 
-        rules = defaultdict(lambda : defaultdict(set))
+        rules = defaultdict(lambda: defaultdict(set))
 
-        for host in filter(lambda host: len(hostLabel[host]) == 1 and host in tmpRst, tmpRst):
+        for host in filter(lambda h: len(hostLabel[h]) == 1 and h in tmpRst, tmpRst):
             rules[rawHost[host]] = tmpRst[host]
         return rules
 
     def _count_company(self, trainData):
-        get_feature = lambda pkg : self.fLib[pkg.app]
-        get_label = lambda pkg : pkg.company
+        get_feature = lambda pkg: self.fLib[pkg.app]
+        get_label = lambda pkg: pkg.company
         rules = self._count(get_feature, get_label, trainData)
         return rules
 
     def _count_app(self, trainData):
-        get_feature = lambda pkg : set(pkg.app.split('.')) | set(pkg.website.split('.'))
-        get_label = lambda pkg : pkg.app
+        get_feature = lambda pkg: set(pkg.app.split('.')) | set(pkg.website.split('.'))
+        get_label = lambda pkg: pkg.app
         rules = self._count(get_feature, get_label, trainData)
         return rules
 
@@ -158,24 +158,39 @@ class HostApp(AbsClassifer):
                     if len(labels) == 1 and (url in pkg.host or url in pkg.refer_host):
                         self.urlLabel[url].add(pkg.label)
 
-    def c(self, pkg):
+    def classify(self, testSet):
+        batchPredicts = {}
+        compress = defaultdict(set)
+        for tbl, pkg in DataSetIter.iter_pkg(testSet):
+            compress[pkg.rawHost].add(pkg)
+
+        for rawHost, pkgs in compress.items():
+            predictRst = self.c(rawHost)
+            for pkg in pkgs:
+                if pkg.refer_rawHost == '':
+                    batchPredicts[pkg.id] = predictRst
+
+        for tbl, pkg in DataSetIter.iter_pkg(testSet):
+            predict = batchPredicts[pkg.id][consts.APP_RULE]
+            if predict.label and predict.label != pkg.app:
+                print predict.evidence, predict.label, pkg.app
+                print '=' * 10
+        return batchPredicts
+
+    def c(self, host):
         """
         Input
         - self.rules : {ruleType: {host : (label, support, regexObj)}}
-        :param pkg: http packet
         """
         rst = {}
         for ruleType in self.rules:
             predict = consts.NULLPrediction
-            if pkg.refer_rawHost == '':
-                for regexStr, ruleTuple in self.rules[ruleType].iteritems():
-                    label, support, regexObj = ruleTuple
-                    host = pkg.rawHost
-                    match = regexObj.search(host)
-                    if match and predict.score < support:
-                        if match.start() == 0:
-                            predict = consts.Prediction(label, support, (host, regexStr, support))
-
+            for regexStr, ruleTuple in self.rules[ruleType].iteritems():
+                label, support, regexObj = ruleTuple
+                match = regexObj.search(host)
+                if match and predict.score < support:
+                    if match.start() == 0:
+                        predict = consts.Prediction(label, support, (host, regexStr, support))
 
             rst[ruleType] = predict
         return rst
