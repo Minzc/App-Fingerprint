@@ -56,7 +56,7 @@ class HostApp(AbsClassifer):
 
     def _feature_lib(self, expApp):
         self.fLib = defaultdict(set)
-        segCategory = defaultdict(set)
+        segCompany = defaultdict(set)
         for label, appInfo in expApp.iteritems():
             appSegs = appInfo.package.split('.')
             companySegs = appInfo.company.split(' ')
@@ -67,9 +67,9 @@ class HostApp(AbsClassifer):
             for segs in wholeSegs:
                 for seg in segs:
                     self.fLib[label].add(seg)
-                    segCategory[seg].add(appInfo.category)
+                    segCompany[seg].add(appInfo.company)
         for label, segs in self.fLib.items():
-            self.fLib[label] = {seg for seg in segs if len(segCategory[seg]) == 1}
+            self.fLib[label] = {seg for seg in segs if len(segCompany[seg]) == 1}
 
 
     def _count(self, get_feature, get_label, trainData):
