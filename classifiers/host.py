@@ -85,7 +85,7 @@ class HostApp(AbsClassifer):
                 hostLabel[url].add(get_label(pkg))
                 if len(self.fLib[pkg.app].intersection(features)) > 0:
                     tmpRst[url][get_label(pkg)].add(tbl)
-                    if int(get_label(pkg)) == 0:
+                    if get_label(pkg) == '0' or get_label(pkg) == 0:
                         print 'ERROR', pkg.app, pkg.company
 
         rules = defaultdict(lambda : defaultdict(set))
