@@ -28,6 +28,43 @@ USED_CLASSIFIERS = [
 
 ]
 
+class PredictRst:
+    def __init__(self):
+        self.__correct = 0
+        self.__predict = 0
+        self.__appInfo = None
+
+    def set_appInfo(self, appInfo):
+        self.appInfo = appInfo
+
+    def inc_correct(self, n):
+        self.__correct += n
+
+    def inc_total(self):
+        self.__predict +=1
+
+    @property
+    def total(self):
+        return self.__predict
+
+    @property
+    def correct(self):
+        return self.__correct
+
+    @property
+    def trackId(self):
+        return self.__appInfo.trackId
+
+    @property
+    def package(self):
+        return self.__appInfo.package
+
+    @property
+    def wrong(self):
+        return self.__predict - self.__correct
+
+    def if_all_right(self):
+        return self.__predict == self.__correct and self.__predict > 0
 
 def merge_rst(rst, tmprst):
     for pkg_id, predictions in tmprst.iteritems():
@@ -110,35 +147,31 @@ def evaluate(rst, testSet, testApps):
         appPkgs[pkg.app].add(pkg)
 
     for app, pkgs in appPkgs.items():
-        ifCorrect = True
-        appInfo = None
+        cPrdcts = PredictRst()
         for pkg in pkgs:
-            appInfo = pkg.appInfo
+            cPrdcts.set_appInfo(pkg.appInfo)
             predictions = rst[pkg.id]
             correctLabels = [0,0,0]
 
-            ifPredict = False
             for ruleType in [consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE]:
                 predict = predictions[ruleType].label
                 label = get_label(pkg, ruleType)
-                ifPredict |= predict is not None
                 correctLabels[ruleType] = 1 if label == predict else 0
 
-                if ifPredict:
-                    ifCorrect &= sum(correctLabels) > 0
-                    assert sum(correctLabels) > 1
-                    correct += sum(correctLabels)
+                if predict is not None:
+                    assert sum(correctLabels) <= 1
+                    cPrdcts.inc_total()
+                    cPrdcts.inc_correct(sum(correctLabels))
                     break
 
-            if ifPredict:
-                recall += 1
-                detectedApp.add((pkg.app, pkg.appInfo.trackId))
-        if ifCorrect:
-            correctApp.add((pkg.app, appInfo.trackId))
-        else:
-            wrongApp.add((pkg.app, appInfo.trackId))
-
-
+        if cPrdcts.if_all_right():
+            correctApp.add((cPrdcts.package, cPrdcts.appInfo.trackId))
+        elif cPrdcts.correct > 0:
+            detectedApp.add((cPrdcts.package, cPrdcts.appInfo.trackId))
+        elif cPrdcts.wrong > 0:
+            wrongApp.add((cPrdcts.package, cPrdcts.trackId))
+        correct += cPrdcts.correct
+        recall += cPrdcts.total
 
     print '[TEST] Total:', testSet.get_size().values()[0]
     print '[TEST] Recall:', recall
