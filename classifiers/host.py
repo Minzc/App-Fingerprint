@@ -118,24 +118,6 @@ class HostApp(AbsClassifer):
         self.rules[consts.APP_RULE] = appRule
         self.rules[consts.COMPANY_RULE] = companyRule
 
-
-        for url, labels in self.urlLabel.iteritems():
-            if url in test_str:
-                print '#', len(labels)
-                print labels
-                print url
-
-            if len(labels) == 1:
-                label = list(labels)[0]
-                ifValidRule = self._check(url, label, expApp[label].website)
-                ifValidRule = ifValidRule | self._check(url, label, label)
-
-                if ifValidRule:
-                    self.rules[rule_type][url] = (label, set())
-
-                if url in test_str:
-                    print 'Rule Type is', rule_type, ifValidRule, url
-
         print 'number of rule', len(self.rules[consts.APP_RULE])
 
         self.count_support(trainData)
