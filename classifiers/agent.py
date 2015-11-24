@@ -74,8 +74,7 @@ class AgentClassifier(AbsClassifer):
             app = list(apps)[0]
             params.append((app, 1, 1,fRegex.regexObj.pattern, '', consts.APP_RULE))
 
-        for fRegex, companies in filter(lambda item: len(item[1]) == 1, companyRule.iteritems()):
-            company = list(companies)[0]
+        for fRegex, company in companyRule.iteritems():
             params.append((company, 1, 1,fRegex.regexObj.pattern, '', consts.COMPANY_RULE))
 
         for rule, app in hostAgent.items():
@@ -287,12 +286,11 @@ class AgentClassifier(AbsClassifer):
 
         print "Finish Counter"
 
-        companyRule = self._prune(self._company(regexApp))
         regexApp = self._prune(regexApp)
+        companyRule = self._company(regexApp)
+        print 'Company Rules', len(companyRule)
 
         print "Finish Pruning"
-
-
 
         hostAgent = self._add_host(regexApp, hostCategory)
         hostAgent = self.change_raw(hostAgent, trainSet)
