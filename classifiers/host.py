@@ -30,16 +30,6 @@ class HostApp(AbsClassifer):
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
 
-    def _check(self, url, label, string):
-        urlSegs = set(url.split('.'))
-        strSegs = set(string.split('.'))
-        commonStrs = urlSegs.intersection(strSegs)
-        if label == 'net.ohmychef.startup':
-            print commonStrs
-        if len(commonStrs.intersection(self.fLib[label])) == 0:
-            return False
-        return True
-
     def count(self, pkg):
         host = url_clean(pkg.host)
         refer_host = pkg.refer_host
@@ -76,7 +66,7 @@ class HostApp(AbsClassifer):
             self.fLib[consts.COMPANY_RULE][label] = {seg for seg in segs if len(segCompany[seg]) == 1}
             self.fLib[consts.APP_RULE][label] = {seg for seg in segs if len(segApp[seg]) == 1}
 
-    def _count(self, get_feature, get_label, trainData, ruleType):
+    def _count(self, get_feature, get_label, trainData):
         rawHost = {}
         tmpRst = defaultdict(lambda: defaultdict(set))
         hostLabel = defaultdict(set)
@@ -88,10 +78,10 @@ class HostApp(AbsClassifer):
                 features = get_feature(pkg)
                 commons = features.intersection(set(url.split('.')))
                 hostLabel[url].add(get_label(pkg))
-                if len(self.fLib[ruleType][pkg.app].intersection(commons)) > 0:
+                if len(commons) > 0:
                     tmpRst[url][get_label(pkg)].add(tbl)
                     if rawHost[url] == 'ui.bamstatic.com':
-                        print 'ERROR', pkg.app, pkg.company, self.fLib[pkg.app].intersection(features)
+                        print 'ERROR', pkg.app, pkg.company, features.intersection(features)
 
         rules = defaultdict(lambda: defaultdict(set))
 
@@ -100,15 +90,19 @@ class HostApp(AbsClassifer):
         return rules
 
     def _count_company(self, trainData):
-        get_feature = lambda pkg: self.fLib[pkg.app]
+        get_feature = lambda pkg: self.fLib[consts.COMPANY_RULE][pkg.app]
         get_label = lambda pkg: pkg.company
-        rules = self._count(get_feature, get_label, trainData, consts.COMPANY_RULE)
+        rules = self._count(get_feature, get_label, trainData)
         return rules
 
     def _count_app(self, trainData):
-        get_feature = lambda pkg: set(pkg.app.split('.')) | set(pkg.website.split('.'))
+        def get_feature(pkg):
+            defaultF = self.fLib[consts.APP_RULE][pkg.app]
+            constrainF = defaultF.intersection((set(pkg.app.split('.')) | set(pkg.website.split('.'))))
+            return constrainF
+
         get_label = lambda pkg: pkg.app
-        rules = self._count(get_feature, get_label, trainData, consts.APP_RULE)
+        rules = self._count(get_feature, get_label, trainData)
         return rules
 
     def train(self, trainData, rule_type):
