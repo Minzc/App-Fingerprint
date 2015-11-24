@@ -85,8 +85,8 @@ class HostApp(AbsClassifer):
                 hostLabel[url].add(get_label(pkg))
                 if len(self.fLib[pkg.app].intersection(features)) > 0:
                     tmpRst[url][get_label(pkg)].add(tbl)
-                    if get_label(pkg) == '0' or get_label(pkg) == 0:
-                        print 'ERROR', pkg.app, pkg.company
+                    if rawHost[url] == 'ui.bamstatic.com':
+                        print 'ERROR', pkg.app, pkg.company, self.fLib[pkg.app].intersection(features)
 
         rules = defaultdict(lambda : defaultdict(set))
 
