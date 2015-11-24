@@ -104,9 +104,7 @@ def evaluate(rst, testSet, testApps):
             assert "Rule Type Error"
     inforTrack = {consts.DISCOVERED_APP: 0.0, consts.PRECISION: 0.0, consts.RECALL: 0.0}
     correct, recall = 0, 0
-    correctApp = set()
-    wrongApp = set()
-    detectedApp = set()
+    wrongApp, correctApp, detectedApp = set(), set(), set()
     appPkgs = defaultdict(set)
     for tbl, pkg in DataSetIter.iter_pkg(testSet):
         appPkgs[pkg.app].add(pkg)
@@ -117,17 +115,19 @@ def evaluate(rst, testSet, testApps):
         for pkg in pkgs:
             appInfo = pkg.appInfo
             predictions = rst[pkg.id]
-            correct = [0,0,0]
+            correctLabels = [0,0,0]
 
             ifPredict = False
             for ruleType in [consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE]:
-                label = predictions[ruleType].label
-                predict = get_label(pkg, ruleType)
+                predict = predictions[ruleType].label
+                label = get_label(pkg, ruleType)
                 ifPredict |= predict is not None
-                if label == predict:
-                    correct[ruleType] = 1
+                correctLabels[ruleType] = 1 if label == predict else 0
+
                 if ifPredict:
-                    ifCorrect &= sum(correct) > 0
+                    ifCorrect &= sum(correctLabels) > 0
+                    assert sum(correctLabels) > 1
+                    correct += sum(correctLabels)
                     break
 
             if ifPredict:
