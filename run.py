@@ -113,7 +113,9 @@ def evaluate(rst, testSet, testApps):
 
     for app, pkgs in appPkgs.items():
         ifCorrect = True
+        appInfo = None
         for pkg in pkgs:
+            appInfo = pkg.appInfo
             predictions = rst[pkg.id]
             correct = [0,0,0]
 
@@ -132,9 +134,9 @@ def evaluate(rst, testSet, testApps):
                 recall += 1
                 detectedApp.add((pkg.app, pkg.appInfo.trackId))
         if ifCorrect:
-            correctApp.add((pkg.app, list(pkgs)[0].appInfo.trackId))
+            correctApp.add((pkg.app, appInfo.trackId))
         else:
-            wrongApp.add((pkg.app, list(pkgs)[0].appInfo.trackId))
+            wrongApp.add((pkg.app, appInfo.trackId))
 
 
 
