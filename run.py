@@ -166,9 +166,9 @@ def evaluate(rst, testSet, testApps):
 
         if cPrdcts.if_all_right():
             correctApp.add((cPrdcts.package, cPrdcts.trackId))
-        elif cPrdcts.correct > 0:
+        if cPrdcts.correct > 0:
             detectedApp.add((cPrdcts.package, cPrdcts.trackId))
-        elif cPrdcts.wrong > 0:
+        if cPrdcts.wrong > 0:
             wrongApp.add((cPrdcts.package, cPrdcts.trackId))
         correct += cPrdcts.correct
         recall += cPrdcts.total
