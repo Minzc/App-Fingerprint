@@ -337,7 +337,8 @@ class PathApp(AbsClassifer):
         features = self._get_package_f(package)
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
-            if package.rawHost in rules.keys():
+            if package.rawHost in rules:
+                print 'ok'
                 for rule, label_confidence in rules[package.rawHost].iteritems():
                     label, confidence = label_confidence
                     if rule.issubset(features):
