@@ -169,6 +169,8 @@ class HostApp(AbsClassifer):
             for pkg in pkgs:
                 if pkg.refer_rawHost == '':
                     batchPredicts[pkg.id] = predictRst
+                else:
+                    batchPredicts[pkg.id] = consts.NULLPrediction
 
         for tbl, pkg in DataSetIter.iter_pkg(testSet):
             predict = batchPredicts[pkg.id][consts.APP_RULE]
