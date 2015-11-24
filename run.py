@@ -132,9 +132,9 @@ def evaluate(rst, testSet, testApps):
                 recall += 1
                 detectedApp.add((pkg.app, pkg.appInfo.trackId))
         if ifCorrect:
-            correctApp.add((pkg.app, pkgs[0].appInfo.trackId))
+            correctApp.add((pkg.app, list(pkgs)[0].appInfo.trackId))
         else:
-            wrongApp.add((pkg.app, pkgs[0].appInfo.trackId))
+            wrongApp.add((pkg.app, list(pkgs)[0].appInfo.trackId))
 
 
 
