@@ -1,4 +1,4 @@
-from utils import  url_clean, load_exp_app
+from utils import  url_clean, load_exp_app,flatten
 from sqldao import SqlDao
 from collections import defaultdict
 import const.consts as consts
@@ -18,14 +18,12 @@ class HostApp(AbsClassifer):
         self.labelAppInfo = {}
         self.rules = defaultdict(dict)
 
-    def persist(self, patterns, rawHosts):
+    def persist(self, patterns):
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_HOST_RULES
         params = []
         for ruleType in patterns:
-            for url, labelNsupport in patterns[ruleType].iteritems():
-                label, support = labelNsupport
-                url = rawHosts[url]
+            for url, label, support in flatten(patterns[ruleType]):
                 params.append((label, len(support), 1, url, ruleType))
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
@@ -74,18 +72,50 @@ class HostApp(AbsClassifer):
             self.fLib[label] = {seg for seg in segs if len(segCategory[seg]) == 1}
 
 
+    def _count(self, get_feature, get_label, trainData):
+        rawHost = {}
+        tmpRst = defaultdict(lambda : defaultdict(set))
+        hostLabel = defaultdict(set)
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            rawHost[pkg.host] = pkg.rawHost
+            rawHost[pkg.refer_host] = pkg.refer_rawHost
+
+            for url in [pkg.host, pkg.refer_host]:
+                features = get_feature(pkg, url)
+                hostLabel[url].add(get_label(pkg))
+                if len(self.fLib[pkg.app].intersect(features)) > 0:
+                    tmpRst[url][get_label(pkg)].add(tbl)
+
+        rules = defaultdict(lambda : defaultdict(set))
+
+        for host in filter(lambda host: len(hostLabel[host]) ==1,tmpRst):
+            rules[rawHost[host]] = tmpRst[host]
+        return rules
+
+    def _count_company(self, trainData):
+        get_feature = lambda pkg : self.fLib[pkg.app]
+        get_label = lambda pkg : pkg.company
+        rules = self._count(get_feature, get_label, trainData)
+        return rules
+
+    def _count_app(self, trainData):
+        get_feature = lambda pkg : set(pkg.app.split('.')) | set(pkg.website.split('.'))
+        get_label = lambda pkg : pkg.app
+        rules = self._count(get_feature, get_label, trainData)
+        return rules
+
     def train(self, trainData, rule_type):
         expApp = load_exp_app()[self.appType]
         expApp = {label: AppInfos.get(self.appType, label) for label in expApp}
         self._feature_lib(expApp)
-        rawHosts = {}
-        for tbl, pkg in DataSetIter.iter_pkg(trainData):
-            self.count(pkg)
-            rawHosts[pkg.host] = pkg.rawHost
-            rawHosts[pkg.refer_host] = pkg.refer_rawHost
         ########################
         # Generate Rules
         ########################
+        appRule = self._count_app(trainData)
+        companyRule = self._count_company(trainData)
+        self.rules[consts.APP_RULE] = appRule
+        self.rules[consts.COMPANY_RULE] = companyRule
+
 
         for url, labels in self.urlLabel.iteritems():
             if url in test_str:
@@ -107,7 +137,7 @@ class HostApp(AbsClassifer):
         print 'number of rule', len(self.rules[consts.APP_RULE])
 
         self.count_support(trainData)
-        self.persist(self.rules, rawHosts)
+        self.persist(self.rules)
         self.__init__(self.appType)
         return self
 

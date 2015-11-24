@@ -1,10 +1,11 @@
-from utils import longest_common_substring, get_top_domain, url_clean, load_exp_app
+from utils import  url_clean, load_exp_app
 from sqldao import SqlDao
 from collections import defaultdict
 import const.consts as consts
 from const.app_info import AppInfos
 from classifier import AbsClassifer
 import re
+from const.dataset import DataSetIter as DataSetIter
 
 test_str = {'stats.3sidedcube.com', 'redcross.com'}
 
@@ -17,35 +18,29 @@ class HostApp(AbsClassifer):
         self.labelAppInfo = {}
         self.rules = defaultdict(dict)
 
-    def persist(self, patterns, rule_type):
-        self._clean_db(rule_type)
+    def persist(self, patterns, rawHosts):
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_HOST_RULES
         params = []
         for ruleType in patterns:
             for url, labelNsupport in patterns[ruleType].iteritems():
                 label, support = labelNsupport
+                url = rawHosts[url]
                 params.append((label, len(support), 1, url, ruleType))
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
 
+    def _check(self, url, label, string):
+        urlSegs = set(url.split('.'))
+        strSegs = set(string.split('.'))
+        commonStrs = urlSegs.intersection(strSegs)
+        if label == 'net.ohmychef.startup':
+            print commonStrs
+        if len(commonStrs.intersection(self.fLib[label])) == 0:
+            return False
+        return True
+
     def count(self, pkg):
-        def addCommonStr(url, label, string):
-            common_str = longest_common_substring(url.lower(), string.lower())
-            common_str = common_str.strip('.')
-            if label == 'net.ohmychef.startup':
-                print common_str, common_str not in self.fLib[label]
-            #print common_str, url, string, label
-            if common_str not in self.fLib[label]:
-                return
-            # for subStr in filter( lambda x: common_str in x, string.split('.')):
-            #     sPos = subStr.find(common_str)
-            #     ePos = sPos + len(common_str)
-            #     if sPos != 0 and ePos != len(subStr):
-            #         return
-            self.substrCompany[common_str].add(pkg.label)
-
-
         host = url_clean(pkg.host)
         refer_host = pkg.refer_host
         if not host:
@@ -53,24 +48,6 @@ class HostApp(AbsClassifer):
 
         self.labelAppInfo[pkg.label] = [pkg.website]
         map(lambda url: self.urlLabel[url].add(pkg.label), [host, refer_host])
-        map(lambda string: addCommonStr(host, pkg.label, string), [pkg.website])
-
-    def checkCommonStr(self, label, url):
-        for astr in self.labelAppInfo[label]:
-            common_str = longest_common_substring(url.lower(), astr.lower())
-            common_str = common_str.strip('.')
-            if url in test_str:
-                print common_str, url,astr
-                print self.substrCompany[common_str], url
-            subCompanyLen = len(self.substrCompany[common_str])
-            strValid = True if len(common_str) > 2 else False
-            companyValid = True if 5 > subCompanyLen > 0 else False
-
-            if companyValid and strValid:
-                if url in test_str:
-                    print 'INNNNNNNNNNNN', url, label, common_str
-                return True
-        return False
 
     @staticmethod
     def _clean_db(rule_type):
@@ -81,24 +58,66 @@ class HostApp(AbsClassifer):
 
     def _feature_lib(self, expApp):
         self.fLib = defaultdict(set)
+        segCategory = defaultdict(set)
         for label, appInfo in expApp.iteritems():
             appSegs = appInfo.package.split('.')
             companySegs = appInfo.company.split(' ')
             categorySegs = appInfo.category.split(' ')
             websiteSegs = url_clean(appInfo.website).split('.')
-            wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs]
+            nameSegs = appInfo.name.split(' ')
+            wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs, nameSegs]
             for segs in wholeSegs:
                 for seg in segs:
                     self.fLib[label].add(seg)
+                    segCategory[seg].add(appInfo.category)
+        for label, segs in self.fLib.items():
+            self.fLib[label] = {seg for seg in segs if len(segCategory[seg]) == 1}
 
-    def train(self, records, rule_type):
+
+    def _count_company(self, trainData):
+        rawHost = {}
+        tmpRst = defaultdict(lambda : defaultdict(set))
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            hostSegs = set(pkg.host.split('.'))
+            rawHost[pkg.host] = pkg.rawHost
+            rawHost[pkg.refer_host] = pkg.refer_rawHost
+            if len(self.fLib[pkg.app].intersect(hostSegs)) > 0:
+                tmpRst[pkg.host][pkg.company].add(tbl)
+                tmpRst[pkg.rawHost][pkg.company].add(tbl)
+
+        rules = defaultdict(lambda : defaultdict(set))
+
+        for host in tmpRst:
+            if len(tmpRst[host]) == 1:
+                rules[rawHost[host]] = tmpRst[host]
+        return rules
+
+    def _count_app(self, trainData):
+        rawHost = {}
+        tmpRst = defaultdict(lambda : defaultdict(set))
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            hostSegs = set(pkg.host.split('.'))
+            rawHost[pkg.host] = pkg.rawHost
+            rawHost[pkg.refer_host] = pkg.refer_rawHost
+            if len(self.fLib[pkg.app].intersect(hostSegs)) > 0:
+                tmpRst[pkg.host][pkg.app].add(tbl)
+
+        rules = defaultdict(lambda : defaultdict(set))
+        for host in tmpRst:
+            if len(tmpRst[host]) == 1:
+                rules[rawHost[host]] = tmpRst[host]
+
+        return rules
+
+    def train(self, trainData, rule_type):
         expApp = load_exp_app()[self.appType]
         expApp = {label: AppInfos.get(self.appType, label) for label in expApp}
         self._feature_lib(expApp)
-        for pkgs in records.values():
-            for pkg in pkgs:
-                self.count(pkg)
-        self._recount(records)
+        rawHosts = {}
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            self.count(pkg)
+            rawHosts[pkg.host] = pkg.rawHost
+            rawHosts[pkg.refer_host] = pkg.refer_rawHost
         ########################
         # Generate Rules
         ########################
@@ -110,8 +129,9 @@ class HostApp(AbsClassifer):
                 print url
 
             if len(labels) == 1:
-                label = labels.pop()
-                ifValidRule = True if self.checkCommonStr(label, url) else False
+                label = list(labels)[0]
+                ifValidRule = self._check(url, label, expApp[label].website)
+                ifValidRule = ifValidRule | self._check(url, label, label)
 
                 if ifValidRule:
                     self.rules[rule_type][url] = (label, set())
@@ -121,8 +141,8 @@ class HostApp(AbsClassifer):
 
         print 'number of rule', len(self.rules[consts.APP_RULE])
 
-        self.count_support(records)
-        self.persist(self.rules, rule_type)
+        self.count_support(trainData)
+        self.persist(self.rules, rawHosts)
         self.__init__(self.appType)
         return self
 
@@ -138,21 +158,18 @@ class HostApp(AbsClassifer):
         print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
 
-
-    def count_support(self, records):
+    def count_support(self, trainData):
         LABEL = 0
         TBLSUPPORT = 1
-        for tbl, pkgs in records.items():
-            for pkg in pkgs:
-                for ruleType in self.rules:
-                    host = url_clean(pkg.host)
-                    refer_host = pkg.refer_host
-                    for url in [host,  refer_host]:
-                        if url in self.rules[ruleType]:
-                            label = self.rules[ruleType][url][LABEL]
-                            if label == pkg.label:
-                                self.rules[ruleType][url][TBLSUPPORT].add(tbl)
-
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            for ruleType in self.rules:
+                host = url_clean(pkg.host)
+                refer_host = pkg.refer_host
+                for url in [host, refer_host]:
+                    if url in self.rules[ruleType]:
+                        label = self.rules[ruleType][url][LABEL]
+                        if label == pkg.label:
+                            self.rules[ruleType][url][TBLSUPPORT].add(tbl)
 
     def _recount(self, records):
         for tbl, pkgs in records.items():
@@ -161,7 +178,7 @@ class HostApp(AbsClassifer):
                     if len(labels) == 1 and (url in pkg.host or url in pkg.refer_host):
                         self.urlLabel[url].add(pkg.label)
 
-    def classify(self, pkg):
+    def c(self, pkg):
         """
         Input
         - self.rules : {ruleType: {host : (label, support, regexObj)}}
@@ -170,19 +187,15 @@ class HostApp(AbsClassifer):
         rst = {}
         for ruleType in self.rules:
             predict = consts.NULLPrediction
-            for regexStr, ruleTuple in self.rules[ruleType].iteritems():
-                label, support, regexObj = ruleTuple
-                host = pkg.refer_host if pkg.refer_host else pkg.host
-                if pkg.app == 'com.idrudgereport.idrudgereportuniversal' and pkg.host == 'images.politico.com':
-                    print '>>>', host, pkg.refer_host, host
-                match = regexObj.search(host)
-                if match and predict.score < support:
-                    predict = consts.Prediction(label, support, (host, regexStr, support))
-                    # if pkg.app == 'com.logos.vyrso' and pkg.host == 'gsp1.apple.com':
-                    #   print regexStr
-                    # print match
+            if pkg.refer_rawHost == '':
+                for regexStr, ruleTuple in self.rules[ruleType].iteritems():
+                    label, support, regexObj = ruleTuple
+                    host = pkg.rawHost
+                    match = regexObj.search(host)
+                    if match and predict.score < support:
+                        if match.start() == 0:
+                            predict = consts.Prediction(label, support, (host, regexStr, support))
+
 
             rst[ruleType] = predict
-            if predict.label != pkg.app and predict.label is not None:
-                print 'Evidence:', predict.evidence, 'App:', pkg.app, 'Predict:', predict.label
         return rst
