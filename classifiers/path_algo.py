@@ -340,6 +340,8 @@ class PathApp(AbsClassifer):
             if package.rawHost in rules:
                 print 'ok'
                 for rule, label_confidence in rules[package.rawHost].iteritems():
+                    if package.id == 246231:
+                        print '[HIT]', rule, features, rule.issubset(features)
                     label, confidence = label_confidence
                     if rule.issubset(features):
                         rst = consts.Prediction(label, confidence, rule)
