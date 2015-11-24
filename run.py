@@ -21,7 +21,7 @@ TRAIN_LABEL = {
 
 USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
-    #consts.AGENT_CLASSIFIER,
+    consts.AGENT_CLASSIFIER,
     consts.KV_CLASSIFIER,
     consts.CMAR_CLASSIFIER,
     consts.HOST_CLASSIFIER,
@@ -98,27 +98,40 @@ def evaluate(rst, testSet, testApps):
     correctApp = set()
     wrongApp = set()
     detectedApp = set()
+    appPkgs = defaultdict(set)
     for tbl, pkg in DataSetIter.iter_pkg(testSet):
-        predictions = rst[pkg.id]
-        predictApp = predictions[consts.APP_RULE].label
-        predictCompany = predictions[consts.COMPANY_RULE].label
-        predictCategory = predictions[consts.CATEGORY_RULE].label
-        ifCorrect = True
-        if predictApp and predictApp != pkg.app:
-            ifCorrect = False
-        if predictCompany and predictCompany != pkg.company:
-            ifCorrect = False
-        if predictCategory and predictCategory != pkg.category:
-            ifCorrect = False
+        appPkgs[pkg.app].add(pkg)
 
-        if sum([1 for value in predictions.values() if value != consts.NULLPrediction]) > 0:
-            recall += 1
-            detectedApp.add((pkg.app, pkg.appInfo.trackId))
-            if ifCorrect:
-                correct += 1
-                correctApp.add((pkg.app, pkg.appInfo.trackId))
-            else:
-                wrongApp.add((pkg.app, pkg.appInfo.trackId))
+    for app, pkgs in appPkgs.items():
+        ifCorrect = True
+        for pkg in pkgs:
+            predictions = rst[pkg.id]
+            predictApp = predictions[consts.APP_RULE].label
+            predictCompany = predictions[consts.COMPANY_RULE].label
+            predictCategory = predictions[consts.CATEGORY_RULE].label
+            ifCorrect = [0,0,0]
+            ifPredict = False
+            if predictApp:
+                ifPredict = True
+                if predictApp == pkg.app:
+                    ifCorrect[consts.APP_RULE] = 1
+            elif predictCompany:
+                ifPredict = True
+                if predictCompany == pkg.company:
+                    ifCorrect[consts.COMPANY_RULE] = 1
+            elif predictCategory:
+                ifPredict = True
+                if predictCategory == pkg.category:
+                    ifCorrect[consts.CATEGORY_RULE] = 1
+
+            if ifPredict:
+                recall += 1
+                detectedApp.add((pkg.app, pkg.appInfo.trackId))
+                if sum(ifCorrect) > 0:
+                    correct += 1
+                    correctApp.add((pkg.app, pkg.appInfo.trackId))
+                else:
+                    wrongApp.add((pkg.app, pkg.appInfo.trackId))
 
     print '[TEST] Total:', testSet.get_size().values()[0]
     print '[TEST] Recall:', recall

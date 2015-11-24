@@ -11,9 +11,9 @@ SUPPORT = 't'
 REGEX_OBJ = 'r'
 
 #############TYPE###############
-APP_RULE = 1
-COMPANY_RULE = 2
-CATEGORY_RULE = 3
+APP_RULE = 0
+COMPANY_RULE = 1
+CATEGORY_RULE = 2
 
 ANDROID = 0
 IOS = 1
