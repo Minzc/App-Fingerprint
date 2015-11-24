@@ -204,7 +204,7 @@ class AgentClassifier(AbsClassifer):
                 rst[fRegex] = apps
         return rst
 
-    def _count(self, appFeatureRegex, appAgent, trainapps, appCategory):
+    def _count(self, appFeatureRegex, appAgent, trainapps, appCategory, appCompany):
         """
         Count regex
         :param appAgent: app -> (host, agent) -> tbls
@@ -239,14 +239,14 @@ class AgentClassifier(AbsClassifer):
                     regexApp[fRegex] |= apps
                     for app in apps:
                         for host in values[app]:
-                            fRegex.set_match_record(host, app, values[app][host], appCategory[app])
+                            fRegex.set_match_record(host, app, values[app][host], appCategory[app], appCompany[app])
                     for regex in self.regexCover[regexStr]:
                         covered.add(regex)
                 elif fRegex.featureStr in apps:
                     app = fRegex.featureStr
                     regexApp[fRegex].add(app)
                     for host in values[app]:
-                        fRegex.set_match_record(host, app, values[app][host], appCategory[app])
+                        fRegex.set_match_record(host, app, values[app][host], appCategory[app], appCompany[app])
         return regexApp
 
     def _infer_from_xml(self, appFeatureRegex, agentTuples):
@@ -256,27 +256,20 @@ class AgentClassifier(AbsClassifer):
                     for regexStr in self._gen_regex(featureStr):
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
-    @staticmethod
-    def _sample_app(agentTuples, cmprsDB, sampleRate):
-        import random
-        agentTuples = {app: agents for app, agents in agentTuples.iteritems() if random.uniform(0, 1) <= sampleRate}
-        tmp = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
-        for agent, values in cmprsDB.items():
-            for app in filter(lambda app: app in agentTuples, values.keys()):
-                tmp[agent][app] = cmprsDB[agent][app]
-        return agentTuples, cmprsDB
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
         cmprsDB = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
         hostCategory = defaultdict(set)
         appCategory = dict()
+        appCompany = dict()
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             label, agent = pkg.label, pkg.agent
             agentTuples[label].add(agent)
             cmprsDB[agent][label][pkg.host].add(tbl)
             hostCategory[pkg.host].add(pkg.category)
             appCategory[label] = pkg.category
+            appCompany[label] = pkg.company
 
         '''
         Compose regular expression
@@ -290,7 +283,7 @@ class AgentClassifier(AbsClassifer):
         '''
         Count regex
         '''
-        regexApp = self._count(appFeatureRegex, cmprsDB, set(agentTuples.keys()), appCategory)
+        regexApp = self._count(appFeatureRegex, cmprsDB, set(agentTuples.keys()), appCategory, appCompany)
 
         print "Finish Counter"
 
