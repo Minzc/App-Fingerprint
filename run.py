@@ -165,9 +165,9 @@ def evaluate(rst, testSet, testApps):
                     break
 
         if cPrdcts.if_all_right():
-            correctApp.add((cPrdcts.package, cPrdcts.appInfo.trackId))
+            correctApp.add((cPrdcts.package, cPrdcts.trackId))
         elif cPrdcts.correct > 0:
-            detectedApp.add((cPrdcts.package, cPrdcts.appInfo.trackId))
+            detectedApp.add((cPrdcts.package, cPrdcts.trackId))
         elif cPrdcts.wrong > 0:
             wrongApp.add((cPrdcts.package, cPrdcts.trackId))
         correct += cPrdcts.correct
