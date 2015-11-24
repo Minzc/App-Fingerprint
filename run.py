@@ -35,7 +35,7 @@ class PredictRst:
         self.__appInfo = None
 
     def set_appInfo(self, appInfo):
-        self.appInfo = appInfo
+        self.__appInfo = appInfo
 
     def inc_correct(self, n):
         self.__correct += n
