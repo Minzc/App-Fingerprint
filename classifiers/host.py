@@ -83,12 +83,14 @@ class HostApp(AbsClassifer):
             for url in [pkg.host, pkg.refer_host]:
                 features = get_feature(pkg, url)
                 hostLabel[url].add(get_label(pkg))
-                if len(self.fLib[pkg.app].intersect(features)) > 0:
+                if len(self.fLib[pkg.app].intersection(features)) > 0:
                     tmpRst[url][get_label(pkg)].add(tbl)
+                    if int(get_label(pkg)) == 0:
+                        print 'ERROR', pkg.app, pkg.company
 
         rules = defaultdict(lambda : defaultdict(set))
 
-        for host in filter(lambda host: len(hostLabel[host]) ==1,tmpRst):
+        for host in filter(lambda host: len(hostLabel[host]) == 1,tmpRst):
             rules[rawHost[host]] = tmpRst[host]
         return rules
 
