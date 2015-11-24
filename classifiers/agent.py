@@ -70,8 +70,8 @@ class AgentClassifier(AbsClassifer):
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_AGENT_RULES
         params = []
-        for fRegex, apps in filter(lambda item: len(item[1]) == 1, appRule.iteritems()):
-            app = list(apps)[0]
+
+        for fRegex, app in appRule.iteritems():
             params.append((app, 1, 1,fRegex.regexObj.pattern, '', consts.APP_RULE))
 
         for fRegex, company in companyRule.iteritems():
@@ -84,23 +84,35 @@ class AgentClassifier(AbsClassifer):
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
 
-    def _add_host(self, patterns, hostCategory):
-        hostAgentRule = {}
-        for fRegex, apps in patterns.iteritems():
-            if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCategory) == 1:
-                for host in fRegex.matchRecord:
-                    if len(fRegex.matchRecord[host]) == 1 and len(hostCategory[host]) == 1:
-                        hostAgentRule[(host, fRegex.regexObj.pattern)] = list(fRegex.matchRecord[host])[0]
-
-        return hostAgentRule
+    # def _add_host(self, patterns, hostCategory):
+    #     hostAgentRule = {}
+    #     for fRegex, apps in patterns.iteritems():
+    #         if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCategory) == 1:
+    #             for host in fRegex.matchRecord:
+    #                 if len(fRegex.matchRecord[host]) == 1 and len(hostCategory[host]) == 1:
+    #                     hostAgentRule[(host, fRegex.regexObj.pattern)] = list(fRegex.matchRecord[host])[0]
+    #
+    #     return hostAgentRule
 
     def _company(self, patterns):
         companyRule = {}
         for fRegex, apps in patterns.iteritems():
             if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCompany) == 1:
                 companyRule[fRegex] = list(fRegex.matchCompany)[0]
-
         return companyRule
+
+    def _app(self, patterns, hostCategory):
+        appRules = {}
+        for fRegex, apps in filter(lambda item: len(item[1]) == 1, patterns.iteritems()):
+            app = list(apps)[0]
+            appRules[fRegex] = app
+        hostAgentRule = {}
+        for fRegex, apps in patterns.iteritems():
+            if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCategory) == 1:
+                for host in fRegex.matchRecord:
+                    if len(fRegex.matchRecord[host]) == 1 and len(hostCategory[host]) == 1:
+                        hostAgentRule[(host, fRegex.regexObj.pattern)] = list(fRegex.matchRecord[host])[0]
+        return appRules, hostAgentRule
 
     @staticmethod
     def _gen_features(f):
@@ -288,11 +300,12 @@ class AgentClassifier(AbsClassifer):
 
         regexApp = self._prune(regexApp)
         companyRule = self._company(regexApp)
+        appRule, hostAgent = self._app(regexApp, hostCategory)
         print 'Company Rules', len(companyRule)
 
         print "Finish Pruning"
 
-        hostAgent = self._add_host(regexApp, hostCategory)
+        # hostAgent = self._add_host(regexApp, hostCategory)
         hostAgent = self.change_raw(hostAgent, trainSet)
 
         self.persist(regexApp, companyRule, hostAgent, consts.APP_RULE)
