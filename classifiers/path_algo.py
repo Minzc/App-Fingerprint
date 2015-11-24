@@ -314,7 +314,7 @@ class PathApp(AbsClassifer):
         SQL = consts.SQL_SELECT_CMAR_RULES
         for label, patterns, host, ruleType, support in sqldao.execute(SQL):
             counter += 1
-            patterns = frozenset(map(lambda x: x.strip(), patterns))
+            patterns = frozenset([patterns.strip()])
             self.rules[ruleType][host][patterns] = (label, support)
         sqldao.close()
         print '>>>[CMAR] Totaly number of rules is', counter
