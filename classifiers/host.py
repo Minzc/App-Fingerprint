@@ -17,6 +17,7 @@ class HostApp(AbsClassifer):
         self.substrCompany = defaultdict(set)
         self.labelAppInfo = {}
         self.rules = defaultdict(dict)
+        self.fLib = defaultdict(lambda : defaultdict(set))
 
     @staticmethod
     def persist(patterns):
@@ -56,8 +57,9 @@ class HostApp(AbsClassifer):
         sqldao.close()
 
     def _feature_lib(self, expApp):
-        self.fLib = defaultdict(set)
         segCompany = defaultdict(set)
+        segApp = defaultdict(set)
+        tmpLib = defaultdict(set)
         for label, appInfo in expApp.iteritems():
             appSegs = appInfo.package.split('.')
             companySegs = appInfo.company.split(' ')
@@ -67,12 +69,14 @@ class HostApp(AbsClassifer):
             wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs, nameSegs]
             for segs in wholeSegs:
                 for seg in segs:
-                    self.fLib[label].add(seg)
+                    tmpLib[label].add(seg)
                     segCompany[seg].add(appInfo.company)
-        for label, segs in self.fLib.items():
-            self.fLib[label] = {seg for seg in segs if len(segCompany[seg]) == 1}
+                    segApp[seg].add(appInfo.package)
+        for label, segs in tmpLib.items():
+            self.fLib[consts.COMPANY_RULE][label] = {seg for seg in segs if len(segCompany[seg]) == 1}
+            self.fLib[consts.APP_RULE][label] = {seg for seg in segs if len(segApp[seg]) == 1}
 
-    def _count(self, get_feature, get_label, trainData):
+    def _count(self, get_feature, get_label, trainData, ruleType):
         rawHost = {}
         tmpRst = defaultdict(lambda: defaultdict(set))
         hostLabel = defaultdict(set)
@@ -84,7 +88,7 @@ class HostApp(AbsClassifer):
                 features = get_feature(pkg)
                 commons = features.intersection(set(url.split('.')))
                 hostLabel[url].add(get_label(pkg))
-                if len(self.fLib[pkg.app].intersection(commons)) > 0:
+                if len(self.fLib[ruleType][pkg.app].intersection(commons)) > 0:
                     tmpRst[url][get_label(pkg)].add(tbl)
                     if rawHost[url] == 'ui.bamstatic.com':
                         print 'ERROR', pkg.app, pkg.company, self.fLib[pkg.app].intersection(features)
@@ -98,13 +102,13 @@ class HostApp(AbsClassifer):
     def _count_company(self, trainData):
         get_feature = lambda pkg: self.fLib[pkg.app]
         get_label = lambda pkg: pkg.company
-        rules = self._count(get_feature, get_label, trainData)
+        rules = self._count(get_feature, get_label, trainData, consts.COMPANY_RULE)
         return rules
 
     def _count_app(self, trainData):
         get_feature = lambda pkg: set(pkg.app.split('.')) | set(pkg.website.split('.'))
         get_label = lambda pkg: pkg.app
-        rules = self._count(get_feature, get_label, trainData)
+        rules = self._count(get_feature, get_label, trainData, consts.APP_RULE)
         return rules
 
     def train(self, trainData, rule_type):

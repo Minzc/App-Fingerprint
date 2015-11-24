@@ -173,6 +173,7 @@ def evaluate(rst, testSet, testApps):
         correct += cPrdcts.correct
         recall += cPrdcts.total
 
+    assert len(correctApp.intersection(wrongApp)) == 0
     print '[TEST] Total:', testSet.get_size().values()[0]
     print '[TEST] Recall:', recall
     print '[TEST] Correct:', correct
