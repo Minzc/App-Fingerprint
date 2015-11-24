@@ -81,9 +81,10 @@ class HostApp(AbsClassifer):
             rawHost[pkg.refer_host] = pkg.refer_rawHost
 
             for url in [pkg.host, pkg.refer_host]:
-                features = get_feature(pkg, url)
+                features = get_feature(pkg)
+                commons = features.intersection(set(url.split('.')))
                 hostLabel[url].add(get_label(pkg))
-                if len(self.fLib[pkg.app].intersection(features)) > 0:
+                if len(self.fLib[pkg.app].intersection(commons)) > 0:
                     tmpRst[url][get_label(pkg)].add(tbl)
                     if rawHost[url] == 'ui.bamstatic.com':
                         print 'ERROR', pkg.app, pkg.company, self.fLib[pkg.app].intersection(features)
@@ -95,13 +96,13 @@ class HostApp(AbsClassifer):
         return rules
 
     def _count_company(self, trainData):
-        get_feature = lambda pkg, url : self.fLib[pkg.app]
+        get_feature = lambda pkg : self.fLib[pkg.app]
         get_label = lambda pkg : pkg.company
         rules = self._count(get_feature, get_label, trainData)
         return rules
 
     def _count_app(self, trainData):
-        get_feature = lambda pkg, url : set(pkg.app.split('.')) | set(pkg.website.split('.'))
+        get_feature = lambda pkg : set(pkg.app.split('.')) | set(pkg.website.split('.'))
         get_label = lambda pkg : pkg.app
         rules = self._count(get_feature, get_label, trainData)
         return rules
