@@ -72,13 +72,20 @@ class AgentClassifier(AbsClassifer):
         params = []
 
         for fRegex, app in appRule.iteritems():
+            assert type(fRegex.regexObj.pattern) == str
+            assert type(app) == str
             params.append((app, 1, 1,fRegex.regexObj.pattern, '', consts.APP_RULE))
 
         for fRegex, company in companyRule.iteritems():
+            assert type(fRegex.regexObj.pattern) == str
+            assert type(company) == str
             params.append((company, 1, 1,fRegex.regexObj.pattern, '', consts.COMPANY_RULE))
 
         for rule, app in hostAgent.items():
             host, agentRegex = rule
+            assert type(host) == str
+            assert type(agentRegex) == str
+            assert type(app) == str
             params.append((app, 1, 1, agentRegex, host, consts.APP_RULE))
 
         sqldao.executeBatch(QUERY, params)
@@ -106,6 +113,7 @@ class AgentClassifier(AbsClassifer):
         for fRegex, apps in filter(lambda item: len(item[1]) == 1, patterns.iteritems()):
             app = list(apps)[0]
             appRules[fRegex] = app
+
         hostAgentRule = {}
         for fRegex, apps in patterns.iteritems():
             if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCategory) == 1:
