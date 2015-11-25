@@ -19,7 +19,7 @@ class FRegex:
         self.regexStr = regexStr
         self.rawF = rawF
         self.regexObj = re.compile(regexStr, re.IGNORECASE)
-        self.matchRecord =  defaultdict(lambda: defaultdict(set))
+        self.matchRecord = defaultdict(lambda: defaultdict(set))
         self.matchCategory = set()
         self.matchCompany = set()
         self.cover = set()
@@ -32,7 +32,6 @@ class FRegex:
 
     def set_cover(self, regexSet):
         self.cover = regexSet
-
 
 
 class AgentClassifier(AbsClassifer):
@@ -62,6 +61,7 @@ class AgentClassifier(AbsClassifer):
     def persist(self, appRule, companyRule, hostAgent, ruleType):
         """
         Input
+        :param companyRule:
         :param appRule : {regex: {app1, app2}}
         :param ruleType : type of rules (App, Company, Category)
         :param hostAgent: (host, regex) -> label
@@ -72,10 +72,10 @@ class AgentClassifier(AbsClassifer):
         params = []
 
         for fRegex, app in appRule.iteritems():
-            params.append((app, 1, 1,fRegex.regexObj.pattern, '', consts.APP_RULE))
+            params.append((app, 1, 1, fRegex.regexObj.pattern, '', consts.APP_RULE))
 
         for fRegex, company in companyRule.iteritems():
-            params.append((company, 1, 1,fRegex.regexObj.pattern, '', consts.COMPANY_RULE))
+            params.append((company, 1, 1, fRegex.regexObj.pattern, '', consts.COMPANY_RULE))
 
         for rule, app in hostAgent.items():
             host, agentRegex = rule
@@ -84,24 +84,16 @@ class AgentClassifier(AbsClassifer):
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
 
-    # def _add_host(self, patterns, hostCategory):
-    #     hostAgentRule = {}
-    #     for fRegex, apps in patterns.iteritems():
-    #         if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCategory) == 1:
-    #             for host in fRegex.matchRecord:
-    #                 if len(fRegex.matchRecord[host]) == 1 and len(hostCategory[host]) == 1:
-    #                     hostAgentRule[(host, fRegex.regexObj.pattern)] = list(fRegex.matchRecord[host])[0]
-    #
-    #     return hostAgentRule
-
-    def _company(self, patterns):
+    @staticmethod
+    def _company(patterns):
         companyRule = {}
         for fRegex, apps in patterns.iteritems():
             if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCompany) == 1:
                 companyRule[fRegex] = list(fRegex.matchCompany)[0]
         return companyRule
 
-    def _app(self, patterns, hostCategory):
+    @staticmethod
+    def _app(patterns, hostCategory):
         appRules = {}
         for fRegex, apps in filter(lambda item: len(item[1]) == 1, patterns.iteritems()):
             app = list(apps)[0]
@@ -135,9 +127,9 @@ class AgentClassifier(AbsClassifer):
         return featureSet
 
     def _gen_regex(self, featureStr):
-        if featureStr[-1].isalnum() == False:
+        if not featureStr[-1].isalnum():
             featureStr = featureStr[:-1]
-        if featureStr[0].isalnum() == False:
+        if not featureStr[0].isalnum():
             featureStr = featureStr[1:]
 
         regex = []
@@ -160,7 +152,7 @@ class AgentClassifier(AbsClassifer):
             for featureStr in self._gen_features(f):
 
                 '''1. featureStr in agent. 2. featureStr is app'''
-                if len(filter(lambda agent: featureStr in agent, agents)) > 0 or app in featureStr:
+                if len(filter(lambda x: featureStr in x, agents)) > 0 or app in featureStr:
 
                     for regexStr in self._gen_regex(featureStr):
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
@@ -203,8 +195,8 @@ class AgentClassifier(AbsClassifer):
 
         invRegexCover = defaultdict(set)
         for regexStr, regexStrs in self.regexCover.items():
-            for str in regexStrs:
-                invRegexCover[str].add(regexStr)
+            for string in regexStrs:
+                invRegexCover[string].add(regexStr)
         regexLabel = sorted(regexLabel.items(), key=sortPattern, reverse=True)
         rst = defaultdict(set)
         pruned = defaultdict(set)
@@ -268,7 +260,6 @@ class AgentClassifier(AbsClassifer):
                     for regexStr in self._gen_regex(featureStr):
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
-
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
         cmprsDB = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
@@ -311,8 +302,6 @@ class AgentClassifier(AbsClassifer):
 
         self.persist(appRule, companyRule, hostAgent, consts.APP_RULE)
 
-
-
     def load_rules(self):
         self.rules = {consts.APP_RULE: {}, consts.COMPANY_RULE: {}, consts.CATEGORY_RULE: {}}
         self.rulesHost = {consts.APP_RULE: defaultdict(dict),
@@ -338,19 +327,20 @@ class AgentClassifier(AbsClassifer):
                 wrapPredicts[ruleType] = consts.Prediction(label, 1.0, evidence) if label else consts.NULLPrediction
             return wrapPredicts
 
-        compressed = defaultdict(lambda : defaultdict(set))
+        compressed = defaultdict(lambda: defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(testSet):
             compressed[pkg.agent][pkg.rawHost].add(pkg)
 
         batchPredicts = {}
         for agent, host, pkgs in flatten(compressed):
-            assert(type(pkgs) == set, "Type of pkgs is not correct" + str(type(pkgs)))
+            assert (type(pkgs) == set, "Type of pkgs is not correct" + str(type(pkgs)))
             predict = wrap_predict(self.c((agent, host)))
             for pkg in pkgs:
                 batchPredicts[pkg.id] = predict
                 l = predict[consts.APP_RULE].label
                 if l is not None and l != pkg.app:
-                    print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', predict[consts.APP_RULE]
+                    print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', predict[
+                        consts.APP_RULE]
         return batchPredicts
 
     def c(self, pkgInfo):
@@ -373,7 +363,8 @@ class AgentClassifier(AbsClassifer):
             rst[ruleType] = (rstLabel, longestWord)
         return rst
 
-    def change_raw(self, rules, trainSet):
+    @staticmethod
+    def change_raw(rules, trainSet):
         tmpRules = {}
         hostDict = {}
         for rule, app in rules.items():

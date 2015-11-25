@@ -23,7 +23,8 @@ class KVClassifier(AbsClassifer):
         self.inferFrmData = inferFrmData
         self.sampleRate = sampleRate
 
-    def _prune_general_rules(self, generalRules, trainData, xmlGenRules):
+    @staticmethod
+    def _prune_general_rules(generalRules, trainData, xmlGenRules):
         """
         1. PK by coverage
         2. Prune by xml rules
@@ -79,10 +80,6 @@ class KVClassifier(AbsClassifer):
                     counter += 1
                 tmp.append(rule)
             prunedGenRules[host] = tmp
-
-
-            # if len(prunedGenRules[host]) > 2:
-            #     prunedGenRules[host] = prunedGenRules[host][:2]
         return prunedGenRules
 
     @staticmethod
@@ -132,7 +129,8 @@ class KVClassifier(AbsClassifer):
             generalRules[secdomain] = sorted(generalRules[secdomain], key=lambda rule: rule.score, reverse=True)
         return generalRules
 
-    def _generate_rules(self, trainData, generalRules, valueLabelCounter, ruleType):
+    @staticmethod
+    def _generate_rules(trainData, generalRules, valueLabelCounter, ruleType):
         """
         Generate specific rules
         Input
@@ -159,7 +157,8 @@ class KVClassifier(AbsClassifer):
 
         return specificRules
 
-    def _merge_result(self, appSpecificRules, companySpecificRules):
+    @staticmethod
+    def _merge_result(appSpecificRules):
         def __create_dic():
             return defaultdict(lambda: defaultdict(
                 lambda: defaultdict(lambda: defaultdict(lambda: {consts.SCORE: 0, consts.SUPPORT: set()}))))
@@ -226,6 +225,7 @@ class KVClassifier(AbsClassifer):
     @staticmethod
     def gen_specific_rules_xml(xmlSpecificRules, specificRules, trackIds):
         """
+        :param trackIds:
         :param xmlSpecificRules:
         :param specificRules : specific rules for apps
              host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
@@ -238,7 +238,7 @@ class KVClassifier(AbsClassifer):
             specificRules[host][key][v][app][consts.SUPPORT] = tbls
         return specificRules
 
-    def _infer_from_xml(self, specificRules, xmlGenRules, rmApps, appKeyScore):
+    def _infer_from_xml(self, specificRules, xmlGenRules, rmApps):
         print 'Start Infering'
         xmlFieldValues = defaultdict(lambda: defaultdict(set))
         for app in self.xmlFeatures:
@@ -306,17 +306,16 @@ class KVClassifier(AbsClassifer):
         print 'Infer from data', self.inferFrmData
 
         if self.inferFrmData:
-            appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, trainData.rmapp, appKeyScore)
+            appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, trainData.rmapp)
         appSpecificRules = self.gen_specific_rules_xml(xmlSpecificRules, appSpecificRules, trackIds)
         companySpecificRules = self._generate_rules(trainData, companyGeneralRules,
                                                     self.valueLabelCounter[consts.COMPANY_RULE], consts.COMPANY_RULE)
-        specificRules = self._merge_result(appSpecificRules, companySpecificRules)
+        specificRules = self._merge_result(appSpecificRules)
         specificRules = self.change_raw(specificRules, trainData)
         #############################
         # Persist rules
         #############################
         self.persist(specificRules, rule_type)
-        #self.__compare(trainData, specificRules, hostSecdomain, appKeyScore)
         self.__init__(self.appType)
         return self
 
@@ -370,7 +369,8 @@ class KVClassifier(AbsClassifer):
             predictRst[ruleType] = rst
         return predictRst
 
-    def change_raw(self, specificRules, trainData):
+    @staticmethod
+    def change_raw(specificRules, trainData):
         tmpSpecificRules = {}
         for ruleType, patterns in specificRules.iteritems():
             tmpRules = {}

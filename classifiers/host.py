@@ -7,7 +7,7 @@ from classifier import AbsClassifer
 import re
 from const.dataset import DataSetIter as DataSetIter
 
-test_str = {'stats.3sidedcube.com', 'redcross.com'}
+test_str = {'fox8.com', 'fox2now.com'}
 
 
 class HostApp(AbsClassifer):
@@ -80,8 +80,8 @@ class HostApp(AbsClassifer):
                 hostLabel[url].add(get_label(pkg))
                 if len(commons) > 0:
                     tmpRst[url][get_label(pkg)].add(tbl)
-                    if rawHost[url] == 'ui.bamstatic.com':
-                        print 'ERROR', pkg.app, pkg.company, features.intersection(features)
+                    if rawHost[url] in test_str:
+                        print 'ERROR', pkg.app, pkg.company, features.intersection(features), hostLabel[url],features
 
         rules = defaultdict(lambda: defaultdict(set))
 

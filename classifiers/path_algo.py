@@ -160,9 +160,6 @@ from const.dataset import DataSetIter as DataSetIter
 #                 queue.append(child)
 #     return rules
 
-
-
-
 test_str = {'Market_RoyalFarms_001'.lower()}
 
 
@@ -175,8 +172,9 @@ class PathApp(AbsClassifer):
         self.rules = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(set))))
         self.xmlFeatures = load_xml_features()
 
-    def _persist(self, rules, rule_type):
-        '''specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support'''
+    @staticmethod
+    def _persist(rules, rule_type):
+        """specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support"""
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_CMAR_RULES
         params = []
@@ -330,9 +328,9 @@ class PathApp(AbsClassifer):
 
 
     def c(self, package):
-        '''
+        """
         Return {type:[(label, confidence)]}
-        '''
+        """
         labelRsts = {}
         features = self._get_package_f(package)
         for rule_type, rules in self.rules.iteritems():
