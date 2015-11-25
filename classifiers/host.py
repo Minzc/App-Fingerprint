@@ -78,10 +78,11 @@ class HostApp(AbsClassifer):
                 features = get_feature(pkg)
                 commons = features.intersection(set(url.split('.')))
                 hostLabel[url].add(get_label(pkg))
+                if rawHost[url] in test_str:
+                    print 'ERROR', pkg.app, pkg.company, features.intersection(features), hostLabel[url],features
                 if len(commons) > 0:
                     tmpRst[url][get_label(pkg)].add(tbl)
-                    if rawHost[url] in test_str:
-                        print 'ERROR', pkg.app, pkg.company, features.intersection(features), hostLabel[url],features
+
 
         rules = defaultdict(lambda: defaultdict(set))
 
