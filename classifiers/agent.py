@@ -72,6 +72,7 @@ class AgentClassifier(AbsClassifer):
         params = []
 
         for fRegex, app in appRule.iteritems():
+            print app
             assert type(app) == str
             params.append((app, 1, 1,fRegex.regexObj.pattern, '', consts.APP_RULE))
 
