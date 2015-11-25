@@ -314,7 +314,7 @@ class AgentClassifier(AbsClassifer):
         # hostAgent = self._add_host(regexApp, hostCategory)
         hostAgent = self.change_raw(hostAgent, trainSet)
 
-        self.persist(regexApp, companyRule, hostAgent, consts.APP_RULE)
+        self.persist(appRule, companyRule, hostAgent, consts.APP_RULE)
 
 
 
