@@ -46,8 +46,7 @@ SQL_UPDATE_PKG = "UPDATE %s SET classified = %s WHERE id = %s"
 #############CLASSIFIER NAMES###############
 HEAD_CLASSIFIER = "Header Rule"
 KV_CLASSIFIER = "KV Rule"
-CMAR_CLASSIFIER = "CMAR Rule"
-HOST_CLASSIFIER = "Host Rule"
+URI_CLASSIFIER = "URI Rule"
 AGENT_CLASSIFIER = "Agent Rule"
 
 #############EVALUATIONS###############

@@ -39,6 +39,58 @@ class Node:
     def tblInfo(self, appInfo):
         return self.counter[appInfo]
 
+    @property
+    def categories(self):
+        return {appInfo.category for appInfo in self.appInfos}
+
+    @property
+    def companies(self):
+        return {appInfo.company for appInfo in self.appInfos}
+
+
+class HostIdentifier:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def app_feature(fLib, appInfos):
+        appInfo = list(appInfos)[0]
+        constrain = set(appInfo.package.split('.')) | set(appInfo.website.split('.'))
+        return fLib[consts.APP_RULE][appInfo.package] & constrain
+
+    @staticmethod
+    def company_feature(fLib, appInfos):
+        appInfos = list(appInfos)
+        features = fLib[consts.COMPANY_RULE][appInfos[0].package]
+        for appInfo in appInfos[1:]:
+            features &= fLib[consts.COMPANY_RULE][appInfo.package]
+        return features
+
+
+def app_filter(node): return len(node.appInfos) == 1
+
+
+def company_filter(node): return len(node.companies) == 1
+
+
+def part(fs, target):
+    for featureSet in fs:
+        featureSet = list(featureSet) if type(featureSet) == tuple else [featureSet]
+        matchFeature = filter(lambda x: x in target, featureSet)
+        ifValid = len(matchFeature) == len(featureSet)
+        if ifValid:
+            return True
+    return False
+
+
+def whole(f, host): return len(f & set(host.split('.')))
+
+
+def get_f(pkg):
+    features = [pkg.refer_host, pkg.host]
+    features += filter(None, map(lambda x: x.strip(), pkg.path.split('/')))
+    return features
+
 
 class UriClassifier(AbsClassifer):
     def __init__(self, appType):
@@ -47,10 +99,9 @@ class UriClassifier(AbsClassifer):
         self.fLib = feature_lib(expApp)
         self.pathLabel = defaultdict(set)
         self.hostLabel = defaultdict(set)
-        self.rules = {}
-        self.rules[consts.APP_RULE] = defaultdict(lambda: defaultdict())
-        self.rules[consts.COMPANY_RULE] = defaultdict(lambda: defaultdict())
-        self.rules[consts.CATEGORY_RULE] = defaultdict(lambda: defaultdict())
+        self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict()),
+                      consts.COMPANY_RULE: defaultdict(lambda: defaultdict()),
+                      consts.CATEGORY_RULE: defaultdict(lambda: defaultdict())}
 
     def add(self, node, features, appInfo, tbl):
         if len(features) == 0:
@@ -62,50 +113,45 @@ class UriClassifier(AbsClassifer):
         child.inc(appInfo, tbl)
         self.add(child, features[1:], appInfo, tbl)
 
-    def __get_f(self, pkg):
-        features = [pkg.refer_host, pkg.host]
-        features += filter(None, map(lambda x: x.strip(), pkg.path.split('/')))
-        return features
-
     def __count(self, features, label):
         map(lambda host: self.hostLabel[host].add(label), features[0:2])
         map(lambda pathSeg: self.pathLabel[pathSeg].add(label), features[2:])
 
     def __host_rules(self, trainSet):
-        hostNodes = self.root.children.values()
-        tmpR = defaultdict(set)
-        for node in filter(lambda x: len(x.appInfos) == 1, hostNodes):
-            appInfo = list(node.appInfos)[0]
+        def __count(get, check, f, ruleType):
+            hostNodes = self.root.children.values()
+            tmpR = defaultdict(set)
+            for node in filter(f, hostNodes):
+                features = get(self.fLib, node.appInfos)
+                if check(features, node.feature):
+                    tmpR[ruleType].add(node.feature)
 
-            constrain = set(appInfo.package.split('.')) | set(appInfo.website.split('.'))
-            features = self.fLib[consts.APP_RULE][appInfo.package] & constrain
-
-            commons = features & set(node.feature.split('.'))
-            if len(commons) > 0:
-                #print node.feature, '[FEATURES]',features
-                tmpR[consts.APP_RULE].add(node.feature)
+            for tbl, pkg in DataSetIter.iter_pkg(trainSet):
+                if pkg.host in tmpR[ruleType]:
+                    hostRules[ruleType][(pkg.rawHost, None, pkg.label)].add(tbl)
 
         hostRules = defaultdict(lambda: defaultdict(set))
-        for tbl, pkg in DataSetIter.iter_pkg(trainSet):
-            if pkg.host in tmpR[consts.APP_RULE]:
-                hostRules[consts.APP_RULE][(pkg.rawHost, None, pkg.label)].add(tbl)
-
+        __count(HostIdentifier.app_feature, whole, app_filter, consts.APP_RULE)
+        __count(HostIdentifier.company_feature, part, company_filter, consts.COMPANY_RULE)
         return hostRules
 
     def __path_rules(self, trainSet):
+        pathRules = defaultdict(lambda: defaultdict(set))
         tmpR = defaultdict(set)
         for pathSeg, labels in filter(lambda x: len(x[1]) == 1, self.pathLabel.iteritems()):
             label = list(labels)[0]
-            ifValid = self.__f_valid(pathSeg, label, consts.APP_RULE)
-            if ifValid: tmpR[consts.APP_RULE].add(pathSeg)
+            fs = self.fLib[consts.APP_RULE][label]
+            ifValid = part(fs, pathSeg)
+            if ifValid:
+                tmpR[consts.APP_RULE].add(pathSeg)
 
-        pathRules = defaultdict(lambda: defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
-            pkgFs = set(self.__get_f(pkg)[2:])
+            pkgFs = set(get_f(pkg)[2:])
             for pathSeg in tmpR[consts.APP_RULE]:
                 if pathSeg in pkgFs:
                     pathRules[consts.APP_RULE][(pkg.rawHost, pathSeg, pkg.label)].add(tbl)
-        return pathRules, tmpR
+
+        return pathRules
 
     def __f_valid(self, feature, package, ruleType):
         for featureSet in self.fLib[ruleType][package]:
@@ -113,63 +159,22 @@ class UriClassifier(AbsClassifer):
             matchFeature = filter(lambda x: x in feature, featureSet)
             ifValid = len(matchFeature) == len(featureSet)
             if ifValid:
-                print featureSet,'[ORIGIN]', matchFeature, '[Feature]', feature.encode('utf-8'), '[APP]', package
                 return True
         return False
-
-    def __hst_valid(self, host, package, ruleType):
-        features = self.fLib[consts.APP_RULE][package]
-        commons = features & set(host.split('.'))
-        return len(commons) > 0
-
-    def __homo_rules(self, hostRules, trainSet, tmpR):
-        print '======'
-        def iter_branch(hostNode):
-            stack = [hostNode]
-            while len(stack) > 0:
-                n, stack = stack[0], stack[1:]
-                for node in n.children.values():
-                    stack.insert(0, node)
-                if len(n.appInfos) == 1 and len(n.children) > 0:
-                    appInfo = list(n.appInfos)[0]
-                    pathSegValid = self.__f_valid(n.feature, appInfo.package, consts.CATEGORY_RULE)
-                    hostValid = self.__hst_valid(hostNode.feature, appInfo.package, consts.CATEGORY_RULE)
-
-                    if pathSegValid and hostValid and n.feature not in tmpR[consts.APP_RULE]:
-                        print '[FEATURE]', n.feature.encode('utf-8'),'[HOST]', hostNode.feature, '[APP]', appInfo.package
-                        yield (hostNode.feature, n.feature)
-
-
-        hostNodes = filter(lambda node: node.feature not in hostRules[consts.APP_RULE], self.root.children.values())
-        tmpR = defaultdict(lambda: defaultdict(set))
-        for hNode in hostNodes:
-            for host, pathSeg in iter_branch(hNode):
-                tmpR[consts.APP_RULE][host].add(pathSeg)
-
-        rules = defaultdict(lambda: defaultdict(set))
-        for tbl, pkg in DataSetIter.iter_pkg(trainSet):
-            if pkg.host in tmpR[consts.APP_RULE]:
-                pkgFs = set(self.__get_f(pkg)[2:])
-                for pathSeg in tmpR[consts.APP_RULE][pkg.host]:
-                    if pathSeg in pkgFs:
-                        rules[consts.APP_RULE][(pkg.rawHost, pathSeg, pkg.label)].add(tbl)
-        return rules
 
     def train(self, trainData, rule_type):
         rawHost = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             rawHost[pkg.host].add(pkg.rawHost)
-            features = self.__get_f(pkg)
+            features = get_f(pkg)
             self.__count(features, pkg.app)
             self.add(self.root, features[1:], pkg.appInfo, tbl)
 
         hostRules = self.__host_rules(trainData)
-        pathRules, tmpR = self.__path_rules(trainData)
-        #homoRules = self.__homo_rules(hostRules, trainData, tmpR)
+        pathRules = self.__path_rules(trainData)
 
         self._persist(hostRules)
         self._persist(pathRules)
-        #self._persist(homoRules)
 
     def load_rules(self):
         QUERY = 'SELECT label, pattens, host, rule_type, support FROM patterns where agent IS  NULL and paramkey IS NULL'
@@ -185,9 +190,10 @@ class UriClassifier(AbsClassifer):
     def c(self, package):
         """
         Return {type:[(label, confidence)]}
+        :param package:
         """
         labelRsts = {}
-        pathSegs = set(self.__get_f(package)[2:])
+        pathSegs = set(get_f(package)[2:])
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
             if package.rawHost in rules:
@@ -214,3 +220,44 @@ class UriClassifier(AbsClassifer):
             print "Total Number of Rules is", len(rules[ruleType])
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
+
+
+
+# def __homo_rules(self, hostRules, trainSet, tmpR):
+#         print '======'
+#
+#         def __hst_valid(self, host, package, ruleType):
+#             features = self.fLib[consts.APP_RULE][package]
+#             commons = features & set(host.split('.'))
+#             return len(commons) > 0
+#
+#         def iter_branch(hostNode):
+#             stack = [hostNode]
+#             while len(stack) > 0:
+#                 n, stack = stack[0], stack[1:]
+#                 for node in n.children.values():
+#                     stack.insert(0, node)
+#                 if len(n.appInfos) == 1 and len(n.children) > 0:
+#                     appInfo = list(n.appInfos)[0]
+#                     pathSegValid = self.__f_valid(n.feature, appInfo.package, consts.CATEGORY_RULE)
+#                     hostValid = self.__hst_valid(hostNode.feature, appInfo.package, consts.CATEGORY_RULE)
+#
+#                     if pathSegValid and hostValid and n.feature not in tmpR[consts.APP_RULE]:
+#                         print '[FEATURE]', n.feature.encode(
+#                             'utf-8'), '[HOST]', hostNode.feature, '[APP]', appInfo.package
+#                         yield (hostNode.feature, n.feature)
+#
+#         hostNodes = filter(lambda node: node.feature not in hostRules[consts.APP_RULE], self.root.children.values())
+#         tmpR = defaultdict(lambda: defaultdict(set))
+#         for hNode in hostNodes:
+#             for host, pathSeg in iter_branch(hNode):
+#                 tmpR[consts.APP_RULE][host].add(pathSeg)
+#
+#         rules = defaultdict(lambda: defaultdict(set))
+#         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
+#             if pkg.host in tmpR[consts.APP_RULE]:
+#                 pkgFs = set(get_f(pkg)[2:])
+#                 for pathSeg in tmpR[consts.APP_RULE][pkg.host]:
+#                     if pathSeg in pkgFs:
+#                         rules[consts.APP_RULE][(pkg.rawHost, pathSeg, pkg.label)].add(tbl)
+#         return rules
