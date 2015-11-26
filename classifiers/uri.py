@@ -171,10 +171,10 @@ class UriClassifier(AbsClassifer):
             self.add(self.root, features[1:], pkg.appInfo, tbl)
 
         hostRules = self.__host_rules(trainData)
-        pathRules = self.__path_rules(trainData)
+        #pathRules = self.__path_rules(trainData)
 
         self._persist(hostRules)
-        self._persist(pathRules)
+        #self._persist(pathRules)
 
     def load_rules(self):
         QUERY = 'SELECT label, pattens, host, rule_type, support FROM patterns where agent IS  NULL and paramkey IS NULL'
