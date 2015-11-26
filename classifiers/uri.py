@@ -69,9 +69,11 @@ class HostIdentifier:
 
 def app_filter(node): return len(node.appInfos) == 1
 
-
 def company_filter(node): return len(node.companies) == 1
 
+def company_label(pkg): return pkg.appInfo.company
+
+def app_label(pkg): return pkg.appInfo.package
 
 def part(fs, target):
     for featureSet in fs:
@@ -118,7 +120,7 @@ class UriClassifier(AbsClassifer):
         map(lambda pathSeg: self.pathLabel[pathSeg].add(label), features[2:])
 
     def __host_rules(self, trainSet):
-        def __count(get, check, f, ruleType):
+        def __count(get, check, f, get_label,ruleType):
             hostNodes = self.root.children.values()
             tmpR = defaultdict(set)
             for node in filter(f, hostNodes):
@@ -128,11 +130,11 @@ class UriClassifier(AbsClassifer):
 
             for tbl, pkg in DataSetIter.iter_pkg(trainSet):
                 if pkg.host in tmpR[ruleType]:
-                    hostRules[ruleType][(pkg.rawHost, None, pkg.label)].add(tbl)
+                    hostRules[ruleType][(pkg.rawHost, None, get_label(pkg))].add(tbl)
 
         hostRules = defaultdict(lambda: defaultdict(set))
-        __count(HostIdentifier.app_feature, whole, app_filter, consts.APP_RULE)
-        __count(HostIdentifier.company_feature, part, company_filter, consts.COMPANY_RULE)
+        __count(HostIdentifier.app_feature, whole, app_filter, app_label, consts.APP_RULE)
+        __count(HostIdentifier.company_feature, part, company_filter, company_label, consts.COMPANY_RULE)
         return hostRules
 
     def __path_rules(self, trainSet):
