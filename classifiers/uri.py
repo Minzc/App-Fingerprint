@@ -40,7 +40,7 @@ class Node:
 
 
 class UriClassifier(AbsClassifer):
-    def __init__(self, appType):
+    def __init__(self):
         self.root = Node(None, None)
         expApp = {label: AppInfos.get(appType, label) for label in load_exp_app()[appType]}
         self.fLib = feature_lib(expApp)
