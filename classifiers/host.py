@@ -25,7 +25,7 @@ class HostApp(AbsClassifer):
         QUERY = consts.SQL_INSERT_HOST_RULES
         params = []
         for ruleType in patterns:
-            for url, label, support in flatten(patterns[ruleType]):
+            for url, label, support in latten(patterns[ruleType]):
                 params.append((label, len(support), 1, url, ruleType))
         sqldao.executeBatch(QUERY, params)
         sqldao.close()

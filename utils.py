@@ -400,13 +400,46 @@ def load_info_features(_parse_xml):
             appFeatures[app] = features
     return appFeatures
 
+def get_app_features(appInfo, xmlFeature):
+    def _getitemset(fSet):
+        itemset = filter(lambda x: len(x)> 1, fSet)
+        itemset += [(itemset[i], itemset[j]) for i in range(0, len(itemset)-1)
+                        for j in range(i, len(itemset)-1)]
+        return itemset
+    appSegs = appInfo.package.split('.')
+    appSegs = _getitemset(appSegs)
 
-# def _parse_xml(filePath):
-#     import plistlib
-#     plistObj = plistlib.readPlist(filePath)
-#     features = set()
-#     for key in VALID_FEATURES:
-#         if key in plistObj:
-#             value = unescape(plistObj[key].lower())
-#             features.add(value)
-#     return features
+    companySegs = appInfo.company.split(' ')
+    companySegs = _getitemset(companySegs)
+
+    nameSegs = appInfo.name.split(' ')
+    nameSegs = _getitemset(nameSegs)
+
+    categorySegs = appInfo.category.split(' ')
+
+    websiteSegs = url_clean(appInfo.website).split('.')
+
+    valueSegs = set()
+    for _, value in xmlFeature:
+        valueSegs |= set(value.split(' '))
+    wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs, valueSegs, nameSegs]
+    return [seg for segs in wholeSegs for seg in segs ]
+
+def feature_lib(expApp):
+    fLib = defaultdict(lambda : defaultdict(set))
+    compressSegs = {consts.APP_RULE: defaultdict(set), consts.COMPANY_RULE:defaultdict(set), consts.CATEGORY_RULE:defaultdict(set)}
+    tmpLib = defaultdict(set)
+    xmlFeatures = load_xml_features()
+    for label, appInfo in expApp.iteritems():
+        totalSegs = get_app_features(appInfo, xmlFeatures[label])
+        for seg in totalSegs:
+            tmpLib[label].add(seg)
+            compressSegs[consts.CATEGORY_RULE][seg].add(appInfo.category)
+            compressSegs[consts.COMPANY_RULE][seg].add(appInfo.company)
+            compressSegs[consts.APP_RULE][seg].add(appInfo.package)
+
+    for label, segs in tmpLib.items():
+        fLib[consts.CATEGORY_RULE][label] = {seg for seg in segs if len(compressSegs[consts.CATEGORY_RULE][seg]) == 1}
+        fLib[consts.COMPANY_RULE][label] = {seg for seg in segs if len(compressSegs[consts.COMPANY_RULE][seg]) == 1}
+        fLib[consts.APP_RULE][label] = {seg for seg in segs if len(compressSegs[consts.APP_RULE][seg]) == 1}
+    return fLib
