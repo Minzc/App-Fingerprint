@@ -408,41 +408,23 @@ def get_app_features(appInfo, xmlFeature):
         return itemset
 
     appSegs = appInfo.package.split('.')
-    if appInfo.package == 'com.cushwaygames.snapcard':
-        print '[xxxappSegs]', appSegs
     appSegs = _getitemset(appSegs)
-    if appInfo.package == 'com.cushwaygames.snapcard':
-        print '[xxxappSegs]', appSegs
 
 
     companySegs = appInfo.company.split(' ')
-    if appInfo.package == 'com.cushwaygames.snapcard':
-        print '[xxxcompanySegs]', companySegs
     companySegs = _getitemset(companySegs)
-    if appInfo.package == 'com.cushwaygames.snapcard':
-        print '[xxxcompanySegs]', companySegs
 
     nameSegs = appInfo.name.split(' ')
-    if appInfo.package == 'com.cushwaygames.snapcard':
-        print '[xxxnameSegs]', nameSegs
     nameSegs = _getitemset(nameSegs)
-    if appInfo.package == 'com.cushwaygames.snapcard':
-        print '[xxxnameSegs]', nameSegs
 
     categorySegs = filter(lambda x: len(x) > 1, appInfo.category.split(' '))
-    if appInfo.package == 'com.cushwaygames.snapcard':
-        print '[xxxcategorySegs]', categorySegs
 
     websiteSegs = filter(lambda x: len(x) > 1, url_clean(appInfo.website).split('.'))
-    if appInfo.package == 'com.cushwaygames.snapcard':
-        print '[xxxwebsiteSegs]', websiteSegs
 
     valueSegs = set()
     for _, value in xmlFeature:
         valueSegs |= set(value.split(' '))
     valueSegs = filter(lambda x: len(x) > 1, valueSegs)
-    if appInfo.package == 'com.cushwaygames.snapcard':
-        print '[xxxvalueSegs]', valueSegs
     wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs, valueSegs, nameSegs]
     return [seg for segs in wholeSegs for seg in segs ]
 
