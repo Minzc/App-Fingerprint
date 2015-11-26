@@ -67,7 +67,7 @@ class UriClassifier(AbsClassifer):
         map(lambda pathSeg: self.pathLabel[pathSeg].add(label), features[2:])
 
     def __host_rules(self, trainSet):
-        hostNodes = self.root.children
+        hostNodes = self.root.children.values()
         tmpR = defaultdict(set)
         for node in filter(lambda x:len(x.appInfos) == 1,hostNodes):
             appInfo = list(node.appInfos)[0]
