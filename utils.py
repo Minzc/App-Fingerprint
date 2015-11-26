@@ -406,30 +406,42 @@ def get_app_features(appInfo, xmlFeature):
         itemset += [(itemset[i], itemset[j]) for i in range(0, len(itemset)-1)
                         for j in range(i, len(itemset)-1)]
         return itemset
-    appSegs = appInfo.package.split('.')
-    appSegs = _getitemset(appSegs)
 
-    if 's' in appSegs:
-        print '[XXXXAPP]', appInfo.package.split('.')
+    appSegs = appInfo.package.split('.')
+    if appInfo.package == 'com.cushwaygames.snapcard':
+        print '[xxxappSegs]', appSegs
+    appSegs = _getitemset(appSegs)
+    if appInfo.package == 'com.cushwaygames.snapcard':
+        print '[xxxappSegs]', appSegs
+
 
     companySegs = appInfo.company.split(' ')
+    if appInfo.package == 'com.cushwaygames.snapcard':
+        print '[xxxcompanySegs]', companySegs
     companySegs = _getitemset(companySegs)
-
-    if 's' in companySegs:
-        print '[XXXXCOMPANY]',appInfo.company.split('.')
+    if appInfo.package == 'com.cushwaygames.snapcard':
+        print '[xxxcompanySegs]', companySegs
 
     nameSegs = appInfo.name.split(' ')
+    if appInfo.package == 'com.cushwaygames.snapcard':
+        print '[xxxnameSegs]', nameSegs
     nameSegs = _getitemset(nameSegs)
-    if 's' in nameSegs:
-        print '[XXXXnameseg]',appInfo.name.split('.')
+    if appInfo.package == 'com.cushwaygames.snapcard':
+        print '[xxxnameSegs]', nameSegs
 
     categorySegs = appInfo.category.split(' ')
+    if appInfo.package == 'com.cushwaygames.snapcard':
+        print '[xxxcategorySegs]', categorySegs
 
     websiteSegs = url_clean(appInfo.website).split('.')
+    if appInfo.package == 'com.cushwaygames.snapcard':
+        print '[xxxwebsiteSegs]', websiteSegs
 
     valueSegs = set()
     for _, value in xmlFeature:
         valueSegs |= set(value.split(' '))
+    if appInfo.package == 'com.cushwaygames.snapcard':
+        print '[xxxvalueSegs]', valueSegs
     wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs, valueSegs, nameSegs]
     return [seg for segs in wholeSegs for seg in segs ]
 
