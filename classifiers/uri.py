@@ -117,6 +117,11 @@ class UriClassifier(AbsClassifer):
                 return True
         return False
 
+    def __hst_valid(self, host, package, ruleType):
+        features = self.fLib[consts.APP_RULE][package]
+        commons = features & set(host.split('.'))
+        return len(commons) > 0
+
     def __homo_rules(self, hostRules, trainSet):
         print '======'
         def iter_branch(hostNode):
@@ -128,7 +133,7 @@ class UriClassifier(AbsClassifer):
                 if len(n.appInfos) == 1:
                     appInfo = list(n.appInfos)[0]
                     pathSegValid = self.__f_valid(n.feature, appInfo.package, consts.CATEGORY_RULE)
-                    hostValid = self.__f_valid(hostNode.feature, appInfo.package, consts.CATEGORY_RULE)
+                    hostValid = self.__hst_valid(hostNode.feature, appInfo.package, consts.CATEGORY_RULE)
 
                     if pathSegValid and hostValid:
                         print '[FEATURE]', n.feature.encode('utf-8'),'[HOST]', hostNode.feature, '[APP]', appInfo.package
