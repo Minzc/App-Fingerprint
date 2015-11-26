@@ -96,11 +96,11 @@ class UriClassifier(AbsClassifer):
         tmpR = defaultdict(set)
         for pathSeg, labels in filter(lambda x: len(x[1]) == 1, self.pathLabel.iteritems()):
             label = list(labels)[0]
-            print '[Path]', pathSeg.encode('utf-8'),'[LABEL]', label
+            #print '[Path]', pathSeg.encode('utf-8'),'[LABEL]', label
             for featureSet in self.fLib[consts.APP_RULE][label]:
                 featureSet = list(featureSet) if type(featureSet) == tuple else [featureSet]
                 matchFeature = filter(lambda x: x in pathSeg, featureSet)
-                print matchFeature,'[ORIGIN]', featureSet
+                #print matchFeature,'[ORIGIN]', featureSet
                 ifValid = len(matchFeature) == len(featureSet)
                 if ifValid: tmpR[consts.APP_RULE].add(pathSeg)
 
@@ -120,11 +120,15 @@ class UriClassifier(AbsClassifer):
                 for node in n.children.values():
                     stack.insert(0, node)
                 if len(n.appInfos) == 1:
-                    appInfo = list(n.appInfos)[0]
-                    features = self.fLib[consts.CATEGORY_RULE][appInfo.package]
-                    commons = features.intersection(n.feature)
-                    if len(commons) > 0:
-                        yield (hostNode.feature, n.feature)
+                    appInfo = n.appInfos.values()[0]
+                    for featureSet in self.fLib[consts.APP_RULE][appInfo.package]:
+                        featureSet = list(featureSet) if type(featureSet) == tuple else [featureSet]
+                        matchFeature = filter(lambda x: x in n.feature, featureSet)
+                        print featureSet,'[ORIGIN]', matchFeature,'[FEATURE]', n.feature
+                        ifValid = len(matchFeature) == len(featureSet)
+                        if ifValid:
+                            yield (hostNode.feature, n.feature)
+
 
         hostNodes = filter(lambda node: node.feature not in hostRules[consts.APP_RULE], self.root.children.values())
         tmpR = defaultdict(lambda: defaultdict(set))
@@ -149,13 +153,13 @@ class UriClassifier(AbsClassifer):
             self.__count(features, pkg.app)
             self.add(self.root, features[1:], pkg.appInfo, tbl)
 
-        #hostRules = self.__host_rules(trainData)
-        pathRules = self.__path_rules(trainData)
-        # homoRules = self.__homo_rules(hostRules, trainData)
+        hostRules = self.__host_rules(trainData)
+        #pathRules = self.__path_rules(trainData)
+        homoRules = self.__homo_rules(hostRules, trainData)
 
         #self._persist(hostRules)
-        self._persist(pathRules)
-        # self._persist(homoRules)
+        #self._persist(pathRules)
+        self._persist(homoRules)
 
     def load_rules(self):
         QUERY = 'SELECT label, pattens, host, rule_type, support FROM patterns where agent IS  NULL and paramkey IS NULL'
