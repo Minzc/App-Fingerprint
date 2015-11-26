@@ -81,7 +81,9 @@ class UriClassifier(AbsClassifer):
             features = self.fLib[consts.APP_RULE][appInfo.package] & constrain
 
             commons = features & set(node.feature.split('.'))
-            if len(commons) > 0: tmpR[consts.APP_RULE].add(node.feature)
+            if len(commons) > 0:
+                print node.feature, '[FEATURES]',features
+                tmpR[consts.APP_RULE].add(node.feature)
 
         hostRules = defaultdict(lambda: defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
@@ -146,12 +148,12 @@ class UriClassifier(AbsClassifer):
             self.add(self.root, features[1:], pkg.appInfo, tbl)
 
         hostRules = self.__host_rules(trainData)
-        pathRules = self.__path_rules(trainData)
-        homoRules = self.__homo_rules(hostRules, trainData)
+        # pathRules = self.__path_rules(trainData)
+        # homoRules = self.__homo_rules(hostRules, trainData)
 
         self._persist(hostRules)
-        self._persist(pathRules)
-        self._persist(homoRules)
+        # self._persist(pathRules)
+        # self._persist(homoRules)
 
     def load_rules(self):
         QUERY = 'SELECT label, pattens, host, rule_type, support FROM patterns where agent IS  NULL and paramkey IS NULL'
@@ -159,7 +161,7 @@ class UriClassifier(AbsClassifer):
         counter = 0
         for label, pathSeg, host, ruleType, support in sqldao.execute(QUERY):
             counter += 1
-            if pathSeg == 'None': pathSeg = ''
+            if pathSeg is None: pathSeg = ''
             self.rules[ruleType][host][pathSeg] = (label, support)
         print '>>> [URI Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
