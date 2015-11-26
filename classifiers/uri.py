@@ -113,7 +113,7 @@ class UriClassifier(AbsClassifer):
             matchFeature = filter(lambda x: x in feature, featureSet)
             ifValid = len(matchFeature) == len(featureSet)
             if ifValid:
-                print featureSet.encode('utf-8'),'[ORIGIN]', matchFeature.encode('utf-8'), '[Feature]', feature, '[APP]', package
+                print featureSet,'[ORIGIN]', matchFeature, '[Feature]', feature.encode('utf-8'), '[APP]', package
                 return True
         return False
 
