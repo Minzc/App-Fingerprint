@@ -105,7 +105,7 @@ class UriClassifier(AbsClassifer):
             for pathSeg in tmpR[consts.APP_RULE]:
                 if pathSeg in pkgFs:
                     pathRules[consts.APP_RULE][(pkg.rawHost, pathSeg, pkg.label)].add(tbl)
-        return pathRules
+        return pathRules, tmpR
 
     def __f_valid(self, feature, package, ruleType):
         for featureSet in self.fLib[ruleType][package]:
@@ -122,7 +122,7 @@ class UriClassifier(AbsClassifer):
         commons = features & set(host.split('.'))
         return len(commons) > 0
 
-    def __homo_rules(self, hostRules, trainSet):
+    def __homo_rules(self, hostRules, trainSet, tmpR):
         print '======'
         def iter_branch(hostNode):
             stack = [hostNode]
@@ -135,7 +135,7 @@ class UriClassifier(AbsClassifer):
                     pathSegValid = self.__f_valid(n.feature, appInfo.package, consts.CATEGORY_RULE)
                     hostValid = self.__hst_valid(hostNode.feature, appInfo.package, consts.CATEGORY_RULE)
 
-                    if pathSegValid and hostValid:
+                    if pathSegValid and hostValid and n.feature not in tmpR[consts.APP_RULE]:
                         print '[FEATURE]', n.feature.encode('utf-8'),'[HOST]', hostNode.feature, '[APP]', appInfo.package
                         yield (hostNode.feature, n.feature)
 
@@ -164,8 +164,8 @@ class UriClassifier(AbsClassifer):
             self.add(self.root, features[1:], pkg.appInfo, tbl)
 
         hostRules = self.__host_rules(trainData)
-        #pathRules = self.__path_rules(trainData)
-        homoRules = self.__homo_rules(hostRules, trainData)
+        pathRules, tmpR = self.__path_rules(trainData)
+        homoRules = self.__homo_rules(hostRules, trainData, tmpR)
 
         #self._persist(hostRules)
         #self._persist(pathRules)
