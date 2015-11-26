@@ -147,7 +147,7 @@ class UriClassifier(AbsClassifer):
 
         hostRules = self.__host_rules(trainData)
         pathRules = self.__path_rules(trainData)
-        homoRules = self.__homo_rules(hostRules, pathRules)
+        homoRules = self.__homo_rules(hostRules, trainData)
 
         self._persist(hostRules)
         self._persist(pathRules)
