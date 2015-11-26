@@ -147,12 +147,12 @@ class UriClassifier(AbsClassifer):
             self.__count(features, pkg)
             self.add(self.root, features[1:], pkg.appInfo, tbl)
 
-        hostRules = self.__host_rules(trainData)
-        # pathRules = self.__path_rules(trainData)
+        #hostRules = self.__host_rules(trainData)
+        pathRules = self.__path_rules(trainData)
         # homoRules = self.__homo_rules(hostRules, trainData)
 
-        self._persist(hostRules)
-        # self._persist(pathRules)
+        #self._persist(hostRules)
+        self._persist(pathRules)
         # self._persist(homoRules)
 
     def load_rules(self):
@@ -171,16 +171,16 @@ class UriClassifier(AbsClassifer):
         Return {type:[(label, confidence)]}
         """
         labelRsts = {}
-        features = set(self.__get_f(package)[2:])
+        pathSegs = set(self.__get_f(package)[2:])
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
             if package.rawHost in rules:
-                if '' in rules[package.rawHost]:
+                if '' in rules[package.rawHost] and package.refer_rawHost == '':
                     label = rules[package.rawHost][''][0]
                     rst = consts.Prediction(label, 1.0, ('Host', package.rawHost))
                 else:
                     for pathSeg in rules[package.rawHost]:
-                        if pathSeg in features:
+                        if pathSeg in pathSegs:
                             label = rules[package.rawHost][pathSeg][0]
                             rst = consts.Prediction(label, 1, ("Path", package.rawHost, pathSeg))
             labelRsts[rule_type] = rst
