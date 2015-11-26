@@ -98,7 +98,7 @@ class UriClassifier(AbsClassifer):
         pathRules = defaultdict(lambda : defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             pkgFs = set(self.__get_f(pkg)[2:])
-            for pathSeg in tmpR[consts.APP_RULE][pkg.label]:
+            for pathSeg in tmpR[consts.APP_RULE]:
                 if pathSeg in pkgFs:
                     pathRules[consts.APP_RULE][(pkg.rawHost, pathSeg, pkg.label)].add(tbl)
         return pathRules
