@@ -113,6 +113,7 @@ class UriClassifier(AbsClassifer):
         return pathRules
 
     def __homo_rules(self, hostRules, trainSet):
+        print '======'
         def iter_branch(hostNode):
             stack = [hostNode]
             while len(stack) > 0:
@@ -120,7 +121,7 @@ class UriClassifier(AbsClassifer):
                 for node in n.children.values():
                     stack.insert(0, node)
                 if len(n.appInfos) == 1:
-                    appInfo = n.appInfos.values()[0]
+                    appInfo = list(n.appInfos)[0]
                     for featureSet in self.fLib[consts.APP_RULE][appInfo.package]:
                         featureSet = list(featureSet) if type(featureSet) == tuple else [featureSet]
                         matchFeature = filter(lambda x: x in n.feature, featureSet)
