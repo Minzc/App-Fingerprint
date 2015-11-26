@@ -82,7 +82,7 @@ class UriClassifier(AbsClassifer):
 
             commons = features & set(node.feature.split('.'))
             if len(commons) > 0:
-                print node.feature, '[FEATURES]',features
+                #print node.feature, '[FEATURES]',features
                 tmpR[consts.APP_RULE].add(node.feature)
 
         hostRules = defaultdict(lambda: defaultdict(set))
@@ -127,7 +127,7 @@ class UriClassifier(AbsClassifer):
                         matchFeature = filter(lambda x: x in n.feature, featureSet)
                         ifValid = len(matchFeature) == len(featureSet)
                         if ifValid:
-                            print featureSet,'[ORIGIN]', matchFeature,'[FEATURE]', n.feature.encode('utf-8'),'[HOST]', hostNode.feature
+                            print featureSet,'[ORIGIN]', matchFeature,'[FEATURE]', n.feature.encode('utf-8'),'[HOST]', hostNode.feature, '[APP]', appInfo.package
                             yield (hostNode.feature, n.feature)
 
 
