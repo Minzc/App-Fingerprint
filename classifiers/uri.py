@@ -165,11 +165,11 @@ class UriClassifier(AbsClassifer):
 
         hostRules = self.__host_rules(trainData)
         pathRules, tmpR = self.__path_rules(trainData)
-        homoRules = self.__homo_rules(hostRules, trainData, tmpR)
+        #homoRules = self.__homo_rules(hostRules, trainData, tmpR)
 
-        #self._persist(hostRules)
-        #self._persist(pathRules)
-        self._persist(homoRules)
+        self._persist(hostRules)
+        self._persist(pathRules)
+        #self._persist(homoRules)
 
     def load_rules(self):
         QUERY = 'SELECT label, pattens, host, rule_type, support FROM patterns where agent IS  NULL and paramkey IS NULL'
