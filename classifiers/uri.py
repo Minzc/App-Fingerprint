@@ -146,7 +146,7 @@ class UriClassifier(AbsClassifer):
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             rawHost[pkg.host].add(pkg.rawHost)
             features = self.__get_f(pkg)
-            self.__count(features, pkg)
+            self.__count(features, pkg.app)
             self.add(self.root, features[1:], pkg.appInfo, tbl)
 
         #hostRules = self.__host_rules(trainData)
