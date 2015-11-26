@@ -404,7 +404,7 @@ def get_app_features(appInfo, xmlFeature):
     def _getitemset(fSet):
         itemset = filter(lambda x: len(x)> 1, fSet)
         itemset += [(itemset[i], itemset[j]) for i in range(0, len(itemset)-1)
-                        for j in range(i, len(itemset)-1)]
+                        for j in range(i, len(itemset)-1) if itemset[i] != itemset[j]]
         return itemset
 
     appSegs = appInfo.package.split('.')

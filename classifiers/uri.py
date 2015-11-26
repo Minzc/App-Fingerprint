@@ -112,6 +112,16 @@ class UriClassifier(AbsClassifer):
                     pathRules[consts.APP_RULE][(pkg.rawHost, pathSeg, pkg.label)].add(tbl)
         return pathRules
 
+    def __f_valid(self, feature, appInfo):
+        for featureSet in self.fLib[consts.CATEGORY_RULE][appInfo.package]:
+            featureSet = list(featureSet) if type(featureSet) == tuple else [featureSet]
+            matchFeature = filter(lambda x: x in feature, featureSet)
+            ifValid = len(matchFeature) == len(featureSet)
+            if ifValid:
+                print featureSet,'[ORIGIN]', matchFeature, '[Feature]', feature, '[APP]', appInfo.package
+                return True
+        return False
+
     def __homo_rules(self, hostRules, trainSet):
         print '======'
         def iter_branch(hostNode):
@@ -122,13 +132,12 @@ class UriClassifier(AbsClassifer):
                     stack.insert(0, node)
                 if len(n.appInfos) == 1:
                     appInfo = list(n.appInfos)[0]
-                    for featureSet in self.fLib[consts.APP_RULE][appInfo.package]:
-                        featureSet = list(featureSet) if type(featureSet) == tuple else [featureSet]
-                        matchFeature = filter(lambda x: x in n.feature, featureSet)
-                        ifValid = len(matchFeature) == len(featureSet)
-                        if ifValid:
-                            print featureSet,'[ORIGIN]', matchFeature,'[FEATURE]', n.feature.encode('utf-8'),'[HOST]', hostNode.feature, '[APP]', appInfo.package
-                            yield (hostNode.feature, n.feature)
+                    pathSegValid = self.__f_valid(n.feature, appInfo)
+                    hostValid = self.__f_valid(hostNode.feature, appInfo)
+
+                    if pathSegValid and hostValid:
+                        print '[FEATURE]', n.feature.encode('utf-8'),'[HOST]', hostNode.feature, '[APP]', appInfo.package
+                        yield (hostNode.feature, n.feature)
 
 
         hostNodes = filter(lambda node: node.feature not in hostRules[consts.APP_RULE], self.root.children.values())
