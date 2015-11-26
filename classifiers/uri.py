@@ -45,7 +45,7 @@ class UriClassifier(AbsClassifer):
         self.root = Node(None, None)
         expApp = {label: AppInfos.get(appType, label) for label in load_exp_app()[appType]}
         self.fLib = feature_lib(expApp)
-        print '[PPPPPPP]', self.fLib['com.cushwaygames.snapcard']
+        print '[PPPPPPP]', self.fLib[consts.CATEGORY_RULE]['com.cushwaygames.snapcard']
         self.pathLabel = defaultdict(set)
         self.hostLabel = defaultdict(set)
         self.rules = {}
