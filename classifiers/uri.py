@@ -123,7 +123,7 @@ class UriClassifier(AbsClassifer):
             hostNodes = self.root.children.values()
             tmpR = defaultdict(set)
             for node in filter(miner.filter, hostNodes):
-                features = miner.filter(self.fLib, node.appInfos)
+                features = miner.features(self.fLib, node.appInfos)
                 if check(features, node.feature):
                     tmpR[ruleType].add(node.feature)
 
