@@ -410,16 +410,18 @@ def get_app_features(appInfo, xmlFeature):
     appSegs = _getitemset(appSegs)
 
     if 's' in appSegs:
-        print appInfo.package.split('.')
+        print '[XXXXAPP]', appInfo.package.split('.')
 
     companySegs = appInfo.company.split(' ')
     companySegs = _getitemset(companySegs)
 
     if 's' in companySegs:
-        print appInfo.company.split('.')
+        print '[XXXXCOMPANY]',appInfo.company.split('.')
 
     nameSegs = appInfo.name.split(' ')
     nameSegs = _getitemset(nameSegs)
+    if 's' in nameSegs:
+        print '[XXXXnameseg]',appInfo.name.split('.')
 
     categorySegs = appInfo.category.split(' ')
 
