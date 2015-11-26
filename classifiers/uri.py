@@ -118,7 +118,7 @@ class UriClassifier(AbsClassifer):
                         yield (hostNode.feature, n.feature)
 
 
-        hostNodes = filter(lambda node: node.feature not in hostRules[consts.APP_RULE], self.root.children)
+        hostNodes = filter(lambda node: node.feature not in hostRules[consts.APP_RULE], self.root.children.values())
         tmpR = defaultdict(lambda : defaultdict(set))
         for hNode in hostNodes:
             for host, pathSeg in iter_branch(hNode):
