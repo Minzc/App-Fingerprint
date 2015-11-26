@@ -429,17 +429,18 @@ def get_app_features(appInfo, xmlFeature):
     if appInfo.package == 'com.cushwaygames.snapcard':
         print '[xxxnameSegs]', nameSegs
 
-    categorySegs = appInfo.category.split(' ')
+    categorySegs = filter(lambda x: len(x) > 1, appInfo.category.split(' '))
     if appInfo.package == 'com.cushwaygames.snapcard':
         print '[xxxcategorySegs]', categorySegs
 
-    websiteSegs = url_clean(appInfo.website).split('.')
+    websiteSegs = filter(lambda x: len(x) > 1, url_clean(appInfo.website).split('.'))
     if appInfo.package == 'com.cushwaygames.snapcard':
         print '[xxxwebsiteSegs]', websiteSegs
 
     valueSegs = set()
     for _, value in xmlFeature:
         valueSegs |= set(value.split(' '))
+    valueSegs = filter(lambda x: len(x) > 1, valueSegs)
     if appInfo.package == 'com.cushwaygames.snapcard':
         print '[xxxvalueSegs]', valueSegs
     wholeSegs = [appSegs, companySegs, categorySegs, websiteSegs, valueSegs, nameSegs]
