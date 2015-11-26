@@ -20,7 +20,7 @@ def classifier_factory(names, appType):
     elif name == consts.CMAR_CLASSIFIER:
       # classifier = CMAR(min_cover = 1)
       # classifier = PathApp(appType)
-      classifier = UriClassifier()
+      classifier = UriClassifier(appType)
     elif name == consts.KV_CLASSIFIER:
       classifier = KVClassifier(appType, inferFrmData = True, sampleRate = 1)
     classifiers.append((name, classifier))
