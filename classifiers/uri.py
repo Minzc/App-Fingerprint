@@ -96,13 +96,8 @@ class UriClassifier(AbsClassifer):
         tmpR = defaultdict(set)
         for pathSeg, labels in filter(lambda x: len(x[1]) == 1, self.pathLabel.iteritems()):
             label = list(labels)[0]
-            #print '[Path]', pathSeg.encode('utf-8'),'[LABEL]', label
-            for featureSet in self.fLib[consts.APP_RULE][label]:
-                featureSet = list(featureSet) if type(featureSet) == tuple else [featureSet]
-                matchFeature = filter(lambda x: x in pathSeg, featureSet)
-                #print matchFeature,'[ORIGIN]', featureSet
-                ifValid = len(matchFeature) == len(featureSet)
-                if ifValid: tmpR[consts.APP_RULE].add(pathSeg)
+            ifValid = self.__f_valid(pathSeg, label, consts.APP_RULE)
+            if ifValid: tmpR[consts.APP_RULE].add(pathSeg)
 
         pathRules = defaultdict(lambda: defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
@@ -112,13 +107,13 @@ class UriClassifier(AbsClassifer):
                     pathRules[consts.APP_RULE][(pkg.rawHost, pathSeg, pkg.label)].add(tbl)
         return pathRules
 
-    def __f_valid(self, feature, appInfo):
-        for featureSet in self.fLib[consts.CATEGORY_RULE][appInfo.package]:
+    def __f_valid(self, feature, package, ruleType):
+        for featureSet in self.fLib[ruleType][package]:
             featureSet = list(featureSet) if type(featureSet) == tuple else [featureSet]
             matchFeature = filter(lambda x: x in feature, featureSet)
             ifValid = len(matchFeature) == len(featureSet)
             if ifValid:
-                print featureSet,'[ORIGIN]', matchFeature, '[Feature]', feature, '[APP]', appInfo.package
+                print featureSet.encode('utf-8'),'[ORIGIN]', matchFeature.encode('utf-8'), '[Feature]', feature, '[APP]', package
                 return True
         return False
 
@@ -132,8 +127,8 @@ class UriClassifier(AbsClassifer):
                     stack.insert(0, node)
                 if len(n.appInfos) == 1:
                     appInfo = list(n.appInfos)[0]
-                    pathSegValid = self.__f_valid(n.feature, appInfo)
-                    hostValid = self.__f_valid(hostNode.feature, appInfo)
+                    pathSegValid = self.__f_valid(n.feature, appInfo.package, consts.CATEGORY_RULE)
+                    hostValid = self.__f_valid(hostNode.feature, appInfo.package, consts.CATEGORY_RULE)
 
                     if pathSegValid and hostValid:
                         print '[FEATURE]', n.feature.encode('utf-8'),'[HOST]', hostNode.feature, '[APP]', appInfo.package
