@@ -96,9 +96,11 @@ class UriClassifier(AbsClassifer):
         tmpR = defaultdict(set)
         for pathSeg, labels in filter(lambda x: len(x[1]) == 1, self.pathLabel.iteritems()):
             label = list(labels)[0]
+            print '[Path]', pathSeg,'[LABEL]', label
             for featureSet in self.fLib[consts.APP_RULE][label]:
                 featureSet = list(featureSet) if type(featureSet) == tuple else [featureSet]
                 matchFeature = filter(lambda x: x in pathSeg, featureSet)
+                print matchFeature,'[ORIGIN]', featureSet
                 ifValid = len(matchFeature) == len(featureSet)
                 if ifValid: tmpR[consts.APP_RULE].add(pathSeg)
 
