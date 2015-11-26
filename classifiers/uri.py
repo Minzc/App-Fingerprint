@@ -124,7 +124,7 @@ class UriClassifier(AbsClassifer):
                     for featureSet in self.fLib[consts.APP_RULE][appInfo.package]:
                         featureSet = list(featureSet) if type(featureSet) == tuple else [featureSet]
                         matchFeature = filter(lambda x: x in n.feature, featureSet)
-                        print featureSet,'[ORIGIN]', matchFeature,'[FEATURE]', n.feature
+                        print featureSet,'[ORIGIN]', matchFeature,'[FEATURE]', n.feature,'[HOST]', hostNode.feature
                         ifValid = len(matchFeature) == len(featureSet)
                         if ifValid:
                             yield (hostNode.feature, n.feature)
