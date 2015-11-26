@@ -1,5 +1,6 @@
 from collections import defaultdict
 import const.consts as consts
+
 from classifiers.classifier import AbsClassifer
 from const.app_info import AppInfos
 from const.dataset import DataSetIter as DataSetIter
@@ -12,7 +13,7 @@ class Node:
     def __init__(self, string, parent):
         self.__string = string
         self.appInfos = set()
-        self.counter = defaultdict(lambda : defaultdict(int))
+        self.counter = defaultdict(lambda: defaultdict(int))
         self.children = {}
         self.__parent = parent
 
@@ -46,6 +47,10 @@ class UriClassifier(AbsClassifer):
         self.fLib = feature_lib(expApp)
         self.pathLabel = defaultdict(set)
         self.hostLabel = defaultdict(set)
+        self.rules = {}
+        self.rules[consts.APP_RULE] = defaultdict(lambda: defaultdict())
+        self.rules[consts.COMPANY_RULE] = defaultdict(lambda: defaultdict())
+        self.rules[consts.CATEGORY_RULE] = defaultdict(lambda: defaultdict())
 
     def add(self, node, features, appInfo, tbl):
         if len(features) == 0:
@@ -69,16 +74,16 @@ class UriClassifier(AbsClassifer):
     def __host_rules(self, trainSet):
         hostNodes = self.root.children.values()
         tmpR = defaultdict(set)
-        for node in filter(lambda x:len(x.appInfos) == 1,hostNodes):
+        for node in filter(lambda x: len(x.appInfos) == 1, hostNodes):
             appInfo = list(node.appInfos)[0]
 
             constrain = set(appInfo.package.split('.')) | set(appInfo.website.split('.'))
             features = self.fLib[consts.APP_RULE][appInfo.package] & constrain
 
             commons = features & set(node.feature.split('.'))
-            if len(commons) > 0 : tmpR[consts.APP_RULE].add(node.feature)
+            if len(commons) > 0: tmpR[consts.APP_RULE].add(node.feature)
 
-        hostRules = defaultdict(lambda : defaultdict(set))
+        hostRules = defaultdict(lambda: defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             if pkg.host in tmpR[consts.APP_RULE]:
                 hostRules[consts.APP_RULE][(pkg.rawHost, None, pkg.label)].add(tbl)
@@ -87,7 +92,7 @@ class UriClassifier(AbsClassifer):
 
     def __path_rules(self, trainSet):
         tmpR = defaultdict(set)
-        for pathSeg, labels in filter(lambda x: len(x[1])==1,self.pathLabel.iteritems()):
+        for pathSeg, labels in filter(lambda x: len(x[1]) == 1, self.pathLabel.iteritems()):
             label = list(labels)[0]
             for featureSet in self.fLib[consts.APP_RULE][label]:
                 featureSet = list(featureSet) if type(featureSet) == tuple else [featureSet]
@@ -95,7 +100,7 @@ class UriClassifier(AbsClassifer):
                 ifValid = len(matchFeature) == len(featureSet)
                 if ifValid: tmpR[consts.APP_RULE].add(pathSeg)
 
-        pathRules = defaultdict(lambda : defaultdict(set))
+        pathRules = defaultdict(lambda: defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             pkgFs = set(self.__get_f(pkg)[2:])
             for pathSeg in tmpR[consts.APP_RULE]:
@@ -108,7 +113,7 @@ class UriClassifier(AbsClassifer):
             stack = [hostNode]
             while len(stack) > 0:
                 n, stack = stack[0], stack[1:]
-                for node in n.children:
+                for node in n.children.values():
                     stack.insert(0, node)
                 if len(n.appInfos) == 1:
                     appInfo = list(n.appInfos)[0]
@@ -117,14 +122,13 @@ class UriClassifier(AbsClassifer):
                     if len(commons) > 0:
                         yield (hostNode.feature, n.feature)
 
-
         hostNodes = filter(lambda node: node.feature not in hostRules[consts.APP_RULE], self.root.children.values())
-        tmpR = defaultdict(lambda : defaultdict(set))
+        tmpR = defaultdict(lambda: defaultdict(set))
         for hNode in hostNodes:
             for host, pathSeg in iter_branch(hNode):
                 tmpR[consts.APP_RULE][host].add(pathSeg)
 
-        rules = defaultdict(lambda : defaultdict(set))
+        rules = defaultdict(lambda: defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             if pkg.host in tmpR[consts.APP_RULE]:
                 pkgFs = set(self.__get_f(pkg)[2:])
@@ -132,7 +136,6 @@ class UriClassifier(AbsClassifer):
                     if pathSeg in pkgFs:
                         rules[consts.APP_RULE][(pkg.rawHost, pathSeg, pkg.label)].add(tbl)
         return rules
-
 
     def train(self, trainData, rule_type):
         rawHost = defaultdict(set)
@@ -151,10 +154,6 @@ class UriClassifier(AbsClassifer):
         self._persist(homoRules)
 
     def load_rules(self):
-        self.rules = {}
-        self.rules[consts.APP_RULE] = defaultdict(lambda: defaultdict())
-        self.rules[consts.COMPANY_RULE] = defaultdict(lambda: defaultdict())
-        self.rules[consts.CATEGORY_RULE] = defaultdict(lambda: defaultdict())
         QUERY = 'SELECT label, pattens, host, rule_type, support FROM patterns where agent IS  NULL and paramkey IS NULL'
         sqldao = SqlDao()
         counter = 0
