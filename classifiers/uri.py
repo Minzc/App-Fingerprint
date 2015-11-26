@@ -130,7 +130,7 @@ class UriClassifier(AbsClassifer):
                 n, stack = stack[0], stack[1:]
                 for node in n.children.values():
                     stack.insert(0, node)
-                if len(n.appInfos) == 1:
+                if len(n.appInfos) == 1 and len(n.children) > 0:
                     appInfo = list(n.appInfos)[0]
                     pathSegValid = self.__f_valid(n.feature, appInfo.package, consts.CATEGORY_RULE)
                     hostValid = self.__hst_valid(hostNode.feature, appInfo.package, consts.CATEGORY_RULE)
