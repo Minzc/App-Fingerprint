@@ -217,7 +217,7 @@ class UriClassifier(AbsClassifer):
         for ruleType in rules:
             for rule, tbls in rules[ruleType].items():
                 host, pathSeg, label = rule
-                if len(pathSeg) > 0:
+                if pathSeg is not None:
                     if not pathSeg[-1].isalnum():
                         pathSeg = pathSeg[:-1]
                     if not pathSeg[0].isalnum():
