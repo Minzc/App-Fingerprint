@@ -363,6 +363,8 @@ class KVClassifier(AbsClassifer):
                     print regexObj.search(path)
                 if regexObj.search(path):
                     label, support, confidence = scores['label'], scores[consts.SUPPORT] ,scores[consts.SCORE]
+                    print support, confidence, rst.score
+                    print support > rst.score
                     if support > rst.score or (support == rst.score and confidence > fatherScore):
                         fatherScore = confidence
                         evidence = (host, regexObj.pattern)
