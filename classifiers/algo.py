@@ -360,6 +360,7 @@ class KVClassifier(AbsClassifer):
                 if 'ads.mopub.com' in host:
                     print '[HOST IN]', host, path
                     print '[PATTERN]', regexObj.pattern
+                    print regexObj.search(path)
                 if regexObj.search(path):
                     label, support, confidence = scores['label'], scores[consts.SUPPORT] ,scores[consts.SCORE]
                     if support > rst.score or (support == rst.score and confidence > fatherScore):
