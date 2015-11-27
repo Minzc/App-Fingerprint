@@ -12,7 +12,11 @@ LIMIT = None
 INSERT = True
 PRUNE = False
 
-VALID_LABEL = {consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE}
+VALID_LABEL = {
+    consts.APP_RULE,
+    #consts.COMPANY_RULE,
+    #consts.CATEGORY_RULE
+}
 
 USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
