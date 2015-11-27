@@ -72,9 +72,8 @@ class Package:
             self.refer_secdomain = "{}.{}".format(extracted.domain, extracted.suffix)
 
     def set_path(self, path):
-
-        path = urllib.unquote(path).lower().replace(';', '?', 1).replace(';', '&')
         self.origPath = path
+        path = urllib.unquote(path).lower().replace(';', '?', 1).replace(';', '&')
         self.queries = urlparse.parse_qs(urlparse.urlparse(path).query, True)
         self.path = urlparse.urlparse(path).path
 
