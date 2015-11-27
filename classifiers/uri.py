@@ -183,8 +183,8 @@ class UriClassifier(AbsClassifer):
         counter = 0
         for label, pathSeg, host, ruleType, support in sqldao.execute(QUERY):
             counter += 1
-            if pathSeg is None: pathSeg = ''
-            self.rules[ruleType][host][pathSeg] = (label, support)
+            pathSegObj = re.compile(pathSeg) if pathSeg is not None else ''
+            self.rules[ruleType][host][pathSegObj] = (label, support)
         print '>>> [URI Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
 
@@ -202,10 +202,10 @@ class UriClassifier(AbsClassifer):
                     label = rules[package.rawHost][''][0]
                     rst = consts.Prediction(label, 1.0, ('Host', package.rawHost))
                 else:
-                    for pathSeg in rules[package.rawHost]:
-                        if pathSeg in pathSegs:
-                            label = rules[package.rawHost][pathSeg][0]
-                            rst = consts.Prediction(label, 1, ("Path", package.rawHost, pathSeg))
+                    for pathSegObj in rules[package.rawHost]:
+                        if pathSegObj.search(package.origPath):
+                            label = rules[package.rawHost][pathSegObj][0]
+                            rst = consts.Prediction(label, 1, ("Path", package.rawHost, pathSegObj.pattern))
             labelRsts[rule_type] = rst
         return labelRsts
 
@@ -217,6 +217,12 @@ class UriClassifier(AbsClassifer):
         for ruleType in rules:
             for rule, tbls in rules[ruleType].items():
                 host, pathSeg, label = rule
+                if len(pathSeg) > 0:
+                    if not pathSeg[-1].isalnum():
+                        pathSeg = pathSeg[:-1]
+                    if not pathSeg[0].isalnum():
+                        pathSeg = pathSeg[1:]
+                    pathSeg = '\b' + re.escape(pathSeg) + '\b'
                 params.append((label, pathSeg, 1, len(tbls), host, ruleType))
             print "Total Number of Rules is", len(rules[ruleType])
         sqldao.executeBatch(QUERY, params)
