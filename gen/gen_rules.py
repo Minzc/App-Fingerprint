@@ -70,7 +70,7 @@ def generate_agent_rules(vulnID=100000):
             vulnID += 1
 
     for host in classifier.rulesHost[consts.APP_RULE]:
-        for agentFeature, regexNlabel in classifier.rulesHost[consts.APP_RULE][host]:
+        for agentFeature, regexNlabel in classifier.rulesHost[consts.APP_RULE][host].items():
             regex, label = regexNlabel
             rule = Rule(vulnID, label, IOS_GROUP, 41 - 1 / float(len(agentFeature)))
             patternRegex = re.escape('User-Agent:') + '.*' + regex.pattern
