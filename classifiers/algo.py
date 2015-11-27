@@ -375,7 +375,6 @@ class KVClassifier(AbsClassifer):
                         rst = consts.Prediction(label, support, evidence)
 
             predictRst[ruleType] = rst
-        print predictRst[consts.APP_RULE]
         return predictRst
 
     @staticmethod
