@@ -333,7 +333,6 @@ class KVClassifier(AbsClassifer):
         sqldao.close()
 
     def load_rules(self):
-
         sqldao = SqlDao()
 
         QUERY = consts.SQL_SELECT_KV_RULES
@@ -356,6 +355,7 @@ class KVClassifier(AbsClassifer):
             fatherScore = -1
             rst = consts.NULLPrediction
             host = pkg.refer_rawHost if pkg.refer_rawHost else pkg.rawHost
+            print host
             for regexObj, scores in self.rules[ruleType][host].iteritems():
                 path = pkg.refer_origpath if pkg.refer_origpath else pkg.origPath
                 if regexObj.search(path):
