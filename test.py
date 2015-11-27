@@ -29,7 +29,7 @@ def test(testTbl):
       trainTbls.append(tbl)
 
   print trainTbls, testTbl
-  inforTrack = cross_batch_test(trainTbls, testTbl, consts.IOS, ifTrain = True)
+  inforTrack = cross_batch_test(trainTbls, testTbl, consts.IOS, ifTrain = False)
   output = _output_rst(inforTrack)
   log(trainTbls, testTbl, output)
   _compare_rst(inforTrack[consts.DISCOVERED_APP_LIST], inforTrack[consts.RESULT])

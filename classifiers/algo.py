@@ -357,6 +357,8 @@ class KVClassifier(AbsClassifer):
             host = pkg.refer_rawHost if pkg.refer_rawHost else pkg.rawHost
             for regexObj, scores in self.rules[ruleType][host].iteritems():
                 path = pkg.refer_origpath if pkg.refer_rawHost else pkg.origPath
+                print '[HOST IN]', host, path
+                print '[PATTERN]', regexObj.pattern
                 if regexObj.search(path):
                     label, support, confidence = scores['label'], scores[consts.SUPPORT] ,scores[consts.SCORE]
                     if support > rst.score or (support == rst.score and confidence > fatherScore):
