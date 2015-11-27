@@ -343,7 +343,6 @@ class KVClassifier(AbsClassifer):
             if len(value.split('\n')) == 1 and ';' not in label:
                 if rule_type == consts.APP_RULE:
                     counter += 1
-                print value.encode('utf-8')
                 try:
                     value = urllib.quote(value)
                 except:
@@ -363,10 +362,6 @@ class KVClassifier(AbsClassifer):
             host = pkg.refer_rawHost if pkg.refer_rawHost else pkg.rawHost
             for regexObj, scores in self.rules[ruleType][host].iteritems():
                 path = pkg.refer_origpath if pkg.refer_rawHost else pkg.origPath
-                # if 'ads.mopub.com' in host:
-                #     print '[HOST IN]', host, path
-                #     print '[PATTERN]', regexObj.pattern
-                #     print regexObj.search(path)
                 if regexObj.search(path):
                     label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT] ,scores[consts.SCORE]
                     if support > rst.score or (support == rst.score and confidence > fatherScore):

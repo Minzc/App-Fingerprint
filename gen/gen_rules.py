@@ -11,124 +11,135 @@ PATTERN = 'pattern'
 PCRE = 'pcre'
 IOS_GROUP = 'ios_app'
 HTTP_GET = '--parsed_type HTTP_GET; '
+
+
 class Rule:
-  def __init__(self, vulnID, name, group, weight):
-    trackID = AppInfos.get(consts.IOS, name).trackId
-    self.vulnID = vulnID
-    self.group = group
-    self.attachID = 1
-    self.revision = 1
-    self.group = group
-    self.protocol = 'tcp'
-    self.service = 'HTTP'
-    self.flow = 'from_client'
-    self.weight = min(weight, 255)
-    self.name = '[%s][%s]%s' % (self.weight, trackID, name)
-    self.features = []
-  
-  def add_feature_str(self, patternType, featureStr, context, parsedType = None):
-    self.features.append((patternType, featureStr, context, parsedType))
+    def __init__(self, vulnID, name, group, weight):
+        trackID = AppInfos.get(consts.IOS, name).trackId
+        self.vulnID = vulnID
+        self.group = group
+        self.attachID = 1
+        self.revision = 1
+        self.group = group
+        self.protocol = 'tcp'
+        self.service = 'HTTP'
+        self.flow = 'from_client'
+        self.weight = min(weight, 255)
+        self.name = '[%s][%s]%s' % (self.weight, trackID, name)
+        self.features = []
 
-  def to_string(self):
-    wholePatternStr = ''
-    for patternType, featureStr, context, parsedType in self.features:
-      patternStr = patternTmplate % (patternType, featureStr, context)
-      if parsedType:
-        patternStr = parsedType + patternStr
-      wholePatternStr += patternStr
+    def add_feature_str(self, patternType, featureStr, context, parsedType=None):
+        self.features.append((patternType, featureStr, context, parsedType))
 
+    def to_string(self):
+        wholePatternStr = ''
+        for patternType, featureStr, context, parsedType in self.features:
+            patternStr = patternTmplate % (patternType, featureStr, context)
+            if parsedType:
+                patternStr = parsedType + patternStr
+            wholePatternStr += patternStr
 
-    return ruleTmplate % (self.vulnID, self.attachID, self.name, self.revision, self.group, self.protocol, self.service, self.flow, self.weight, wholePatternStr)
+        return ruleTmplate % (
+            self.vulnID, self.attachID, self.name, self.revision, self.group, self.protocol, self.service, self.flow,
+            self.weight, wholePatternStr)
+
 
 def output_rules(name, rules):
-  fileWriter = open(name, 'w')
-  fileWriter.write('# IDS rule version=6.639 2015/05/04 11:23:50  syntax=1  fortios=501\n')
-  fileWriter.write('F-SGROUP( --name %s; )\n' % IOS_GROUP)
-  for rule in rules:
-    fileWriter.write(rule.to_string().encode('utf-8')+'\n')
-  fileWriter.close()
-
-def generate_agent_rules(vulnID = 100000):
-  trainedClassifiers = [ consts.AGENT_CLASSIFIER ]
-
-  appType = consts.IOS
-  classifier = classifier_factory(trainedClassifiers, appType)[0][1]
-  classifier.load_rules()
-  iosGroup = IOS_GROUP
-  rules = []
-  for ruleType in classifier.rules:
-    for agentFeature, regxNlabel in classifier.rules[ruleType].items():
-      if len(agentFeature) > 1:
-        regex, label = regxNlabel
-        rule = Rule(vulnID, label, IOS_GROUP, 41 - 1/float(len(agentFeature)))
-        patternRegex = re.escape('User-Agent:')+'.*' + regex.pattern
-        rule.add_feature_str(PCRE, patternRegex, 'header')
-        rules.append(rule)
-        vulnID += 1
-  return rules
-
-def generate_host_rules(vulnID = 200000):
-  trainedClassifiers = [ consts.HOST_CLASSIFIER, ] 
-  appType = consts.IOS
-  classifier = classifier_factory(trainedClassifiers, appType)[0][1]
-  classifier.load_rules()
-  iosGroup = IOS_GROUP
-  rules = []
-  for ruleType in classifier.rules:
-    for host, labelNsupport in classifier.rules[ruleType].items():
-      label, support, regexObj = labelNsupport
-      rule = Rule(vulnID, label, IOS_GROUP, 30 + support)
-      pattern = regexObj.pattern
-      rule.add_feature_str(PCRE, pattern, 'host')
-      vulnID += 1
-      rules.append(rule)
-  return rules
-
-def generate_kv_rules(vulnID = 300000):
-  trainedClassifiers = [ consts.KV_CLASSIFIER ]
-  appType = consts.IOS
-  classifier = classifier_factory(trainedClassifiers, appType)[0][1]
-  classifier.load_rules()
-  iosGroup = IOS_GROUP
-  
-  ipsRules = []
-
-  for ruleType, rules in classifier.rules.items():
-    for host, keyValues in rules.items():
-      for key, valueLabels in keyValues.items():
-        for value, labelScores in valueLabels.items():
-          for label, scoreNcount in labelScores.items():
-            score, support, regexObj = scoreNcount[consts.SCORE], scoreNcount[consts.SUPPORT], scoreNcount[consts.REGEX_OBJ]
-            if len(value.split('\n')) == 1:
-              rule = Rule(vulnID, label, IOS_GROUP, 20 + support)
-              rule.add_feature_str(PCRE, re.escape(host), 'host', HTTP_GET)
-              rule.add_feature_str(PCRE, regexObj.pattern, 'uri', HTTP_GET)
-              ipsRules.append(rule)
-              vulnID += 1
-  return ipsRules
+    fileWriter = open(name, 'w')
+    fileWriter.write('# IDS rule version=6.639 2015/05/04 11:23:50  syntax=1  fortios=501\n')
+    fileWriter.write('F-SGROUP( --name %s; )\n' % IOS_GROUP)
+    for rule in rules:
+        fileWriter.write(rule.to_string().encode('utf-8') + '\n')
+    fileWriter.close()
 
 
-def generate_path_rules(vulnID = 400000):
-  trainedClassifiers = [ consts.CMAR_CLASSIFIER ]
+def generate_agent_rules(vulnID=100000):
+    trainedClassifiers = [consts.AGENT_CLASSIFIER]
 
-  appType = consts.IOS
-  classifier = classifier_factory(trainedClassifiers, appType)[0][1]
-  classifier.load_rules()
-  iosGroup = IOS_GROUP
-  
-  rules = []
-  for ruleType in classifier.rules:
-    for host, patterns in classifier.rules[ruleType].items():
-      for cmarFeatures, labelNsupport in patterns.items():
-        label, support = labelNsupport
-        rule = Rule(vulnID, label, IOS_GROUP, 10 + support)
-        rule.add_feature_str(PCRE, host, 'host')
-        for feature in cmarFeatures:
-          feature = re.escape(feature)
-          rule.add_feature_str(PCRE, feature, 'uri')
-        vulnID += 1
-        rules.append(rule)
-  return rules
+    appType = consts.IOS
+    classifier = classifier_factory(trainedClassifiers, appType)[0][1]
+    classifier.load_rules()
+    iosGroup = IOS_GROUP
+    ipsRules = []
+    for agentFeature, regxNlabel in classifier.rules[consts.APP_RULE].items():
+        if len(agentFeature) > 1:
+            regex, label = regxNlabel
+            rule = Rule(vulnID, label, IOS_GROUP, 41 - 1 / float(len(agentFeature)))
+            patternRegex = re.escape('User-Agent:') + '.*' + regex.pattern
+            rule.add_feature_str(PCRE, patternRegex, 'header')
+            ipsRules.append(rule)
+            vulnID += 1
+
+    for host in classifier.rulesHost[consts.APP_RULE]:
+        for agentFeature, regexNlabel in classifier.rulesHost[host]:
+            regex, label = regexNlabel
+            rule = Rule(vulnID, label, IOS_GROUP, 41 - 1 / float(len(agentFeature)))
+            patternRegex = re.escape('User-Agent:') + '.*' + regex.pattern
+            rule.add_feature_str(PCRE, host, 'host')
+            rule.add_feature_str(PCRE, patternRegex, 'header')
+            ipsRules.append(rule)
+            vulnID += 1
+    return ipsRules
+
+def generate_path_rules(vulnID=200000):
+    trainedClassifiers = [consts.URI_CLASSIFIER]
+
+    appType = consts.IOS
+    classifier = classifier_factory(trainedClassifiers, appType)[0][1]
+    classifier.load_rules()
+    iosGroup = IOS_GROUP
+    ipsRules = []
+    rules = classifier.rules
+    for host in rules[consts.APP_RULE]:
+        if '' not in rules[consts.APP_RULE][host]:
+            for pathSegObj, labelInfo in rules[consts.APP_RULE][host].items():
+                label, support = labelInfo
+                rule = Rule(vulnID, label, IOS_GROUP, 30 + support)
+                rule.add_feature_str(PCRE, host, 'host')
+                rule.add_feature_str(PCRE, pathSegObj.pattern, 'uri')
+                vulnID += 1
+                ipsRules.append(rule)
+    return rules
+
+
+def generate_kv_rules(vulnID=300000):
+    trainedClassifiers = [consts.KV_CLASSIFIER]
+    appType = consts.IOS
+    classifier = classifier_factory(trainedClassifiers, appType)[0][1]
+    classifier.load_rules()
+    iosGroup = IOS_GROUP
+
+    ipsRules = []
+    rules = classifier.rules
+    for host in rules[consts.APP_RULE]:
+        for regexObj, scores in rules[consts.APP_RULE][host].iteritems():
+            label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
+            if len(regexObj.pattern.split('\n')) == 1:
+                rule = Rule(vulnID, label, IOS_GROUP, 20 + support)
+                rule.add_feature_str(PCRE, re.escape(host), 'host', HTTP_GET)
+                rule.add_feature_str(PCRE, regexObj.pattern, 'uri', HTTP_GET)
+                ipsRules.append(rule)
+                vulnID += 1
+
+    return ipsRules
+
+
+def generate_host_rules(vulnID=400000):
+    trainedClassifiers = [consts.URI_CLASSIFIER]
+    appType = consts.IOS
+    classifier = classifier_factory(trainedClassifiers, appType)[0][1]
+    classifier.load_rules()
+    iosGroup = IOS_GROUP
+    ipsRules = []
+    for host in classifier.rules[consts.APP_RULE]:
+        if '' in rules[consts.APP_RULE][host]:
+            label, support = rules[consts.APP_RULE][host]['']
+            rule = Rule(vulnID, label, IOS_GROUP, 10 + support)
+            rule.add_feature_str(PCRE, host, 'host')
+            vulnID += 1
+            ipsRules.append(rule)
+    return rules
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate rule in ips format')
@@ -139,23 +150,22 @@ if __name__ == '__main__':
 
     test_tbl = None
     if args.t == 'agent':
-      rules = generate_agent_rules()
-      output_rules(args.p+'_agent.rule', rules)
+        rules = generate_agent_rules()
+        output_rules(args.p + '_agent.rule', rules)
     elif args.t == 'host':
-      rules = generate_host_rules()
-      output_rules(args.p+'_host.rule', rules)
+        rules = generate_host_rules()
+        output_rules(args.p + '_host.rule', rules)
     elif args.t == 'path':
-      rules = generate_path_rules()
-      output_rules(args.p+'_cmar.rule', rules)
+        rules = generate_path_rules()
+        output_rules(args.p + '_cmar.rule', rules)
     elif args.t == 'kv':
-      rules = generate_kv_rules()
-      output_rules(args.p+'_kv.rule', rules)
+        rules = generate_kv_rules()
+        output_rules(args.p + '_kv.rule', rules)
     elif args.t == 'all':
-      rules = generate_agent_rules(vulnID = 100000)
-      rules += generate_host_rules(vulnID = 200000)
-      rules += generate_path_rules(vulnID = 300000)
-      rules += generate_kv_rules(vulnID = 400000)
-      output_rules(args.p+'_all.rule', rules)
+        rules = generate_agent_rules()
+        rules += generate_path_rules()
+        rules += generate_kv_rules()
+        rules += generate_host_rules()
+        output_rules(args.p + '_all.rule', rules)
     else:
-      parser.print_help()
-
+        parser.print_help()
