@@ -345,7 +345,7 @@ class KVClassifier(AbsClassifer):
                 regexObj = re.compile(re.escape(key + '=' + value))
                 self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
                 self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
-                self.rules[rule_type][host][regexObj][consts.REGEX_OBJ] = label
+                self.rules[rule_type][host][regexObj][consts.LABEL] = label
         print '>>> [KV Rules#Load Rules] total number of rules is', counter
         sqldao.close()
 
@@ -362,14 +362,13 @@ class KVClassifier(AbsClassifer):
                 #     print '[PATTERN]', regexObj.pattern
                 #     print regexObj.search(path)
                 if regexObj.search(path):
-                    label, support, confidence = scores['label'], scores[consts.SUPPORT] ,scores[consts.SCORE]
+                    label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT] ,scores[consts.SCORE]
                     print support, confidence, rst.score
                     print support > rst.score
                     if support > rst.score or (support == rst.score and confidence > fatherScore):
                         fatherScore = confidence
                         evidence = (host, regexObj.pattern)
                         rst = consts.Prediction(label, support, evidence)
-                        print '[HIT]', rst
 
             predictRst[ruleType] = rst
         print predictRst[consts.APP_RULE]
