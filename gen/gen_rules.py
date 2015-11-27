@@ -131,7 +131,7 @@ def generate_host_rules(vulnID=400000):
     cRules = classifier.rules
     for host in cRules[consts.APP_RULE]:
         if '' in cRules[consts.APP_RULE][host]:
-            label, support = rules[consts.APP_RULE][host]['']
+            label, support = cRules[consts.APP_RULE][host]['']
             rule = Rule(vulnID, label, IOS_GROUP, 10 + support)
             rule.add_feature_str(PCRE, host, 'host')
             vulnID += 1
