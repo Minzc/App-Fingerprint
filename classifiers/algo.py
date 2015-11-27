@@ -342,7 +342,7 @@ class KVClassifier(AbsClassifer):
                 if rule_type == consts.APP_RULE:
                     counter += 1
 
-                regexObj = re.compile(re.escape(key + '=' + value))
+                regexObj = re.compile(u'\b' + re.escape(key + '=' + value) + u'\b')
                 self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
                 self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
                 self.rules[rule_type][host][regexObj][consts.LABEL] = label
@@ -363,8 +363,6 @@ class KVClassifier(AbsClassifer):
                 #     print regexObj.search(path)
                 if regexObj.search(path):
                     label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT] ,scores[consts.SCORE]
-                    print support, confidence, rst.score
-                    print support > rst.score
                     if support > rst.score or (support == rst.score and confidence > fatherScore):
                         fatherScore = confidence
                         evidence = (host, regexObj.pattern)
