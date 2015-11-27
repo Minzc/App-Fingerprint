@@ -359,6 +359,7 @@ class KVClassifier(AbsClassifer):
             for regexObj, scores in self.rules[ruleType][host].iteritems():
                 path = pkg.refer_origpath if pkg.refer_origpath else pkg.origPath
                 if regexObj.search(path):
+                    print 'ok'
                     label, support, confidence = scores['label'], scores[consts.SUPPORT] ,scores[consts.SCORE]
                     if support > rst.score or (support == rst.score and confidence > fatherScore):
                         fatherScore = confidence
