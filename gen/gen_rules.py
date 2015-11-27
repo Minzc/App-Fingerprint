@@ -44,11 +44,11 @@ class Rule:
             self.weight, wholePatternStr)
 
 
-def output_rules(name, rules):
+def output_rules(name, ipsRules):
     fileWriter = open(name, 'w')
     fileWriter.write('# IDS rule version=6.639 2015/05/04 11:23:50  syntax=1  fortios=501\n')
     fileWriter.write('F-SGROUP( --name %s; )\n' % IOS_GROUP)
-    for rule in rules:
+    for rule in ipsRules:
         fileWriter.write(rule.to_string().encode('utf-8') + '\n')
     fileWriter.close()
 
@@ -59,7 +59,6 @@ def generate_agent_rules(vulnID=100000):
     appType = consts.IOS
     classifier = classifier_factory(trainedClassifiers, appType)[0][1]
     classifier.load_rules()
-    iosGroup = IOS_GROUP
     ipsRules = []
     for agentFeature, regxNlabel in classifier.rules[consts.APP_RULE].items():
         if len(agentFeature) > 1:
@@ -81,25 +80,25 @@ def generate_agent_rules(vulnID=100000):
             vulnID += 1
     return ipsRules
 
+
 def generate_path_rules(vulnID=200000):
     trainedClassifiers = [consts.URI_CLASSIFIER]
 
     appType = consts.IOS
     classifier = classifier_factory(trainedClassifiers, appType)[0][1]
     classifier.load_rules()
-    iosGroup = IOS_GROUP
     ipsRules = []
-    rules = classifier.rules
-    for host in rules[consts.APP_RULE]:
-        if '' not in rules[consts.APP_RULE][host]:
-            for pathSegObj, labelInfo in rules[consts.APP_RULE][host].items():
+    cRules = classifier.rules
+    for host in cRules[consts.APP_RULE]:
+        if '' not in cRules[consts.APP_RULE][host]:
+            for pathSegObj, labelInfo in cRules[consts.APP_RULE][host].items():
                 label, support = labelInfo
                 rule = Rule(vulnID, label, IOS_GROUP, 30 + support)
                 rule.add_feature_str(PCRE, host, 'host')
                 rule.add_feature_str(PCRE, pathSegObj.pattern, 'uri')
                 vulnID += 1
                 ipsRules.append(rule)
-    return rules
+    return ipsRules
 
 
 def generate_kv_rules(vulnID=300000):
@@ -107,7 +106,6 @@ def generate_kv_rules(vulnID=300000):
     appType = consts.IOS
     classifier = classifier_factory(trainedClassifiers, appType)[0][1]
     classifier.load_rules()
-    iosGroup = IOS_GROUP
 
     ipsRules = []
     rules = classifier.rules
@@ -129,16 +127,16 @@ def generate_host_rules(vulnID=400000):
     appType = consts.IOS
     classifier = classifier_factory(trainedClassifiers, appType)[0][1]
     classifier.load_rules()
-    iosGroup = IOS_GROUP
     ipsRules = []
-    for host in classifier.rules[consts.APP_RULE]:
-        if '' in rules[consts.APP_RULE][host]:
+    cRules = classifier.rules
+    for host in cRules[consts.APP_RULE]:
+        if '' in cRules[consts.APP_RULE][host]:
             label, support = rules[consts.APP_RULE][host]['']
             rule = Rule(vulnID, label, IOS_GROUP, 10 + support)
             rule.add_feature_str(PCRE, host, 'host')
             vulnID += 1
             ipsRules.append(rule)
-    return rules
+    return ipsRules
 
 
 if __name__ == '__main__':

@@ -13,16 +13,11 @@ INSERT = True
 PRUNE = False
 
 VALID_LABEL = {consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE}
-TRAIN_LABEL = {
-    consts.APP_RULE,
-    # consts.COMPANY_RULE,
-    # consts.CATEGORY_RULE
-}
 
 USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
-    #consts.AGENT_CLASSIFIER,
-    #consts.KV_CLASSIFIER,
+    consts.AGENT_CLASSIFIER,
+    consts.KV_CLASSIFIER,
     consts.URI_CLASSIFIER,
 ]
 
@@ -106,13 +101,12 @@ def train(trainTbls, appType):
     :parm appType: android or ios
     """
     trainSet = DataSetFactory.get_traindata(tbls=trainTbls, sampleRate=1.0, appType=appType, LIMIT=LIMIT)
-    for ruleType in TRAIN_LABEL:
-        trainSet.set_label(ruleType)
-        classifiers = classifier_factory(USED_CLASSIFIERS, appType)
-        for name, classifier in classifiers:
-            classifier.set_name(name)
-            print ">>> [train#%s] " % name
-            classifier.train(trainSet, ruleType)
+    trainSet.set_label(consts.APP_RULE)
+    classifiers = classifier_factory(USED_CLASSIFIERS, appType)
+    for name, classifier in classifiers:
+        classifier.set_name(name)
+        print ">>> [train#%s] " % name
+        classifier.train(trainSet, consts.APP_RULE)
 
     print '>>> Finish training all classifiers'
 
@@ -151,7 +145,7 @@ def evaluate(rst, testSet, testApps):
             predictions = rst[pkg.id]
             correctLabels = [0,0,0]
 
-            for ruleType in [consts.APP_RULE, consts.COMPANY_RULE, consts.CATEGORY_RULE]:
+            for ruleType in VALID_LABEL:
                 predict = predictions[ruleType].label
                 label = get_label(pkg, ruleType)
                 correctLabels[ruleType] = 1 if label == predict else 0
