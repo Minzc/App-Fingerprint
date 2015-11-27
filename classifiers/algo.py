@@ -1,3 +1,5 @@
+import urllib
+
 import const.consts as consts
 import re
 from sqldao import SqlDao
@@ -341,8 +343,8 @@ class KVClassifier(AbsClassifer):
             if len(value.split('\n')) == 1 and ';' not in label:
                 if rule_type == consts.APP_RULE:
                     counter += 1
-
-                regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b')
+                value = urllib.quote(value)
+                regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b', re.IGNORECASE)
                 self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
                 self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
                 self.rules[rule_type][host][regexObj][consts.LABEL] = label

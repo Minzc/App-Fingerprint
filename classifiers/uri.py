@@ -183,7 +183,7 @@ class UriClassifier(AbsClassifer):
         counter = 0
         for label, pathSeg, host, ruleType, support in sqldao.execute(QUERY):
             counter += 1
-            pathSegObj = re.compile(pathSeg) if pathSeg is not None else ''
+            pathSegObj = re.compile(pathSeg, re.IGNORECASE) if pathSeg is not None else ''
             self.rules[ruleType][host][pathSegObj] = (label, support)
         print '>>> [URI Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
@@ -194,7 +194,6 @@ class UriClassifier(AbsClassifer):
         :param package:
         """
         labelRsts = {}
-        pathSegs = set(get_f(package)[2:])
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
             if package.rawHost in rules:
