@@ -252,9 +252,9 @@ def test(testTbl, appType):
         classifier.load_rules()
         tmprst = _use_classifier(classifier, testSet)
         rst = merge_rst(rst, tmprst)
-        recall = sum([1 for i in rst.values() if
-                      i[consts.APP_RULE][0] or i[consts.COMPANY_RULE][0] or i[consts.CATEGORY_RULE][0]])
-        print ">>> Recognized: %s Test Size: %s" % (recall, testSize)
+        # recall = sum([1 for i in rst.values() if
+        #               i[consts.APP_RULE][0] or i[consts.COMPANY_RULE][0] or i[consts.CATEGORY_RULE][0]])
+        # print ">>> Recognized: %s Test Size: %s" % (recall, testSize)
 
     print '>>> Start evaluating'
     inforTrack = evaluate(rst, testSet, testApps)
