@@ -343,8 +343,11 @@ class KVClassifier(AbsClassifer):
             if len(value.split('\n')) == 1 and ';' not in label:
                 if rule_type == consts.APP_RULE:
                     counter += 1
-                print value
-                value = urllib.quote(value)
+                print value.encode('utf-8')
+                try:
+                    value = urllib.quote(value)
+                except:
+                    pass
                 regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b', re.IGNORECASE)
                 self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
                 self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
