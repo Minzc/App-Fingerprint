@@ -357,10 +357,10 @@ class KVClassifier(AbsClassifer):
             host = pkg.refer_rawHost if pkg.refer_rawHost else pkg.rawHost
             for regexObj, scores in self.rules[ruleType][host].iteritems():
                 path = pkg.refer_origpath if pkg.refer_rawHost else pkg.origPath
-                if 'ads.mopub.com' in host:
-                    print '[HOST IN]', host, path
-                    print '[PATTERN]', regexObj.pattern
-                    print regexObj.search(path)
+                # if 'ads.mopub.com' in host:
+                #     print '[HOST IN]', host, path
+                #     print '[PATTERN]', regexObj.pattern
+                #     print regexObj.search(path)
                 if regexObj.search(path):
                     label, support, confidence = scores['label'], scores[consts.SUPPORT] ,scores[consts.SCORE]
                     print support, confidence, rst.score
@@ -369,8 +369,10 @@ class KVClassifier(AbsClassifer):
                         fatherScore = confidence
                         evidence = (host, regexObj.pattern)
                         rst = consts.Prediction(label, support, evidence)
+                        print '[HIT]', rst
 
             predictRst[ruleType] = rst
+        print predictRst[consts.APP_RULE]
         return predictRst
 
     @staticmethod
