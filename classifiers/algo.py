@@ -8,7 +8,6 @@ from const.dataset import DataSetIter as DataSetIter
 
 DEBUG = False
 
-
 class KVClassifier(AbsClassifer):
     def __init__(self, appType, inferFrmData=True, sampleRate=1):
         def __create_dict():
@@ -22,6 +21,12 @@ class KVClassifier(AbsClassifer):
         self.xmlFeatures = load_xml_features()
         self.inferFrmData = inferFrmData
         self.sampleRate = sampleRate
+        self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
+                          lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
+                      consts.COMPANY_RULE: defaultdict(lambda: defaultdict(
+                          lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
+                      consts.CATEGORY_RULE: defaultdict(lambda: defaultdict(
+                          lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None}))}
 
     @staticmethod
     def _prune_general_rules(generalRules, trainData, xmlGenRules):
@@ -328,43 +333,37 @@ class KVClassifier(AbsClassifer):
         sqldao.close()
 
     def load_rules(self):
-        self.rules = {}
+
         sqldao = SqlDao()
-        self.rules[consts.APP_RULE] = defaultdict(lambda: defaultdict(
-            lambda: defaultdict(lambda: defaultdict(lambda: {'score': 0, 'support': 0, 'regexObj': None}))))
-        self.rules[consts.COMPANY_RULE] = defaultdict(lambda: defaultdict(
-            lambda: defaultdict(lambda: defaultdict(lambda: {'score': 0, 'support': 0, 'regexObj': None}))))
-        self.rules[consts.CATEGORY_RULE] = defaultdict(lambda: defaultdict(
-            lambda: defaultdict(lambda: defaultdict(lambda: {'score': 0, 'support': 0, 'regexObj': None}))))
+
         QUERY = consts.SQL_SELECT_KV_RULES
         counter = 0
         for key, value, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
             if len(value.split('\n')) == 1 and ';' not in label:
                 if rule_type == consts.APP_RULE:
                     counter += 1
-                self.rules[rule_type][host][key][value][label][consts.SCORE] = confidence
-                self.rules[rule_type][host][key][value][label][consts.SUPPORT] = support
-                self.rules[rule_type][host][key][value][label][consts.REGEX_OBJ] = re.compile(
-                    re.escape(key + '=' + value))
+
+                regexObj = re.compile(u'\b' + re.escape(key + '=' + value) +u'\b')
+                self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
+                self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
+                self.rules[rule_type][host][regexObj][consts.REGEX_OBJ] = label
         print '>>> [KV Rules#Load Rules] total number of rules is', counter
         sqldao.close()
 
     def c(self, pkg):
         predictRst = {}
         for ruleType in self.rules:
-            host, queries = (pkg.refer_rawHost, pkg.refer_queries) if pkg.refer_rawHost else (pkg.rawHost, pkg.queries)
             fatherScore = -1
             rst = consts.NULLPrediction
-            for k, kRules in self.rules[ruleType].get(host, {}).iteritems():
-                for v in queries.get(k, []):
-                    for label, scoreNcount in kRules.get(v, {}).iteritems():
-                        score, support, regexObj = scoreNcount[consts.SCORE], scoreNcount[consts.SUPPORT], \
-                                                   scoreNcount[consts.REGEX_OBJ]
-
-                        if support > rst.score or (support == rst.score and score > fatherScore):
-                            fatherScore = score
-                            evidence = (k, v)
-                            rst = consts.Prediction(label, support, evidence)
+            host = pkg.refer_rawHost if pkg.refer_rawHost else pkg.rawHost
+            for regexObj, scores in self.rules[ruleType][host].iteritems():
+                path = pkg.refer_origpath if pkg.refer_origpath else pkg.origPath
+                if regexObj.search(path):
+                    label, support, confidence = scores['label'], scores[consts.SUPPORT] ,scores[consts.SCORE]
+                    if support > rst.score or (support == rst.score and confidence > fatherScore):
+                        fatherScore = confidence
+                        evidence = (host, regexObj.pattern)
+                        rst = consts.Prediction(label, support, evidence)
 
             predictRst[ruleType] = rst
         return predictRst

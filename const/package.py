@@ -56,6 +56,7 @@ class Package:
         self.app = app.lower()
 
     def set_refer(self, refer):
+        self.refer_origpath = refer
         url = urllib.unquote(refer).lower().replace(';', '?', 1).replace(';', '&')
         parsed_url = urlparse.urlparse(url)
         query = urlparse.parse_qs(urlparse.urlparse(url).query, True)
