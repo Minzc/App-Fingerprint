@@ -182,7 +182,7 @@ class UriClassifier(AbsClassifer):
         sqldao = SqlDao()
         counter = 0
         for label, pathSeg, host, ruleType, support in sqldao.execute(QUERY):
-            print pathSeg
+            print pathSeg.encode('utf-8')
             counter += 1
             pathSegObj = re.compile(pathSeg, re.IGNORECASE) if pathSeg is not None else ''
             self.rules[ruleType][host][pathSegObj] = (label, support)
