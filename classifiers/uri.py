@@ -182,7 +182,6 @@ class UriClassifier(AbsClassifer):
         sqldao = SqlDao()
         counter = 0
         for label, pathSeg, host, ruleType, support in sqldao.execute(QUERY):
-            print pathSeg.encode('utf-8')
             counter += 1
             pathSegObj = re.compile(pathSeg, re.IGNORECASE) if pathSeg is not None else ''
             self.rules[ruleType][host][pathSegObj] = (label, support)
@@ -203,6 +202,7 @@ class UriClassifier(AbsClassifer):
                         label = rules[package.rawHost][''][0]
                         rst = consts.Prediction(label, 1.0, ('Host', package.rawHost))
                 else:
+                    print '[URI] 205'
                     for pathSegObj in rules[package.rawHost]:
                         if pathSegObj.search(package.origPath):
                             label = rules[package.rawHost][pathSegObj][0]
