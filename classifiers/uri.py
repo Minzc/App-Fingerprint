@@ -150,6 +150,7 @@ class UriClassifier(AbsClassifer):
             pkgFs = set(get_f(pkg)[2:])
             for pathSeg in tmpR[consts.APP_RULE]:
                 if pathSeg in pkgFs:
+                    print 'OK'
                     pathRules[consts.APP_RULE][(pkg.rawHost, pathSeg, pkg.label)].add(tbl)
 
         return pathRules
