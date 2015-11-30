@@ -203,7 +203,8 @@ class UriClassifier(AbsClassifer):
                         rst = consts.Prediction(label, 1.0, ('Host', package.rawHost))
                 else:
                     for pathSegObj in rules[package.rawHost]:
-                        print '[URI] 206', pathSegObj.pattern, package.origPath
+                        if package.rawHost == 'tags.tiqcdn.com':
+                            print '[URI] 206', pathSegObj.pattern, package.origPath, pathSegObj.search(package.origPath)
                         if pathSegObj.search(package.origPath):
                             print '[URI] 208', pathSegObj.pattern
                             label = rules[package.rawHost][pathSegObj][0]
