@@ -204,8 +204,8 @@ class UriClassifier(AbsClassifer):
                 else:
                     print '[URI] 205'
                     for pathSegObj in rules[package.rawHost]:
-                        print '[URI] 207', pathSegObj.pattern
                         if pathSegObj.search(package.origPath):
+                            print '[URI] 208', pathSegObj.pattern
                             label = rules[package.rawHost][pathSegObj][0]
                             rst = consts.Prediction(label, 1, ("Path", package.rawHost, pathSegObj.pattern))
             labelRsts[rule_type] = rst
