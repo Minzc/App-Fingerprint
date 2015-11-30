@@ -21,9 +21,9 @@ IOS = 1
 ANDROID_STR = 'android'
 IOS_STR = 'ios'
 #############SQLS###############
-SQL_SELECT_HTTP_PKGS = "select id, app, add_header, path, refer, hst, agent, dst, method,raw from %s where method=\'GET\' or method=\'POST\'"
+#SQL_SELECT_HTTP_PKGS = "select id, app, add_header, path, refer, hst, agent, dst, method,raw from %s where method=\'GET\' or method=\'POST\'"
 SQL_SELECT_HTTP_PKGS_LIMIT = "select id, app, add_header, path, refer, hst, agent, dst, method,raw from %s where method=\'GET\' or method=\'POST\'limit %s"
-#SQL_SELECT_HTTP_PKGS = "select id, app, add_header, path, refer, hst, agent, dst, method,raw from %s where app =\'com.conversiongames.guesstheemoji\' "
+SQL_SELECT_HTTP_PKGS = "select id, app, add_header, path, refer, hst, agent, dst, method,raw from %s where app =\'com.toysrus.tru\' "
 # SQL_SELECT_HTTP_PKGS_LIMIT = "select id, app, add_header, path, refer, hst, agent, dst, raw from %s where limit %s" 
 SQL_CLEAN_ALL_RULES = 'DELETE FROM patterns'
 SQL_INSERT_HOST_RULES = 'INSERT INTO patterns (label, support, confidence, host, rule_type) VALUES (%s, %s, %s, %s, %s)'
