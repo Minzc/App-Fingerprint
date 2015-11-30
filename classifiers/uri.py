@@ -225,7 +225,7 @@ class UriClassifier(AbsClassifer):
                         pathSeg = pathSeg[:-1]
                     if not pathSeg[0].isalnum():
                         pathSeg = pathSeg[1:]
-                    pathSeg = '\b' + re.escape(pathSeg) + '\b'
+                    pathSeg = r'\b' + re.escape(pathSeg) + r'\b'
                 params.append((label, pathSeg, 1, len(tbls), host, ruleType))
             print "Total Number of Rules is", len(rules[ruleType])
         sqldao.executeBatch(QUERY, params)
