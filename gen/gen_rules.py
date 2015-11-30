@@ -91,6 +91,7 @@ def generate_path_rules(vulnID=200000):
     cRules = classifier.rules
     for host in cRules[consts.APP_RULE]:
         if '' not in cRules[consts.APP_RULE][host]:
+            print 'OK'
             for pathSegObj, labelInfo in cRules[consts.APP_RULE][host].items():
                 label, support = labelInfo
                 rule = Rule(vulnID, label, IOS_GROUP, 30 + support)
