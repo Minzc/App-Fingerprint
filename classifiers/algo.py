@@ -109,7 +109,7 @@ class KVClassifier(AbsClassifer):
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[secdomain][k][label])
                 keyScore[secdomain][cleanedK][consts.SCORE] += \
-                    (len(tbls) - 1) / float(numOfValues * numOfValues)
+                    (len(tbls) - 1) / float(numOfValues * numOfValues * len(featureTbl[secdomain][k]))
                 keyScore[secdomain][cleanedK][consts.LABEL].add(label)
 
         return keyScore
@@ -360,15 +360,14 @@ class KVClassifier(AbsClassifer):
             fatherScore = -1
             rst = consts.NULLPrediction
             host = pkg.refer_rawHost if pkg.refer_rawHost else pkg.rawHost
-            if not pkg.refer_rawHost:
-                for regexObj, scores in self.rules[ruleType][host].iteritems():
-                    path = pkg.refer_origpath if pkg.refer_rawHost else pkg.origPath
-                    if regexObj.search(path):
-                        label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT] ,scores[consts.SCORE]
-                        if support > rst.score or (support == rst.score and confidence > fatherScore):
-                            fatherScore = confidence
-                            evidence = (host, regexObj.pattern)
-                            rst = consts.Prediction(label, support, evidence)
+            for regexObj, scores in self.rules[ruleType][host].iteritems():
+                path = pkg.refer_origpath if pkg.refer_rawHost else pkg.origPath
+                if regexObj.search(path):
+                    label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT] ,scores[consts.SCORE]
+                    if support > rst.score or (support == rst.score and confidence > fatherScore):
+                        fatherScore = confidence
+                        evidence = (host, regexObj.pattern)
+                        rst = consts.Prediction(label, support, evidence)
 
             predictRst[ruleType] = rst
         return predictRst
