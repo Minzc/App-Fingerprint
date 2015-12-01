@@ -74,13 +74,10 @@ class KVClassifier(AbsClassifer):
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
             tmp = []
-            counter = 0
             for index, rule in enumerate(prunedGenRules[host]):
                 # if counter == 1 or prunedGenRules[host][index-1][2] - rule[2] >= 1:
                 if prunedGenRules[host][index-1][2] - rule[2] >= 1:
                     break
-                if rule[2] < 2:
-                    counter += 1
                 tmp.append(rule)
             prunedGenRules[host] = tmp
         return prunedGenRules

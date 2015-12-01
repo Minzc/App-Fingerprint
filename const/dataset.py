@@ -78,7 +78,7 @@ class DataSetFactory:
         def _keep_exp_app(package):
             return package.app in sampledApps
 
-        print '[TRAIN FACTORY] Loading data set', tbls
+        print '[TRAIN FACTORY] Loading data set', tbls, 'SAMPLE RATE is', sampleRate
         expApp = load_exp_app()[appType]
 
         # Do sample
