@@ -259,7 +259,6 @@ class KVClassifier(AbsClassifer):
                         rules = sorted(rules, key=lambda x: x[2], reverse=True)[:3]
                         for rule in rules:
                             host, key, score = rule
-                            print 'Infer One Rule', host, key, value.encode('utf-8'), app
                             specificRules[host][key][value][app][consts.SCORE] = 1.0
                             specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
         return specificRules

@@ -157,16 +157,17 @@ class AgentClassifier(AbsClassifer):
                     for regexStr in self._gen_regex(featureStr):
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
-            for agent in filter(lambda x: '/' in x, agents):
-                matchStrs = re.findall(r'^[a-zA-Z0-9][0-9a-zA-Z. _\-:&?\'%!]+/', agent)
-                if len(matchStrs) > 0:
-                    regexStr = r'^' + re.escape(matchStrs[0])
-                    if regexStr not in appFeatureRegex[app]:
-                        try:
-                            featureStr = matchStrs[0]
-                            appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, None)
-                        except:
-                            pass
+            if len(appFeatureRegex[app]) == 0:
+                for agent in filter(lambda x: '/' in x, agents):
+                    matchStrs = re.findall(r'^[a-zA-Z0-9][0-9a-zA-Z. _\-:&?\'%!]+/', agent)
+                    if len(matchStrs) > 0:
+                        regexStr = r'^' + re.escape(matchStrs[0])
+                        if regexStr not in appFeatureRegex[app]:
+                            try:
+                                featureStr = matchStrs[0]
+                                appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, None)
+                            except:
+                                pass
 
         '''
         Compose regular expression
