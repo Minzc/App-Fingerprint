@@ -66,11 +66,6 @@ class KVClassifier(AbsClassifer):
                             ifKeepRule = (False, jKey, '1')
                 if iKey == 'devapp':
                     print ifKeepRule, host, ruleScores[(host, iKey)]
-                ''' Prune by believing xml rules'''
-                # for j in range(1, len(keyNcoveredIds)):
-                #     jKey, jCoveredIds = keyNcoveredIds[j]
-                #     if (host, jKey) in xmlGenRules and (host, iKey) not in xmlGenRules:
-                #         ifKeepRule = (False, jKey, '2')
 
                 if ifKeepRule[0]:
                     rule = consts.Rule(host, iKey, ruleScores[(host, iKey)], ruleLabelNum[(host, iKey)])
@@ -81,7 +76,7 @@ class KVClassifier(AbsClassifer):
             tmp = []
             counter = 0
             for index, rule in enumerate(prunedGenRules[host]):
-                if counter == 1:# or prunedGenRules[host][index][2] - rule[2] >= 1:
+                if counter == 1 or prunedGenRules[host][index-1][2] - rule[2] >= 1:
                     break
                 if rule[2] < 2:
                     counter += 1
