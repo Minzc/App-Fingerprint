@@ -11,6 +11,7 @@ from classifiers.classifier_factory import classifier_factory
 LIMIT = None
 INSERT = False
 PRUNE = False
+SAMPLERATE = 0.5
 
 VALID_LABEL = {
     consts.APP_RULE,
@@ -104,7 +105,7 @@ def train(trainTbls, appType):
     :param trainTbls: A list of tables used to train classifiers
     :parm appType: android or ios
     """
-    trainSet = DataSetFactory.get_traindata(tbls=trainTbls, sampleRate=1.0, appType=appType, LIMIT=LIMIT)
+    trainSet = DataSetFactory.get_traindata(tbls=trainTbls, sampleRate=SAMPLERATE, appType=appType, LIMIT=LIMIT)
     trainSet.set_label(consts.APP_RULE)
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
     for name, classifier in classifiers:
