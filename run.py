@@ -9,7 +9,7 @@ from const.dataset import DataSetIter as DataSetIter
 from classifiers.classifier_factory import classifier_factory
 
 LIMIT = None
-INSERT = True
+INSERT = False
 PRUNE = False
 
 VALID_LABEL = {

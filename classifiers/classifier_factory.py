@@ -1,9 +1,6 @@
 from classifiers.agent import AgentClassifier
 from classifiers.algo import KVClassifier
 from classifiers.head import HeaderClassifier
-from classifiers.host import HostApp
-from classifiers.fp_modify import CMAR
-from classifiers.path_algo import PathApp
 import const.consts as consts
 from classifiers.uri import UriClassifier
 

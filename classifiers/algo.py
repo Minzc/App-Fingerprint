@@ -56,8 +56,8 @@ class KVClassifier(AbsClassifer):
             for i in range(len(keyNcoveredIds)):
                 ifKeepRule = (True, None)
                 iKey, iCoveredIds = keyNcoveredIds[i]
-                if (host, iKey) not in xmlGenRules and ruleScores[(host, iKey)] < 1:
-                    ifKeepRule = (False, None, '3')
+                # if (host, iKey) not in xmlGenRules and ruleScores[(host, iKey)] < 1:
+                #     ifKeepRule = (False, None, '3')
                 ''' Prune by coverage '''
                 for j in range(i + 1, len(keyNcoveredIds)):
                     jKey, jCoveredIds = keyNcoveredIds[j]
@@ -81,7 +81,7 @@ class KVClassifier(AbsClassifer):
             tmp = []
             counter = 0
             for index, rule in enumerate(prunedGenRules[host]):
-                if counter == 1 or prunedGenRules[host][index][2] - rule[2] >= 1:
+                if counter == 1:# or prunedGenRules[host][index][2] - rule[2] >= 1:
                     break
                 if rule[2] < 2:
                     counter += 1
