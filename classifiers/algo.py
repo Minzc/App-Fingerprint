@@ -129,7 +129,7 @@ class KVClassifier(AbsClassifer):
             for key in keyScore[secdomain]:
                 labelNum = len(keyScore[secdomain][key][consts.LABEL])
                 score = keyScore[secdomain][key][consts.SCORE]
-                if labelNum == 1 or score <= 0.5:
+                if labelNum == 1 or score <= 1:
                     continue
                 generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
         for secdomain in generalRules:
