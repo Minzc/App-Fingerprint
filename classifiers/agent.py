@@ -38,6 +38,12 @@ class AgentClassifier(AbsClassifer):
     def __init__(self, inferFrmData=True, sampleRate=1):
         self.rules = defaultdict(dict)
         self.appFeatures = load_info_features(self._parse_xml)
+
+        self.valueApp = defaultdict(set)
+        for app, features in self.appFeatures.items():
+            for f in features.values():
+                self.valueApp[f].add(app)
+
         self.inferFrmData = inferFrmData
         self.sampleRate = sampleRate
         '''Following variables are used to speed up the count step '''
@@ -161,13 +167,14 @@ class AgentClassifier(AbsClassifer):
                 for agent in filter(lambda x: '/' in x, agents):
                     matchStrs = re.findall(r'^[a-zA-Z0-9][0-9a-zA-Z. _\-:&?\'%!]+/', agent)
                     if len(matchStrs) > 0:
-                        regexStr = r'^' + re.escape(matchStrs[0])
-                        if regexStr not in appFeatureRegex[app]:
-                            try:
-                                featureStr = matchStrs[0]
-                                appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, None)
-                            except:
-                                pass
+                        if len(self.valueApp[matchStrs[0]]) <= 1:
+                            regexStr = r'^' + re.escape(matchStrs[0])
+                            if regexStr not in appFeatureRegex[app]:
+                                try:
+                                    featureStr = matchStrs[0]
+                                    appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, None)
+                                except:
+                                    pass
 
         '''
         Compose regular expression
@@ -257,9 +264,10 @@ class AgentClassifier(AbsClassifer):
     def _infer_from_xml(self, appFeatureRegex, agentTuples):
         for app, features in filter(lambda x: x[0] not in agentTuples, self.appFeatures.items()):
             for f in features.values():
-                for featureStr in self._gen_features(f):
-                    for regexStr in self._gen_regex(featureStr):
-                        appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
+                if len(self.valueApp[f]) == 1:
+                    for featureStr in self._gen_features(f):
+                        for regexStr in self._gen_regex(featureStr):
+                            appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
