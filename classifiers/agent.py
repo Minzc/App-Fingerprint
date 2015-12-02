@@ -108,9 +108,9 @@ class AgentClassifier(AbsClassifer):
 
         for fRegex, apps in filter(lambda item: len(item[1]) == 1, patterns.iteritems()):
             app = list(apps)[0]
-            # appRules[fRegex] = app
-            for host in fRegex.matchRecord:
-                hostAgentRule[(host, fRegex.regexObj.pattern)] = app
+            appRules[fRegex] = app
+            # for host in fRegex.matchRecord:
+            #     hostAgentRule[(host, fRegex.regexObj.pattern)] = app
 
         for fRegex, apps in patterns.iteritems():
             if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCategory) == 1:
@@ -269,11 +269,10 @@ class AgentClassifier(AbsClassifer):
     def _infer_from_xml(self, appFeatureRegex, agentTuples):
         for app, features in filter(lambda x: x[0] not in agentTuples, self.appFeatures.items()):
             for f in features.values():
-                if len(self.valueApp[f]) == 1:
-                    if f not in STOPWORDS:
-                        for featureStr in self._gen_features(f):
-                            for regexStr in self._gen_regex(featureStr):
-                                appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
+                if len(self.valueApp[f]) == 1 and f not in STOPWORDS:
+                    for featureStr in self._gen_features(f):
+                        for regexStr in self._gen_regex(featureStr):
+                            appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
@@ -308,7 +307,6 @@ class AgentClassifier(AbsClassifer):
         regexApp = self._prune(regexApp)
         companyRule = self._company(regexApp)
         appRule, hostAgent = self._app(regexApp, hostCategory)
-        print 'Company Rules', len(companyRule)
 
         print "Finish Pruning"
 
