@@ -193,7 +193,7 @@ class AgentClassifier(AbsClassifer):
             for f in self.appFeatures[app].values():
                 _compile_regex()
 
-        print '[196]', appFeatureRegex['com.news12.news12togo'].values()
+        print '[196]', appFeatureRegex['com.news12.news12togo'].keys()
         return appFeatureRegex
 
     def _prune(self, regexLabel):
