@@ -105,11 +105,14 @@ class AgentClassifier(AbsClassifer):
     @staticmethod
     def _app(patterns, hostCategory):
         appRules = {}
+        hostAgentRule = {}
+
         for fRegex, apps in filter(lambda item: len(item[1]) == 1, patterns.iteritems()):
             app = list(apps)[0]
-            appRules[fRegex] = app
+            # appRules[fRegex] = app
+            for host in fRegex.matchRecord:
+                hostAgentRule[(host, fRegex.regexObj.pattern)] = app
 
-        hostAgentRule = {}
         for fRegex, apps in patterns.iteritems():
             if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCategory) == 1:
                 for host in fRegex.matchRecord:
