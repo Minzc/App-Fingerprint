@@ -265,6 +265,8 @@ class AgentClassifier(AbsClassifer):
         for app, features in filter(lambda x: x[0] not in agentTuples, self.appFeatures.items()):
             for f in features.values():
                 if len(self.valueApp[f]) == 1:
+                    if f == 'iphone':
+                        print 'ERROR!!!!!'
                     for featureStr in self._gen_features(f):
                         for regexStr in self._gen_regex(featureStr):
                             appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
