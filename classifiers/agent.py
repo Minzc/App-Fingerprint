@@ -162,7 +162,7 @@ class AgentClassifier(AbsClassifer):
     def _compose_regxobj(self, agentTuples):
         def _compile_regex():
             for featureStr in self._gen_features(f):
-                if app == 'com.news12.news12togo':
+                if app == 'com.newsday.newsdayapp':
                     print '[164]', app, self.appFeatures[app], f, featureStr
 
                 '''1. featureStr in agent. 2. featureStr is app'''
