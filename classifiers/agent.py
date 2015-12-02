@@ -163,7 +163,7 @@ class AgentClassifier(AbsClassifer):
         def _compile_regex():
             for featureStr in self._gen_features(f):
                 if app == 'com.news12.news12togo':
-                    print '[164]', app, self.appFeatures[app], f
+                    print '[164]', app, self.appFeatures[app], f, featureStr
 
                 '''1. featureStr in agent. 2. featureStr is app'''
                 if len(filter(lambda x: featureStr in x, agents)) > 0 or app in featureStr:
