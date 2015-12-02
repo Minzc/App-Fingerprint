@@ -174,8 +174,9 @@ class AgentClassifier(AbsClassifer):
                 for agent in filter(lambda x: '/' in x, agents):
                     matchStrs = re.findall(r'^[a-zA-Z0-9][0-9a-zA-Z. _\-:&?\'%!]+/', agent)
                     if len(matchStrs) > 0:
-                        if len(self.valueApp[matchStrs[0][:-1]]) <= 1 and matchStrs[0][:-1].strip() not in STOPWORDS:
-                            regexStr = r'^' + re.escape(matchStrs[0])
+                        featureStr = matchStrs[0][:-1].strip()
+                        if len(self.valueApp[featureStr]) <= 1 and featureStr not in STOPWORDS:
+                            regexStr = r'^' + re.escape(featureStr + '/')
                             if regexStr not in appFeatureRegex[app]:
                                 try:
                                     featureStr = matchStrs[0]
@@ -192,6 +193,7 @@ class AgentClassifier(AbsClassifer):
             for f in self.appFeatures[app].values():
                 _compile_regex()
 
+        print '[196]', appFeatureRegex['com.news12.news12togo'].values()
         return appFeatureRegex
 
     def _prune(self, regexLabel):
