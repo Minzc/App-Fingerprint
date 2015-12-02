@@ -160,6 +160,8 @@ class AgentClassifier(AbsClassifer):
     def _compose_regxobj(self, agentTuples):
         def _compile_regex():
             for featureStr in self._gen_features(f):
+                if 'app' in f:
+                    print '[164]', app, self.appFeatures[app]
 
                 '''1. featureStr in agent. 2. featureStr is app'''
                 if len(filter(lambda x: featureStr in x, agents)) > 0 or app in featureStr:
@@ -270,6 +272,8 @@ class AgentClassifier(AbsClassifer):
             for f in features.values():
                 if len(self.valueApp[f]) == 1:
                     if f not in STOPWORDS:
+                        if 'app' in f:
+                            print '[276]', app, self.appFeatures[app]
                         for featureStr in self._gen_features(f):
                             if f.strip() == 'app':
                                 print app, self.appFeatures[app]
