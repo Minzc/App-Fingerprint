@@ -158,21 +158,17 @@ class AgentClassifier(AbsClassifer):
         self.regexCover[regexStr1].add(regexStr4)
         self.regexCover[regexStr2].add(regexStr4)
         self.regexCover[regexStr3].add(regexStr4)
-        if 'app' in featureStr:
-            print '[159] FUCK!!!!!!!!', featureStr.encode('utf-8')
         return regex
 
     def _compose_regxobj(self, agentTuples):
         def _compile_regex():
             for featureStr in self._gen_features(f):
-                if app == 'com.newsday.newsdayapp':
-                    print '[164]', app, self.appFeatures[app], f, featureStr
-
                 '''1. featureStr in agent. 2. featureStr is app'''
                 if len(filter(lambda x: featureStr in x, agents)) > 0 or app in featureStr:
-
                     for regexStr in self._gen_regex(featureStr):
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
+                        if app == 'com.news12.news12togo':
+                            print app, self.appFeatures[app], featureStr, f
 
             if len(appFeatureRegex[app]) == 0:
                 for agent in filter(lambda x: '/' in x, agents):
@@ -277,13 +273,11 @@ class AgentClassifier(AbsClassifer):
             for f in features.values():
                 if len(self.valueApp[f]) == 1:
                     if f not in STOPWORDS:
-                        if 'app' in f:
-                            print '[276]', app, self.appFeatures[app]
                         for featureStr in self._gen_features(f):
-                            if f.strip() == 'app':
-                                print app, self.appFeatures[app]
                             for regexStr in self._gen_regex(featureStr):
                                 appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
+                                if app == 'com.news12.news12togo':
+                                    print app, self.appFeatures[app], featureStr, f
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
