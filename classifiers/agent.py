@@ -193,7 +193,7 @@ class AgentClassifier(AbsClassifer):
             for f in self.appFeatures[app].values():
                 _compile_regex()
 
-        print '[196]', appFeatureRegex['com.newsday.newsdayapp'].keys()
+
         return appFeatureRegex
 
     def _prune(self, regexLabel):
@@ -278,8 +278,6 @@ class AgentClassifier(AbsClassifer):
                         for featureStr in self._gen_features(f):
                             for regexStr in self._gen_regex(featureStr):
                                 appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
-                                if app == 'com.newsday.newsdayapp':
-                                    print 'INFER', app, self.appFeatures[app], featureStr, f
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
@@ -299,10 +297,14 @@ class AgentClassifier(AbsClassifer):
         Compose regular expression
         '''
         appFeatureRegex = self._compose_regxobj(agentTuples)
+        print '[302]', appFeatureRegex['com.newsday.newsdayapp'].keys()
 
         print 'Infer From Data Is', self.inferFrmData
         if self.inferFrmData:
             self._infer_from_xml(appFeatureRegex, agentTuples)
+        print '[307]', appFeatureRegex['com.newsday.newsdayapp'].keys()
+        for key, value in appFeatureRegex.items():
+            print key, value
 
         '''
         Count regex
