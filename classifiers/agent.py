@@ -160,8 +160,8 @@ class AgentClassifier(AbsClassifer):
     def _compose_regxobj(self, agentTuples):
         def _compile_regex():
             for featureStr in self._gen_features(f):
-                if 'app' in f:
-                    print '[164]', app, self.appFeatures[app]
+                if 'app' in featureStr:
+                    print '[164]', app, self.appFeatures[app], f
 
                 '''1. featureStr in agent. 2. featureStr is app'''
                 if len(filter(lambda x: featureStr in x, agents)) > 0 or app in featureStr:
