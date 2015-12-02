@@ -80,7 +80,8 @@ class AgentClassifier(AbsClassifer):
         params = []
 
         for fRegex, app in appRule.iteritems():
-            params.append((app, 1, 1, fRegex.regexObj.pattern, '', consts.APP_RULE))
+            if len(self.valueApp[fRegex.rawF]) <= 1:
+                params.append((app, 1, 1, fRegex.regexObj.pattern, '', consts.APP_RULE))
 
         for fRegex, company in companyRule.iteritems():
             params.append((company, 1, 1, fRegex.regexObj.pattern, '', consts.COMPANY_RULE))
@@ -160,12 +161,11 @@ class AgentClassifier(AbsClassifer):
 
     def _compose_regxobj(self, agentTuples):
         def _compile_regex():
-            if len(self.valueApp[f]) == 1:
-                for featureStr in self._gen_features(f):
-                    '''1. featureStr in agent. 2. featureStr is app'''
-                    if len(filter(lambda x: featureStr in x, agents)) > 0 or app in featureStr:
-                        for regexStr in self._gen_regex(featureStr):
-                            appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
+            for featureStr in self._gen_features(f):
+                '''1. featureStr in agent. 2. featureStr is app'''
+                if len(filter(lambda x: featureStr in x, agents)) > 0 or app in featureStr:
+                    for regexStr in self._gen_regex(featureStr):
+                        appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
             if len(appFeatureRegex[app]) == 0:
                 for agent in filter(lambda x: '/' in x, agents):
