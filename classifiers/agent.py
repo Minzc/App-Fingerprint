@@ -161,9 +161,6 @@ class AgentClassifier(AbsClassifer):
         def _compile_regex():
             for featureStr in self._gen_features(f):
 
-                if featureStr.strip() == 'app':
-                    print app, self.appFeatures[app]
-
                 '''1. featureStr in agent. 2. featureStr is app'''
                 if len(filter(lambda x: featureStr in x, agents)) > 0 or app in featureStr:
 
@@ -274,6 +271,8 @@ class AgentClassifier(AbsClassifer):
                 if len(self.valueApp[f]) == 1:
                     if f not in STOPWORDS:
                         for featureStr in self._gen_features(f):
+                            if f.strip() == 'app':
+                                print app, self.appFeatures[app]
                             for regexStr in self._gen_regex(featureStr):
                                 appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
