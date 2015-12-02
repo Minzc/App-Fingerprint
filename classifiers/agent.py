@@ -61,11 +61,9 @@ class AgentClassifier(AbsClassifer):
                 if type(plistObj[key]) != unicode:
                     value = plistObj[key].decode('ascii')
 
-                if value == 'app':
-                    print value, key, 'ERROR'
-
                 value = unescape(value.lower())
-                features[key] = value
+                if value.lower not in STOPWORDS:
+                    features[key] = value
         return features
 
     def persist(self, appRule, companyRule, hostAgent, ruleType):
@@ -297,14 +295,10 @@ class AgentClassifier(AbsClassifer):
         Compose regular expression
         '''
         appFeatureRegex = self._compose_regxobj(agentTuples)
-        print '[302]', appFeatureRegex['com.newsday.newsdayapp'].keys()
 
         print 'Infer From Data Is', self.inferFrmData
         if self.inferFrmData:
             self._infer_from_xml(appFeatureRegex, agentTuples)
-        print '[307]', appFeatureRegex['com.newsday.newsdayapp'].keys()
-        for key, value in appFeatureRegex.items():
-            print key, value
 
         '''
         Count regex
