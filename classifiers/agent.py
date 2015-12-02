@@ -167,7 +167,7 @@ class AgentClassifier(AbsClassifer):
                 if len(filter(lambda x: featureStr in x, agents)) > 0 or app in featureStr:
                     for regexStr in self._gen_regex(featureStr):
                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
-                        if app == 'com.news12.news12togo':
+                        if app == 'com.newsday.newsdayapp':
                             print app, self.appFeatures[app], featureStr, f
 
             if len(appFeatureRegex[app]) == 0:
@@ -193,7 +193,7 @@ class AgentClassifier(AbsClassifer):
             for f in self.appFeatures[app].values():
                 _compile_regex()
 
-        print '[196]', appFeatureRegex['com.news12.news12togo'].keys()
+        print '[196]', appFeatureRegex['com.newsday.newsdayapp'].keys()
         return appFeatureRegex
 
     def _prune(self, regexLabel):
@@ -278,8 +278,8 @@ class AgentClassifier(AbsClassifer):
                         for featureStr in self._gen_features(f):
                             for regexStr in self._gen_regex(featureStr):
                                 appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
-                                if app == 'com.news12.news12togo':
-                                    print app, self.appFeatures[app], featureStr, f
+                                if app == 'com.newsday.newsdayapp':
+                                    print 'INFER', app, self.appFeatures[app], featureStr, f
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
