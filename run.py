@@ -22,8 +22,8 @@ VALID_LABEL = {
 USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
     consts.AGENT_CLASSIFIER,
-    consts.KV_CLASSIFIER,
-    consts.URI_CLASSIFIER,
+    #consts.KV_CLASSIFIER,
+    #consts.URI_CLASSIFIER,
 ]
 
 class PredictRst:
@@ -105,6 +105,7 @@ def train(trainTbls, appType):
     :param trainTbls: A list of tables used to train classifiers
     :parm appType: android or ios
     """
+    trainTbls = []
     trainSet = DataSetFactory.get_traindata(tbls=trainTbls, sampleRate=SAMPLERATE, appType=appType, LIMIT=LIMIT)
     trainSet.set_label(consts.APP_RULE)
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)

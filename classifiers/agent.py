@@ -12,6 +12,7 @@ VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier',
                   'CFBundleDisplayName', 'CFBundleURLSchemes'}
 STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName'}
 
+STOPWORDS = {'iphone'}
 
 class FRegex:
     def __init__(self, featureStr, regexStr, rawF):
@@ -59,6 +60,9 @@ class AgentClassifier(AbsClassifer):
                 value = plistObj[key]
                 if type(plistObj[key]) != unicode:
                     value = plistObj[key].decode('ascii')
+
+                if value == 'app':
+                    print value, key, 'ERROR'
 
                 value = unescape(value.lower())
                 features[key] = value
@@ -167,7 +171,7 @@ class AgentClassifier(AbsClassifer):
                 for agent in filter(lambda x: '/' in x, agents):
                     matchStrs = re.findall(r'^[a-zA-Z0-9][0-9a-zA-Z. _\-:&?\'%!]+/', agent)
                     if len(matchStrs) > 0:
-                        if len(self.valueApp[matchStrs[0]]) <= 1:
+                        if len(self.valueApp[matchStrs[0][:-1]]) <= 1 and matchStrs[0][:-1].strip() not in STOPWORDS:
                             regexStr = r'^' + re.escape(matchStrs[0])
                             if regexStr not in appFeatureRegex[app]:
                                 try:
@@ -265,11 +269,10 @@ class AgentClassifier(AbsClassifer):
         for app, features in filter(lambda x: x[0] not in agentTuples, self.appFeatures.items()):
             for f in features.values():
                 if len(self.valueApp[f]) == 1:
-                    if f == 'iphone':
-                        print 'ERROR!!!!!'
-                    for featureStr in self._gen_features(f):
-                        for regexStr in self._gen_regex(featureStr):
-                            appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
+                    if f not in STOPWORDS:
+                        for featureStr in self._gen_features(f):
+                            for regexStr in self._gen_regex(featureStr):
+                                appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
