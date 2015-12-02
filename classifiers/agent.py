@@ -155,6 +155,8 @@ class AgentClassifier(AbsClassifer):
         self.regexCover[regexStr1].add(regexStr4)
         self.regexCover[regexStr2].add(regexStr4)
         self.regexCover[regexStr3].add(regexStr4)
+        if 'app' in featureStr:
+            print '[159] FUCK!!!!!!!!', featureStr
         return regex
 
     def _compose_regxobj(self, agentTuples):
