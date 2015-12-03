@@ -197,15 +197,16 @@ class UriClassifier(AbsClassifer):
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
             if package.rawHost in rules:
-                if '' in rules[package.rawHost]:
-                    if package.refer_rawHost == '':
-                        label = rules[package.rawHost][''][0]
-                        rst = consts.Prediction(label, 1.0, ('Host', package.rawHost))
-                else:
+                if '' not in rules[package.rawHost]:
                     for pathSegObj in rules[package.rawHost]:
                         if pathSegObj.search(package.origPath):
                             label = rules[package.rawHost][pathSegObj][0]
                             rst = consts.Prediction(label, 1, ("Path", package.rawHost, pathSegObj.pattern))
+
+                else:
+                   if package.refer_rawHost == '':
+                        label = rules[package.rawHost][''][0]
+                        rst = consts.Prediction(label, 1.0, ('Host', package.rawHost))
             labelRsts[rule_type] = rst
         return labelRsts
 
