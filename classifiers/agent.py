@@ -12,7 +12,7 @@ VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier',
                   'CFBundleDisplayName', 'CFBundleURLSchemes'}
 STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName'}
 
-STOPWORDS = {'iphone'}
+STOPWORDS = {'iphone', 'app'}
 
 class FRegex:
     def __init__(self, featureStr, regexStr, rawF):
@@ -62,8 +62,6 @@ class AgentClassifier(AbsClassifer):
                     value = plistObj[key].decode('ascii')
 
                 value = unescape(value.lower()).strip()
-                if '706099830.xml' in filePath:
-                    print 'app' in value.lower(), value
                 if value.lower() not in STOPWORDS:
                     features[key] = value
         return features
