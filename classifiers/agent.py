@@ -61,7 +61,9 @@ class AgentClassifier(AbsClassifer):
                 if type(plistObj[key]) != unicode:
                     value = plistObj[key].decode('ascii')
 
-                value = unescape(value.lower())
+                value = unescape(value.lower()).strip()
+                if '706099830.xml' in filePath:
+                    print 'app' in value.lower(), value
                 if value.lower() not in STOPWORDS:
                     features[key] = value
         return features
