@@ -62,7 +62,7 @@ class AgentClassifier(AbsClassifer):
                     value = plistObj[key].decode('ascii')
 
                 value = unescape(value.lower())
-                if value.lower not in STOPWORDS:
+                if value.lower() not in STOPWORDS:
                     features[key] = value
         return features
 
