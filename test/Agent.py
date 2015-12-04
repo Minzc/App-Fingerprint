@@ -1,10 +1,10 @@
 # -*- encoding = utf-8 -*-
 from utils import unescape, flatten, load_info_features, load_folder
 from collections import defaultdict
-import const.consts as consts
+#import const.consts as consts
 import re
 import urllib
-from const.dataset import DataSetIter as DataSetIter
+#from const.dataset import DataSetIter as DataSetIter
 
 VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier',
                   'CFBundleDisplayName', 'CFBundleURLSchemes'}
@@ -209,66 +209,66 @@ class AgentClassifier():
             print identifier, ','.join(apps)
 
 
-    def classify(self, testSet):
-        def wrap_predict(predicts):
-            wrapPredicts = {}
-            for ruleType, predict in predicts.items():
-                label, evidence = predict
-                wrapPredicts[ruleType] = consts.Prediction(label, 1.0, evidence) if label else consts.NULLPrediction
-            return wrapPredicts
-
-        compressed = defaultdict(lambda: defaultdict(set))
-        for tbl, pkg in DataSetIter.iter_pkg(testSet):
-            compressed[pkg.agent][pkg.rawHost].add(pkg)
-
-        batchPredicts = {}
-        for agent, host, pkgs in flatten(compressed):
-            assert (type(pkgs) == set, "Type of pkgs is not correct" + str(type(pkgs)))
-            predict = wrap_predict(self.c((agent, host)))
-            for pkg in pkgs:
-                batchPredicts[pkg.id] = predict
-                l = predict[consts.APP_RULE].label
-                if l is not None and l != pkg.app:
-                    print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', predict[
-                        consts.APP_RULE]
-        return batchPredicts
-
-    def c(self, pkgInfo):
-        agent, host = pkgInfo
-        rst = {}
-        for ruleType in self.rules:
-            longestWord = ''
-            rstLabel = None
-            for agentF, regxNlabel in self.rules[ruleType].items():
-                regex, label = regxNlabel
-                if regex.search(agent) and len(longestWord) < len(agentF):
-                    rstLabel = label
-                    longestWord = agentF
-
-            for agentF, regxNlabel in self.rulesHost[ruleType][host].items():
-                regex, label = regxNlabel
-                if regex.search(agent) and len(longestWord) < len(agentF):
-                    rstLabel = label
-                    longestWord = agentF
-            rst[ruleType] = (rstLabel, longestWord)
-        return rst
-
-    @staticmethod
-    def change_raw(rules, trainSet):
-        tmpRules = {}
-        hostDict = {}
-        for rule, app in rules.items():
-            hostDict[rule[0]] = set()
-
-        for tbl, pkg in DataSetIter.iter_pkg(trainSet):
-            if pkg.host in hostDict:
-                hostDict[pkg.host].add(pkg.rawHost)
-
-        for rule, app in rules.items():
-            host, regexObj = rule
-            for rawHost in hostDict[host]:
-                tmpRules[(rawHost, regexObj)] = app
-        return tmpRules
+    # def classify(self, testSet):
+    #     def wrap_predict(predicts):
+    #         wrapPredicts = {}
+    #         for ruleType, predict in predicts.items():
+    #             label, evidence = predict
+    #             wrapPredicts[ruleType] = consts.Prediction(label, 1.0, evidence) if label else consts.NULLPrediction
+    #         return wrapPredicts
+    #
+    #     compressed = defaultdict(lambda: defaultdict(set))
+    #     for tbl, pkg in DataSetIter.iter_pkg(testSet):
+    #         compressed[pkg.agent][pkg.rawHost].add(pkg)
+    #
+    #     batchPredicts = {}
+    #     for agent, host, pkgs in flatten(compressed):
+    #         assert (type(pkgs) == set, "Type of pkgs is not correct" + str(type(pkgs)))
+    #         predict = wrap_predict(self.c((agent, host)))
+    #         for pkg in pkgs:
+    #             batchPredicts[pkg.id] = predict
+    #             l = predict[consts.APP_RULE].label
+    #             if l is not None and l != pkg.app:
+    #                 print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', predict[
+    #                     consts.APP_RULE]
+    #     return batchPredicts
+    #
+    # def c(self, pkgInfo):
+    #     agent, host = pkgInfo
+    #     rst = {}
+    #     for ruleType in self.rules:
+    #         longestWord = ''
+    #         rstLabel = None
+    #         for agentF, regxNlabel in self.rules[ruleType].items():
+    #             regex, label = regxNlabel
+    #             if regex.search(agent) and len(longestWord) < len(agentF):
+    #                 rstLabel = label
+    #                 longestWord = agentF
+    #
+    #         for agentF, regxNlabel in self.rulesHost[ruleType][host].items():
+    #             regex, label = regxNlabel
+    #             if regex.search(agent) and len(longestWord) < len(agentF):
+    #                 rstLabel = label
+    #                 longestWord = agentF
+    #         rst[ruleType] = (rstLabel, longestWord)
+    #     return rst
+    #
+    # @staticmethod
+    # def change_raw(rules, trainSet):
+    #     tmpRules = {}
+    #     hostDict = {}
+    #     for rule, app in rules.items():
+    #         hostDict[rule[0]] = set()
+    #
+    #     for tbl, pkg in DataSetIter.iter_pkg(trainSet):
+    #         if pkg.host in hostDict:
+    #             hostDict[pkg.host].add(pkg.rawHost)
+    #
+    #     for rule, app in rules.items():
+    #         host, regexObj = rule
+    #         for rawHost in hostDict[host]:
+    #             tmpRules[(rawHost, regexObj)] = app
+    #     return tmpRules
 
 def load_files():
     fileContents = load_folder('db')
