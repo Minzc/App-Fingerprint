@@ -53,7 +53,7 @@ class Identifier:
     def add_record(self, app, identifier):
         self.matched[app].add(identifier)
 
-    def len(self):
+    def weight(self):
         return len(self.matched)
 
 
@@ -195,6 +195,8 @@ class AgentClassifier():
                         extractors[(prefix, suffix)].add_record(app, value)
                         break
 
+        extractors = sorted(extractors.items(), key=lambda x: x[1].weight(), reverse=True)
+
         generalForms = defaultdict(set)
         for _, appAgent in agentTuples.items():
             for app, agent in appAgent:
@@ -202,10 +204,11 @@ class AgentClassifier():
                 #     print '[136]', self.process_agent(agent, app)
                 agent = self.process_agent(agent, app)
                 for key, extractor in extractors.items():
-                    if extractor.len() > 10:
+                    identifier = None
+                    if extractor.weight() > 10:
                         identifier = extractor.match(agent)
                     if identifier:
-                        print '[identifier]', identifier, '[agent]', agent, '[rules]', key
+                        print '[identifier]', identifier, '[agent]', agent, '[rules]', key, '[weight]', extractor.weight()
                         generalForms[identifier].add(app)
         for identifier, apps in sorted(generalForms.items(), key=lambda x: len(x[1])):
             print identifier, ','.join(apps)
