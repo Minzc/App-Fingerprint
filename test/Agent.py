@@ -34,21 +34,37 @@ class FRegex:
         self.cover = regexSet
 
 class Identifier:
-    def __init__(self, prefix, suffix):
-        self.rule = (prefix, suffix)
-        self.prefix = prefix
-        self.suffix = suffix
-        self.regex = re.compile(prefix + '([^/]+?)' + suffix)
-        self.matched = defaultdict(set)
+    # def __init__(self, prefix, suffix):
+    #     self.rule = (prefix, suffix)
+    #     self.prefix = prefix
+    #     self.suffix = suffix
+    #     self.regex = re.compile(prefix + '([^/]+?)' + suffix)
+    #     self.matched = defaultdict(set)
+    def __init__(self, rule):
+            start = rule.find('[IDENTIFIER]')
+            end = start + len('[IDENTIFIER]')
+            prefix = r'^' + re.escape(rule[:start])
+            suffix = re.escape(rule[end:])+'$'
+            self.ruleStr = rule
+            self.prefix = re.compile(prefix)
+            self.suffix = re.compile(suffix)
+            self.matched = defaultdict(set)
 
     def match(self, agent):
-        identifier = None
-        maxLen = len(agent)
-        for m in self.regex.finditer(agent):
-            if len(m.group(1)) < maxLen:
-                identifier = m.group(1)
-                maxLen = len(identifier)
-        return identifier
+        if self.prefix.search(agent) and self.suffix.search(agent):
+            agent = self.prefix.sub('', agent)
+            agent = self.suffix.sub('', agent)
+        else:
+            agent = None
+        return agent
+    # def match(self, agent):
+    #     identifier = None
+    #     maxLen = len(agent)
+    #     for m in self.regex.finditer(agent):
+    #         if len(m.group(1)) < maxLen:
+    #             identifier = m.group(1)
+    #             maxLen = len(identifier)
+    #     return identifier
 
     def add_record(self, app, identifier):
         self.matched[app].add(identifier)
@@ -184,15 +200,19 @@ class AgentClassifier():
 
     def train(self, agentTuples):
         extractors = defaultdict(set)
+
+        for tbl, appAgents in agentTuples.items():
+            appAgents = {(app, self.process_agent(agent, app)) for app, agent in appAgents}
+            agentTuples[tbl] = appAgents
+
         for _, appAgent in agentTuples.items():
             for app, agent in appAgent:
-                agent = self.process_agent(agent, app)
                 for key, value in sorted(self.appFeatures[app].items(), key=lambda x:len(x[1]), reverse=True):
                     if value not in STOPWORDS and value in agent:
                         agent = agent.replace(value, '[IDENTIFIER]')
-                        prefix, suffix = self.getPrefixNSuffix(agent)
-                        if (prefix, suffix) not in extractors: extractors[(prefix, suffix)] = Identifier(prefix, suffix)
-                        extractors[(prefix, suffix)].add_record(app, value)
+                        # prefix, suffix = self.getPrefixNSuffix(agent)
+                        if agent not in extractors: extractors[agent] = Identifier(agent)
+                        extractors[agent].add_record(app, value)
                         break
 
         extractors = sorted(extractors.items(), key=lambda x: x[1].weight(), reverse=True)
@@ -202,16 +222,23 @@ class AgentClassifier():
             for app, agent in appAgent:
                 # if agent == 'Heat%20Tool/21 CFNetwork/711.4.6 Darwin/14.0.0'.lower():
                 #     print '[136]', self.process_agent(agent, app)
-                agent = self.process_agent(agent, app)
                 for key, extractor in extractors:
                     identifier = None
                     if extractor.weight() > 10:
                         identifier = extractor.match(agent)
                     if identifier:
-                        print '[identifier]', identifier, '[agent]', agent, '[rules]', key, '[weight]', extractor.weight()
+                        extractor.add_record(app, identifier)
                         generalForms[identifier].add(app)
+                        break
+
+
+        print '======'
+        coveredApps = set()
         for identifier, apps in sorted(generalForms.items(), key=lambda x: len(x[1])):
-            print identifier, ','.join(apps)
+            print identifier, len(apps), ','.join(apps)
+            map(lambda x: coveredApps.add(x), apps)
+        print '======'
+        print 'covered apps', len(coveredApps)
 
 
     # def classify(self, testSet):
