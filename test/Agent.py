@@ -51,7 +51,10 @@ class Identifier:
         return identifier
 
     def add_record(self, app, identifier):
-        self.matched[identifier].add(app)
+        self.matched[app].add(identifier)
+
+    def len(self):
+        return len(self.matched)
 
 
 class AgentClassifier():
@@ -150,7 +153,7 @@ class AgentClassifier():
         prefixStart = start - 1
         prefixStop = start
 
-        while prefixStart >= 0:
+        while prefixStart > 0:
             if rule[prefixStart].isalnum() != True and rule[prefixStart] not in {' ', '.'}:
                 break
             else:
@@ -159,6 +162,8 @@ class AgentClassifier():
         prefix = get_seg(prefixStart, prefixStop)
         if prefixStop == 0:
             prefix = r'^' + prefix
+        if prefix == '':
+            print '[ERROR]', prefixStart, prefixStop, rule
 
         ############# SUFFIX #################
         suffixStart = end
@@ -178,22 +183,17 @@ class AgentClassifier():
 
 
     def train(self, agentTuples):
-        generalForms = defaultdict(set)
+        extractors = defaultdict(set)
         for _, appAgent in agentTuples.items():
             for app, agent in appAgent:
                 agent = self.process_agent(agent, app)
                 for key, value in sorted(self.appFeatures[app].items(), key=lambda x:len(x[1]), reverse=True):
                     if value not in STOPWORDS and value in agent:
                         agent = agent.replace(value, '[IDENTIFIER]')
-                        generalForms[agent].add(app)
+                        prefix, suffix = self.getPrefixNSuffix(agent)
+                        if (prefix, suffix) not in extractors: extractors[(prefix, suffix)] = Identifier(prefix, suffix)
+                        extractors[(prefix, suffix)].add_record(app, value)
                         break
-
-        extracers = {}
-        for agent, apps in generalForms.items():
-            prefix, suffix = self.getPrefixNSuffix(agent)
-            extracers[(prefix, suffix)] = Identifier(prefix, suffix)
-
-            # print agent, self.getPrefixNSuffix(agent)
 
         generalForms = defaultdict(set)
         for _, appAgent in agentTuples.items():
@@ -201,8 +201,9 @@ class AgentClassifier():
                 # if agent == 'Heat%20Tool/21 CFNetwork/711.4.6 Darwin/14.0.0'.lower():
                 #     print '[136]', self.process_agent(agent, app)
                 agent = self.process_agent(agent, app)
-                for key, extracer in extracers.items():
-                    identifier = extracer.match(agent)
+                for key, extractor in extractors.items():
+                    if extractor.len() > 10:
+                        identifier = extractor.match(agent)
                     if identifier:
                         print '[identifier]', identifier, '[agent]', agent, '[rules]', key
                         generalForms[identifier].add(app)
