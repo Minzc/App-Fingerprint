@@ -446,3 +446,14 @@ def feature_lib(expApp):
         fLib[consts.COMPANY_RULE][label] = {seg for seg in segs if len(compressSegs[consts.COMPANY_RULE][seg]) == 1}
         fLib[consts.APP_RULE][label] = {seg for seg in segs if len(compressSegs[consts.APP_RULE][seg]) == 1}
     return fLib
+
+def load_folder(folder):
+    from os import listdir
+    from os.path import isfile, join
+    fileContents = {}
+    for f in listdir(folder):
+        filePath = join(folder, f)
+        if isfile(filePath):
+            content = open(filePath).readlines()
+            fileContents[f] = content
+    return fileContents
