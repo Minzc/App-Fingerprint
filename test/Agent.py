@@ -203,7 +203,7 @@ class AgentClassifier():
                 # if agent == 'Heat%20Tool/21 CFNetwork/711.4.6 Darwin/14.0.0'.lower():
                 #     print '[136]', self.process_agent(agent, app)
                 agent = self.process_agent(agent, app)
-                for key, extractor in extractors.items():
+                for key, extractor in extractors:
                     identifier = None
                     if extractor.weight() > 10:
                         identifier = extractor.match(agent)
