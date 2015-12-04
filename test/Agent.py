@@ -200,9 +200,10 @@ class AgentClassifier():
                 # if agent == 'Heat%20Tool/21 CFNetwork/711.4.6 Darwin/14.0.0'.lower():
                 #     print '[136]', self.process_agent(agent, app)
                 agent = self.process_agent(agent, app)
-                for extracer in extracers.values():
+                for key, extracer in extracers.items():
                     identifier = extracer.match(agent)
                     if identifier:
+                        print '[identifier]', identifier, '[agent]', agent, '[rules]', key
                         generalForms[identifier].add(app)
         for identifier, apps in sorted(generalForms.items(), key=lambda x: len(x[1])):
             print identifier, ','.join(apps)
