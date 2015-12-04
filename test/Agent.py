@@ -10,7 +10,8 @@ VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier',
                   'CFBundleDisplayName', 'CFBundleURLSchemes'}
 STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName'}
 
-STOPWORDS = {'iphone', 'app', 'mobile'}
+STOPWORDS = {'iphone', 'app', 'mobile' ,'cfnetwork'}
+
 
 class FRegex:
     def __init__(self, featureStr, regexStr, rawF):
@@ -37,7 +38,7 @@ class Identifier:
         self.rule = (prefix, suffix)
         self.prefix = prefix
         self.suffix = suffix
-        self.regex = re.compile(prefix + '(.+?)' + suffix)
+        self.regex = re.compile(prefix + '([^/]+?)' + suffix)
         self.matched = defaultdict(set)
 
     def match(self, agent):
