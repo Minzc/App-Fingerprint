@@ -121,15 +121,6 @@ def app_clean(appname):
         appname = appname.replace('.' + extracted.suffix, '')
     return appname
 
-
-def agent_clean(agent):
-    agent = re.sub('[/]?[0-9][0-9.]*', ' ', agent)
-    agent = re.sub('\\([^\\)][^\\)]*$', ' ', agent)
-    agent = agent.replace(';', ' ').replace('(', ' ').replace(')', ' ').replace('/', ' ').replace('-', ' ').replace('_',
-                                                                                                                    ' ')
-    return agent
-
-
 def top_domain(host):
     """
     Return the topdomain of given host
@@ -457,3 +448,12 @@ def load_folder(folder):
             content = open(filePath).readlines()
             fileContents[f] = content
     return fileContents
+
+def process_agent(self, agent, app):
+    agent = re.sub(r'[a-z]?[0-9]+-[a-z]?[0-9]+-[a-z]?[0-9]+', r'[VERSION]', agent)
+    agent = re.sub(r'(/)([0-9]+)([ ;])', r'\1[VERSION]\3', agent)
+    agent = re.sub(r'/[0-9][.0-9]+', r'/[VERSION]', agent)
+    agent = re.sub(r'([ :])([0-9][.0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
+    agent = re.sub(r'([ :])([0-9][_0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
+    agent = re.sub(r'(^[0-9a-z]*)(.'+app+r'$)', r'[RANDOM]\2', agent)
+    return agent
