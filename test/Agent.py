@@ -36,17 +36,18 @@ class FRegex:
         self.cover = regexSet
 
 class Identifier:
-    # def __init__(self, prefix, suffix):
-    #     self.rule = (prefix, suffix)
-    #     self.prefix = prefix
-    #     self.suffix = suffix
-    #     self.regex = re.compile(prefix + '([^/]+?)' + suffix)
-    #     self.matched = defaultdict(set)
+    @staticmethod
+    def check_valid(rule):
+        start = rule.find(consts.IDENTIFIER)
+        end = start + len(consts.IDENTIFIER)
+        return not rule[end].isalnum()
+
     def __init__(self, rule):
         start = rule.find(consts.IDENTIFIER)
         end = start + len(consts.IDENTIFIER)
         prefix = r'^' + re.escape(rule[:start])
         suffix = re.escape(rule[end:])+'$'
+        self.ifValid = not rule[end].isalnum()
         self.ruleStr = rule
         self.prefix = re.compile(prefix)
         self.suffix = re.compile(suffix)
@@ -196,7 +197,8 @@ class AgentClassifier():
                         if value not in STOPWORDS and value in agent:
                             tmp = agent.replace(value, consts.IDENTIFIER, 1)
                             # prefix, suffix = self.getPrefixNSuffix(agent)
-                            if tmp not in extractors: extractors[tmp] = Identifier(tmp)
+                            if tmp not in extractors and Identifier.check_valid(tmp):
+                                extractors[tmp] = Identifier(tmp)
                             extractors[tmp].add_identifier(app, value)
                             ifMatch = True
                             break
@@ -257,8 +259,6 @@ class AgentClassifier():
                     identifier = extractor.match(agent)
                     if identifier and extractor.check(identifier):
                         ifMatch = True
-                        if identifier == 'assistant':
-                            print agent, app
                         identifierApps[identifier].add(app)
                         extractor.add_identifier(app, identifier)
 
