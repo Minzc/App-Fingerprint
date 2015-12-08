@@ -79,7 +79,7 @@ class Identifier:
     #             maxLen = len(identifier)
     #     return identifier
 class AgentClassifier(AbsClassifer):
-    def __init__(self, inferFrmData=True, sampleRate=1):
+    def __init__(self, inferFrmData=True):
         self.rules = defaultdict(dict)
         self.appFeatures = load_info_features(self._parse_xml)
 
@@ -89,9 +89,6 @@ class AgentClassifier(AbsClassifer):
                 self.valueApp[f].add(app)
 
         self.inferFrmData = inferFrmData
-        self.sampleRate = sampleRate
-        '''Following variables are used to speed up the count step '''
-        self.regexCover = defaultdict(set)
 
     @staticmethod
     def _parse_xml(filePath):
@@ -196,7 +193,7 @@ class AgentClassifier(AbsClassifer):
         return extractors
 
 
-    def _count(self, agentTuples, extractors):
+    def __count(self, agentTuples, extractors):
         """
         Count regex
         :param appAgent: app -> (host, agent) -> tbls
@@ -235,7 +232,7 @@ class AgentClassifier(AbsClassifer):
         '''
         extractors = self.__compose_idextractor(agentTuples)
         extractors = sorted(extractors.items(), key=lambda x: x[1].weight(), reverse=True)
-        print 'Len extractors', len(extractors)
+
 
         print 'Infer From Data Is', self.inferFrmData
         # if self.inferFrmData:
@@ -244,7 +241,8 @@ class AgentClassifier(AbsClassifer):
         '''
         Count regex
         '''
-        identifierApps, extractors = self._count(agentTuples, extractors)
+        print 'Len extractors', len(extractors), 'Len agent', len(agentTuples)
+        identifierApps, extractors = self.__count(agentTuples, extractors)
 
         print "Finish Counter"
 
