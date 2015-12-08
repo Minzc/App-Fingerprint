@@ -236,7 +236,7 @@ class AgentClassifier():
         for _, appAgent in agentTuples.items():
             for app, agent in appAgent:
                 ifMatch = False
-                for key, extractor in filter(lambda x: x[1].weight() > 10, extractors):
+                for key, extractor in extractors:
                     identifier = extractor.match(agent)
                     if identifier:
                         ifMatch = True
