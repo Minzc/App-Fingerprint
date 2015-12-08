@@ -106,7 +106,7 @@ class AgentClassifier(AbsClassifer):
                     features[key] = value
         return features
 
-    def persist(self, appRule, companyRule, hostAgent, ruleType):
+    def persist(self, appRule, ruleType):
         """
         Input
         :param companyRule:
@@ -123,13 +123,6 @@ class AgentClassifier(AbsClassifer):
             regexStr = regexStr.repace('[VERSION]', r'\b[a-z0-9-.]+\b')
             params.append((app, 1, 1, regexStr, '', consts.APP_RULE))
 
-        for fRegex, company in companyRule.iteritems():
-            params.append((company, 1, 1, fRegex.regexObj.pattern, '', consts.COMPANY_RULE))
-
-        for rule, app in hostAgent.items():
-            host, agentRegex = rule
-            params.append((app, 1, 1, agentRegex, host, consts.APP_RULE))
-
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
 
@@ -142,7 +135,7 @@ class AgentClassifier(AbsClassifer):
         return companyRule
 
     @staticmethod
-    def _app(identifierApps, extractors, hostCategory):
+    def _app(identifierApps, extractors):
         appRules = {}
         hostAgentRule = {}
 
@@ -157,11 +150,6 @@ class AgentClassifier(AbsClassifer):
 
         for identifier in check:
             print '[CHECK]',identifier, identifierApps[identifier]
-        # for fRegex, apps in patterns.iteritems():
-        #     if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCategory) == 1:
-        #         for host in fRegex.matchRecord:
-        #             if len(fRegex.matchRecord[host]) == 1 and len(hostCategory[host]) == 1:
-        #                 hostAgentRule[(host, fRegex.regexObj.pattern)] = list(fRegex.matchRecord[host])[0]
         return appRules, hostAgentRule
 
     @staticmethod
@@ -222,17 +210,9 @@ class AgentClassifier(AbsClassifer):
                         ifMatch = True
                         extractor.add_identifier(app, identifier)
                         identifierApps[identifier].add(app)
-                        break
-                if ifMatch == False:
-                    for key, extractor in filter(lambda x: x[1].weight() <= 10, extractors):
-                        identifier = extractor.match(agent)
-                        if identifier and extractor.check(identifier):
-                            ifMatch = True
-                            identifierApps[identifier].add(app)
-                            break
+
                 if ifMatch == False:
                     notDisAgent.add(agent)
-        return identifierApps, extractors
 
     # def _infer_from_xml(self, appFeatureRegex, agentTuples):
     #     for app, features in filter(lambda x: x[0] not in agentTuples, self.appFeatures.items()):
@@ -244,24 +224,13 @@ class AgentClassifier(AbsClassifer):
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
-        cmprsDB = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
-        hostCategory = defaultdict(set)
-        appCategory = dict()
-        appCompany = dict()
-        newAgentTuples = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
-            label, agent = pkg.label, pkg.agent
-            agentTuples[label].add(agent)
-            cmprsDB[agent][label][pkg.host].add(tbl)
-            hostCategory[pkg.host].add(pkg.category)
-            appCategory[label] = pkg.category
-            appCompany[label] = pkg.company
-            newAgentTuples[tbl].add((pkg.app, process_agent(pkg.agent, pkg.app)))
+            agentTuples[tbl].add((pkg.app, process_agent(pkg.agent, pkg.app)))
 
         '''
         Compose regular expression
         '''
-        extractors = self.__compose_idextractor(newAgentTuples)
+        extractors = self.__compose_idextractor(agentTuples)
         extractors = sorted(extractors.items(), key=lambda x: x[1].weight(), reverse=True)
 
         print 'Infer From Data Is', self.inferFrmData
@@ -271,21 +240,17 @@ class AgentClassifier(AbsClassifer):
         '''
         Count regex
         '''
-        identifierApps, extractors = self._count(newAgentTuples, extractors)
+        identifierApps, extractors = self._count(agentTuples, extractors)
 
         print "Finish Counter"
 
         # identifierApps, extractors = self._prune(regexApp)
-        appRule, hostAgent = self._app(identifierApps, extractors, hostCategory)
-        #companyRule = self._company(regexApp)
+        appRule, hostAgent = self._app(identifierApps, extractors)
 
 
         print "Finish Pruning"
 
-        # hostAgent = self._add_host(regexApp, hostCategory)
-        # hostAgent = self.change_raw(hostAgent, trainSet)
-
-        self.persist(appRule, {}, hostAgent, consts.APP_RULE)
+        self.persist(appRule, consts.APP_RULE)
 
     def load_rules(self):
         self.rules = {consts.APP_RULE: {}, consts.COMPANY_RULE: {}, consts.CATEGORY_RULE: {}}

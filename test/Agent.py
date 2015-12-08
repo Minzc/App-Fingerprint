@@ -231,10 +231,8 @@ class AgentClassifier():
         Count regex
         :param appAgent: app -> (host, agent) -> tbls
         """
-
         identifierApps = defaultdict(set)
         notDisAgent = set()
-        covered = set()
         for _, appAgent in agentTuples.items():
             for app, agent in appAgent:
                 ifMatch = False
@@ -244,14 +242,6 @@ class AgentClassifier():
                         ifMatch = True
                         extractor.add_identifier(app, identifier)
                         identifierApps[identifier].add(app)
-                        covered.add(app)
-
-                for key, extractor in filter(lambda x: x[1].weight() <= 10, extractors):
-                    identifier = extractor.match(agent)
-                    if identifier and extractor.check(identifier):
-                        ifMatch = True
-                        identifierApps[identifier].add(app)
-                        extractor.add_identifier(app, identifier)
 
                 if ifMatch == False:
                     notDisAgent.add(agent)
