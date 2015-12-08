@@ -125,7 +125,7 @@ class AgentClassifier():
 
         rules = {}
         for regexStr, app in appRule.iteritems():
-            regexStr = regexStr.repace('[VERSION]', r'\b[a-z0-9-.]+\b')
+            regexStr = regexStr.replace('[VERSION]', r'\b[a-z0-9-.]+\b')
             regexObj = re.compile(regexStr, re.IGNORECASE)
             rules[regexObj] = app
         return rules
@@ -329,7 +329,7 @@ class AgentClassifier():
         identifierApps = set()
         for _, appAgent in agentTuples.items():
             for app, agent in appAgent:
-                for regexObj, pApp in rules:
+                for regexObj, pApp in rules.items():
                     if regexObj.match(agent):
                         identifierApps.add(app)
                         if app != pApp:
