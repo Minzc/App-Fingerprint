@@ -40,7 +40,6 @@ class Identifier:
         end = start + len(consts.IDENTIFIER)
         prefix = r'^' + re.escape(rule[:start])
         suffix = re.escape(rule[end:])+'$'
-        self.ifValid = not rule[end].isalnum()
         self.ruleStr = rule
         self.prefix = re.compile(prefix)
         self.suffix = re.compile(suffix)
