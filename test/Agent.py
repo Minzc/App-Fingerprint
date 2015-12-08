@@ -198,8 +198,6 @@ class AgentClassifier():
                             # prefix, suffix = self.getPrefixNSuffix(agent)
                             if tmp not in extractors: extractors[tmp] = Identifier(tmp)
                             extractors[tmp].add_identifier(app, value)
-                            if value == 'bingo%20bash':
-                                print '[SIZE0]', agent
                             ifMatch = True
                             break
                     if ifMatch == True:
@@ -249,14 +247,8 @@ class AgentClassifier():
                 ifMatch = False
                 for key, extractor in filter(lambda x: x[1].weight() > 10, extractors):
                     identifier = extractor.match(agent)
-
-                    if identifier == 'assistantservices':
-                        print agent, app
-
                     if identifier:
                         ifMatch = True
-                        if app == 'com.speaktoit.assistant':
-                            print '[IDENTIFIER]', identifier
                         extractor.add_identifier(app, identifier)
                         identifierApps[identifier].add(app)
                         covered.add(app)
@@ -265,6 +257,10 @@ class AgentClassifier():
                     identifier = extractor.match(agent)
                     if identifier and extractor.check(identifier):
                         ifMatch = True
+                        if identifier == 'assistant':
+                            print agent, app
+                        if app == 'com.speaktoit.assistant':
+                            print '[IDENTIFIER]', identifier
                         identifierApps[identifier].add(app)
 
                 if ifMatch == False:
