@@ -35,21 +35,17 @@ class FRegex:
         self.cover = regexSet
 
 class Identifier:
-    # def __init__(self, prefix, suffix):
-    #     self.rule = (prefix, suffix)
-    #     self.prefix = prefix
-    #     self.suffix = suffix
-    #     self.regex = re.compile(prefix + '([^/]+?)' + suffix)
-    #     self.matched = defaultdict(set)
     def __init__(self, rule):
-            start = rule.find(consts.IDENTIFIER)
-            end = start + len(consts.IDENTIFIER)
-            prefix = r'^' + re.escape(rule[:start])
-            suffix = re.escape(rule[end:])+'$'
-            self.ruleStr = rule
-            self.prefix = re.compile(prefix)
-            self.suffix = re.compile(suffix)
-            self.matched = defaultdict(set)
+        start = rule.find(consts.IDENTIFIER)
+        end = start + len(consts.IDENTIFIER)
+        prefix = r'^' + re.escape(rule[:start])
+        suffix = re.escape(rule[end:])+'$'
+        self.ifValid = not rule[end].isalnum()
+        self.ruleStr = rule
+        self.prefix = re.compile(prefix)
+        self.suffix = re.compile(suffix)
+        self.matched = defaultdict(set)
+        self.apps = set()
 
     def match(self, agent):
         if self.prefix.search(agent) and self.suffix.search(agent):
@@ -60,18 +56,17 @@ class Identifier:
         return agent
 
     def add_identifier(self, app, identifier):
-        self.matched[app].add(identifier)
+        self.apps.add(app)
+        self.matched[identifier].add(app)
 
     def weight(self):
-        return len(self.matched)
+        return len(self.apps)
 
     def check(self, identifier):
-        for app, identifiers in self.matched.items():
-            if identifier in identifiers:
-                return True
-        return False
+        return identifier in self.matched
+
     def gen(self, identifier):
-        return self.prefix.pattern + identifier + self.suffix.pattern
+        return self.prefix.pattern + re.escape(identifier) + self.suffix.pattern
     # def match(self, agent):
     #     identifier = None
     #     maxLen = len(agent)
@@ -153,12 +148,13 @@ class AgentClassifier(AbsClassifer):
 
         check = set()
         for _, extractor in extractors:
-            for app, identifiers in extractor.matched.items():
-                for identifier in identifiers:
-                    if len(identifierApps[identifier]) == 1:
-                        appRules[extractor.gen(identifier)] = app
-                    elif len(identifierApps[identifier]) < 10:
+            for identifier, apps in extractor.matched.items():
+                if len(apps) == 1:
+                    app = list(apps)[0]
+                    appRules[extractor.gen(identifier)] = app
+                    if len(identifierApps[identifier]) > 1:
                         check.add(identifier)
+
         for identifier in check:
             print '[CHECK]',identifier, identifierApps[identifier]
         # for fRegex, apps in patterns.iteritems():
