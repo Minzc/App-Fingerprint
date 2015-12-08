@@ -43,14 +43,15 @@ class Identifier:
     #     self.regex = re.compile(prefix + '([^/]+?)' + suffix)
     #     self.matched = defaultdict(set)
     def __init__(self, rule):
-            start = rule.find(consts.IDENTIFIER)
-            end = start + len(consts.IDENTIFIER)
-            prefix = r'^' + re.escape(rule[:start])
-            suffix = re.escape(rule[end:])+'$'
-            self.ruleStr = rule
-            self.prefix = re.compile(prefix)
-            self.suffix = re.compile(suffix)
-            self.matched = defaultdict(set)
+        start = rule.find(consts.IDENTIFIER)
+        end = start + len(consts.IDENTIFIER)
+        prefix = r'^' + re.escape(rule[:start])
+        suffix = re.escape(rule[end:])+'$'
+        self.ruleStr = rule
+        self.prefix = re.compile(prefix)
+        self.suffix = re.compile(suffix)
+        self.matched = defaultdict(set)
+        self.apps = set()
 
     def match(self, agent):
         if self.prefix.search(agent) and self.suffix.search(agent):
@@ -61,16 +62,15 @@ class Identifier:
         return agent
 
     def add_identifier(self, app, identifier):
-        self.matched[app].add(identifier)
+        self.apps.add(app)
+        self.matched[identifier].add(app)
 
     def weight(self):
-        return len(self.matched)
+        return len(self.apps)
 
     def check(self, identifier):
-        for app, identifiers in self.matched.items():
-            if identifier in identifiers:
-                return True
-        return False
+        return identifier in self.matched
+
     def gen(self, identifier):
         return self.prefix.pattern + re.escape(identifier) + self.suffix.pattern
     # def match(self, agent):
@@ -147,14 +147,15 @@ class AgentClassifier():
 
         check = set()
         for _, extractor in extractors:
-            for app, identifiers in extractor.matched.items():
-                for identifier in identifiers:
-                    if len(identifierApps[identifier]) == 1:
-                        if app == 'com.speaktoit.assistant':
-                            print '[gen]', identifier, '[num]', identifierApps[identifier]
-                        appRules[extractor.gen(identifier)] = app
-                    elif len(identifierApps[identifier]) < 10:
-                        check.add(identifier)
+            for identifier, apps in extractor.matched.items():
+                if len(apps) == 1:
+                    app = list(apps)[0]
+                    if 'com.speaktoit.assistant' in apps:
+                        print '[gen]', identifier, '[num]', identifierApps[identifier]
+                    appRules[extractor.gen(identifier)] = app
+                elif len(apps):
+                    check.add(identifier)
+
         for identifier in check:
             print '[CHECK]',identifier, identifierApps[identifier]
 
@@ -259,14 +260,13 @@ class AgentClassifier():
                         extractor.add_identifier(app, identifier)
                         identifierApps[identifier].add(app)
                         covered.add(app)
-                        break
-                if ifMatch == False:
-                    for key, extractor in filter(lambda x: x[1].weight() <= 10, extractors):
-                        identifier = extractor.match(agent)
-                        if identifier and extractor.check(identifier):
-                            ifMatch = True
-                            identifierApps[identifier].add(app)
-                            break
+
+                for key, extractor in filter(lambda x: x[1].weight() <= 10, extractors):
+                    identifier = extractor.match(agent)
+                    if identifier and extractor.check(identifier):
+                        ifMatch = True
+                        identifierApps[identifier].add(app)
+
                 if ifMatch == False:
                     notDisAgent.add(agent)
         return identifierApps, extractors
