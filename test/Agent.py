@@ -259,9 +259,8 @@ class AgentClassifier():
                         ifMatch = True
                         if identifier == 'assistant':
                             print agent, app
-                        if app == 'com.speaktoit.assistant':
-                            print '[IDENTIFIER]', identifier
                         identifierApps[identifier].add(app)
+                        extractor.add_identifier(app, identifier)
 
                 if ifMatch == False:
                     notDisAgent.add(agent)
