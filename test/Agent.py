@@ -144,11 +144,9 @@ class AgentClassifier():
             for identifier, apps in extractor.matched.items():
                 if len(apps) == 1:
                     app = list(apps)[0]
-                    if 'com.speaktoit.assistant' in apps:
-                        print '[gen]', identifier, '[num]', identifierApps[identifier]
                     appRules[extractor.gen(identifier)] = app
-                elif len(apps):
-                    check.add(identifier)
+                    if len(identifierApps[identifier]) > 1:
+                        check.add(identifier)
 
         for identifier in check:
             print '[CHECK]',identifier, identifierApps[identifier]
