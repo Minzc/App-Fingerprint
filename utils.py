@@ -449,7 +449,7 @@ def load_folder(folder):
             fileContents[f] = content
     return fileContents
 
-def process_agent(self, agent, app):
+def process_agent( agent, app):
     agent = re.sub(r'[a-z]?[0-9]+-[a-z]?[0-9]+-[a-z]?[0-9]+', r'[VERSION]', agent)
     agent = re.sub(r'(/)([0-9]+)([ ;])', r'\1[VERSION]\3', agent)
     agent = re.sub(r'/[0-9][.0-9]+', r'/[VERSION]', agent)

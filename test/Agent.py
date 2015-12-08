@@ -122,23 +122,15 @@ class AgentClassifier():
         """
         # self.clean_db(ruleType, consts.SQL_DELETE_AGENT_RULES)
         # sqldao = SqlDao()
-        QUERY = consts.SQL_INSERT_AGENT_RULES
-        params = []
 
+        rules = {}
         for regexStr, app in appRule.iteritems():
-            print '[regex]', regexStr
-            # if len(self.valueApp[fRegex.rawF]) <= 1:
-            #     params.append((app, 1, 1, fRegex.regexObj.pattern, '', consts.APP_RULE))
+            regexStr = regexStr.repace('[VERSION]', r'\b[a-z0-9-.]+\b')
+            regexObj = re.compile(regexStr, re.IGNORECASE)
+            rules[regexObj] = app
+        return rules
 
-        for fRegex, company in companyRule.iteritems():
-            params.append((company, 1, 1, fRegex.regexObj.pattern, '', consts.COMPANY_RULE))
 
-        for rule, app in hostAgent.items():
-            host, agentRegex = rule
-            params.append((app, 1, 1, agentRegex, host, consts.APP_RULE))
-
-        # sqldao.executeBatch(QUERY, params)
-        # sqldao.close()
 
     @staticmethod
     def _company(patterns):
@@ -153,11 +145,16 @@ class AgentClassifier():
         appRules = {}
         hostAgentRule = {}
 
-        for extractor in extractors:
-            for app, identifiers in extractor.match.items():
+        check = set()
+        for _, extractor in extractors:
+            for app, identifiers in extractor.matched.items():
                 for identifier in identifiers:
                     if len(identifierApps[identifier]) == 1:
                         appRules[extractor.gen(identifier)] = app
+                    elif len(identifierApps[identifier]) < 10:
+                        check.add(identifier)
+        for identifier in check:
+            print '[CHECK]',identifier, identifierApps[identifier]
 
         # for fRegex, apps in patterns.iteritems():
         #     if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCategory) == 1:
@@ -262,6 +259,7 @@ class AgentClassifier():
 
         identifierApps = defaultdict(set)
         notDisAgent = set()
+        covered = set()
         for _, appAgent in agentTuples.items():
             for app, agent in appAgent:
                 ifMatch = False
@@ -271,6 +269,7 @@ class AgentClassifier():
                         ifMatch = True
                         extractor.add_identifier(app, identifier)
                         identifierApps[identifier].add(app)
+                        covered.add(app)
                         break
                 if ifMatch == False:
                     for key, extractor in filter(lambda x: x[1].weight() <= 10, extractors):
@@ -295,7 +294,7 @@ class AgentClassifier():
         newAgentTuples = defaultdict(set)
         for tbl, tuples in agentTuples.items():
             for app, agent in tuples:
-                newAgentTuples[tbl].add(app, process_agent(agent, app))
+                newAgentTuples[tbl].add((app, process_agent(agent, app)))
 
         '''
         Compose regular expression
@@ -310,7 +309,7 @@ class AgentClassifier():
         '''
         Count regex
         '''
-        identifierApps, extractors = self._count(agentTuples, extractors)
+        identifierApps, extractors = self._count(newAgentTuples, extractors)
 
         print "Finish Counter"
 
@@ -325,48 +324,18 @@ class AgentClassifier():
         # hostAgent = self._add_host(regexApp, hostCategory)
         # hostAgent = self.change_raw(hostAgent, trainSet)
 
-        self.persist(appRule, {}, hostAgent, consts.APP_RULE)
+        rules = self.persist(appRule, {}, hostAgent, consts.APP_RULE)
 
-    # def load_rules(self):
-    #     self.rules = {consts.APP_RULE: {}, consts.COMPANY_RULE: {}, consts.CATEGORY_RULE: {}}
-    #     self.rulesHost = {consts.APP_RULE: defaultdict(dict),
-    #                       consts.COMPANY_RULE: defaultdict(dict),
-    #                       consts.CATEGORY_RULE: defaultdict(dict)}
-    #     QUERY = consts.SQL_SELECT_AGENT_RULES
-    #     sqldao = SqlDao()
-    #     counter = 0
-    #     for host, agentF, label, ruleType in sqldao.execute(QUERY):
-    #         counter += 1
-    #         if host == '':
-    #             self.rules[ruleType][agentF] = (re.compile(agentF), label)
-    #         else:
-    #             self.rulesHost[ruleType][host][agentF] = (re.compile(agentF), label)
-    #     print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
-    #     sqldao.close()
+        identifierApps = set()
+        for _, appAgent in agentTuples.items():
+            for app, agent in appAgent:
+                for regexObj, pApp in rules:
+                    if regexObj.match(agent):
+                        identifierApps.add(app)
+                        if app != pApp:
+                            print 'ERROR [Predict]', pApp, '[APP]', app, '[RULE]', regexObj.pattern
+        print '[FINISH]', len(identifierApps)
 
-    # def classify(self, testSet):
-    #     def wrap_predict(predicts):
-    #         wrapPredicts = {}
-    #         for ruleType, predict in predicts.items():
-    #             label, evidence = predict
-    #             wrapPredicts[ruleType] = consts.Prediction(label, 1.0, evidence) if label else consts.NULLPrediction
-    #         return wrapPredicts
-    #
-    #     compressed = defaultdict(lambda: defaultdict(set))
-    #     for tbl, pkg in DataSetIter.iter_pkg(testSet):
-    #         compressed[pkg.agent][pkg.rawHost].add(pkg)
-    #
-    #     batchPredicts = {}
-    #     for agent, host, pkgs in flatten(compressed):
-    #         assert (type(pkgs) == set, "Type of pkgs is not correct" + str(type(pkgs)))
-    #         predict = wrap_predict(self.c((agent, host)))
-    #         for pkg in pkgs:
-    #             batchPredicts[pkg.id] = predict
-    #             l = predict[consts.APP_RULE].label
-    #             if l is not None and l != pkg.app:
-    #                 print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', predict[
-    #                     consts.APP_RULE]
-    #     return batchPredicts
 
     def c(self, pkgInfo):
         agent, host = pkgInfo
