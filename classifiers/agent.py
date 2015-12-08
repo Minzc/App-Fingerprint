@@ -213,6 +213,7 @@ class AgentClassifier(AbsClassifer):
 
                 if ifMatch == False:
                     notDisAgent.add(agent)
+        return identifierApps, extractors
 
     # def _infer_from_xml(self, appFeatureRegex, agentTuples):
     #     for app, features in filter(lambda x: x[0] not in agentTuples, self.appFeatures.items()):
