@@ -36,12 +36,6 @@ class FRegex:
         self.cover = regexSet
 
 class Identifier:
-    @staticmethod
-    def check_valid(rule):
-        start = rule.find(consts.IDENTIFIER)
-        end = start + len(consts.IDENTIFIER)
-        return not rule[end].isalnum()
-
     def __init__(self, rule):
         start = rule.find(consts.IDENTIFIER)
         end = start + len(consts.IDENTIFIER)
@@ -197,7 +191,7 @@ class AgentClassifier():
                         if value not in STOPWORDS and value in agent:
                             tmp = agent.replace(value, consts.IDENTIFIER, 1)
                             # prefix, suffix = self.getPrefixNSuffix(agent)
-                            if tmp not in extractors and Identifier.check_valid(tmp):
+                            if tmp not in extractors:
                                 extractors[tmp] = Identifier(tmp)
                             extractors[tmp].add_identifier(app, value)
                             ifMatch = True
