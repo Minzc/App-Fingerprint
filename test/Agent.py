@@ -246,8 +246,14 @@ class AgentClassifier():
                 ifMatch = False
                 for key, extractor in filter(lambda x: x[1].weight() > 10, extractors):
                     identifier = extractor.match(agent)
+
+                    if identifier == 'assistantservices':
+                        print agent, app
+
                     if identifier:
                         ifMatch = True
+                        if app == 'com.speaktoit.assistant':
+                            print '[IDENTIFIER]', identifier
                         extractor.add_identifier(app, identifier)
                         identifierApps[identifier].add(app)
                         covered.add(app)
@@ -313,10 +319,10 @@ class AgentClassifier():
                 for regexObj, pApp in rules.items():
                     if regexObj.match(agent):
                         identifierApps.add(app)
+                        print 'MATCH [Predict]', pApp, '[AGENT]', agent, '[RULE]', regexObj.pattern
                         if app != pApp:
                             print 'ERROR [Predict]', pApp, '[APP]', app, '[RULE]', regexObj.pattern, '[AGENT]', agent
-                    elif app == pApp:
-                        print 'MISMATCH [Predict]', pApp, '[AGENT]', agent, '[RULE]', regexObj.pattern
+
         print '[FINISH]', len(identifierApps)
 
 
