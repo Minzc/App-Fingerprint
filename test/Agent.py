@@ -182,27 +182,6 @@ class AgentClassifier():
         featureSet.add(f.replace(' ', ''))
         return featureSet
 
-    def _gen_regex(self, featureStr):
-        if not featureStr[-1].isalnum():
-            featureStr = featureStr[:-1]
-        if not featureStr[0].isalnum():
-            featureStr = featureStr[1:]
-
-        regex = []
-        regexStr1 = r'^' + re.escape(featureStr + '/')
-        regexStr2 = r'\b' + re.escape(featureStr) + r' \b[vr]?[0-9.]+\b'
-        regexStr3 = r'\b' + re.escape(featureStr + '/')
-        regexStr4 = r'\b' + re.escape(featureStr) + r'\b'
-        regex.append(regexStr1)
-        regex.append(regexStr2)
-        regex.append(regexStr3)
-        regex.append(regexStr4)
-        self.regexCover[regexStr1].add(regexStr3)
-        self.regexCover[regexStr1].add(regexStr4)
-        self.regexCover[regexStr2].add(regexStr4)
-        self.regexCover[regexStr3].add(regexStr4)
-        return regex
-
     def __compose_idextractor(self, agentTuples):
         sortFunc = lambda x:len(x[1])
         extractors = {}
@@ -216,6 +195,8 @@ class AgentClassifier():
                             # prefix, suffix = self.getPrefixNSuffix(agent)
                             if tmp not in extractors: extractors[tmp] = Identifier(tmp)
                             extractors[tmp].add_identifier(app, value)
+                            if value == 'bingo%20bash':
+                                print '[SIZE0]', agent
                             ifMatch = True
                             break
                     if ifMatch == True:
@@ -333,7 +314,9 @@ class AgentClassifier():
                     if regexObj.match(agent):
                         identifierApps.add(app)
                         if app != pApp:
-                            print 'ERROR [Predict]', pApp, '[APP]', app, '[RULE]', regexObj.pattern
+                            print 'ERROR [Predict]', pApp, '[APP]', app, '[RULE]', regexObj.pattern, '[AGENT]', agent
+                    elif app == pApp:
+                        print 'MISMATCH [Predict]', pApp, '[AGENT]', agent, '[RULE]', regexObj.pattern
         print '[FINISH]', len(identifierApps)
 
 
