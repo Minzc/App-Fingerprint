@@ -125,7 +125,7 @@ class AgentClassifier():
 
         rules = {}
         for regexStr, app in appRule.iteritems():
-            regexStr = regexStr.replace('[VERSION]', r'\b[a-z0-9-.]+\b')
+            regexStr = regexStr.replace(re.escape(consts.VERSION), r'\b[a-z0-9-.]+\b')
             regexObj = re.compile(regexStr, re.IGNORECASE)
             rules[regexObj] = app
         return rules
