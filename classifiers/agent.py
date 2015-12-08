@@ -64,8 +64,12 @@ class Identifier:
     def check(self, identifier):
         return identifier in self.matched
 
-    def gen(self, identifier):
-        return self.prefix.pattern + re.escape(identifier) + self.suffix.pattern
+    def gen(self, identifier, app):
+        if identifier != app:
+            return self.prefix.pattern + re.escape(identifier) + self.suffix.pattern
+        else:
+            return re.escape(identifier)
+
     # def match(self, agent):
     #     identifier = None
     #     maxLen = len(agent)
@@ -143,7 +147,7 @@ class AgentClassifier(AbsClassifer):
             for identifier, apps in extractor.matched.items():
                 if len(apps) == 1:
                     app = list(apps)[0]
-                    appRules[extractor.gen(identifier)] = app
+                    appRules[extractor.gen(identifier, app)] = app
                     if len(identifierApps[identifier]) > 1:
                         check.add(identifier)
 
@@ -231,6 +235,7 @@ class AgentClassifier(AbsClassifer):
         '''
         extractors = self.__compose_idextractor(agentTuples)
         extractors = sorted(extractors.items(), key=lambda x: x[1].weight(), reverse=True)
+        print 'Len extractors', len(extractors)
 
         print 'Infer From Data Is', self.inferFrmData
         # if self.inferFrmData:
