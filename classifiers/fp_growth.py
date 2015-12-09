@@ -43,7 +43,6 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
         # last item is class label
         for item in transaction[:-1]:
             items[item] += 1
-            # processed.append(item)
         # processed_transactions.append(processed)
         processed_transactions.append(transaction)
 
@@ -61,7 +60,6 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
         # sorted according to item's frequence
         # first by support then by itemnum
         transaction.sort(key=lambda v: (items[v], v), reverse=True)
-        # print '[DEBUG]', transaction
         transaction = transaction + [label]
         return transaction
 
@@ -83,7 +81,7 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
             debug_num = items[item]
 
             support = 0
-            support_dist = defaultdict(lambda : 0)
+            support_dist = defaultdict(int)
             nodes = [node for node in nodes]
 
             for node in nodes:
@@ -110,8 +108,7 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
 
             for node in nodes:
                 if node.parent is not None: # the node might already be an orphan
-                    if len(node.children) > 0:
-                        print 'error'
+                    assert len(node.children) <= 0
                     node.parent.remove(node)
 
     # Search for frequent itemsets, and yield the results we find.
@@ -143,14 +140,15 @@ class FPTree(object):
         """The root node of the tree."""
         return self._root
 
-    def add(self, transaction):
+    def add(self, transactionNLabel):
         """
         Adds a transaction to the tree.
         """
 
         point = self._root
+        transaction = transactionNLabel[:-1]
 
-        for item in transaction[:-1]:
+        for item in transaction:
             # point is FPNode
             next_point = point.search(item)
             if next_point:
@@ -168,7 +166,8 @@ class FPTree(object):
                 self._update_route(next_point)
 
             point = next_point
-        point.assign_clss(transaction[-1])
+        label = transactionNLabel[-1]
+        point.assign_clss(label)
 
     def _update_route(self, point):
         """Add the given node to the route through all nodes for its item."""
@@ -282,7 +281,6 @@ def conditional_tree_from_paths(paths, minimum_support):
             if not next_point:
                 # Add a new node to the tree.
                 items.add(node.item)
-                # count = node.count if node.item == condition_item else 0
                 next_point = FPNode(tree, node.item, 0)
                 point.add(next_point)
                 tree._update_route(next_point)
@@ -333,7 +331,7 @@ class FPNode(object):
         self._parent = None
         self._children = {}
         self._neighbor = None
-        self._clsses = defaultdict(lambda: 0)
+        self._clsses = defaultdict(int)
 
 
     def assign_clss(self, clss, count=1):
@@ -370,27 +368,15 @@ class FPNode(object):
                 self._tree._removed(child)
 
                 assert len(child.clsses) > 0
+                assert len(child.children) <= 0
+
+                # Since the parent node only has projected distribution
                 # merge class distribution into parent node
                 for k, v in child.clsses.items():
                     self.assign_clss(k, v)
 
                 if len(child.children) > 0:
                     print child
-                    
-                assert len(child.children) <= 0
-
-                for sub_child in child.children:
-                    try:
-                        # Merger case: we already have a child for that item, so
-                        # add the sub-child's count to our child's count.
-                        self._children[sub_child.item]._count += sub_child.count
-
-                        sub_child.parent = None # it's an orphan now
-                    except KeyError:
-                        # Turns out we don't actually have a child, so just add
-                        # the sub-child as our own child.
-                        self.add(sub_child)
-                child._children = {}
             else:
                 raise ValueError("that node is not a child of this node")
         except KeyError:

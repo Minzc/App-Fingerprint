@@ -14,6 +14,17 @@ DEBUG_ITEM = 'Mrd/1.2.1 (Linux; U; Android 5.0.2; google Nexus 7) com.crossfield
 Rule = namedtuple('Rule', 'rule, label, host, confidence, support')
 
 
+class AgentEncoder:
+    def __init__(self):
+        self.rules = load_agent()
+    def get_feature(self, package):
+        app = package.app
+        agent = package.agent
+        for regex in self.rules[app]:
+            if regex.search(agent):
+                return [regex.pattern, package.host]
+        return []
+
 def _get_package_f(package):
     """Get package features"""
     features = filter(None, map(lambda x: x.strip(), package.path.split('/')))
@@ -28,73 +39,27 @@ def _get_package_f(package):
 test_str = 'com.fdgentertainment.bananakong/1.8.1 (Linux; U; Android 5.0.2; en_US; razor) Apache-HttpClient/UNAVAILABLE (java 1.4)'.lower()
 
 
-def _encode_data(packages=None, minimum_support=2):
-    def _get_transactions(packages):
-        """Change package to transaction"""
-        f_counter = defaultdict(int)
-        f_company = defaultdict(set)
-        processed_transactions = []
+def _encode_data(encoders, packages=None, minimum_support=2):
+    """Change package to transaction"""
+    transactions = []
 
-        for package in packages:
-            transaction = _get_package_f(package)
-            transaction.append(package.label)
-            transaction.append(package.tbl)
-            processed_transactions.append(transaction)
-            # Last item is table name
-            # Second from last is app
-            # Third from last is host.
-            # Do not use them as feature
-            for item in transaction[:-3]:
-                f_counter[item] += 1
-                f_company[item].add(package.company)
-        # Get frequent 1-item
-        items = {item for item, num in f_counter.iteritems()
-                 if num > minimum_support and len(f_company[item]) < 4}
-        return processed_transactions, items
+    for package in packages:
+        for encoder in encoders:
+            transaction = encoder(package)
+            if transaction:
+                transaction.append(package.label)
+                transactions.append(transaction)
+            # transaction.append(package.tbl)
 
-    processed_transactions, items = _get_transactions(packages)
-
-    itemIndx = defaultdict(lambda: len(itemIndx))
-    packageNInfo = {}
-
-    def _encode_transaction(transaction):
-        """Change string items to numbers"""
-        host = transaction[-3]
-        label = transaction[-2]
-        tbl = transaction[-1]
-        # Prune infrequent items
-        # Host and app are not included in transaction now
-        encode_transaction = [itemIndx[item] for item in set(transaction[:-3])
-                              if item in items]
-        packageNInfo[frozenset(encode_transaction)] = {'Tbl': tbl, 'Host': host}
-
-        return (label, encode_transaction)
-
-    train_data = []
-    for trans_tuple in imap(_encode_transaction, processed_transactions):
-        train_data.append(trans_tuple)
-
-    # train_data
-    # all features are encoded; decode dictionary is itemIndx
-    # ((label, [f1, f2, f3]))
-    # 1 is added to avoid index overlap 
-    start_indx = len(itemIndx) + 1
-    appIndx = defaultdict(lambda: start_indx + len(appIndx))
-    encodedpackages = []
-
-    for app, encode_transaction in train_data:
-        # host = encode_transaction[-1]
-        # Append class lable at the end of a transaction
-        packageNInfo[frozenset(encode_transaction)]['Label'] = appIndx[app]
-        encode_transaction.append(appIndx[app])
-        encodedpackages.append(encode_transaction)
-
-    print 'Item index is ', itemIndx[test_str]
-    # encodedpackages: ([Features, app])
-    return encodedpackages, rever_map(appIndx), rever_map(itemIndx), packageNInfo
+        # Last item is table name
+        # Second from last is app
+        # Third from last is host.
+        # Do not use them as feature
+    return transactions
 
 
-def _gen_rules(transactions, tSupport, tConfidence, featureIndx, appIndx):
+
+def _gen_rules(transactions, tSupport, tConfidence):
     '''
     Generate encoded rules
     Input
@@ -108,16 +73,15 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx, appIndx):
     ###########################
     # FP-tree Version
     ###########################
-    print '_gen_rules', featureIndx.keys()[:10]
     rules = set()
     frequentPatterns = find_frequent_itemsets(transactions, tSupport, True)
     for frequent_pattern_info in frequentPatterns:
         itemset, support, tag_dist = frequent_pattern_info
-        ruleStrSet = frozenset({featureIndx[itemcode] for itemcode in itemset})
+        ruleStrSet = frozenset(itemset)
         labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
         if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
             confidence = max(tag_dist.values()) * 1.0 / support
-            rules.add((ruleStrSet, confidence, support, appIndx[labelIndex]))
+            rules.add((ruleStrSet, confidence, support, labelIndex))
 
     print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
@@ -161,7 +125,6 @@ def _prune_rules(tRules, trainData, min_cover=3):
     import datetime
     ts = datetime.datetime.now()
     cover_num = defaultdict(int)
-    index_packages = defaultdict(list)
     tblSupport = defaultdict(set)
     for tbl, packages in trainData.iteritems():
         packageInfos = defaultdict(set)
@@ -199,6 +162,8 @@ class CMAR(AbsClassifer):
         self.min_cover = min_cover
         self.tSupport = tSupport
         self.tConfidence = tConfidence
+        self.get_feature = [AgentEncoder()]
+
 
     def _persist(self, rules):
         '''specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support'''
@@ -220,9 +185,9 @@ class CMAR(AbsClassifer):
         for tblPackages in trainData.values():
             packages += tblPackages
         print "#CMAR:", len(packages)
-        encodedpackages, appIndx, featureIndx, packageNInfo = _encode_data(packages)
+        encodedpackages = _encode_data(self.get_feature, packages)
         ''' Rules format : (feature, confidence, support, label) '''
-        rules = _gen_rules(encodedpackages, self.tSupport, self.tConfidence, featureIndx, appIndx)
+        rules = _gen_rules(encodedpackages, self.tSupport, self.tConfidence)
         ''' Prune duplicated rules'''
         # rules = _remove_duplicate(rules)
         ''' feature, app, host '''
@@ -259,11 +224,11 @@ class CMAR(AbsClassifer):
 
     def _count(self, specificRules, trainData):
         '''
-    Input
-    - rules
-        specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support
-    Return {type:[(label, confidence)]}
-    '''
+        Input
+        - rules
+            specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support
+        Return {type:[(label, confidence)]}
+        '''
         labelRsts = {}
         for tbl, packages in trainData.iteritems():
             for package in packages:
@@ -278,8 +243,8 @@ class CMAR(AbsClassifer):
 
     def classify(self, package):
         '''
-    Return {type:[(label, confidence)]}
-    '''
+        Return {type:[(label, confidence)]}
+        '''
         labelRsts = {}
         features = _get_package_f(package)[:-1]
         for rule_type, rules in self.rules.iteritems():
@@ -297,3 +262,17 @@ class CMAR(AbsClassifer):
                 print rst, package.app
                 print '=' * 10
         return labelRsts
+
+
+def load_agent():
+    import re
+    rules = defaultdict(set)
+    QUERY = consts.SQL_SELECT_AGENT_RULES
+    sqldao = SqlDao()
+    counter = 0
+    for host, agentF, label, ruleType in sqldao.execute(QUERY):
+        counter += 1
+        rules[label].add(re.compile(agentF))
+    print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
+    sqldao.close()
+    return rules

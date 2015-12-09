@@ -119,32 +119,25 @@ class AgentClassifier(AbsClassifer):
         QUERY = consts.SQL_INSERT_AGENT_RULES
         params = []
 
-        for regexStr, app in appRule.iteritems():
+        for regexStr, apps in appRule.iteritems():
             regexStr = regexStr.replace(re.escape(consts.VERSION), r'\b[a-z0-9-.]+\b')
-            params.append((app, 1, 1, regexStr, '', consts.APP_RULE))
+            for app in apps:
+                params.append((app, 1, 1, regexStr, '', consts.APP_RULE))
 
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
 
     @staticmethod
-    def _company(patterns):
-        companyRule = {}
-        for fRegex, apps in patterns.iteritems():
-            if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCompany) == 1:
-                companyRule[fRegex] = list(fRegex.matchCompany)[0]
-        return companyRule
-
-    @staticmethod
-    def _app(identifierApps, extractors):
+    def _app(identifierApps, extractors, appInfos):
         appRules = {}
         hostAgentRule = {}
 
         check = set()
         for _, extractor in extractors:
             for identifier, apps in extractor.matched.items():
-                if len(apps) == 1:
-                    app = list(apps)[0]
-                    appRules[extractor.gen(identifier, app)] = app
+                categories = {appInfos[app].category for app in apps}
+                if len(categories) == 1:
+                    appRules[extractor.gen(identifier, app)] = apps
                     if len(identifierApps[identifier]) > 1:
                         check.add(identifier)
 
@@ -225,8 +218,11 @@ class AgentClassifier(AbsClassifer):
 
     def train(self, trainSet, ruleType):
         agentTuples = defaultdict(set)
+        appInfos = {}
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             agentTuples[tbl].add((pkg.app, process_agent(pkg.agent, pkg.app)))
+            appInfos[pkg.app] = pkg.appInfo
+
 
         '''
         Compose regular expression
@@ -248,7 +244,7 @@ class AgentClassifier(AbsClassifer):
         print "Finish Counter"
 
         # identifierApps, extractors = self._prune(regexApp)
-        appRule, hostAgent = self._app(identifierApps, extractors)
+        appRule, hostAgent = self._app(identifierApps, extractors, appInfos)
 
 
         print "Finish Pruning"
