@@ -48,6 +48,7 @@ HEAD_CLASSIFIER = "Header Rule"
 KV_CLASSIFIER = "KV Rule"
 URI_CLASSIFIER = "URI Rule"
 AGENT_CLASSIFIER = "Agent Rule"
+CMAR_CLASSIFIER = 'CMAR Rule'
 
 #############EVALUATIONS###############
 DISCOVERED_APP = 'discoveried_app'
@@ -59,3 +60,6 @@ F1SCORE = 'f1'
 RESULT = 'rst'
 IDENTIFIER = '[IDENTIFIER]'
 VERSION = '[VERSION]'
+
+
+

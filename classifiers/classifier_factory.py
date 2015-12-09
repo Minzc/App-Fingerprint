@@ -3,6 +3,7 @@ from classifiers.algo import KVClassifier
 from classifiers.head import HeaderClassifier
 import const.consts as consts
 from classifiers.uri import UriClassifier
+from classifiers.fp import CMAR
 
 
 def classifier_factory(names, appType):
@@ -16,5 +17,7 @@ def classifier_factory(names, appType):
             classifier = UriClassifier(appType)
         elif name == consts.KV_CLASSIFIER:
             classifier = KVClassifier(appType, inferFrmData=True, sampleRate=1)
+        elif name == consts.CMAR_CLASSIFIER:
+            classifier = CMAR()
         classifiers.append((name, classifier))
     return classifiers

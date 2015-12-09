@@ -137,7 +137,8 @@ class AgentClassifier(AbsClassifer):
             for identifier, apps in extractor.matched.items():
                 categories = {appInfos[app].category for app in apps}
                 if len(categories) == 1:
-                    appRules[extractor.gen(identifier, app)] = apps
+                    for app in apps:
+                        appRules[extractor.gen(identifier, app)] = apps
                     if len(identifierApps[identifier]) > 1:
                         check.add(identifier)
 

@@ -13,50 +13,51 @@ DEBUG_ITEM = 'Mrd/1.2.1 (Linux; U; Android 5.0.2; google Nexus 7) com.crossfield
 
 Rule = namedtuple('Rule', 'rule, label, host, confidence, support')
 
+HOST = '[HOST]:'
+AGENT = '[AGENT]:'
+
 
 class AgentEncoder:
     def __init__(self):
         self.rules = load_agent()
+
     def get_feature(self, package):
         app = package.app
         agent = package.agent
         for regex in self.rules[app]:
             if regex.search(agent):
-                return [regex.pattern, package.host]
+                return [AGENT + regex.pattern, HOST + package.host]
         return []
 
-def _get_package_f(package):
-    """Get package features"""
-    features = filter(None, map(lambda x: x.strip(), package.path.split('/')))
-    if package.json: features += package.json
-    # features.append(package.agent)
-    host = package.host if package.host else package.dst
-    features.append(host)
-
-    return features
+    def change2Rule(self, strList):
+        agent = None
+        host = None
+        for str in strList:
+            if HOST in str:
+                host = str.replace(HOST, '')
+            if AGENT in str:
+                agent = str.replace(AGENT, '')
+        return (agent, host)
 
 
 test_str = 'com.fdgentertainment.bananakong/1.8.1 (Linux; U; Android 5.0.2; en_US; razor) Apache-HttpClient/UNAVAILABLE (java 1.4)'.lower()
 
 
-def _encode_data(encoders, packages=None, minimum_support=2):
+def _encode_data(encoders, packages=None):
     """Change package to transaction"""
     transactions = []
 
     for package in packages:
         for encoder in encoders:
-            transaction = encoder(package)
+            transaction = encoder.get_feature(package)
             if transaction:
                 transaction.append(package.label)
                 transactions.append(transaction)
-            # transaction.append(package.tbl)
-
-        # Last item is table name
-        # Second from last is app
-        # Third from last is host.
-        # Do not use them as feature
+                # Last item is table name
+                # Second from last is app
+                # Third from last is host.
+                # Do not use them as feature
     return transactions
-
 
 
 def _gen_rules(transactions, tSupport, tConfidence):
@@ -113,48 +114,6 @@ def _remove_duplicate(rawRules):
     return prunedRules
 
 
-def _prune_rules(tRules, trainData, min_cover=3):
-    '''
-  Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
-  Input packages: list of packets
-  Return
-  - specificRules host -> ruleStrSet -> label -> {consts.SUPPORT, consts.SCORE}
-  defaultdict(lambda : defaultdict(lambda : defaultdict(lambda : { consts.SCORE: 0, consts.SUPPORT: 0 })))
-
-  '''
-    import datetime
-    ts = datetime.datetime.now()
-    cover_num = defaultdict(int)
-    tblSupport = defaultdict(set)
-    for tbl, packages in trainData.iteritems():
-        packageInfos = defaultdict(set)
-        for package in packages:
-            featuresNhost = _get_package_f(package)
-            features = frozenset(featuresNhost[:-1])
-            host = featuresNhost[-1]
-            packageInfos[package.label].add((features, host))
-        print 'Len of Rules is', len(tRules)
-        for rule, confidence, support, classlabel in tRules:
-            for packageInfo in packageInfos[classlabel]:
-                features, host = packageInfo
-                if rule.issubset(features):
-                    tblSupport[rule].add(tbl)
-
-    tRules = sorted(tRules, key=lambda x: len(tblSupport[x]), reverse=True)
-    specificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: {consts.SCORE: 0, consts.SUPPORT: 0})))
-    for rule in tRules:
-        ruleStrSet, confidence, support, classlabel = rule
-        for packageInfo in packageInfos[classlabel]:
-            package, info = packageInfo
-            host = info
-            if cover_num[package] <= min_cover and ruleStrSet.issubset(package) and len(tblSupport[ruleStrSet]) > 1:
-                cover_num[package] += 1
-                specificRules[host][ruleStrSet][classlabel][consts.SCORE] = confidence
-                specificRules[host][ruleStrSet][classlabel][consts.SUPPORT] = len(tblSupport[ruleStrSet])
-    print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
-    return specificRules
-
-
 class CMAR(AbsClassifer):
     def __init__(self, min_cover=3, tSupport=2, tConfidence=1.0):
         # feature, app, host
@@ -163,7 +122,6 @@ class CMAR(AbsClassifer):
         self.tSupport = tSupport
         self.tConfidence = tConfidence
         self.get_feature = [AgentEncoder()]
-
 
     def _persist(self, rules):
         '''specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support'''
@@ -191,7 +149,7 @@ class CMAR(AbsClassifer):
         ''' Prune duplicated rules'''
         # rules = _remove_duplicate(rules)
         ''' feature, app, host '''
-        specificRules = _prune_rules(rules, trainData, self.min_cover)
+        specificRules = self._prune_rules(rules, trainData, self.min_cover)
         ''' change encoded features back to string '''
 
         self.rules[rule_type] = specificRules
@@ -246,22 +204,68 @@ class CMAR(AbsClassifer):
         Return {type:[(label, confidence)]}
         '''
         labelRsts = {}
-        features = _get_package_f(package)[:-1]
-        for rule_type, rules in self.rules.iteritems():
-            rst = consts.NULLPrediction
-            max_confidence = 0
-            if package.host in rules.keys():
-                for rule, label_confidence in rules[package.host].iteritems():
-                    label, confidence = label_confidence
-                    if rule.issubset(features):  # and confidence > max_confidence:
-                        max_confidence = confidence
-                        rst = consts.Prediction(label, confidence, rule)
+        for encoder in self.get_feature:
+            features = encoder.get_feature(package)
+            for rule_type, rules in self.rules.iteritems():
+                rst = consts.NULLPrediction
+                max_confidence = 0
+                if package.host in rules.keys():
+                    for rule, label_confidence in rules[package.host].iteritems():
+                        label, confidence = label_confidence
+                        if rule.issubset(features):  # and confidence > max_confidence:
+                            max_confidence = confidence
+                            rst = consts.Prediction(label, confidence, rule)
 
-            labelRsts[rule_type] = rst
-            if rule_type == consts.APP_RULE and rst != consts.NULLPrediction and rst.label != package.app:
-                print rst, package.app
-                print '=' * 10
+                labelRsts[rule_type] = rst
+                if rule_type == consts.APP_RULE and rst != consts.NULLPrediction and rst.label != package.app:
+                    print rst, package.app
+                    print '=' * 10
         return labelRsts
+
+    def _prune_rules(self, tRules, trainData, min_cover=3):
+        '''
+        Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
+        Input packages: list of packets
+        Return
+        - specificRules host -> ruleStrSet -> label -> {consts.SUPPORT, consts.SCORE}
+        defaultdict(lambda : defaultdict(lambda : defaultdict(lambda : { consts.SCORE: 0, consts.SUPPORT: 0 })))
+
+        '''
+        import datetime
+        ts = datetime.datetime.now()
+        cover_num = defaultdict(int)
+        tblSupport = defaultdict(set)
+        packageInfos = defaultdict(set)
+        for tbl, packages in trainData.iteritems():
+            for package in packages:
+                for encoder in self.get_feature:
+                    featuresNhost = encoder.get_feature(package)
+                    if len(featuresNhost) > 0:
+                        features = frozenset(featuresNhost)
+                        packageInfos[package.label].add((features, tbl))
+        print 'Len of Rules is', len(tRules)
+        for rule, confidence, support, classlabel in tRules:
+            for packageInfo in packageInfos[classlabel]:
+                features, tbl = packageInfo
+                if rule.issubset(features):
+                    tblSupport[rule].add(tbl)
+
+        tRules = sorted(tRules, key=lambda x: len(tblSupport[x]), reverse=True)
+        agentRules = defaultdict(lambda: defaultdict())
+        for rule in tRules:
+            ruleStrSet, confidence, support, classlabel = rule
+            for packageInfo in packageInfos[classlabel]:
+                package, tbl = packageInfo
+                if cover_num[package] <= min_cover and ruleStrSet.issubset(package) and len(tblSupport[ruleStrSet]) > 1:
+                    cover_num[package] += 1
+                    for encoder in self.get_feature:
+                        agent, host = encoder.get_feature(package)
+                        if host is None: host = ''
+                        if agent is not None:
+                            agentRules[agent][host] = classlabel
+
+        print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
+        return agentRules
 
 
 def load_agent():
@@ -273,6 +277,6 @@ def load_agent():
     for host, agentF, label, ruleType in sqldao.execute(QUERY):
         counter += 1
         rules[label].add(re.compile(agentF))
-    print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
+    print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(rules)
     sqldao.close()
     return rules
