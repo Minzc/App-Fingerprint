@@ -1,50 +1,28 @@
 import sys
 from classifier import AbsClassifer
 import operator
+
+from features.agent import AgentEncoder
 from sqldao import SqlDao
 from fp_growth import find_frequent_itemsets
-from utils import rever_map
-from itertools import imap
 from collections import defaultdict, namedtuple
 import const.consts as consts
 
 DEBUG_INDEX = None
 DEBUG_ITEM = 'Mrd/1.2.1 (Linux; U; Android 5.0.2; google Nexus 7) com.crossfield.casinogame_bingo/20'.lower()
 
-Rule = namedtuple('Rule', 'rule, label, host, confidence, support')
-
-HOST = '[HOST]:'
-AGENT = '[AGENT]:'
-
-
-class AgentEncoder:
-    def __init__(self):
-        self.rules = load_agent()
-
-    def get_feature(self, package):
-        app = package.app
-        agent = package.agent
-        for regex in self.rules[app]:
-            if regex.search(agent):
-                return [AGENT + regex.pattern, HOST + package.host]
-        return []
-
-    def change2Rule(self, strList):
-        agent = None
-        host = None
-        for str in strList:
-            if HOST in str:
-                host = str.replace(HOST, '')
-            if AGENT in str:
-                agent = str.replace(AGENT, '')
-        return (agent, host)
-
-
+FinalRule = namedtuple('Rule', 'agent, path, host, label, confidence, support')
 test_str = 'com.fdgentertainment.bananakong/1.8.1 (Linux; U; Android 5.0.2; en_US; razor) Apache-HttpClient/UNAVAILABLE (java 1.4)'.lower()
 
 
 def _encode_data(encoders, packages=None):
-    """Change package to transaction"""
+    """
+    Change package to transaction
+    Last item is table name
+    Second from last is app
+    Third from last is host.
+    Do not use them as feature
+    """
     transactions = []
 
     for package in packages:
@@ -53,10 +31,7 @@ def _encode_data(encoders, packages=None):
             if transaction:
                 transaction.append(package.label)
                 transactions.append(transaction)
-                # Last item is table name
-                # Second from last is app
-                # Third from last is host.
-                # Do not use them as feature
+
     return transactions
 
 
@@ -71,9 +46,6 @@ def _gen_rules(transactions, tSupport, tConfidence):
     - appIndex     : a map between number and app
     Return : (itemsets, confidencet, support, label)
     '''
-    ###########################
-    # FP-tree Version
-    ###########################
     rules = set()
     frequentPatterns = find_frequent_itemsets(transactions, tSupport, True)
     for frequent_pattern_info in frequentPatterns:
@@ -88,32 +60,6 @@ def _gen_rules(transactions, tSupport, tConfidence):
     return rules
 
 
-def _remove_duplicate(rawRules):
-    '''
-  Input
-  - rawRules : [(ruleStrSet, confidence, support, label), ...]
-  '''
-    rules = defaultdict(list)
-    for rule in rawRules:
-        rules[rule[3]].append(rule)
-    prunedRules = []
-    print 'Total number of rules', len(rawRules)
-    for label in rules:
-        '''From large to small set'''
-        sortedRules = sorted(rules[label], key=lambda x: len(x[0]), reverse=True)
-        root = {}
-        for i in range(len(sortedRules)):
-            ifKeep = True
-            iStrSet = sortedRules[0]
-            for j in range(i + 1, len(sortedRules)):
-                jStrSet = sortedRules[j][0]
-                if jStrSet.issubset(iStrSet):
-                    ifKeep = False
-            if ifKeep:
-                prunedRules.append(sortedRules[i])
-    return prunedRules
-
-
 class CMAR(AbsClassifer):
     def __init__(self, min_cover=3, tSupport=2, tConfidence=1.0):
         # feature, app, host
@@ -123,20 +69,22 @@ class CMAR(AbsClassifer):
         self.tConfidence = tConfidence
         self.get_feature = [AgentEncoder()]
 
-    def _persist(self, rules):
+    def pkg2features(self, package):
+        features = {}
+        for encoder in self.get_feature:
+            tmp = encoder.get_feature(package)
+            features |= set(tmp)
+        return frozenset(features)
+
+    def _persist(self, agentRules):
         '''specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support'''
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_CMAR_RULES
-        params = []
-        for ruleType in rules:
-            for host in rules[ruleType]:
-                for ruleStrSet in rules[ruleType][host]:
-                    for label, scores in rules[ruleType][host][ruleStrSet].items():
-                        confidence, support = scores[consts.SCORE], scores[consts.SUPPORT]
-                        params.append((label, ','.join(ruleStrSet), confidence, support, host, ruleType))
-            sqldao.executeBatch(QUERY, params)
-            sqldao.close()
-            print "Total Number of Rules is", len(rules)
+        params = self.get_feature[0].changeRule2Para(agentRules)
+
+        sqldao.executeBatch(QUERY, params)
+        sqldao.close()
+        print "Total Number of Rules is", len(params)
 
     def train(self, trainData, rule_type):
         packages = []
@@ -149,11 +97,9 @@ class CMAR(AbsClassifer):
         ''' Prune duplicated rules'''
         # rules = _remove_duplicate(rules)
         ''' feature, app, host '''
-        specificRules = self._prune_rules(rules, trainData, self.min_cover)
+        rules = self._prune_rules(rules, trainData, self.min_cover)
         ''' change encoded features back to string '''
-
-        self.rules[rule_type] = specificRules
-        self._persist(self.rules)
+        self._persist(rules)
         self.__init__()
         return self
 
@@ -165,10 +111,20 @@ class CMAR(AbsClassifer):
         sqldao = SqlDao()
         counter = 0
         SQL = consts.SQL_SELECT_CMAR_RULES
-        for label, patterns, host, ruleType, support in sqldao.execute(SQL):
+        for label, patterns, agent, host, ruleType, support in sqldao.execute(SQL):
             counter += 1
-            patterns = frozenset(map(lambda x: x.strip(), patterns.split(",")))
-            self.rules[ruleType][host][patterns] = (label, support)
+            rule = []
+            if patterns is not None:
+                rule.append(patterns)
+            if agent is not None:
+                rule.append(agent)
+            if host is not None:
+                rule.append(host)
+            rule = frozenset(rule)
+            if host is not None:
+                self.rules[ruleType][host][rule] = (label, support)
+            else:
+                self.rules[ruleType][''][rule] = (label, support)
         sqldao.close()
         print '>>>[CMAR] Totaly number of rules is', counter
         for ruleType in self.rules:
@@ -180,46 +136,26 @@ class CMAR(AbsClassifer):
         sqldao.commit()
         sqldao.close()
 
-    def _count(self, specificRules, trainData):
-        '''
-        Input
-        - rules
-            specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support
-        Return {type:[(label, confidence)]}
-        '''
-        labelRsts = {}
-        for tbl, packages in trainData.iteritems():
-            for package in packages:
-                if package.host not in self.specificRules:
-                    continue
-                rules = self.specificRules[package.host]
-                features = _get_package_f(package)[:-1]
-                for rule in rules:
-                    if rule.issubset(features):
-                        rule[package.app][consts.SUPPORT].add(tbl)
-        return specificRules
-
     def classify(self, package):
         '''
         Return {type:[(label, confidence)]}
         '''
         labelRsts = {}
-        for encoder in self.get_feature:
-            features = encoder.get_feature(package)
-            for rule_type, rules in self.rules.iteritems():
-                rst = consts.NULLPrediction
-                max_confidence = 0
-                if package.host in rules.keys():
-                    for rule, label_confidence in rules[package.host].iteritems():
-                        label, confidence = label_confidence
-                        if rule.issubset(features):  # and confidence > max_confidence:
-                            max_confidence = confidence
-                            rst = consts.Prediction(label, confidence, rule)
+        features = self.pkg2features(package)
+        for rule_type, rules in self.rules.iteritems():
+            rst = consts.NULLPrediction
+            max_confidence = 0
+            for host in [package.host, '']:
+                for rule, label_confidence in rules[host].iteritems():
+                    label, confidence = label_confidence
+                    if rule.issubset(features) and confidence > max_confidence:  # and confidence > max_confidence:
+                        max_confidence = confidence
+                        rst = consts.Prediction(label, confidence, rule)
 
-                labelRsts[rule_type] = rst
-                if rule_type == consts.APP_RULE and rst != consts.NULLPrediction and rst.label != package.app:
-                    print rst, package.app
-                    print '=' * 10
+            labelRsts[rule_type] = rst
+            if rule_type == consts.APP_RULE and rst != consts.NULLPrediction and rst.label != package.app:
+                print rst, package.app
+                print '=' * 10
         return labelRsts
 
     def _prune_rules(self, tRules, trainData, min_cover=3):
@@ -229,7 +165,6 @@ class CMAR(AbsClassifer):
         Return
         - specificRules host -> ruleStrSet -> label -> {consts.SUPPORT, consts.SCORE}
         defaultdict(lambda : defaultdict(lambda : defaultdict(lambda : { consts.SCORE: 0, consts.SUPPORT: 0 })))
-
         '''
         import datetime
         ts = datetime.datetime.now()
@@ -251,7 +186,7 @@ class CMAR(AbsClassifer):
                     tblSupport[rule].add(tbl)
 
         tRules = sorted(tRules, key=lambda x: len(tblSupport[x]), reverse=True)
-        agentRules = defaultdict(lambda: defaultdict())
+        agentRules = []
         for rule in tRules:
             ruleStrSet, confidence, support, classlabel = rule
             for packageInfo in packageInfos[classlabel]:
@@ -261,22 +196,34 @@ class CMAR(AbsClassifer):
                     for encoder in self.get_feature:
                         agent, host = encoder.get_feature(package)
                         if host is None: host = ''
-                        if agent is not None:
-                            agentRules[agent][host] = classlabel
+                        r = FinalRule(agent, None, host, classlabel, confidence, support)
+                        agentRules.append(r)
 
         print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
         return agentRules
 
 
-def load_agent():
-    import re
-    rules = defaultdict(set)
-    QUERY = consts.SQL_SELECT_AGENT_RULES
-    sqldao = SqlDao()
-    counter = 0
-    for host, agentF, label, ruleType in sqldao.execute(QUERY):
-        counter += 1
-        rules[label].add(re.compile(agentF))
-    print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(rules)
-    sqldao.close()
-    return rules
+#def _remove_duplicate(rawRules):
+#     '''
+#   Input
+#   - rawRules : [(ruleStrSet, confidence, support, label), ...]
+#   '''
+#     rules = defaultdict(list)
+#     for rule in rawRules:
+#         rules[rule[3]].append(rule)
+#     prunedRules = []
+#     print 'Total number of rules', len(rawRules)
+#     for label in rules:
+#         '''From large to small set'''
+#         sortedRules = sorted(rules[label], key=lambda x: len(x[0]), reverse=True)
+#         root = {}
+#         for i in range(len(sortedRules)):
+#             ifKeep = True
+#             iStrSet = sortedRules[0]
+#             for j in range(i + 1, len(sortedRules)):
+#                 jStrSet = sortedRules[j][0]
+#                 if jStrSet.issubset(iStrSet):
+#                     ifKeep = False
+#             if ifKeep:
+#                 prunedRules.append(sortedRules[i])
+#     return prunedRules
