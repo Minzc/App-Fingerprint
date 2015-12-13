@@ -28,8 +28,8 @@ class AgentEncoder:
         agent = package.agent
         for regex in self.rules[app]:
             if regex.search(agent):
-                return {AGENT + regex.pattern, HOST + package.host}
-        return set()
+                return [AGENT + regex.pattern, HOST + package.host]
+        return []
 
     def change2Rule(self, strList):
         agent = None
