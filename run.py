@@ -21,9 +21,10 @@ VALID_LABEL = {
 
 USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
-    consts.AGENT_CLASSIFIER,
+    #consts.AGENT_CLASSIFIER,
     #consts.KV_CLASSIFIER,
     #consts.URI_CLASSIFIER,
+    consts.CMAR_CLASSIFIER,
 ]
 
 class PredictRst:
