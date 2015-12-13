@@ -98,7 +98,7 @@ class CMAR(AbsClassifer):
         ''' Prune duplicated rules'''
         # rules = _remove_duplicate(rules)
         ''' feature, app, host '''
-        rules = self._prune_rules(rules, trainData, self.min_cover)
+        rules = self._prune_rules(rules, trainSet, self.min_cover)
         ''' change encoded features back to string '''
         self._persist(rules)
         self.__init__()
