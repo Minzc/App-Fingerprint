@@ -136,7 +136,7 @@ class CMAR(AbsClassifer):
         sqldao.commit()
         sqldao.close()
 
-    def classify(self, package):
+    def c(self, package):
         '''
         Return {type:[(label, confidence)]}
         '''
