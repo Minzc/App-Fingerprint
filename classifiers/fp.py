@@ -194,7 +194,7 @@ class CMAR(AbsClassifer):
                 if cover_num[package] <= min_cover and ruleStrSet.issubset(package) and len(tblSupport[ruleStrSet]) > 1:
                     cover_num[package] += 1
                     for encoder in self.get_feature:
-                        agent, host = encoder.get_feature(package)
+                        agent, host = encoder.change2Rule(ruleStrSet)
                         if host is None: host = ''
                         r = FinalRule(agent, None, host, classlabel, confidence, support)
                         agentRules.append(r)
