@@ -2,6 +2,7 @@ import sys
 from classifier import AbsClassifer
 import operator
 
+from const.dataset import DataSetIter
 from features.agent import AgentEncoder
 from sqldao import SqlDao
 from fp_growth import find_frequent_itemsets
@@ -86,10 +87,10 @@ class CMAR(AbsClassifer):
         sqldao.close()
         print "Total Number of Rules is", len(params)
 
-    def train(self, trainData, rule_type):
+    def train(self, trainSet, rule_type):
         packages = []
-        for tblPackages in trainData.values():
-            packages += tblPackages
+        for tbl, pkg in DataSetIter.iter_pkg(trainSet):
+            packages.append(pkg)
         print "#CMAR:", len(packages)
         encodedpackages = _encode_data(self.get_feature, packages)
         ''' Rules format : (feature, confidence, support, label) '''
@@ -158,7 +159,7 @@ class CMAR(AbsClassifer):
                 print '=' * 10
         return labelRsts
 
-    def _prune_rules(self, tRules, trainData, min_cover=3):
+    def _prune_rules(self, tRules, trainSet, min_cover=3):
         '''
         Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
         Input packages: list of packets
@@ -171,13 +172,12 @@ class CMAR(AbsClassifer):
         cover_num = defaultdict(int)
         tblSupport = defaultdict(set)
         packageInfos = defaultdict(set)
-        for tbl, packages in trainData.iteritems():
-            for package in packages:
-                for encoder in self.get_feature:
-                    featuresNhost = encoder.get_feature(package)
-                    if len(featuresNhost) > 0:
-                        features = frozenset(featuresNhost)
-                        packageInfos[package.label].add((features, tbl))
+        for tbl, pkg in DataSetIter.iter_pkg(trainSet):
+            for encoder in self.get_feature:
+                featuresNhost = encoder.get_feature(pkg)
+                if len(featuresNhost) > 0:
+                    features = frozenset(featuresNhost)
+                    packageInfos[pkg.label].add((features, tbl))
         print 'Len of Rules is', len(tRules)
         for rule, confidence, support, classlabel in tRules:
             for packageInfo in packageInfos[classlabel]:
