@@ -11,7 +11,7 @@ from classifiers.classifier_factory import classifier_factory
 LIMIT = None
 INSERT = False
 PRUNE = False
-SAMPLERATE = 0.5
+SAMPLERATE = 1
 
 VALID_LABEL = {
     consts.APP_RULE,

@@ -71,7 +71,7 @@ class CMAR(AbsClassifer):
         self.get_feature = [AgentEncoder()]
 
     def pkg2features(self, package):
-        features = {}
+        features = set()
         for encoder in self.get_feature:
             tmp = encoder.get_feature(package)
             features |= set(tmp)
