@@ -142,12 +142,15 @@ class CMAR(AbsClassifer):
         '''
         labelRsts = {}
         features = self.pkg2features(package)
+        if len(features) > 0:
+            print '[package]', features
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
             max_confidence = 0
             for host in [package.host, '']:
                 for rule, label_confidence in rules[host].iteritems():
-                    print '[rule]:', rule, '[package]', features
+                    if len(features) > 0:
+                        print '[rule]:', rule, '[package]', features
                     label, confidence = label_confidence
                     if rule.issubset(features) and confidence > max_confidence:  # and confidence > max_confidence:
                         max_confidence = confidence
@@ -195,7 +198,6 @@ class CMAR(AbsClassifer):
                     cover_num[package] += 1
                     for encoder in self.get_feature:
                         agent, host = encoder.change2Rule(ruleStrSet)
-                        if host is None: host = ''
                         r = FinalRule(agent, None, host, classlabel, confidence, support)
                         agentRules.append(r)
 

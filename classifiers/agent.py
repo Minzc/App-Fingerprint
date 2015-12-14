@@ -122,7 +122,7 @@ class AgentClassifier(AbsClassifer):
         for regexStr, apps in appRule.iteritems():
             regexStr = regexStr.replace(re.escape(consts.VERSION), r'\b[a-z0-9-.]+\b')
             for app in apps:
-                params.append((app, 1, 1, regexStr, '', consts.APP_RULE))
+                params.append((app, 1, 1, regexStr, None, consts.APP_RULE))
 
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
