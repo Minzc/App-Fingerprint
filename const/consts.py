@@ -30,7 +30,7 @@ SQL_INSERT_HOST_RULES = 'INSERT INTO patterns (label, support, confidence, host,
 SQL_DELETE_HOST_RULES = 'DELETE FROM patterns WHERE paramkey IS NULL and pattens IS NULL and agent IS NULL and rule_type=%s'
 SQL_SELECT_HOST_RULES = 'SELECT host, label, rule_type, support FROM patterns WHERE paramkey is NULL and pattens is NULL and agent IS NULL'
 
-SQL_INSERT_CMAR_RULES = 'INSERT INTO patterns (label, patterns, agent, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+SQL_INSERT_CMAR_RULES = 'INSERT INTO patterns (label, pattens, agent, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s, %s)'
 SQL_DELETE_CMAR_RULES = 'DELETE FROM patterns WHERE pattens IS NOT NULL and rule_type = %s'
 SQL_SELECT_CMAR_RULES = 'SELECT label, pattens, agent, host, rule_type, support FROM patterns where paramkey is NULL'
 
