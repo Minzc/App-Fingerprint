@@ -147,6 +147,7 @@ class CMAR(AbsClassifer):
             max_confidence = 0
             for host in [package.host, '']:
                 for rule, label_confidence in rules[host].iteritems():
+                    print '[rule]:', rule, '[package]', features
                     label, confidence = label_confidence
                     if rule.issubset(features) and confidence > max_confidence:  # and confidence > max_confidence:
                         max_confidence = confidence
