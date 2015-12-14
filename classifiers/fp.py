@@ -73,7 +73,7 @@ class CMAR(AbsClassifer):
     def pkg2features(self, package):
         features = set()
         for encoder in self.get_feature:
-            tmp = encoder.get_feature(package)
+            tmp = encoder.get_feature(package, prefix=False)
             features |= set(tmp)
         return frozenset(features)
 
