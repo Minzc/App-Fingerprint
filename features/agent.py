@@ -23,12 +23,15 @@ class AgentEncoder:
         sqldao.close()
         return rules
 
-    def get_feature(self, package):
+    def get_feature(self, package, prefix=True):
         app = package.app
         agent = package.agent
         for regex in self.rules[app]:
             if regex.search(agent):
-                return [AGENT + regex.pattern, HOST + package.host]
+                if prefix:
+                    return [AGENT + regex.pattern, HOST + package.host]
+                else:
+                    return [regex.pattern, package.host]
         return []
 
     def change2Rule(self, strList):
