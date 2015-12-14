@@ -15,7 +15,6 @@ DEBUG_ITEM = 'Mrd/1.2.1 (Linux; U; Android 5.0.2; google Nexus 7) com.crossfield
 FinalRule = namedtuple('Rule', 'agent, path, host, label, confidence, support')
 test_str = 'com.fdgentertainment.bananakong/1.8.1 (Linux; U; Android 5.0.2; en_US; razor) Apache-HttpClient/UNAVAILABLE (java 1.4)'.lower()
 
-
 def _encode_data(encoders, packages=None):
     """
     Change package to transaction
@@ -149,8 +148,6 @@ class CMAR(AbsClassifer):
             max_confidence = 0
             for host in [package.host, '']:
                 for rule, label_confidence in rules[host].iteritems():
-                    if len(features) > 0:
-                        print '[rule]:', rule, '[package]', features
                     label, confidence = label_confidence
                     if rule.issubset(features) and confidence > max_confidence:  # and confidence > max_confidence:
                         max_confidence = confidence
