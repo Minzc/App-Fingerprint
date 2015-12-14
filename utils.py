@@ -453,7 +453,7 @@ def process_agent( agent, app):
     agent = re.sub(r'[a-z]?[0-9]+-[a-z]?[0-9]+-[a-z]?[0-9]+', r'[VERSION]', agent)
     agent = re.sub(r'(/)([0-9]+)([ ;])', r'\1[VERSION]\3', agent)
     agent = re.sub(r'/[0-9][.0-9]+', r'/[VERSION]', agent)
-    agent = re.sub(r'([ :])([0-9][.0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
-    agent = re.sub(r'([ :])([0-9][_0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
+    agent = re.sub(r'([ :v])([0-9][.0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
+    agent = re.sub(r'([ :v])([0-9][_0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
     agent = re.sub(r'(^[0-9a-z]*)(.'+app+r'$)', r'[RANDOM]\2', agent)
     return agent

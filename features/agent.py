@@ -45,7 +45,6 @@ class AgentEncoder:
         return (agent, host)
 
     def changeRule2Para(self, agentRules):
-        # agentRules[agent][host] = classlabel
         params = []
         for rule in agentRules:
             agent, path, host, classlabel, confidence, support = rule

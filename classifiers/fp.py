@@ -141,8 +141,6 @@ class CMAR(AbsClassifer):
         '''
         labelRsts = {}
         features = self.pkg2features(package)
-        if len(features) > 0:
-            print '[package]', features
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
             max_confidence = 0
