@@ -82,8 +82,6 @@ class CMAR(AbsClassifer):
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_CMAR_RULES
         params = self.get_feature[0].changeRule2Para(agentRules)
-
-
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
         print "Total Number of Rules is", len(params)

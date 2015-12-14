@@ -47,6 +47,6 @@ class AgentEncoder:
 
         for rule in agentRules:
             agent, path, host, classlabel, confidence, support = rule
-            print rule
-            params.append((classlabel, None, agent, confidence, support, host, consts.APP_RULE))
+            print (classlabel, path, agent, confidence, support, host, consts.APP_RULE)
+            params.append((classlabel, path, agent, confidence, support, host, consts.APP_RULE))
         return params
