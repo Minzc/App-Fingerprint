@@ -122,11 +122,11 @@ class CMAR(AbsClassifer):
 
         return transactions
 
-    def _persist(self, agentRules):
+    def _persist(self, rules):
         '''specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support'''
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_CMAR_RULES
-        params = self.encoder[0].changeRule2Para(agentRules)
+        params = self.encoder.changeRule2Para(rules)
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
         print "Total Number of Rules is", len(params)
