@@ -262,7 +262,7 @@ class AgentClassifier(AbsClassifer):
         counter = 0
         for host, agentF, label, ruleType in sqldao.execute(QUERY):
             counter += 1
-            if host == '':
+            if host is None:
                 self.rules[ruleType][agentF] = (re.compile(agentF), label)
             else:
                 self.rulesHost[ruleType][host][agentF] = (re.compile(agentF), label)
@@ -293,17 +293,13 @@ class AgentClassifier(AbsClassifer):
         return batchPredicts
 
     def c(self, pkgInfo):
-        print 'start'
         agent, host = pkgInfo
         rst = {}
         for ruleType in self.rules:
             longestWord = ''
             rstLabel = None
             for agentF, regxNlabel in self.rules[ruleType].items():
-                print agentF, agent, regex.search(agent)
                 regex, label = regxNlabel
-                if 'ondemandworld' in agentF and 'ondemandworld' in agent:
-                    print agentF, agent, regex.search(agent)
                 if regex.search(agent) and len(longestWord) < len(agentF):
                     rstLabel = label
                     longestWord = agentF

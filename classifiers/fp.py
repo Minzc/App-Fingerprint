@@ -178,7 +178,7 @@ class CMAR(AbsClassifer):
         '''
         import datetime
         ####################################
-        # Compress database
+        # Compress database and get table support
         ####################################
         ts = datetime.datetime.now()
         cover_num = defaultdict(int)
@@ -200,7 +200,10 @@ class CMAR(AbsClassifer):
         ####################################
         # Prune by data base coverage
         ####################################
-        tRules = sorted(tRules, key=lambda x: len(tblSupport[x]), reverse=True)
+        def rank(rule):
+            strSet, confidence, support, label = rule
+            return (confidence, len(tblSupport[rule]), len(strSet))
+        tRules = sorted(tRules, key=lambda x: rank(x), reverse=True)
         rules = []
         for rule in tRules:
             ruleStrSet, confidence, _, classlabel = rule
