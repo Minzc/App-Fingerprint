@@ -276,7 +276,6 @@ class AgentClassifier(AbsClassifer):
                 label, evidence = predict
                 wrapPredicts[ruleType] = consts.Prediction(label, 1.0, evidence) if label else consts.NULLPrediction
             return wrapPredicts
-        print 'Start'
         compressed = defaultdict(lambda: defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(testSet):
             compressed[pkg.agent][pkg.rawHost].add(pkg)
@@ -300,9 +299,9 @@ class AgentClassifier(AbsClassifer):
             longestWord = ''
             rstLabel = None
             for agentF, regxNlabel in self.rules[ruleType].items():
-                if agentF == 'com\.ondemandworld\.newyorktransportmap':
-                    print agent, regex.search(agent)
                 regex, label = regxNlabel
+                if 'ondemandworld' in agentF and 'ondemandworld' in agent:
+                    print agentF, agent, regex.search(agent)
                 if regex.search(agent) and len(longestWord) < len(agentF):
                     rstLabel = label
                     longestWord = agentF
