@@ -300,6 +300,8 @@ class AgentClassifier(AbsClassifer):
             longestWord = ''
             rstLabel = None
             for agentF, regxNlabel in self.rules[ruleType].items():
+                if agentF == 'com\.ondemandworld\.newyorktransportmap':
+                    print agent, regex.search(agent)
                 regex, label = regxNlabel
                 if regex.search(agent) and len(longestWord) < len(agentF):
                     rstLabel = label

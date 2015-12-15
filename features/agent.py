@@ -30,7 +30,7 @@ class AgentEncoder:
         pathSegs = package.path.split('/')
         host = package.host
         if prefix:
-            agent = AGENT + agent
+            if agent: agent = AGENT + agent
             pathSegs = map(lambda seg: PATH + seg, pathSegs)
             host = HOST + host
         return [agent] + pathSegs + [host]
