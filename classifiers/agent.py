@@ -293,12 +293,14 @@ class AgentClassifier(AbsClassifer):
         return batchPredicts
 
     def c(self, pkgInfo):
+        print 'start'
         agent, host = pkgInfo
         rst = {}
         for ruleType in self.rules:
             longestWord = ''
             rstLabel = None
             for agentF, regxNlabel in self.rules[ruleType].items():
+                print agentF, , agent, regex.search(agent)
                 regex, label = regxNlabel
                 if 'ondemandworld' in agentF and 'ondemandworld' in agent:
                     print agentF, agent, regex.search(agent)
