@@ -32,13 +32,6 @@ class Rule:
         agent = None
         pathSeg = None
         host = None
-        for str in self.itemSet:
-            if HOST in str:
-                host = str.replace(HOST, '')
-            if AGENT in str:
-                agent = str.replace(AGENT, '')
-            if PATH in str:
-                pathSeg = str.replace(PATH, '')
         return FinalRule(agent, pathSeg, host, self.label, self.confidence, self.support)
 
 
