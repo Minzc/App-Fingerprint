@@ -136,6 +136,8 @@ class AgentClassifier(AbsClassifer):
         for _, extractor in extractors:
             for identifier, apps in extractor.matched.items():
                 categories = {appInfos[app].category for app in apps}
+                # All rules related to the same category are considered as
+                # candidate features
                 if len(categories) == 1:
                     for app in apps:
                         appRules[extractor.gen(identifier, app)] = apps
