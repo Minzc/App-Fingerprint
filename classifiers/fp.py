@@ -252,7 +252,7 @@ class CMAR(AbsClassifer):
                         yield rule
 
         def rank(node, rule):
-            strSet, confidence, support, label = rule
+            strSet, confidence, support, label = rule.itemSet, rule.confidence, rule.support, rule.label
             if node.confidence > confidence:
                 return 1
             elif node.confidence == confidence and node.support > support:
@@ -282,10 +282,8 @@ class CMAR(AbsClassifer):
                     node.confidence = confidence
 
             if node.label is None:
-                print '[LABEL]', label
                 node.label = label
             else:
-                print label, strSet, '[LABEL]', node.label
                 assert node.label == label
 
         rules = [rule for rule in travers(root, [])]
