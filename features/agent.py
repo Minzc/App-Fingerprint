@@ -65,5 +65,6 @@ class AgentEncoder:
         params = []
         for rule in agentRules:
             agent, path, host, classlabel, confidence, support = rule
+            assert agent is not None and path is not None and host is not None
             params.append((classlabel, path, agent, confidence, support, host, consts.APP_RULE))
         return params
