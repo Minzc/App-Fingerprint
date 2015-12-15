@@ -1,38 +1,46 @@
 import sys
 from classifier import AbsClassifer
 import operator
-
 from const.dataset import DataSetIter
-from features.agent import AgentEncoder, AGENT, PATH
+from features.agent import AgentEncoder, AGENT, PATH, HOST
 from sqldao import SqlDao
 from fp_growth import find_frequent_itemsets
 from collections import defaultdict, namedtuple
 import const.consts as consts
 
-DEBUG_INDEX = None
-DEBUG_ITEM = 'Mrd/1.2.1 (Linux; U; Android 5.0.2; google Nexus 7) com.crossfield.casinogame_bingo/20'.lower()
 
 FinalRule = namedtuple('Rule', 'agent, path, host, label, confidence, support')
-test_str = 'com.fdgentertainment.bananakong/1.8.1 (Linux; U; Android 5.0.2; en_US; razor) Apache-HttpClient/UNAVAILABLE (java 1.4)'.lower()
 
-def _encode_data(encoders, packages=None):
-    """
-    Change package to transaction
-    Last item is table name
-    Second from last is app
-    Third from last is host.
-    Do not use them as feature
-    """
-    transactions = []
+# HOST = '[HOST]:'
+# AGENT = '[AGENT]:'
+# PATH = '[PATH]:'
 
-    for package in packages:
-        for encoder in encoders:
-            transaction = encoder.get_feature(package)
-            if transaction:
-                transaction.append(package.label)
-                transactions.append(transaction)
 
-    return transactions
+class Rule:
+    def __init__(self, itemLst, confidence, support, label):
+        self.itemLst = itemLst
+        self.confidence = confidence
+        self.support = support
+        self.label = label
+        self.tblSupport = set()
+        self.itemSet = frozenset(itemLst)
+
+    def add_tbl(self, tbl):
+        self.tblSupport.add(tbl)
+
+    def export(self):
+        agent = None
+        pathSeg = None
+        host = None
+        for str in self.itemSet:
+            if HOST in str:
+                host = str.replace(HOST, '')
+            if AGENT in str:
+                agent = str.replace(AGENT, '')
+            if PATH in str:
+                pathSeg = str.replace(PATH, '')
+        return FinalRule(agent, pathSeg, host, self.label, self.confidence, self.support)
+
 
 def sort_key(item):
     if AGENT in item:
@@ -41,6 +49,24 @@ def sort_key(item):
         return 2
     else:
         return 3
+
+
+def change_support(compressDB, rules, encoder):
+    import datetime
+    ####################################
+    # Compress database and get table support
+    ####################################
+    ts = datetime.datetime.now()
+    print 'Len of Rules is', len(rules)
+    for r in rules:
+        for packageInfo in compressDB[r.label]:
+            features, tbl = packageInfo
+            if r.itemSet.issubset(features):
+                r.add_tbl(tbl)
+    for r in rules:
+        r.support = len(r.tblSupport)
+    print ">>> Change support time:", (datetime.datetime.now() - ts).seconds
+
 
 def _gen_rules(transactions, tSupport, tConfidence):
     '''
@@ -62,8 +88,8 @@ def _gen_rules(transactions, tSupport, tConfidence):
         labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
         if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
             confidence = max(tag_dist.values()) * 1.0 / support
-
-            rules.add((itemset, confidence, support, labelIndex))
+            r = Rule(itemset, confidence, support, labelIndex)
+            rules.add(r)
 
     print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
@@ -76,41 +102,58 @@ class CMAR(AbsClassifer):
         self.min_cover = min_cover
         self.tSupport = tSupport
         self.tConfidence = tConfidence
-        self.get_feature = [AgentEncoder()]
+        self.encoder = AgentEncoder()
 
     def pkg2features(self, package):
-        features = set()
-        for encoder in self.get_feature:
-            tmp = encoder.get_feature(package, prefix=False)
-            features |= set(tmp)
-        return frozenset(features)
+        features = self.encoder.get_f_list(package)
+        return features
+
+    def _encode_data(self, packages):
+        """
+        Change package to transaction
+        Last item is table name
+        Second from last is app
+        Third from last is host.
+        Do not use them as feature
+        """
+        transactions = []
+        for package in packages:
+            transaction = self.encoder.get_f_list(package)
+            if len(transaction) > 0:
+                transaction.append(package.label)
+                transactions.append(transaction)
+
+        return transactions
 
     def _persist(self, agentRules):
         '''specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support'''
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_CMAR_RULES
-        params = self.get_feature[0].changeRule2Para(agentRules)
+        params = self.encoder[0].changeRule2Para(agentRules)
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
         print "Total Number of Rules is", len(params)
 
     def train(self, trainSet, rule_type):
         packages = []
+        compressDB = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             packages.append(pkg)
+            features = frozenset(self.encoder.get_f_list(pkg))
+            compressDB[pkg.label].add((features, tbl))
         print "#CMAR:", len(packages)
-        encodedpackages = _encode_data(self.get_feature, packages)
+        trainList = self._encode_data(packages)
         ''' Rules format : (feature, confidence, support, label) '''
-        rules = _gen_rules(encodedpackages, self.tSupport, self.tConfidence)
+        rules = _gen_rules(trainList, self.tSupport, self.tConfidence)
+        change_support(compressDB, rules, self.encoder)
         ''' Prune duplicated rules'''
         print '[CMAR] Before pruning', len(rules)
         rules = self._remove_duplicate(rules)
         print '[CMAR] After pruning', len(rules)
         ''' feature, app, host '''
-        rules = self._prune_rules(rules, trainSet, self.min_cover)
+        rules = self._db_coverage(rules, compressDB, self.min_cover)
         ''' change encoded features back to string '''
         self._persist(rules)
-        self.__init__()
         return self
 
     def load_rules(self):
@@ -147,11 +190,11 @@ class CMAR(AbsClassifer):
         sqldao.close()
 
     def c(self, package):
-        '''
+        """
         Return {type:[(label, confidence)]}
-        '''
+        """
         labelRsts = {}
-        features = self.pkg2features(package)
+        features = frozenset(self.encoder.get_f_list(package))
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
             max_confidence = 0
@@ -168,7 +211,7 @@ class CMAR(AbsClassifer):
                 print '=' * 10
         return labelRsts
 
-    def _prune_rules(self, tRules, trainSet, min_cover=3):
+    def _db_coverage(self, rules, compressDB, min_cover=3):
         '''
         Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
         Input packages: list of packets
@@ -176,65 +219,41 @@ class CMAR(AbsClassifer):
         - specificRules host -> ruleStrSet -> label -> {consts.SUPPORT, consts.SCORE}
         defaultdict(lambda : defaultdict(lambda : defaultdict(lambda : { consts.SCORE: 0, consts.SUPPORT: 0 })))
         '''
-        import datetime
-        ####################################
-        # Compress database and get table support
-        ####################################
-        ts = datetime.datetime.now()
-        cover_num = defaultdict(int)
-        tblSupport = defaultdict(set)
-        packageInfos = defaultdict(set)
-        for tbl, pkg in DataSetIter.iter_pkg(trainSet):
-            for encoder in self.get_feature:
-                featuresNhost = encoder.get_feature(pkg)
-                if len(featuresNhost) > 0:
-                    features = frozenset(featuresNhost)
-                    packageInfos[pkg.label].add((features, tbl))
-        print 'Len of Rules is', len(tRules)
-        for rule, confidence, support, classlabel in tRules:
-            for packageInfo in packageInfos[classlabel]:
-                features, tbl = packageInfo
-                if rule.issubset(features):
-                    tblSupport[rule].add(tbl)
 
         ####################################
         # Prune by data base coverage
         ####################################
         def rank(rule):
-            strSet, confidence, support, label = rule
-            return (confidence, len(tblSupport[rule]), len(strSet))
-        tRules = sorted(tRules, key=lambda x: rank(x), reverse=True)
-        rules = []
-        for rule in tRules:
-            ruleStrSet, confidence, _, classlabel = rule
-            support = tblSupport[rule]
-            for packageInfo in packageInfos[classlabel]:
-                package, tbl = packageInfo
-                if cover_num[package] <= min_cover and ruleStrSet.issubset(package) and len(tblSupport[ruleStrSet]) > 1:
-                    cover_num[package] += 1
-                    for encoder in self.get_feature:
-                        pathSeg, agent, host = encoder.change2Rule(ruleStrSet)
-                        r = FinalRule(agent, pathSeg, host, classlabel, confidence, support)
-                        rules.append(r)
+            return (rule.confidence, rule.support, len(rule.itemSet))
 
-        print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
+        tRules = sorted(rules, key=lambda x: rank(x), reverse=True)
+        rules = []
+        coverNum = defaultdict(int)
+        for rule in tRules:
+            for pkgNtbl in compressDB[rule.label]:
+                package, tbl = pkgNtbl
+                if coverNum[package] <= min_cover and rule.itemSet.issubset(package):
+                    coverNum[package] += 1
+                    r = rule.export()
+                    rules.append(r)
         return rules
 
-
-    def _remove_duplicate(self, rawRules):
+    def _remove_duplicate(self, rules):
         '''
         Input
         - rawRules : [(ruleStrSet, confidence, support, label), ...]
         '''
+
         def travers(node, ancestors):
             if node.label is not None:
                 assert node.support != 0
                 assert node.confidence != 0
-                yield (ancestors + [node.label], node.support, node.confidence)
+                yield Rule(ancestors, node.support, node.confidence, node.label)
             if len(node.children) > 0:
                 for item, child in node.children.items():
                     for rule in travers(child, ancestors + [item]):
                         yield rule
+
         def rank(node, rule):
             strSet, confidence, support, label = rule
             if node.confidence > confidence:
@@ -244,13 +263,13 @@ class CMAR(AbsClassifer):
             elif node.confidence == confidence and node.support == support:
                 return 1
             return 0
-                
-        rules = sorted(rawRules, key=lambda x: (len(x), sort_key(x[0])))
+
+        rules = sorted(rules, key=lambda r: (len(r.itemSet), sort_key(r.itemLst[0])))
 
         root = Node(None, None)
         for rule in rules:
             node = root
-            strSet, confidence, support, label = rule
+            strSet, confidence, support, label = rule.itemLst, rule.confidence, rule.support, rule.label
             for item in strSet:
                 if item in node.children:
                     node = node.children[item]
@@ -273,6 +292,7 @@ class CMAR(AbsClassifer):
         rules = [rule for rule in travers(root, [])]
 
         return rules
+
 
 class Node:
     def __init__(self, label, item):

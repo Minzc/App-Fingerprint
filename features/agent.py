@@ -16,6 +16,8 @@ def load_agent():
     counter = 0
     for host, agentF, label, ruleType in sqldao.execute(QUERY):
         counter += 1
+        if AGENT in agentF:
+            agentF = agentF.replace(AGENT, '')
         rules[label].add(re.compile(agentF))
     print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(rules)
     sqldao.close()
@@ -25,15 +27,17 @@ class AgentEncoder:
     def __init__(self):
         self.__agentF = load_agent()
 
-    def get_feature(self, package, prefix=True):
+    def get_f_list(self, package):
         agent = self.get_agent(package)
         pathSegs = package.path.split('/')
         host = package.host
-        if prefix:
-            if agent: agent = AGENT + agent
-            pathSegs = map(lambda seg: PATH + seg, pathSegs)
-            host = HOST + host
-        return [agent] + pathSegs + [host]
+        fList = []
+        if agent:
+            agent = AGENT + agent
+            fList.append(agent)
+        map(lambda seg: fList.append(PATH + seg), pathSegs)
+        fList.append(HOST + host)
+        return fList
 
     def get_agent(self, package):
         app = package.app
