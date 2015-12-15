@@ -276,7 +276,7 @@ class AgentClassifier(AbsClassifer):
                 label, evidence = predict
                 wrapPredicts[ruleType] = consts.Prediction(label, 1.0, evidence) if label else consts.NULLPrediction
             return wrapPredicts
-
+        print 'Start'
         compressed = defaultdict(lambda: defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(testSet):
             compressed[pkg.agent][pkg.rawHost].add(pkg)
