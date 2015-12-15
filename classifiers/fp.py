@@ -287,6 +287,7 @@ class CMAR(AbsClassifer):
             if node.label is None:
                 node.label = label
             else:
+                print label, strSet, node.label
                 assert node.label == label
 
         rules = [rule for rule in travers(root, [])]
