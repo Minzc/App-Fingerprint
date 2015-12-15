@@ -3,7 +3,7 @@ from classifier import AbsClassifer
 import operator
 
 from const.dataset import DataSetIter
-from features.agent import AgentEncoder
+from features.agent import AgentEncoder, AGENT, PATH
 from sqldao import SqlDao
 from fp_growth import find_frequent_itemsets
 from collections import defaultdict, namedtuple
@@ -34,6 +34,13 @@ def _encode_data(encoders, packages=None):
 
     return transactions
 
+def sort_key(item):
+    if AGENT in item:
+        return 1
+    elif PATH in item:
+        return 2
+    else:
+        return 3
 
 def _gen_rules(transactions, tSupport, tConfidence):
     '''
@@ -50,11 +57,13 @@ def _gen_rules(transactions, tSupport, tConfidence):
     frequentPatterns = find_frequent_itemsets(transactions, tSupport, True)
     for frequent_pattern_info in frequentPatterns:
         itemset, support, tag_dist = frequent_pattern_info
-        ruleStrSet = frozenset(itemset)
+        itemset = sorted(itemset, key=sort_key)
+
         labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
         if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
             confidence = max(tag_dist.values()) * 1.0 / support
-            rules.add((ruleStrSet, confidence, support, labelIndex))
+
+            rules.add((itemset, confidence, support, labelIndex))
 
     print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
@@ -94,7 +103,9 @@ class CMAR(AbsClassifer):
         ''' Rules format : (feature, confidence, support, label) '''
         rules = _gen_rules(encodedpackages, self.tSupport, self.tConfidence)
         ''' Prune duplicated rules'''
-        # rules = _remove_duplicate(rules)
+        print '[CMAR] Before pruning', len(rules)
+        rules = self._remove_duplicate(rules)
+        print '[CMAR] After pruning', len(rules)
         ''' feature, app, host '''
         rules = self._prune_rules(rules, trainSet, self.min_cover)
         ''' change encoded features back to string '''
@@ -166,6 +177,9 @@ class CMAR(AbsClassifer):
         defaultdict(lambda : defaultdict(lambda : defaultdict(lambda : { consts.SCORE: 0, consts.SUPPORT: 0 })))
         '''
         import datetime
+        ####################################
+        # Compress database
+        ####################################
         ts = datetime.datetime.now()
         cover_num = defaultdict(int)
         tblSupport = defaultdict(set)
@@ -183,44 +197,84 @@ class CMAR(AbsClassifer):
                 if rule.issubset(features):
                     tblSupport[rule].add(tbl)
 
+        ####################################
+        # Prune by data base coverage
+        ####################################
         tRules = sorted(tRules, key=lambda x: len(tblSupport[x]), reverse=True)
-        agentRules = []
+        rules = []
         for rule in tRules:
-            ruleStrSet, confidence, support, classlabel = rule
+            ruleStrSet, confidence, _, classlabel = rule
+            support = tblSupport[rule]
             for packageInfo in packageInfos[classlabel]:
                 package, tbl = packageInfo
                 if cover_num[package] <= min_cover and ruleStrSet.issubset(package) and len(tblSupport[ruleStrSet]) > 1:
                     cover_num[package] += 1
                     for encoder in self.get_feature:
-                        agent, host = encoder.change2Rule(ruleStrSet)
-                        r = FinalRule(agent, None, host, classlabel, confidence, support)
-                        agentRules.append(r)
+                        pathSeg, agent, host = encoder.change2Rule(ruleStrSet)
+                        r = FinalRule(agent, pathSeg, host, classlabel, confidence, support)
+                        rules.append(r)
 
         print ">>> Pruning time:", (datetime.datetime.now() - ts).seconds
-        return agentRules
+        return rules
 
 
-#def _remove_duplicate(rawRules):
-#     '''
-#   Input
-#   - rawRules : [(ruleStrSet, confidence, support, label), ...]
-#   '''
-#     rules = defaultdict(list)
-#     for rule in rawRules:
-#         rules[rule[3]].append(rule)
-#     prunedRules = []
-#     print 'Total number of rules', len(rawRules)
-#     for label in rules:
-#         '''From large to small set'''
-#         sortedRules = sorted(rules[label], key=lambda x: len(x[0]), reverse=True)
-#         root = {}
-#         for i in range(len(sortedRules)):
-#             ifKeep = True
-#             iStrSet = sortedRules[0]
-#             for j in range(i + 1, len(sortedRules)):
-#                 jStrSet = sortedRules[j][0]
-#                 if jStrSet.issubset(iStrSet):
-#                     ifKeep = False
-#             if ifKeep:
-#                 prunedRules.append(sortedRules[i])
-#     return prunedRules
+    def _remove_duplicate(self, rawRules):
+        '''
+        Input
+        - rawRules : [(ruleStrSet, confidence, support, label), ...]
+        '''
+        def travers(node, ancestors):
+            if node.label is not None:
+                assert node.support != 0
+                assert node.confidence != 0
+                yield (ancestors + [node.label], node.support, node.confidence)
+            if len(node.children) > 0:
+                for item, child in node.children.items():
+                    for rule in travers(child, ancestors + [item]):
+                        yield rule
+        def rank(node, rule):
+            strSet, confidence, support, label = rule
+            if node.confidence > confidence:
+                return 1
+            elif node.confidence == confidence and node.support > support:
+                return 1
+            elif node.confidence == confidence and node.support == support:
+                return 1
+            return 0
+                
+        rules = sorted(rawRules, key=lambda x: (len(x), sort_key(x[0])))
+
+        root = Node(None, None)
+        for rule in rules:
+            node = root
+            strSet, confidence, support, label = rule
+            for item in strSet:
+                if item in node.children:
+                    node = node.children[item]
+                    if node.label == label:
+                        if rank(node, rule) == 1:
+                            break
+                        else:
+                            node.label, node.support, node.confidence = None, 0, 0
+                else:
+                    node.children[item] = Node(item, None)
+                    node = node.children[item]
+                    node.support = support
+                    node.confidence = confidence
+
+            if node.label is None:
+                node.label = label
+            else:
+                assert node.label == label
+
+        rules = [rule for rule in travers(root, [])]
+
+        return rules
+
+class Node:
+    def __init__(self, label, item):
+        self.item = item
+        self.label = label
+        self.children = {}
+        self.confidence = 0
+        self.support = 0
