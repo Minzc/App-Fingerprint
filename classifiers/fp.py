@@ -8,12 +8,7 @@ from fp_growth import find_frequent_itemsets
 from collections import defaultdict, namedtuple
 import const.consts as consts
 
-
 FinalRule = namedtuple('Rule', 'agent, path, host, label, confidence, support')
-
-# HOST = '[HOST]:'
-# AGENT = '[AGENT]:'
-# PATH = '[PATH]:'
 
 
 class Rule:
@@ -62,7 +57,7 @@ def change_support(compressDB, rules, encoder):
 
 
 def _gen_rules(transactions, tSupport, tConfidence):
-    '''
+    """
     Generate encoded rules
     Input
     - transactions : encoded transaction
@@ -71,7 +66,7 @@ def _gen_rules(transactions, tSupport, tConfidence):
     - featureIndx  : a map between number and feature string
     - appIndex     : a map between number and app
     Return : (itemsets, confidencet, support, label)
-    '''
+    """
     rules = set()
     frequentPatterns = find_frequent_itemsets(transactions, tSupport, True)
     for frequent_pattern_info in frequentPatterns:
@@ -88,6 +83,97 @@ def _gen_rules(transactions, tSupport, tConfidence):
     return rules
 
 
+def _db_coverage(rules, compressDB, min_cover=3):
+    """
+    Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
+    Input packages: list of packets
+    Return
+    - specificRules host -> ruleStrSet -> label -> {consts.SUPPORT, consts.SCORE}
+    defaultdict(lambda : defaultdict(lambda : defaultdict(lambda : { consts.SCORE: 0, consts.SUPPORT: 0 })))
+    """
+
+    ####################################
+    # Prune by data base coverage
+    ####################################
+    def rank(rule):
+        return rule.confidence, rule.support, len(rule.itemSet)
+
+    tRules = sorted(rules, key=lambda x: rank(x), reverse=True)
+    rules = []
+    coverNum = defaultdict(int)
+    for rule in tRules:
+        for pkgNtbl in compressDB[rule.label]:
+            package, tbl = pkgNtbl
+            if coverNum[package] <= min_cover and rule.itemSet.issubset(package):
+                coverNum[package] += 1
+                r = rule.export()
+                rules.append(r)
+    return rules
+
+
+def _remove_duplicate(rules):
+    """
+    Input
+    - rawRules : [(ruleStrSet, confidence, support, label), ...]
+    """
+
+    def travers(node, ancestors):
+        if node.label is not None:
+            assert node.support != 0
+            assert node.confidence != 0
+            yield Rule(ancestors, node.support, node.confidence, node.label)
+        if len(node.children) > 0:
+            for item, child in node.children.items():
+                for rule in travers(child, ancestors + [item]):
+                    yield rule
+
+    def rank(node, rule):
+        strSet, confidence, support, label = rule.itemSet, rule.confidence, rule.support, rule.label
+        if node.confidence > confidence:
+            return 1
+        elif node.confidence == confidence and node.support > support:
+            return 1
+        elif node.confidence == confidence and node.support == support:
+            return 1
+        return 0
+
+    rules = sorted(rules, key=lambda r: (len(r.itemSet), sort_key(r.itemLst[0])))
+
+    root = Node(None)
+    for rule in rules:
+        node = root
+        strSet, confidence, support, label = rule.itemLst, rule.confidence, rule.support, rule.label
+        for item in strSet:
+            if item in node.children:
+                node = node.children[item]
+                if node.label == label:
+                    if rank(node, rule) == 1:
+                        break
+                    else:
+                        node.label, node.support, node.confidence = None, 0, 0
+            else:
+                node.children[item] = Node(item)
+                node = node.children[item]
+                node.support = support
+                node.confidence = confidence
+
+        if node.label is None:
+            node.label = label
+        else:
+            assert node.label == label
+
+    rules = [rule for rule in travers(root, [])]
+
+    return rules
+
+
+def _clean_db(rule_type):
+    sqldao = SqlDao()
+    sqldao.execute(consts.SQL_DELETE_CMAR_RULES % rule_type)
+    sqldao.commit()
+    sqldao.close()
+
+
 class CMAR(AbsClassifer):
     def __init__(self, min_cover=3, tSupport=2, tConfidence=1.0):
         # feature, app, host
@@ -96,7 +182,6 @@ class CMAR(AbsClassifer):
         self.tSupport = tSupport
         self.tConfidence = tConfidence
         self.encoder = AgentEncoder()
-
 
     def _encode_data(self, packages):
         """
@@ -116,7 +201,7 @@ class CMAR(AbsClassifer):
         return transactions
 
     def _persist(self, rules):
-        '''specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support'''
+        """specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support"""
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_CMAR_RULES
         params = self.encoder.changeRule2Para(rules)
@@ -138,19 +223,18 @@ class CMAR(AbsClassifer):
         change_support(compressDB, rules, self.encoder)
         ''' Prune duplicated rules'''
         print '[CMAR] Before pruning', len(rules)
-        rules = self._remove_duplicate(rules)
+        rules = _remove_duplicate(rules)
         print '[CMAR] After pruning', len(rules)
         ''' feature, app, host '''
-        rules = self._db_coverage(rules, compressDB, self.min_cover)
+        rules = _db_coverage(rules, compressDB, self.min_cover)
         ''' change encoded features back to string '''
         self._persist(rules)
         return self
 
     def load_rules(self):
-        self.rules = {}
-        self.rules[consts.APP_RULE] = defaultdict(lambda: defaultdict())
-        self.rules[consts.COMPANY_RULE] = defaultdict(lambda: defaultdict())
-        self.rules[consts.CATEGORY_RULE] = defaultdict(lambda: defaultdict())
+        self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict()),
+                      consts.COMPANY_RULE: defaultdict(lambda: defaultdict()),
+                      consts.CATEGORY_RULE: defaultdict(lambda: defaultdict())}
         sqldao = SqlDao()
         counter = 0
         SQL = consts.SQL_SELECT_CMAR_RULES
@@ -173,12 +257,6 @@ class CMAR(AbsClassifer):
         for ruleType in self.rules:
             print '>>>[CMAR] Rule Type %s Number of Rules %s' % (ruleType, len(self.rules[ruleType]))
 
-    def _clean_db(self, rule_type):
-        sqldao = SqlDao()
-        sqldao.execute(consts.SQL_DELETE_CMAR_RULES % (rule_type))
-        sqldao.commit()
-        sqldao.close()
-
     def c(self, package):
         """
         Return {type:[(label, confidence)]}
@@ -200,88 +278,6 @@ class CMAR(AbsClassifer):
                 print rst, package.app
                 print '=' * 10
         return labelRsts
-
-    def _db_coverage(self, rules, compressDB, min_cover=3):
-        '''
-        Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
-        Input packages: list of packets
-        Return
-        - specificRules host -> ruleStrSet -> label -> {consts.SUPPORT, consts.SCORE}
-        defaultdict(lambda : defaultdict(lambda : defaultdict(lambda : { consts.SCORE: 0, consts.SUPPORT: 0 })))
-        '''
-
-        ####################################
-        # Prune by data base coverage
-        ####################################
-        def rank(rule):
-            return (rule.confidence, rule.support, len(rule.itemSet))
-
-        tRules = sorted(rules, key=lambda x: rank(x), reverse=True)
-        rules = []
-        coverNum = defaultdict(int)
-        for rule in tRules:
-            for pkgNtbl in compressDB[rule.label]:
-                package, tbl = pkgNtbl
-                if coverNum[package] <= min_cover and rule.itemSet.issubset(package):
-                    coverNum[package] += 1
-                    r = rule.export()
-                    rules.append(r)
-        return rules
-
-    def _remove_duplicate(self, rules):
-        '''
-        Input
-        - rawRules : [(ruleStrSet, confidence, support, label), ...]
-        '''
-
-        def travers(node, ancestors):
-            if node.label is not None:
-                assert node.support != 0
-                assert node.confidence != 0
-                yield Rule(ancestors, node.support, node.confidence, node.label)
-            if len(node.children) > 0:
-                for item, child in node.children.items():
-                    for rule in travers(child, ancestors + [item]):
-                        yield rule
-
-        def rank(node, rule):
-            strSet, confidence, support, label = rule.itemSet, rule.confidence, rule.support, rule.label
-            if node.confidence > confidence:
-                return 1
-            elif node.confidence == confidence and node.support > support:
-                return 1
-            elif node.confidence == confidence and node.support == support:
-                return 1
-            return 0
-
-        rules = sorted(rules, key=lambda r: (len(r.itemSet), sort_key(r.itemLst[0])))
-
-        root = Node(None)
-        for rule in rules:
-            node = root
-            strSet, confidence, support, label = rule.itemLst, rule.confidence, rule.support, rule.label
-            for item in strSet:
-                if item in node.children:
-                    node = node.children[item]
-                    if node.label == label:
-                        if rank(node, rule) == 1:
-                            break
-                        else:
-                            node.label, node.support, node.confidence = None, 0, 0
-                else:
-                    node.children[item] = Node(item)
-                    node = node.children[item]
-                    node.support = support
-                    node.confidence = confidence
-
-            if node.label is None:
-                node.label = label
-            else:
-                assert node.label == label
-
-        rules = [rule for rule in travers(root, [])]
-
-        return rules
 
 
 class Node:
