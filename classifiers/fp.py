@@ -104,9 +104,6 @@ class CMAR(AbsClassifer):
         self.tConfidence = tConfidence
         self.encoder = AgentEncoder()
 
-    def pkg2features(self, package):
-        features = self.encoder.get_f_list(package)
-        return features
 
     def _encode_data(self, packages):
         """
@@ -266,7 +263,7 @@ class CMAR(AbsClassifer):
 
         rules = sorted(rules, key=lambda r: (len(r.itemSet), sort_key(r.itemLst[0])))
 
-        root = Node(None, None)
+        root = Node(None)
         for rule in rules:
             node = root
             strSet, confidence, support, label = rule.itemLst, rule.confidence, rule.support, rule.label
@@ -279,7 +276,7 @@ class CMAR(AbsClassifer):
                         else:
                             node.label, node.support, node.confidence = None, 0, 0
                 else:
-                    node.children[item] = Node(item, None)
+                    node.children[item] = Node(item)
                     node = node.children[item]
                     node.support = support
                     node.confidence = confidence
@@ -297,9 +294,9 @@ class CMAR(AbsClassifer):
 
 
 class Node:
-    def __init__(self, label, item):
+    def __init__(self, item):
         self.item = item
-        self.label = label
+        self.label = None
         self.children = {}
         self.confidence = 0
         self.support = 0
