@@ -12,6 +12,7 @@ LIMIT = None
 INSERT = False
 PRUNE = False
 SAMPLERATE = 1
+TRAIN_LABEL = consts.CATEGORY_RULE
 
 VALID_LABEL = {
     #consts.APP_RULE,
@@ -208,8 +209,8 @@ def _use_classifier(classifier, testSet):
             rst[pkgId][ruleType] = predict
 
     for tbl, pkg in DataSetIter.iter_pkg(testSet):
-        predict = rst[pkg.id][consts.APP_RULE]
-        if predict.label is not None and predict.label != pkg.app:
+        predict = rst[pkg.id][TRAIN_LABEL]
+        if predict.label is not None and predict.label != pkg.label:
             wrongApp.add(pkg.app)
 
     print '====', classifier.name, '====', '[WRONG]', len(wrongApp)
