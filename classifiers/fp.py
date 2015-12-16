@@ -86,6 +86,9 @@ def _gen_rules(transactions, tSupport, tConfidence):
             confidence = max(tag_dist.values()) * 1.0 / support
             r = Rule(itemset, confidence, support, labelIndex)
             rules.add(r)
+            for item in itemset:
+                if AGENT in item:
+                    print itemset
 
     print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
@@ -153,6 +156,9 @@ def _remove_duplicate(rules):
         node = root
         strSet, confidence, support, label = rule.itemLst, rule.confidence, rule.support, rule.label
         for item in strSet:
+            if AGENT in item:
+                print '[OK]', item
+
             if item in node.children:
                 node = node.children[item]
                 if node.label == label:
