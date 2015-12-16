@@ -85,6 +85,10 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
             nodes = [node for node in nodes]
 
             for node in nodes:
+                if len(node.clsses) == 0:
+                    print '[item]', item, '[pair]',(items[item], item)
+                    for child in node.children:
+                        print '[child]', child, (items[child], child)
                 assert len(node.clsses) != 0
                 support += node.count
                 for k, v in node.clsses.items():
