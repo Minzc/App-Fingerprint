@@ -211,10 +211,15 @@ class CMAR(AbsClassifer):
         """
         transactions = []
         for package in packages:
-            transaction = self.encoder.get_f_list(package)
-            if len(transaction) > 0:
-                transaction.append(package.label)
-                transactions.append(transaction)
+            host, pathSeg, agent = self.encoder.get_f(package)
+            base = []
+            if host is not None:
+                base.append(host)
+            if agent is not None:
+                base.append(agent)
+
+            for item in pathSeg:
+                transactions.append(base + [item] + [package.label])
 
         return transactions
 

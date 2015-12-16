@@ -27,9 +27,17 @@ class AgentEncoder:
     def __init__(self):
         self.__agentF = load_agent()
 
+    def get_f(self, package):
+        agent = self.get_agent(package)
+        pathSegs = map(lambda x: PATH + x, set(filter(None,package.path.split('/'))))
+        host = HOST + package.host
+        if agent:
+            agent = AGENT + agent
+        return agent, pathSegs, host
+
     def get_f_list(self, package):
         agent = self.get_agent(package)
-        pathSegs = package.path.split('/')
+        pathSegs = set(filter(None,package.path.split('/')))
         host = package.host
         fList = []
         if agent:
