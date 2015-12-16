@@ -133,9 +133,6 @@ def _remove_duplicate(rules):
             assert node.support != 0
             assert node.confidence != 0
             assert len(ancestors) != 0
-            for item in ancestors:
-                if AGENT in item:
-                    print '[OKOK]', item
             yield Rule(ancestors, node.support, node.confidence, node.label)
         if len(node.children) > 0:
             for item, child in node.children.items():
