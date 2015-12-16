@@ -199,6 +199,7 @@ class CMAR(AbsClassifer):
         self.min_cover = min_cover
         self.tSupport = tSupport
         self.tConfidence = tConfidence
+        self.encoder = AgentEncoder()
 
     def _encode_data(self, packages):
         """
