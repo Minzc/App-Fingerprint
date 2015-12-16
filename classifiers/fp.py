@@ -199,7 +199,6 @@ class CMAR(AbsClassifer):
         self.min_cover = min_cover
         self.tSupport = tSupport
         self.tConfidence = tConfidence
-        self.encoder = AgentEncoder()
 
     def _encode_data(self, packages):
         """
@@ -228,6 +227,7 @@ class CMAR(AbsClassifer):
         print "Total Number of Rules is", len(params)
 
     def train(self, trainSet, rule_type):
+        self.encoder = AgentEncoder()
         packages = []
         compressDB = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
