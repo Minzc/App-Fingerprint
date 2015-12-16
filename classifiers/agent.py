@@ -144,8 +144,8 @@ class AgentClassifier(AbsClassifer):
                     if len(identifierApps[identifier]) > 1:
                         check.add(identifier)
 
-        for identifier in check:
-            print '[CHECK]',identifier, identifierApps[identifier]
+        # for identifier in check:
+        #     print '[CHECK]',identifier, identifierApps[identifier]
         return appRules, hostAgentRule
 
     @staticmethod

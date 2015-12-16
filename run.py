@@ -252,7 +252,8 @@ def test(testTbl, appType):
     testSize = testSet.get_size()[testTbl]
 
     rst = {}
-    classifiers = classifier_factory(USED_CLASSIFIERS, appType)
+    # classifiers = classifier_factory(USED_CLASSIFIERS, appType)
+    classifiers = classifier_factory([consts.CMAR_CLASSIFIER], appType)
     for name, classifier in classifiers:
         print ">>> [test#%s] " % name
         classifier.set_name(name)
