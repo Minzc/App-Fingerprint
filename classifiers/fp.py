@@ -43,6 +43,7 @@ def prune_host(items):
         return False
     return True
 
+
 def sort_key(item):
     if AGENT in item:
         return 1
@@ -52,7 +53,7 @@ def sort_key(item):
         return 3
 
 
-def change_support(compressDB, rules, encoder):
+def change_support(compressDB, rules, encoder, support):
     import datetime
     ####################################
     # Compress database and get table support
@@ -64,10 +65,12 @@ def change_support(compressDB, rules, encoder):
             features, tbl = packageInfo
             if r.itemSet.issubset(features):
                 r.add_tbl(tbl)
+    tmpRules = []
     for r in rules:
         r.support = len(r.tblSupport)
-    print ">>> Change support time:", (datetime.datetime.now() - ts).seconds
-
+        if r.support >= support:
+            tmpRules.append(r)
+    return tmpRules
 
 def _gen_rules(transactions, tSupport, tConfidence):
     """
@@ -239,7 +242,7 @@ class CMAR(AbsClassifer):
         trainList = self._encode_data(packages)
         ''' Rules format : (feature, confidence, support, label) '''
         rules = _gen_rules(trainList, self.tSupport, self.tConfidence)
-        change_support(compressDB, rules, self.encoder)
+        rules = change_support(compressDB, rules, self.encoder, self.tSupport)
         ''' Prune duplicated rules'''
         print '[CMAR] Before pruning', len(rules)
         rules = _remove_duplicate(rules)
