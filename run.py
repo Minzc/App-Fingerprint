@@ -24,7 +24,7 @@ USED_CLASSIFIERS = [
     consts.AGENT_CLASSIFIER,
     #consts.KV_CLASSIFIER,
     #consts.URI_CLASSIFIER,
-    consts.CMAR_CLASSIFIER,
+    #consts.CMAR_CLASSIFIER,
 ]
 
 class PredictRst:
@@ -252,8 +252,8 @@ def test(testTbl, appType):
     testSize = testSet.get_size()[testTbl]
 
     rst = {}
-    # classifiers = classifier_factory(USED_CLASSIFIERS, appType)
-    classifiers = classifier_factory([consts.CMAR_CLASSIFIER], appType)
+    classifiers = classifier_factory(USED_CLASSIFIERS, appType)
+    # classifiers = classifier_factory([consts.CMAR_CLASSIFIER], appType)
     for name, classifier in classifiers:
         print ">>> [test#%s] " % name
         classifier.set_name(name)
