@@ -223,16 +223,16 @@ class CMAR(AbsClassifer):
 
         return transactions
 
-    def _persist(self, rules):
+    def _persist(self, ruleType, rules):
         """specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support"""
         sqldao = SqlDao()
         QUERY = consts.SQL_INSERT_CMAR_RULES
-        params = self.encoder.changeRule2Para(rules)
+        params = self.encoder.changeRule2Para(rules, ruleType)
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
         print "Total Number of Rules is", len(params)
 
-    def train(self, trainSet, rule_type):
+    def train(self, trainSet, ruleType):
         self.encoder = AgentEncoder()
         packages = []
         compressDB = defaultdict(set)
@@ -252,7 +252,7 @@ class CMAR(AbsClassifer):
         ''' feature, app, host '''
         rules = _db_coverage(rules, compressDB, self.min_cover)
         ''' change encoded features back to string '''
-        self._persist(rules)
+        self._persist(ruleType, rules)
         return self
 
     def load_rules(self):
@@ -298,8 +298,8 @@ class CMAR(AbsClassifer):
                         rst = consts.Prediction(label, confidence, rule)
 
             labelRsts[rule_type] = rst
-            if rule_type == consts.APP_RULE and rst != consts.NULLPrediction and rst.label != package.app:
-                print rst, package.app
+            if rule_type == consts.CATEGORY_RULE and rst != consts.NULLPrediction and rst.label != package.category:
+                print rst, package.app, package.category
                 print '=' * 10
         return labelRsts
 

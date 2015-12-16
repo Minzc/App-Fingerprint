@@ -249,7 +249,6 @@ class AgentClassifier(AbsClassifer):
         # identifierApps, extractors = self._prune(regexApp)
         appRule, hostAgent = self._app(identifierApps, extractors, appInfos)
 
-
         print "Finish Pruning"
 
         self.persist(appRule, consts.APP_RULE)

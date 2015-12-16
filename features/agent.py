@@ -71,10 +71,10 @@ class AgentEncoder:
 
         return (pathSeg, agent, host)
 
-    def changeRule2Para(self, agentRules):
+    def changeRule2Para(self, agentRules, ruleType):
         params = []
         for rule in agentRules:
             agent, path, host, classlabel, confidence, support = rule
             assert not (agent is None and path is None and host is None)
-            params.append((classlabel, path, agent, confidence, support, host, consts.APP_RULE))
+            params.append((classlabel, path, agent, confidence, support, host, ruleType))
         return params

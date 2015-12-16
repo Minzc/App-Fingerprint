@@ -14,9 +14,9 @@ PRUNE = False
 SAMPLERATE = 1
 
 VALID_LABEL = {
-    consts.APP_RULE,
+    #consts.APP_RULE,
     #consts.COMPANY_RULE,
-    #consts.CATEGORY_RULE
+    consts.CATEGORY_RULE
 }
 
 USED_CLASSIFIERS = [
@@ -108,7 +108,7 @@ def train(trainTbls, appType):
     """
     # trainTbls = []
     trainSet = DataSetFactory.get_traindata(tbls=trainTbls, sampleRate=SAMPLERATE, appType=appType, LIMIT=LIMIT)
-    trainSet.set_label(consts.APP_RULE)
+    trainSet.set_label(consts.CATEGORY_RULE)
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
     for name, classifier in classifiers:
         classifier.set_name(name)
