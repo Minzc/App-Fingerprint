@@ -96,9 +96,9 @@ def _gen_rules(transactions, tSupport, tConfidence):
             for item in itemset:
                 if AGENT in item:
                     print itemset, prune_host(itemset)
-            if prune_host(itemset):
-                r = Rule(itemset, confidence, support, labelIndex)
-                rules.add(r)
+            # if prune_host(itemset):
+            r = Rule(itemset, confidence, support, labelIndex)
+            rules.add(r)
 
     print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
