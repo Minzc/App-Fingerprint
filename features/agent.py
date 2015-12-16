@@ -35,7 +35,9 @@ class AgentEncoder:
         if agent:
             agent = AGENT + agent
             fList.append(agent)
-        map(lambda seg: fList.append(PATH + seg), pathSegs)
+        for seg in pathSegs:
+            if len(seg) > 0:
+                fList.append(PATH + seg)
         fList.append(HOST + host)
         return fList
 
