@@ -13,6 +13,7 @@ FinalRule = namedtuple('Rule', 'agent, path, host, label, confidence, support')
 
 class Rule:
     def __init__(self, itemLst, confidence, support, label):
+        assert len(itemLst) != 0
         self.itemLst = itemLst
         self.confidence = confidence
         self.support = support
@@ -128,6 +129,7 @@ def _remove_duplicate(rules):
         if node.label is not None:
             assert node.support != 0
             assert node.confidence != 0
+            assert len(ancestors) != 0
             yield Rule(ancestors, node.support, node.confidence, node.label)
         if len(node.children) > 0:
             for item, child in node.children.items():
@@ -172,7 +174,6 @@ def _remove_duplicate(rules):
     rules = [rule for rule in travers(root, [])]
 
     return rules
-
 
 def _clean_db(rule_type):
     sqldao = SqlDao()
