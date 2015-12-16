@@ -93,9 +93,6 @@ def _gen_rules(transactions, tSupport, tConfidence):
         if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
             confidence = max(tag_dist.values()) * 1.0 / support
             assert confidence <= 1
-            for item in itemset:
-                if AGENT in item:
-                    print itemset, prune_host(itemset)
             # if prune_host(itemset):
             r = Rule(itemset, confidence, support, labelIndex)
             rules.add(r)
