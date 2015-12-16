@@ -38,6 +38,11 @@ class Rule:
         return FinalRule(agent, pathSeg, host, self.label, self.confidence, self.support)
 
 
+def prune_host(items):
+    if len(items) == 1 and HOST in items[0]:
+        return False
+    return True
+
 def sort_key(item):
     if AGENT in item:
         return 1
@@ -84,11 +89,10 @@ def _gen_rules(transactions, tSupport, tConfidence):
         labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
         if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
             confidence = max(tag_dist.values()) * 1.0 / support
-            r = Rule(itemset, confidence, support, labelIndex)
-            rules.add(r)
-            for item in itemset:
-                if AGENT in item:
-                    print itemset
+            assert confidence <= 1
+            if prune_host(itemset):
+                r = Rule(itemset, confidence, support, labelIndex)
+                rules.add(r)
 
     print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
@@ -133,7 +137,7 @@ def _remove_duplicate(rules):
             assert node.support != 0
             assert node.confidence != 0
             assert len(ancestors) != 0
-            yield Rule(ancestors, node.support, node.confidence, node.label)
+            yield Rule(ancestors, node.confidence, node.support, node.label)
         if len(node.children) > 0:
             for item, child in node.children.items():
                 for rule in travers(child, ancestors + [item]):
