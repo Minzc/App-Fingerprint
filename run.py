@@ -158,6 +158,9 @@ def evaluate(rst, testSet, testApps):
                 label = get_label(pkg, ruleType)
                 correctLabels[ruleType] = 1 if label == predict else 0
 
+                if correctLabels[ruleType] == 0:
+                    print '[run]', label, predict
+
                 if predict is not None:
                     assert sum(correctLabels) <= 1
                     cPrdcts.inc_total()

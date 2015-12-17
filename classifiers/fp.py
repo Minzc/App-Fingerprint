@@ -53,7 +53,7 @@ def sort_key(item):
         return 3
 
 
-def change_support(compressDB, rules, encoder, support):
+def change_support(compressDB, rules, support):
     import datetime
     ####################################
     # Compress database and get table support
@@ -201,7 +201,7 @@ class CMAR(AbsClassifer):
         self.tConfidence = tConfidence
         self.encoder = AgentEncoder()
 
-    def _encode_data(self, packages):
+    def _encode_data(self, packages, fList):
         """
         Change package to transaction
         Last item is table name
@@ -213,13 +213,14 @@ class CMAR(AbsClassifer):
         for package in packages:
             host, pathSeg, agent = self.encoder.get_f(package)
             base = []
-            if host is not None:
+            if host is not None and len(fList[host]) >= self.tSupport:
                 base.append(host)
-            if agent is not None:
+            if agent is not None and len(fList[agent]) >= self.tSupport:
                 base.append(agent)
 
             for item in pathSeg:
-                transactions.append(base + [item] + [package.label])
+                if  len(fList[item]) >= self.tSupport:
+                    transactions.append(base + [item] + [package.label])
 
         return transactions
 
@@ -236,15 +237,17 @@ class CMAR(AbsClassifer):
         self.encoder = AgentEncoder()
         packages = []
         compressDB = defaultdict(set)
+        fList = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             packages.append(pkg)
             features = frozenset(self.encoder.get_f_list(pkg))
+            map(lambda f: fList[f].add(tbl), features)
             compressDB[pkg.label].add((features, tbl))
         print "#CMAR:", len(packages)
-        trainList = self._encode_data(packages)
+        trainList = self._encode_data(packages, fList)
         ''' Rules format : (feature, confidence, support, label) '''
         rules = _gen_rules(trainList, self.tSupport, self.tConfidence)
-        rules = change_support(compressDB, rules, self.encoder, self.tSupport)
+        rules = change_support(compressDB, rules, self.tSupport)
         ''' Prune duplicated rules'''
         print '[CMAR] Before pruning', len(rules)
         rules = _remove_duplicate(rules)
@@ -299,7 +302,7 @@ class CMAR(AbsClassifer):
 
             labelRsts[rule_type] = rst
             if rule_type == consts.CATEGORY_RULE and rst != consts.NULLPrediction and rst.label != package.category:
-                print rst, package.app, package.category
+                print '[WRONG]', rst, package.app, package.category
                 print '=' * 10
         return labelRsts
 
