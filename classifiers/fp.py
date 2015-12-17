@@ -239,6 +239,7 @@ class CMAR(AbsClassifer):
         compressDB = defaultdict(set)
         fList = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
+            assert (pkg.label != pkg.app, tbl, pkg.app)
             packages.append(pkg)
             features = frozenset(self.encoder.get_f_list(pkg))
             map(lambda f: fList[f].add(tbl), features)

@@ -109,12 +109,12 @@ def train(trainTbls, appType):
     """
     # trainTbls = []
     trainSet = DataSetFactory.get_traindata(tbls=trainTbls, sampleRate=SAMPLERATE, appType=appType, LIMIT=LIMIT)
-    trainSet.set_label(consts.CATEGORY_RULE)
+    trainSet.set_label(TRAIN_LABEL)
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
     for name, classifier in classifiers:
         classifier.set_name(name)
         print ">>> [train#%s] " % name
-        classifier.train(trainSet, consts.APP_RULE)
+        classifier.train(trainSet, TRAIN_LABEL)
 
     print '>>> Finish training all classifiers'
 
@@ -211,10 +211,10 @@ def _use_classifier(classifier, testSet):
         for ruleType, predict in filter(lambda x: x[0] in VALID_LABEL, predicts.items()):
             rst[pkgId][ruleType] = predict
 
-    for tbl, pkg in DataSetIter.iter_pkg(testSet):
-        predict = rst[pkg.id][TRAIN_LABEL]
-        if predict.label is not None and predict.label != pkg.label:
-            wrongApp.add(pkg.app)
+    # for tbl, pkg in DataSetIter.iter_pkg(testSet):
+    #     predict = rst[pkg.id][TRAIN_LABEL]
+        # if predict.label is not None and predict.label != pkg.label:
+        #     wrongApp.add(pkg.app)
 
     print '====', classifier.name, '====', '[WRONG]', len(wrongApp)
     return rst
