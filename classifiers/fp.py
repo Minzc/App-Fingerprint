@@ -229,6 +229,7 @@ class CMAR(AbsClassifer):
         Do not use them as feature
         """
         def prune_path(item):
+            item = item.replace(PATH, '')
             if if_version(item) == True:
                 return True
             if len(re.sub('^[0-9]+$', '', item)) == 0:
