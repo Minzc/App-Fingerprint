@@ -208,10 +208,10 @@ def _use_classifier(classifier, testSet):
         for ruleType, predict in filter(lambda x: x[0] in VALID_LABEL, predicts.items()):
             rst[pkgId][ruleType] = predict
 
-    # for tbl, pkg in DataSetIter.iter_pkg(testSet):
-    #     predict = rst[pkg.id][TRAIN_LABEL]
-        # if predict.label is not None and predict.label != pkg.label:
-        #     wrongApp.add(pkg.app)
+    for tbl, pkg in DataSetIter.iter_pkg(testSet):
+        predict = rst[pkg.id][TRAIN_LABEL]
+        if predict.label is not None and predict.label != pkg.category:
+            wrongApp.add(pkg.app)
 
     print '====', classifier.name, '====', '[WRONG]', len(wrongApp)
     return rst
