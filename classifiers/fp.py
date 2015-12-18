@@ -1,4 +1,7 @@
 import sys
+
+import re
+
 from classifier import AbsClassifer
 import operator
 from const.dataset import DataSetIter
@@ -7,6 +10,7 @@ from sqldao import SqlDao
 from fp_growth import find_frequent_itemsets
 from collections import defaultdict, namedtuple
 import const.consts as consts
+from utils import if_version
 
 FinalRule = namedtuple('Rule', 'agent, path, host, label, confidence, support')
 
@@ -224,6 +228,15 @@ class CMAR(AbsClassifer):
         Third from last is host.
         Do not use them as feature
         """
+        def prune_path(item):
+            if if_version(item) == True:
+                return True
+            if len(re.sub('^[0-9]+$', '', item)) == 0:
+                return True
+            if len(item) == 1:
+                return True
+            return False
+
         transactions = []
         for tbl, package in DataSetIter.iter_pkg(trainSet):
             host, pathSeg, agent = self.encoder.get_f(package)
@@ -234,7 +247,7 @@ class CMAR(AbsClassifer):
                 base.append(agent)
 
             for item in pathSeg:
-                if  len(fList[item]) >= self.tSupport:
+                if  len(fList[item]) >= self.tSupport and prune_path(item) == False:
                     transactions.append(base + [item] + [package.label])
 
         return transactions
@@ -254,6 +267,11 @@ class CMAR(AbsClassifer):
         fList = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             assert (pkg.label != pkg.app, tbl, pkg.app)
+
+            # remove request with refer
+            if pkg.refer_rawHost:
+                continue
+
             features = frozenset(self.encoder.get_f_list(pkg))
             map(lambda f: fList[f].add(tbl), features)
             compressDB[pkg.label].add((features, tbl))
@@ -305,18 +323,19 @@ class CMAR(AbsClassifer):
         features = frozenset(self.encoder.get_f_list(package))
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
-            max_confidence = 0
-            for host in [HOST + package.host, '']:
-                for rule, label_confidence in rules[host].iteritems():
-                    label, confidence = label_confidence
-                    if rule.issubset(features) and confidence > max_confidence:  # and confidence > max_confidence:
-                        max_confidence = confidence
-                        rst = consts.Prediction(label, confidence, rule)
+            if not package.refer_rawHost:
+                max_confidence = 0
+                for host in [HOST + package.host, '']:
+                    for rule, label_confidence in rules[host].iteritems():
+                        label, confidence = label_confidence
+                        if rule.issubset(features) and confidence > max_confidence:  # and confidence > max_confidence:
+                            max_confidence = confidence
+                            rst = consts.Prediction(label, confidence, rule)
 
-            labelRsts[rule_type] = rst
-            if rule_type == consts.CATEGORY_RULE and rst != consts.NULLPrediction and rst.label != package.category:
-                print '[WRONG]', rst, package.app, package.category
-                print '=' * 10
+                labelRsts[rule_type] = rst
+                if rule_type == consts.CATEGORY_RULE and rst != consts.NULLPrediction and rst.label != package.category:
+                    print '[WRONG]', rst, package.app, package.category
+                    print '=' * 10
         return labelRsts
 
 
