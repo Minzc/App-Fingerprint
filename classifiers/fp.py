@@ -109,6 +109,7 @@ def _gen_rules(transactions, tSupport, tConfidence):
                 rules.add(r)
 
 
+
     print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
 
@@ -250,6 +251,9 @@ class CMAR(AbsClassifer):
             for item in pathSeg:
                 if  len(fList[item]) >= self.tSupport and prune_path(item) == False:
                     transactions.append(base + [item] + [package.label])
+
+            if len(pathSeg) == 0:
+                transactions.append(base + [package.label])
 
         return transactions
 
