@@ -99,8 +99,7 @@ def _gen_rules(transactions, tSupport, tConfidence):
             # if prune_host(itemset):
             r = Rule(itemset, confidence, support, labelIndex)
             rules.add(r)
-            if '[PATH]:loader2.gif' in set(itemset):
-                print '[FP103]', itemset
+
 
     print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
@@ -122,15 +121,18 @@ def _db_coverage(rules, compressDB, min_cover=3):
         return rule.confidence, rule.support, len(rule.itemSet)
 
     tRules = sorted(rules, key=lambda x: rank(x), reverse=True)
-    rules = []
+    rules = set()
     coverNum = defaultdict(int)
     for rule in tRules:
+        for item in rule.itemSet:
+            if '[PATH]:loader2.gif' in item:
+                print '[FP129]', rule.itemSet, rule.label
         for pkgNtbl in compressDB[rule.label]:
             package, tbl = pkgNtbl
             if coverNum[package] <= min_cover and rule.itemSet.issubset(package):
                 coverNum[package] += 1
                 r = rule.export()
-                rules.append(r)
+                rules.add(r)
     return rules
 
 
@@ -168,6 +170,8 @@ def _remove_duplicate(rules):
         node = root
         strSet, confidence, support, label = rule.itemLst, rule.confidence, rule.support, rule.label
         for item in strSet:
+            if '[PATH]:loader2.gif' in item:
+                print '[FP170]', strSet, label
             if item in node.children:
                 node = node.children[item]
                 if node.label == label:
@@ -188,6 +192,10 @@ def _remove_duplicate(rules):
 
     rules = [rule for rule in travers(root, [])]
 
+    for rule in rules:
+        for item in rule.itemSet:
+            if '[PATH]:loader2.gif' in item:
+                print '[FP195]', rule.itemSet, rule.label
     return rules
 
 def _clean_db(rule_type):
@@ -225,8 +233,6 @@ class CMAR(AbsClassifer):
 
             for item in pathSeg:
                 if  len(fList[item]) >= self.tSupport:
-                    if '[PATH]:loader2.gif' in item:
-                        print '[FP103]', base + [item] + [package.label]
                     transactions.append(base + [item] + [package.label])
 
         return transactions
