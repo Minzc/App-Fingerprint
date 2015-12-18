@@ -225,6 +225,8 @@ class CMAR(AbsClassifer):
 
             for item in pathSeg:
                 if  len(fList[item]) >= self.tSupport:
+                    if '[PATH]:loader2.gif' in item:
+                        print '[FP103]', base + [item] + [package.label]
                     transactions.append(base + [item] + [package.label])
 
         return transactions
