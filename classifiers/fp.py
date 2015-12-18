@@ -14,6 +14,15 @@ from utils import if_version
 
 FinalRule = namedtuple('Rule', 'agent, path, host, label, confidence, support')
 
+def growth(foundSet):
+    """
+    Do not allow single host pattern
+    :param foundSet:
+    :return:
+    """
+    if len(foundSet) == 1 and HOST in foundSet[0]:
+        return True
+    return False
 
 class Rule:
     def __init__(self, itemLst, confidence, support, label):
@@ -62,11 +71,16 @@ def sort_key(item):
 
 
 def change_support(compressDB, rules, support):
-    import datetime
+    """
+    Change to table support and prune by table support
+    :param compressDB:
+    :param rules:
+    :param support:
+    :return:
+    """
     ####################################
     # Compress database and get table support
     ####################################
-    ts = datetime.datetime.now()
     print 'Len of Rules is', len(rules)
     for r in rules:
         for packageInfo in compressDB[r.label]:
@@ -248,6 +262,7 @@ class CMAR(AbsClassifer):
                 base.append(agent)
 
             transactions.append(base + [package.label])
+
             for item in pathSeg:
                 if  len(fList[item]) >= self.tSupport and prune_path(item) == False:
                     if host is not None and 'mt0.googleapis.com' in host:

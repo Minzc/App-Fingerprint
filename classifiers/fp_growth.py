@@ -18,7 +18,7 @@ __author__ = 'Eric Naeseth <eric@naeseth.com>'
 __copyright__ = 'Copyright © 2009 Eric Naeseth'
 __license__ = 'MIT License'
 
-def find_frequent_itemsets(transactions, minimum_support, include_support=False):
+def find_frequent_itemsets(transactions, minimum_support, include_support=False, growth = lambda x : False):
     """
     Find frequent itemsets in the given transactions using FP-growth. This
     function returns a generator instead of an eagerly-populated list of items.
@@ -102,7 +102,7 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
 
                 yield (found_set, support, support_dist) if include_support else found_set
 
-                if len(support_dist) > 1:
+                if len(support_dist) > 1 or growth(found_set):
                     # Build a conditional tree and recursively search for frequent
                     # itemsets within it.
                     cond_tree = conditional_tree_from_paths(tree.prefix_paths(item),
