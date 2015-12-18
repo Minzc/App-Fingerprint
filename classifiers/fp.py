@@ -247,14 +247,12 @@ class CMAR(AbsClassifer):
             if agent is not None and len(fList[agent]) >= self.tSupport:
                 base.append(agent)
 
+            transactions.append(base + [package.label])
             for item in pathSeg:
                 if  len(fList[item]) >= self.tSupport and prune_path(item) == False:
                     if host is not None and 'mt0.googleapis.com' in host:
                         print '[fp246] host',host, package.label, pathSeg, item
                     transactions.append(base + [item] + [package.label])
-
-            if len(pathSeg) == 0:
-                transactions.append(base + [package.label])
 
         return transactions
 
