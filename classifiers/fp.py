@@ -42,6 +42,7 @@ def prune_host(items):
     if len(items) == 1 and HOST in items[0]:
         return False
     return True
+
 def prune_path(items):
     if len(items) == 1 and PATH in items[0]:
         return False
@@ -97,8 +98,9 @@ def _gen_rules(transactions, tSupport, tConfidence):
             confidence = max(tag_dist.values()) * 1.0 / support
             assert confidence <= 1
             # if prune_host(itemset):
-            r = Rule(itemset, confidence, support, labelIndex)
-            rules.add(r)
+            if prune_path(itemset):
+                r = Rule(itemset, confidence, support, labelIndex)
+                rules.add(r)
 
 
     print ">>> Finish Rule Generating. Total number of rules is", len(rules)
