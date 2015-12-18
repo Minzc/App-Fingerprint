@@ -42,7 +42,10 @@ def prune_host(items):
     if len(items) == 1 and HOST in items[0]:
         return False
     return True
-
+def prune_path(items):
+    if len(items) == 1 and PATH in items[0]:
+        return False
+    return True
 
 def sort_key(item):
     if AGENT in item:
@@ -96,6 +99,8 @@ def _gen_rules(transactions, tSupport, tConfidence):
             # if prune_host(itemset):
             r = Rule(itemset, confidence, support, labelIndex)
             rules.add(r)
+            if '[PATH]:loader2.gif' in set(itemset):
+                print '[FP103]', itemset
 
     print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
@@ -201,7 +206,7 @@ class CMAR(AbsClassifer):
         self.tConfidence = tConfidence
         self.encoder = AgentEncoder()
 
-    def _encode_data(self, packages, fList):
+    def _encode_data(self, trainSet, fList):
         """
         Change package to transaction
         Last item is table name
@@ -210,7 +215,7 @@ class CMAR(AbsClassifer):
         Do not use them as feature
         """
         transactions = []
-        for package in packages:
+        for tbl, package in DataSetIter.iter_pkg(trainSet):
             host, pathSeg, agent = self.encoder.get_f(package)
             base = []
             if host is not None and len(fList[host]) >= self.tSupport:
@@ -235,17 +240,14 @@ class CMAR(AbsClassifer):
 
     def train(self, trainSet, ruleType):
         self.encoder = AgentEncoder()
-        packages = []
         compressDB = defaultdict(set)
         fList = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             assert (pkg.label != pkg.app, tbl, pkg.app)
-            packages.append(pkg)
             features = frozenset(self.encoder.get_f_list(pkg))
             map(lambda f: fList[f].add(tbl), features)
             compressDB[pkg.label].add((features, tbl))
-        print "#CMAR:", len(packages)
-        trainList = self._encode_data(packages, fList)
+        trainList = self._encode_data(trainSet, fList)
         ''' Rules format : (feature, confidence, support, label) '''
         rules = _gen_rules(trainList, self.tSupport, self.tConfidence)
         rules = change_support(compressDB, rules, self.tSupport)

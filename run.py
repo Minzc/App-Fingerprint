@@ -9,13 +9,13 @@ from const.dataset import DataSetIter as DataSetIter
 from classifiers.classifier_factory import classifier_factory
 
 LIMIT = None
-INSERT = False
+INSERT = True
 PRUNE = False
 SAMPLERATE = 1
 TRAIN_LABEL = consts.CATEGORY_RULE
 
 VALID_LABEL = {
-    #consts.APP_RULE,
+    consts.APP_RULE,
     #consts.COMPANY_RULE,
     consts.CATEGORY_RULE
 }
@@ -157,9 +157,6 @@ def evaluate(rst, testSet, testApps):
                 predict = predictions[ruleType].label
                 label = get_label(pkg, ruleType)
                 correctLabels[ruleType] = 1 if label == predict else 0
-
-                if correctLabels[ruleType] == 0:
-                    print '[run]', label, predict
 
                 if predict is not None:
                     assert sum(correctLabels) <= 1
