@@ -210,8 +210,9 @@ def _use_classifier(classifier, testSet):
 
     for tbl, pkg in DataSetIter.iter_pkg(testSet):
         predict = rst[pkg.id][TRAIN_LABEL]
-        if predict.label is not None and predict.label != pkg.category:
+        if predict.label is not None:
             wrongApp.add(pkg.app)
+
 
     print '====', classifier.name, '====', '[WRONG]', len(wrongApp)
     return rst
