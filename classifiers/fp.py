@@ -100,6 +100,8 @@ def _gen_rules(transactions, tSupport, tConfidence):
         labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
         if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
             confidence = max(tag_dist.values()) * 1.0 / support
+            if '[HOST]:mt0.googleapis.com' in set(itemset):
+                print '[fp104]', tag_dist, confidence, tag_dist[labelIndex] * 1.0 / support
             assert confidence <= 1
             # if prune_host(itemset):
             if prune_path(itemset):
@@ -198,10 +200,6 @@ def _remove_duplicate(rules):
 
     rules = [rule for rule in travers(root, [])]
 
-    for rule in rules:
-        for item in rule.itemSet:
-            if '[PATH]:loader2.gif' in item:
-                print '[FP195]', rule.itemSet, rule.label
     return rules
 
 def _clean_db(rule_type):
@@ -278,9 +276,6 @@ class CMAR(AbsClassifer):
             features = frozenset(self.encoder.get_f_list(pkg))
             map(lambda f: fList[f].add(tbl), features)
             compressDB[pkg.label].add((features, tbl))
-        print '[fp281]', '[HOST]:mt0.googleapis.com' in fList
-        if '[HOST]:mt0.googleapis.com' in fList:
-            print '[fp283]', fList['[HOST]:mt0.googleapis.com']
         trainList = self._encode_data(trainSet, fList)
         ''' Rules format : (feature, confidence, support, label) '''
         rules = _gen_rules(trainList, self.tSupport, self.tConfidence)
@@ -338,10 +333,10 @@ class CMAR(AbsClassifer):
                             max_confidence = confidence
                             rst = consts.Prediction(label, confidence, rule)
 
-                labelRsts[rule_type] = rst
-                if rule_type == consts.CATEGORY_RULE and rst != consts.NULLPrediction and rst.label != package.category:
-                    print '[WRONG]', rst, package.app, package.category
-                    print '=' * 10
+            labelRsts[rule_type] = rst
+            if rule_type == consts.CATEGORY_RULE and rst != consts.NULLPrediction and rst.label != package.category:
+                print '[WRONG]', rst, package.app, package.category
+                print '=' * 10
         return labelRsts
 
 
