@@ -254,7 +254,7 @@ def test(testTbl, appType):
 
     rst = {}
     # classifiers = classifier_factory(USED_CLASSIFIERS, appType)
-    classifiers = classifier_factory([consts.CMAR_CLASSIFIER], appType)
+    classifiers = classifier_factory([consts.KV_CLASSIFIER,consts.CMAR_CLASSIFIER], appType)
     for name, classifier in classifiers:
         print ">>> [test#%s] " % name
         classifier.set_name(name)

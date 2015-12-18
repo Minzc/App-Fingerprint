@@ -272,9 +272,9 @@ class KVClassifier(AbsClassifer):
 
         trackIds = {}
         for tbl, pkg, k, v in DataSetIter.iter_kv(trainData):
-            self.compressedDB[consts.APP_RULE][pkg.secdomain][k][pkg.label][v].add(tbl)
+            self.compressedDB[consts.APP_RULE][pkg.secdomain][k][pkg.app][v].add(tbl)
             self.compressedDB[consts.COMPANY_RULE][pkg.secdomain][k][pkg.company][v].add(tbl)
-            self.valueLabelCounter[consts.APP_RULE][v].add(pkg.label)
+            self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
             self.valueLabelCounter[consts.COMPANY_RULE][v].add(pkg.company)
             trackIds[pkg.trackId] = pkg.app
 
@@ -293,6 +293,7 @@ class KVClassifier(AbsClassifer):
         #############################
         # Pruning general rules
         #############################
+        print ">>>[KV] Before pruning appGeneralRules", len(appGeneralRules)
         appGeneralRules = self._prune_general_rules(appGeneralRules, trainData, xmlGenRules)
         companyGeneralRules = self._prune_general_rules(companyGeneralRules, trainData, xmlGenRules)
         print ">>>[KV] appGeneralRules", len(appGeneralRules)
@@ -370,7 +371,7 @@ class KVClassifier(AbsClassifer):
         for ruleType, patterns in specificRules.iteritems():
             tmpRules = {}
             for tbl, pkg, key, value in DataSetIter.iter_kv(trainData):
-                if pkg.label in patterns[pkg.host][key][value]:
+                if pkg.app in patterns[pkg.host][key][value]:
                     tmpRules[pkg.rawHost] = patterns[pkg.host]
             tmpSpecificRules[ruleType] = tmpRules
         return tmpSpecificRules
