@@ -243,7 +243,7 @@ class CMAR(AbsClassifer):
             host, pathSeg, agent = self.encoder.get_f(package)
             base = []
             if host is not None and 'mt0.googleapis.com' in host:
-                print '[fp246]',host, package.label, pathSeg
+                print '[fp246] host',host, package.label, pathSeg
             if host is not None and len(fList[host]) >= self.tSupport:
                 base.append(host)
             if agent is not None and len(fList[agent]) >= self.tSupport:
@@ -278,6 +278,9 @@ class CMAR(AbsClassifer):
             features = frozenset(self.encoder.get_f_list(pkg))
             map(lambda f: fList[f].add(tbl), features)
             compressDB[pkg.label].add((features, tbl))
+        print '[fp281]', '[HOST]:mt0.googleapis.com' in fList
+        if '[HOST]:mt0.googleapis.com' in fList:
+            print '[fp283]', fList['[HOST]:mt0.googleapis.com']
         trainList = self._encode_data(trainSet, fList)
         ''' Rules format : (feature, confidence, support, label) '''
         rules = _gen_rules(trainList, self.tSupport, self.tConfidence)
