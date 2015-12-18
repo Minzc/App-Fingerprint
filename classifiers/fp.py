@@ -241,8 +241,7 @@ class CMAR(AbsClassifer):
         for tbl, package in DataSetIter.iter_pkg(trainSet):
             agent, pathSeg, host = self.encoder.get_f(package)
             base = []
-            if host is not None and 'mt0.googleapis.com' in host:
-                print '[fp246] host',host, package.label, pathSeg
+
             if host is not None and len(fList[host]) >= self.tSupport:
                 base.append(host)
             if agent is not None and len(fList[agent]) >= self.tSupport:
@@ -250,6 +249,8 @@ class CMAR(AbsClassifer):
 
             for item in pathSeg:
                 if  len(fList[item]) >= self.tSupport and prune_path(item) == False:
+                    if host is not None and 'mt0.googleapis.com' in host:
+                        print '[fp246] host',host, package.label, pathSeg, item
                     transactions.append(base + [item] + [package.label])
 
             if len(pathSeg) == 0:
