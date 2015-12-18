@@ -209,10 +209,11 @@ def _use_classifier(classifier, testSet):
             rst[pkgId][ruleType] = predict
 
     for tbl, pkg in DataSetIter.iter_pkg(testSet):
-        for ruleType in VALID_LABEL and ruleType in rst[pkg.id]:
-            predict = rst[pkg.id][ruleType]
-            if predict.label is not None:
-                wrongApp.add(pkg.app)
+        for ruleType in rst[pkg.id]:
+            if ruleType in VALID_LABEL:
+                predict = rst[pkg.id][ruleType]
+                if predict.label is not None:
+                    wrongApp.add(pkg.app)
 
 
     print '====', classifier.name, '====', '[WRONG]', len(wrongApp)

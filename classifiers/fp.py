@@ -240,7 +240,7 @@ class CMAR(AbsClassifer):
 
         transactions = []
         for tbl, package in DataSetIter.iter_pkg(trainSet):
-            host, pathSeg, agent = self.encoder.get_f(package)
+            agent, pathSeg, host = self.encoder.get_f(package)
             base = []
             if host is not None and 'mt0.googleapis.com' in host:
                 print '[fp246] host',host, package.label, pathSeg
