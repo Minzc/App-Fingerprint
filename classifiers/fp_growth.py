@@ -97,12 +97,12 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False,
             if support >= minimum_support and item not in suffix:
                 # New winner!
                 found_set = [item] + suffix
-                # for k, v in [pair for pair in node.clsses().items() for node in nodes]:
-                #         support_dist[k] += v
 
-                yield (found_set, support, support_dist) if include_support else found_set
+                not_gen_rule = growth(found_set)
+                if not_gen_rule == False:
+                    yield (found_set, support, support_dist) if include_support else found_set
 
-                if len(support_dist) > 1 or growth(found_set):
+                if len(support_dist) > 1 or not_gen_rule:
                     # Build a conditional tree and recursively search for frequent
                     # itemsets within it.
                     cond_tree = conditional_tree_from_paths(tree.prefix_paths(item),
