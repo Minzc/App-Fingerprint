@@ -106,7 +106,7 @@ def _gen_rules(transactions, tSupport, tConfidence):
     Return : (itemsets, confidencet, support, label)
     """
     rules = set()
-    frequentPatterns = find_frequent_itemsets(transactions, tSupport, True)
+    frequentPatterns = find_frequent_itemsets(transactions, tSupport, True, growth)
     for frequent_pattern_info in frequentPatterns:
         itemset, support, tag_dist = frequent_pattern_info
         itemset = sorted(itemset, key=sort_key)
