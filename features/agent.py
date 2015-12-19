@@ -30,7 +30,7 @@ class AgentEncoder:
     def get_f(self, package):
         agent = self.get_agent(package)
         pathSegs = map(lambda x: PATH + x, set(filter(None,package.path.split('/'))))
-        host = HOST + re.sub('[0-9]+$','[NUM]',package.host)
+        host = HOST + re.sub('[0-9]+\.','[NUM].',package.host)
         if agent:
             agent = AGENT + agent
         return agent, pathSegs, host
