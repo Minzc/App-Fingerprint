@@ -30,23 +30,14 @@ class AgentEncoder:
     def get_f(self, package):
         agent = self.get_agent(package)
         pathSegs = map(lambda x: PATH + x, set(filter(None,package.path.split('/'))))
-        host = HOST + package.host
+        host = HOST + re.sub('[0-9]+$','[NUM]',package.host)
         if agent:
             agent = AGENT + agent
         return agent, pathSegs, host
 
     def get_f_list(self, package):
-        agent = self.get_agent(package)
-        pathSegs = set(filter(None,package.path.split('/')))
-        host = package.host
-        fList = []
-        if agent:
-            agent = AGENT + agent
-            fList.append(agent)
-        for seg in set(pathSegs):
-            if len(seg) > 0:
-                fList.append(PATH + seg)
-        fList.append(HOST + host)
+        agent, pathSegs, host = self.get_f(package)
+        fList = [agent] + pathSegs + [host]
         return fList
 
     def get_agent(self, package):

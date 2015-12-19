@@ -344,7 +344,7 @@ class CMAR(AbsClassifer):
             rst = consts.NULLPrediction
             if not package.refer_rawHost:
                 max_confidence = 0
-                for host in [HOST + package.host, '']:
+                for host in [HOST + re.sub('[0-9]+$','[NUM]',package.host), '']:
                     for rule, label_confidence in rules[host].iteritems():
                         label, confidence = label_confidence
                         if rule.issubset(features) and confidence > max_confidence:  # and confidence > max_confidence:
