@@ -130,8 +130,6 @@ def _gen_rules(transactions, tSupport, tConfidence):
             confidence = max(tag_dist.values()) * 1.0 / support
             if '[HOST]:mt0.googleapis.com' in set(itemset):
                 print '[fp104]', tag_dist, confidence, tag_dist[labelIndex] * 1.0 / support
-            assert confidence <= 1
-            # if prune_host(itemset):
             if prune_path(itemset):
                 r = Rule(itemset, confidence, support, labelIndex)
                 rules.add(r)

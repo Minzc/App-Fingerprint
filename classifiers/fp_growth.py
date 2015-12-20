@@ -85,10 +85,6 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False,
             nodes = [node for node in nodes]
 
             for node in nodes:
-                if len(node.clsses) == 0:
-                    print '[item]', item, '[pair]',(items[item], item)
-                    for child in node._children:
-                        print '[child]', child, (items[child], child)
                 assert len(node.clsses) != 0
                 support += node.count
                 for k, v in node.clsses.items():
@@ -99,6 +95,9 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False,
                 found_set = [item] + suffix
 
                 not_gen_rule = growth(found_set)
+                if '[HOST]:meijer.122.2o7.net' in found_set:
+                    print '[FPGROWTH103]', found_set, support_dist, support
+
                 if not_gen_rule == False:
                     yield (found_set, support, support_dist) if include_support else found_set
 
