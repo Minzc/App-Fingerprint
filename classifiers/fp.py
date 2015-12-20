@@ -4,6 +4,8 @@ import re
 
 from classifier import AbsClassifer
 import operator
+
+from classifiers.uri import UriClassifier
 from const.dataset import DataSetIter
 from features.agent import AgentEncoder, AGENT, PATH, HOST
 from sqldao import SqlDao
@@ -70,7 +72,7 @@ def sort_key(item):
         return 3
 
 
-def change_support(compressDB, rules, support):
+def change_support(compressDB, rules, support, cHosts):
     """
     Change to table support and prune by table support
     :param compressDB:
@@ -88,10 +90,20 @@ def change_support(compressDB, rules, support):
             if r.itemSet.issubset(features):
                 r.add_tbl(tbl)
     tmpRules = []
+    compareHosts = {}
     for r in rules:
         r.support = len(r.tblSupport)
+        #################################
+        for item in r.itemSet:
+            if HOST in item:
+                item = item.replace(HOST, '')
+                compareHosts[item] = r.tblSupport
+        #################################
         if r.support >= support:
             tmpRules.append(r)
+    for host, tbls in cHosts.items():
+        if host not in compareHosts:
+            print '[HOST]', host, tbls
     return tmpRules
 
 def _gen_rules(transactions, tSupport, tConfidence):
@@ -280,24 +292,43 @@ class CMAR(AbsClassifer):
         sqldao.close()
         print "Total Number of Rules is", len(params)
 
+    def getGoodHost(self, trainSet, ruleType):
+        uriClassifier = UriClassifier(consts.IOS)
+        print '[URI] Start Training'
+        hostRules, _ = uriClassifier.train(trainSet, ruleType, ifPersist=False)
+        print '[URI] Finish Training'
+        cHosts = {}
+        for ruleType in hostRules:
+            for rule, tbls in hostRules[ruleType].items():
+                host, pathSeg, label = rule
+                if pathSeg is not None:
+                    if not pathSeg[-1].isalnum():
+                        pathSeg = pathSeg[:-1]
+                    if not pathSeg[0].isalnum():
+                        pathSeg = pathSeg[1:]
+                    # pathSeg = r'\b' + re.escape(pathSeg) + r'\b'
+                cHosts[host] = tbls
+            print "Total Number of Hosts is", len(cHosts)
+        return cHosts
+
     def train(self, trainSet, ruleType):
         self.encoder = AgentEncoder()
         compressDB = defaultdict(set)
         fList = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
-            assert (pkg.label != pkg.app, tbl, pkg.app)
-
             # remove request with refer
             if pkg.refer_rawHost:
                 continue
-
             features = frozenset(self.encoder.get_f_list(pkg))
             map(lambda f: fList[f].add(tbl), features)
             compressDB[pkg.label].add((features, tbl))
+
+        cHosts = self.getGoodHost(trainSet, ruleType)
+
         trainList = self._encode_data(trainSet, fList)
         ''' Rules format : (feature, confidence, support, label) '''
         rules = _gen_rules(trainList, self.tSupport, self.tConfidence)
-        rules = change_support(compressDB, rules, self.tSupport)
+        rules = change_support(compressDB, rules, self.tSupport, cHosts)
         ''' Prune duplicated rules'''
         print '[CMAR] Before pruning', len(rules)
         rules = _remove_duplicate(rules)

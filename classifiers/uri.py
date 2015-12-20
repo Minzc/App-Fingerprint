@@ -163,7 +163,7 @@ class UriClassifier(AbsClassifer):
                 return True
         return False
 
-    def train(self, trainData, rule_type):
+    def train(self, trainData, rule_type, ifPersist = True):
         rawHost = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             rawHost[pkg.host].add(pkg.rawHost)
@@ -174,8 +174,10 @@ class UriClassifier(AbsClassifer):
         hostRules = self.__host_rules(trainData)
         pathRules = self.__path_rules(trainData)
 
-        self._persist(hostRules)
-        self._persist(pathRules)
+        if ifPersist:
+            self._persist(hostRules)
+            self._persist(pathRules)
+        return hostRules, pathRules
 
     def load_rules(self):
         QUERY = 'SELECT label, pattens, host, rule_type, support FROM patterns where agent IS  NULL and paramkey IS NULL'
