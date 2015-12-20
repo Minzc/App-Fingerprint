@@ -1,10 +1,6 @@
-import sys
-
 import re
-
 from classifier import AbsClassifer
 import operator
-
 from classifiers.uri import UriClassifier
 from const.dataset import DataSetIter
 from features.agent import AgentEncoder, AGENT, PATH, HOST
@@ -16,6 +12,7 @@ from utils import if_version
 
 FinalRule = namedtuple('Rule', 'agent, path, host, label, confidence, support')
 
+
 def growth(foundSet):
     """
     Do not allow single host pattern
@@ -25,6 +22,7 @@ def growth(foundSet):
     if len(foundSet) == 1 and HOST in foundSet[0]:
         return True
     return False
+
 
 class Rule:
     def __init__(self, itemLst, confidence, support, label):
@@ -43,13 +41,13 @@ class Rule:
         agent = None
         pathSeg = None
         host = None
-        for str in self.itemSet:
-            if HOST in str:
-                host = str
-            if AGENT in str:
-                agent = str
-            if PATH in str:
-                pathSeg = str
+        for string in self.itemSet:
+            if HOST in string:
+                host = string
+            if AGENT in string:
+                agent = string
+            if PATH in string:
+                pathSeg = string
         return FinalRule(agent, pathSeg, host, self.label, self.confidence, self.support)
 
 
@@ -58,10 +56,12 @@ def prune_host(items):
         return False
     return True
 
+
 def prune_path(items):
     if len(items) == 1 and PATH in items[0]:
         return False
     return True
+
 
 def sort_key(item):
     if AGENT in item:
@@ -75,6 +75,7 @@ def sort_key(item):
 def change_support(compressDB, rules, support, cHosts):
     """
     Change to table support and prune by table support
+    :param cHosts:
     :param compressDB:
     :param rules:
     :param support:
@@ -106,6 +107,7 @@ def change_support(compressDB, rules, support, cHosts):
             print '[HOST]', host, tbls
     return tmpRules
 
+
 def _gen_rules(transactions, tSupport, tConfidence):
     """
     Generate encoded rules
@@ -133,8 +135,6 @@ def _gen_rules(transactions, tSupport, tConfidence):
             if prune_path(itemset):
                 r = Rule(itemset, confidence, support, labelIndex)
                 rules.add(r)
-
-
 
     print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
@@ -229,6 +229,7 @@ def _remove_duplicate(rules):
 
     return rules
 
+
 def _clean_db(rule_type):
     sqldao = SqlDao()
     sqldao.execute(consts.SQL_DELETE_CMAR_RULES % rule_type)
@@ -253,6 +254,7 @@ class CMAR(AbsClassifer):
         Third from last is host.
         Do not use them as feature
         """
+
         def prune_path(item):
             item = item.replace(PATH, '')
             if if_version(item) == True:
@@ -276,9 +278,9 @@ class CMAR(AbsClassifer):
             transactions.append(base + [package.label])
 
             for item in pathSeg:
-                if  len(fList[item]) >= self.tSupport and prune_path(item) == False:
+                if len(fList[item]) >= self.tSupport and prune_path(item) == False:
                     if host is not None and 'mt0.googleapis.com' in host:
-                        print '[fp246] host',host, package.label, pathSeg, item
+                        print '[fp246] host', host, package.label, pathSeg, item
                     transactions.append(base + [item] + [package.label])
 
         return transactions
@@ -306,7 +308,7 @@ class CMAR(AbsClassifer):
                         pathSeg = pathSeg[:-1]
                     if not pathSeg[0].isalnum():
                         pathSeg = pathSeg[1:]
-                    # pathSeg = r'\b' + re.escape(pathSeg) + r'\b'
+                        # pathSeg = r'\b' + re.escape(pathSeg) + r'\b'
                 cHosts[host] = tbls
             print "Total Number of Hosts is", len(cHosts)
         return cHosts
@@ -375,7 +377,7 @@ class CMAR(AbsClassifer):
             rst = consts.NULLPrediction
             if not package.refer_rawHost:
                 max_confidence = 0
-                for host in [HOST + re.sub('[0-9]+$','[NUM]',package.host), '']:
+                for host in [HOST + re.sub('[0-9]+$', '[NUM]', package.rawHost), '']:
                     for rule, label_confidence in rules[host].iteritems():
                         label, confidence = label_confidence
                         if rule.issubset(features) and confidence > max_confidence:  # and confidence > max_confidence:
