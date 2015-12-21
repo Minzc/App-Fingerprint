@@ -21,6 +21,8 @@ def growth(foundSet):
     """
     if len(foundSet) == 1 and HOST in foundSet[0]:
         return True
+    if len(foundSet) == 1 and PATH in foundSet[0]:
+        return True
     return False
 
 
