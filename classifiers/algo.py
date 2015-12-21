@@ -126,7 +126,8 @@ class KV:
             if v not in trackIds and len(re.sub('[0-9]', '', v)) < 2:
                 continue
             host, key = rule
-            print '[algo129] add a text rule'
+            if host == 'pubads.g.doubleclick.net:80':
+                print '[algo129] add a text rule', host, key
             specificRules[host][key][v][app][consts.SCORE] = 1.0
             specificRules[host][key][v][app][consts.SUPPORT] = tbls
         return specificRules
@@ -164,9 +165,11 @@ class KVClassifier(AbsClassifer):
         """
         generalRules = self.miner.prune(generalRules)
         for host in generalRules:
+            if host == 'pubads.g.doubleclick.net:80':
+                print '[algo169]', generalRules[host]
             generalRules[host] = self.miner.sort(generalRules[host], xmlGenRules)
             if host == 'pubads.g.doubleclick.net:80':
-                print '[algo168]', generalRules[host]
+                print '[algo171]', generalRules[host]
 
         coverage = defaultdict(int)
         prunedGenRules = defaultdict(set)
@@ -230,13 +233,13 @@ class KVClassifier(AbsClassifer):
         Rule = consts.Rule
         generalRules = defaultdict(list)
         for secdomain in keyScore:
-            if secdomain == 'pubads.g.doubleclick.net:80':
-                print '[algo234]', keyScore[secdomain]
             for key in keyScore[secdomain]:
                 labelNum = len(keyScore[secdomain][key][consts.LABEL])
                 score = keyScore[secdomain][key][consts.SCORE]
                 generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
         for secdomain in generalRules:
+            if secdomain == 'pubads.g.doubleclick.net:80':
+                print '[algo234]', keyScore[secdomain]
             generalRules[secdomain] = sorted(generalRules[secdomain], key=lambda rule: rule.score, reverse=True)
         return generalRules
 
