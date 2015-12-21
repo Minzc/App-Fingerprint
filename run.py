@@ -12,7 +12,7 @@ LIMIT = None
 INSERT = True
 PRUNE = False
 SAMPLERATE = 1
-TRAIN_LABEL = consts.CATEGORY_RULE
+TRAIN_LABEL = consts.APP_RULE
 
 VALID_LABEL = {
     consts.APP_RULE,
@@ -22,10 +22,10 @@ VALID_LABEL = {
 
 USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
-    consts.AGENT_CLASSIFIER,
+    #consts.AGENT_CLASSIFIER,
     consts.KV_CLASSIFIER,
     #consts.URI_CLASSIFIER,
-    consts.CMAR_CLASSIFIER,
+    #consts.CMAR_CLASSIFIER,
 ]
 
 class PredictRst:

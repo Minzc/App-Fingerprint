@@ -9,20 +9,58 @@ from classifier import AbsClassifer
 from const.dataset import DataSetIter as DataSetIter
 
 DEBUG = False
+PATH = '[PATH]:'
+
+class Path:
+    def __init__(self):
+        pass
+    @staticmethod
+    def get_f(package):
+        host = re.sub('[0-9]+\.','[NUM].',package.rawHost)
+        for index, pathSeg in filter(None,package.path.split('/')):
+            pathSeg = re.sub('[0-9]+$','[NUM].',pathSeg)
+            yield (host, PATH + str(index), pathSeg)
+
+    def txt_analysis(self, trainData):
+        xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+        xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
+        hostSecdomain = {}
+        return xmlGenRules, xmlSpecificRules, hostSecdomain
+
+    def prune(self, keys):
+        """
+        key format Rule(secdomain, key, score, labelNum)
+        :param keys:
+        :return:
+        """
+        prunedK = {}
+        for secdomain, keys in keys.items():
+            keys = [key for key in keys if key.score > 1]
+            prunedK[secdomain] = keys
+        return prunedK
+
+    def sort(self, genRules, txtRules):
+        def compare(genRule):
+            ifTxtRule = 1 if (genRule.secdomain, genRule.key) in txtRules else 0
+            return ( ifTxtRule, genRule.score, 100 - int(genRule.key.replace(PATH, '')))
+        sGenRules = sorted(genRules, key=compare, reverse=True)
+        return sGenRules
+
+
 
 class KVClassifier(AbsClassifer):
-    def __init__(self, appType, inferFrmData=True, sampleRate=1):
+    def __init__(self, appType, inferFrmData=True):
         def __create_dict():
             return defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(set))))
 
         self.name = consts.KV_CLASSIFIER
-        self.compressedDB = {consts.APP_RULE: __create_dict(), consts.COMPANY_RULE: __create_dict()}
+        self.compressedDB = {consts.APP_RULE: __create_dict(), consts.CATEGORY_RULE: __create_dict()}
         self.valueLabelCounter = {consts.APP_RULE: defaultdict(set), consts.COMPANY_RULE: defaultdict(set)}
         self.rules = {}
         self.appType = appType
         self.xmlFeatures = load_xml_features()
         self.inferFrmData = inferFrmData
-        self.sampleRate = sampleRate
+        self.miner = Path()
         self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
                           lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
                       consts.COMPANY_RULE: defaultdict(lambda: defaultdict(
@@ -30,8 +68,7 @@ class KVClassifier(AbsClassifer):
                       consts.CATEGORY_RULE: defaultdict(lambda: defaultdict(
                           lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None}))}
 
-    @staticmethod
-    def _prune_general_rules(generalRules, trainData, xmlGenRules):
+    def _prune_general_rules(self, generalRules, trainData, xmlGenRules):
         """
         1. PK by coverage
         2. Prune by xml rules
@@ -40,36 +77,18 @@ class KVClassifier(AbsClassifer):
         :param trainData : { tbl : [ packet, packet, ... ] }
         :param xmlGenRules : {( host, key) }
         """
-        ruleCoverage = defaultdict(lambda: defaultdict(set))
-        ruleScores = {}
-        ruleLabelNum = {}
-        for tbl, pkg, key, value in DataSetIter.iter_kv(trainData):
-            for rule in [r for r in generalRules[pkg.secdomain] if r.key == key]:
-                ruleCoverage[pkg.host][rule.key].add(tbl + '#' + str(pkg.id))
-                ruleScores[(pkg.host, rule.key)] = rule.score
-                ruleLabelNum[(pkg.host, rule.key)] = rule.labelNum
+        generalRules = self.miner.prune(generalRules)
+        for host in generalRules:
+            generalRules[host] = self.miner.sort(generalRules[host])
 
-        PKG_IDS = 1
-        prunedGenRules = defaultdict(list)
-        for host, keyNcoveredIds in ruleCoverage.iteritems():
-            keyNcoveredIds = sorted(keyNcoveredIds.items(), key=lambda keyNid: len(keyNid[PKG_IDS]))
-            for i in range(len(keyNcoveredIds)):
-                ifKeepRule = (True, None)
-                iKey, iCoveredIds = keyNcoveredIds[i]
-                # if (host, iKey) not in xmlGenRules and ruleScores[(host, iKey)] < 1:
-                #     ifKeepRule = (False, None, '3')
-                ''' Prune by coverage '''
-                for j in range(i + 1, len(keyNcoveredIds)):
-                    jKey, jCoveredIds = keyNcoveredIds[j]
-                    if ruleScores[(host, iKey)] < ruleScores[(host, jKey)]:
-                        if iCoveredIds.issubset(jCoveredIds) and (host, iKey) not in xmlGenRules:
-                            ifKeepRule = (False, jKey, '1')
-                if iKey == 'devapp':
-                    print ifKeepRule, host, ruleScores[(host, iKey)]
-
-                if ifKeepRule[0]:
-                    rule = consts.Rule(host, iKey, ruleScores[(host, iKey)], ruleLabelNum[(host, iKey)])
-                    prunedGenRules[host].append(rule)
+        coverage = defaultdict(int)
+        prunedGenRules = defaultdict(set)
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            for host, key, value in self.miner.get_f(pkg):
+                for rule in generalRules[host]:
+                    if rule.key == key and coverage[tbl+'#'+str(pkg.id)] < 3:
+                        coverage[tbl+'#'+str(pkg.id)] += 1
+                        prunedGenRules[host].add(rule)
 
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
@@ -83,7 +102,7 @@ class KVClassifier(AbsClassifer):
         return prunedGenRules
 
     @staticmethod
-    def _count(featureTbl, valueLabelCounter):
+    def _score(featureTbl, valueLabelCounter):
         """
         Give score to every ( secdomain, key ) pairs
         Input
@@ -122,15 +141,12 @@ class KVClassifier(AbsClassifer):
             for key in keyScore[secdomain]:
                 labelNum = len(keyScore[secdomain][key][consts.LABEL])
                 score = keyScore[secdomain][key][consts.SCORE]
-                if labelNum == 1 or score <= 1:
-                    continue
                 generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
         for secdomain in generalRules:
             generalRules[secdomain] = sorted(generalRules[secdomain], key=lambda rule: rule.score, reverse=True)
         return generalRules
 
-    @staticmethod
-    def _generate_rules(trainData, generalRules, valueLabelCounter, ruleType):
+    def _generate_rules(self, trainData, generalRules, valueLabelCounter, ruleType):
         """
         Generate specific rules
         Input
@@ -147,13 +163,14 @@ class KVClassifier(AbsClassifer):
         specificRules = defaultdict(lambda: defaultdict(
             lambda: defaultdict(lambda: defaultdict(lambda: {consts.SCORE: 0, consts.SUPPORT: set()}))))
 
-        for tbl, pkg, key, value in DataSetIter.iter_kv(trainData):
-            for rule in [r for r in generalRules[pkg.host] if r.key == key]:
-                value = value.strip()
-                if len(valueLabelCounter[value]) == 1 and len(value) != 1:
-                    label = pkg.app if ruleType == consts.APP_RULE else pkg.company
-                    specificRules[pkg.host][key][value][label][consts.SCORE] = rule.score
-                    specificRules[pkg.host][key][value][label][consts.SUPPORT].add(tbl)
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            for host, key, value in self.miner.get_f(pkg):
+                for rule in [r for r in generalRules[pkg.host] if r.key == key]:
+                    value = value.strip()
+                    if len(valueLabelCounter[value]) == 1 and len(value) != 1:
+                        label = pkg.app if ruleType == consts.APP_RULE else pkg.company
+                        specificRules[pkg.host][key][value][label][consts.SCORE] = rule.score
+                        specificRules[pkg.host][key][value][label][consts.SUPPORT].add(tbl)
 
         return specificRules
 
@@ -212,7 +229,6 @@ class KVClassifier(AbsClassifer):
         xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
         hostSecdomain = {}
         for tbl, pkg, k, v in DataSetIter.iter_kv(trainData):
-            self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
             hostSecdomain[pkg.host] = pkg.secdomain
             if if_version(v) == False and len(self.valueLabelCounter[consts.APP_RULE][v]) == 1:
                 for fieldName in [name for name, value in self.xmlFeatures[pkg.app] if value == v]:
@@ -271,20 +287,21 @@ class KVClassifier(AbsClassifer):
         """
 
         trackIds = {}
-        for tbl, pkg, k, v in DataSetIter.iter_kv(trainData):
-            self.compressedDB[consts.APP_RULE][pkg.secdomain][k][pkg.app][v].add(tbl)
-            self.compressedDB[consts.COMPANY_RULE][pkg.secdomain][k][pkg.company][v].add(tbl)
-            self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
-            self.valueLabelCounter[consts.COMPANY_RULE][v].add(pkg.company)
-            trackIds[pkg.trackId] = pkg.app
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            for host, k, v in self.miner.get_f(pkg):
+                self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
+                self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
+                self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
+                self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
+                trackIds[pkg.trackId] = pkg.app
 
-        xmlGenRules, xmlSpecificRules, hostSecdomain = self._gen_xml_rules(trainData)
+        xmlGenRules, xmlSpecificRules, hostSecdomain = self.miner.txt_analysis(trainData)
         ##################
         # Count
         ##################
-        appKeyScore = self._count(self.compressedDB[consts.APP_RULE], self.valueLabelCounter[consts.APP_RULE])
-        companyKeyScore = self._count(self.compressedDB[consts.COMPANY_RULE],
-                                      self.valueLabelCounter[consts.COMPANY_RULE])
+        appKeyScore = self._score(self.compressedDB[consts.APP_RULE], self.valueLabelCounter[consts.APP_RULE])
+        companyKeyScore = self._score(self.compressedDB[consts.CATEGORY_RULE],
+                                      self.valueLabelCounter[consts.CATEGORY_RULE])
         #############################
         # Generate interesting keys
         #############################
@@ -307,16 +324,15 @@ class KVClassifier(AbsClassifer):
 
         if self.inferFrmData:
             appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, trainData.rmapp)
-        appSpecificRules = self.gen_specific_rules_xml(xmlSpecificRules, appSpecificRules, trackIds)
-        companySpecificRules = self._generate_rules(trainData, companyGeneralRules,
-                                                    self.valueLabelCounter[consts.COMPANY_RULE], consts.COMPANY_RULE)
+        # appSpecificRules = self.gen_specific_rules_xml(xmlSpecificRules, appSpecificRules, trackIds)
+        # companySpecificRules = self._generate_rules(trainData, companyGeneralRules,
+        #                                             self.valueLabelCounter[consts.COMPANY_RULE], consts.COMPANY_RULE)
         specificRules = self._merge_result(appSpecificRules)
-        specificRules = self.change_raw(specificRules, trainData)
+        # specificRules = self.change_raw(specificRules, trainData)
         #############################
         # Persist rules
         #############################
         self.persist(specificRules, rule_type)
-        self.__init__(self.appType)
         return self
 
     @staticmethod
@@ -340,7 +356,12 @@ class KVClassifier(AbsClassifer):
                     value = urllib.quote(value)
                 except:
                     pass
-                regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b', re.IGNORECASE)
+
+                if PATH not in key:
+                    regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b', re.IGNORECASE)
+                else:
+                    regexObj = re.compile(r'\b' + re.escape(value) + r'\b', re.IGNORECASE)
+
                 self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
                 self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
                 self.rules[rule_type][host][regexObj][consts.LABEL] = label
@@ -364,17 +385,6 @@ class KVClassifier(AbsClassifer):
 
             predictRst[ruleType] = rst
         return predictRst
-
-    @staticmethod
-    def change_raw(specificRules, trainData):
-        tmpSpecificRules = {}
-        for ruleType, patterns in specificRules.iteritems():
-            tmpRules = {}
-            for tbl, pkg, key, value in DataSetIter.iter_kv(trainData):
-                if pkg.app in patterns[pkg.host][key][value]:
-                    tmpRules[pkg.rawHost] = patterns[pkg.host]
-            tmpSpecificRules[ruleType] = tmpRules
-        return tmpSpecificRules
 
     def persist(self, specificRules, rule_type):
         """
