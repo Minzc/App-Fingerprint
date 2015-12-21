@@ -17,9 +17,14 @@ class Path:
     @staticmethod
     def get_f(package):
         host = re.sub('[0-9]+\.','[NUM].',package.rawHost)
-        for index, pathSeg in filter(None,package.path.split('/')):
-            pathSeg = re.sub('[0-9]+$','[NUM].',pathSeg)
+        for index, pathSeg in enumerate(filter(None,package.path.split('/'))):
             yield (host, PATH + str(index), pathSeg)
+
+    def classify_format(self, package):
+        host = package.refer_rawHost if package.refer_rawHost else package.rawHost
+        host = re.sub('[0-9]+\.','[NUM].',host)
+        path = package.refer_origpath if package.refer_rawHost else package.origPath
+        return host, path
 
     def txt_analysis(self, trainData):
         xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
@@ -328,7 +333,6 @@ class KVClassifier(AbsClassifer):
             appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, trainData.rmapp)
         appSpecificRules = self.miner.gen_txt_rule(xmlSpecificRules, appSpecificRules, trackIds)
         specificRules = self._merge_result(appSpecificRules)
-        # specificRules = self.change_raw(specificRules, trainData)
         #############################
         # Persist rules
         #############################
@@ -360,6 +364,7 @@ class KVClassifier(AbsClassifer):
                 if PATH not in key:
                     regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b', re.IGNORECASE)
                 else:
+                    value = value.replace(PATH, '')
                     regexObj = re.compile(r'\b' + re.escape(value) + r'\b', re.IGNORECASE)
 
                 self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
@@ -373,9 +378,8 @@ class KVClassifier(AbsClassifer):
         for ruleType in self.rules:
             fatherScore = -1
             rst = consts.NULLPrediction
-            host = pkg.refer_rawHost if pkg.refer_rawHost else pkg.rawHost
+            host, path = self.miner.classify_format(pkg)
             for regexObj, scores in self.rules[ruleType][host].iteritems():
-                path = pkg.refer_origpath if pkg.refer_rawHost else pkg.origPath
                 if regexObj.search(path):
                     label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT] ,scores[consts.SCORE]
                     if support > rst.score or (support == rst.score and confidence > fatherScore):
