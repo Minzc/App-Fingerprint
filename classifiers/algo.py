@@ -1,5 +1,4 @@
 import urllib
-
 import const.consts as consts
 import re
 from sqldao import SqlDao
@@ -11,22 +10,24 @@ from const.dataset import DataSetIter as DataSetIter
 DEBUG = False
 PATH = '[PATH]:'
 
+
 class Path:
-    def __init__(self):
-        pass
+    def __init__(self, scoreT):
+        self.scoreThreshold = scoreT
+
     @staticmethod
     def get_f(package):
-        host = re.sub('[0-9]+\.','[NUM].',package.rawHost)
-        for index, pathSeg in enumerate(filter(None,package.path.split('/'))):
+        host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
+        for index, pathSeg in enumerate(filter(None, package.path.split('/'))):
             yield (host, PATH + str(index), pathSeg)
 
     def classify_format(self, package):
         host = package.refer_rawHost if package.refer_rawHost else package.rawHost
-        host = re.sub('[0-9]+\.','[NUM].',host)
+        host = re.sub('[0-9]+\.', '[NUM].', host)
         path = package.refer_origpath if package.refer_rawHost else package.origPath
         return host, path
 
-    def txt_analysis(self, trainData):
+    def txt_analysis(self, valueLabelCounter, trainData):
         xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
         hostSecdomain = {}
@@ -40,14 +41,15 @@ class Path:
         """
         prunedK = {}
         for secdomain, keys in keys.items():
-            keys = [key for key in keys if key.score > 1]
+            keys = [key for key in keys if key.score > self.scoreThreshold]
             prunedK[secdomain] = keys
         return prunedK
 
     def sort(self, genRules, txtRules):
         def compare(genRule):
             ifTxtRule = 1 if (genRule.secdomain, genRule.key) in txtRules else 0
-            return ( ifTxtRule, genRule.score, 100 - int(genRule.key.replace(PATH, '')))
+            return (ifTxtRule, genRule.score, 100 - int(genRule.key.replace(PATH, '')))
+
         sGenRules = sorted(genRules, key=compare, reverse=True)
         return sGenRules
 
@@ -57,14 +59,78 @@ class Path:
 
 class KV:
     def __init__(self):
-        pass
+        self.xmlFeatures = load_xml_features()
+
     @staticmethod
     def get_f(package):
-        host = re.sub('[0-9]+\.','[NUM].',package.rawHost)
+        host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
         queries = package.queries
         for k, vs in queries.items():
             for v in vs:
-                yield (host, k, v )
+                yield (host, k, v)
+
+    def classify_format(self, package):
+        host = package.refer_rawHost if package.refer_rawHost else package.rawHost
+        host = re.sub('[0-9]+\.', '[NUM].', host)
+        path = package.refer_origpath if package.refer_rawHost else package.origPath
+        return host, path
+
+    def txt_analysis(self, valueLabelCounter, trainData):
+        """
+        Match xml information in training data
+        Output
+        :return xmlGenRules : (host, key) -> value -> {app}
+        :return xmlSpecificRules
+        """
+        xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+        xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
+        hostSecdomain = {}
+        for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            for host, k, v in self.get_f(pkg):
+                hostSecdomain[host] = pkg.secdomain
+                if if_version(v) == False and len(valueLabelCounter[consts.APP_RULE][v]) == 1:
+                    for fieldName in [name for name, value in self.xmlFeatures[pkg.app] if value == v]:
+                        xmlGenRules[(host, k)][v][fieldName] += 1
+                        xmlSpecificRules[(host, k)][v][pkg.app].add(tbl)
+
+        return xmlGenRules, xmlSpecificRules, hostSecdomain
+
+    def prune(self, keys):
+        """
+        key format Rule(secdomain, key, score, labelNum)
+        :param keys:
+        :return:
+        """
+        prunedK = {}
+        for secdomain, keys in keys.items():
+            keys = [key for key in keys if key.score > 1 and key.labelNum > 1]
+            prunedK[secdomain] = keys
+        return prunedK
+
+    def sort(self, genRules, txtRules):
+        def compare(genRule):
+            ifTxtRule = 1 if (genRule.secdomain, genRule.key) in txtRules else 0
+            return (ifTxtRule, genRule.score, genRule.labelNum)
+
+        sGenRules = sorted(genRules, key=compare, reverse=True)
+        return sGenRules
+
+    def gen_txt_rule(self, xmlSpecificRules, specificRules, trackIds):
+        """
+        :param trackIds:
+        :param xmlSpecificRules:
+        :param specificRules : specific rules for apps
+             host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
+        """
+        for rule, v, app, tbls in flatten(xmlSpecificRules):
+            if v not in trackIds and len(re.sub('[0-9]', '', v)) < 2:
+                continue
+            host, key = rule
+            print '[algo129] add a text rule'
+            specificRules[host][key][v][app][consts.SCORE] = 1.0
+            specificRules[host][key][v][app][consts.SUPPORT] = tbls
+        return specificRules
+
 
 class KVClassifier(AbsClassifer):
     def __init__(self, appType, inferFrmData=True):
@@ -76,11 +142,12 @@ class KVClassifier(AbsClassifer):
         self.valueLabelCounter = {consts.APP_RULE: defaultdict(set), consts.CATEGORY_RULE: defaultdict(set)}
         self.rules = {}
         self.appType = appType
-        self.xmlFeatures = load_xml_features()
+
         self.inferFrmData = inferFrmData
-        self.miner = Path()
+        # self.miner = Path(1)
+        self.miner = KV()
         self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
-                          lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
+            lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
                       consts.COMPANY_RULE: defaultdict(lambda: defaultdict(
                           lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
                       consts.CATEGORY_RULE: defaultdict(lambda: defaultdict(
@@ -97,26 +164,31 @@ class KVClassifier(AbsClassifer):
         """
         generalRules = self.miner.prune(generalRules)
         for host in generalRules:
-            generalRules[host] = self.miner.sort(generalRules[host])
+            generalRules[host] = self.miner.sort(generalRules[host], xmlGenRules)
+            if host == 'googleads.g.doubleclick.net:80':
+                print '[algo168]', generalRules[host]
 
         coverage = defaultdict(int)
         prunedGenRules = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, key, value in self.miner.get_f(pkg):
-                for rule in generalRules[host]:
-                    if rule.key == key and coverage[tbl+'#'+str(pkg.id)] < 3:
-                        coverage[tbl+'#'+str(pkg.id)] += 1
-                        prunedGenRules[host].add(rule)
+                if host in generalRules:
+                    for rule in generalRules[host]:
+                        if rule.key == key and coverage[tbl + '#' + str(pkg.id)] < 3:
+                            coverage[tbl + '#' + str(pkg.id)] += 1
+                            prunedGenRules[host].add(rule)
 
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
             tmp = []
             for index, rule in enumerate(prunedGenRules[host]):
                 # if counter == 1 or prunedGenRules[host][index-1][2] - rule[2] >= 1:
-                if prunedGenRules[host][index-1][2] - rule[2] >= 1:
+                if prunedGenRules[host][index - 1][2] - rule[2] >= 1:
                     break
                 tmp.append(rule)
             prunedGenRules[host] = tmp
+            if host == 'googleads.g.doubleclick.net:80':
+                print '[algo190]', prunedGenRules[host]
         return prunedGenRules
 
     @staticmethod
@@ -183,12 +255,16 @@ class KVClassifier(AbsClassifer):
 
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, key, value in self.miner.get_f(pkg):
-                for rule in [r for r in generalRules[pkg.host] if r.key == key]:
+                if host == 'googleads.g.doubleclick.net:80':
+                    print '[algo263]', generalRules[host], len(valueLabelCounter[value]) == 1 and len(value) != 1
+                for rule in [r for r in generalRules[host] if r.key == key]:
                     value = value.strip()
                     if len(valueLabelCounter[value]) == 1 and len(value) != 1:
+                        if host == 'googleads.g.doubleclick.net:80':
+                            print '[algo268] add a specific rule'
                         label = pkg.app if ruleType == consts.APP_RULE else pkg.company
-                        specificRules[pkg.host][key][value][label][consts.SCORE] = rule.score
-                        specificRules[pkg.host][key][value][label][consts.SUPPORT].add(tbl)
+                        specificRules[host][key][value][label][consts.SCORE] = rule.score
+                        specificRules[host][key][value][label][consts.SUPPORT].add(tbl)
 
         return specificRules
 
@@ -209,43 +285,6 @@ class KVClassifier(AbsClassifer):
         #         if len(specificRules[consts.COMPANY_RULE][host][key][value]) == 0:
         #           specificRules[consts.COMPANY_RULE][host][key][value][company] = scores
         #           specificRules[consts.APP_RULE][host][key][value][';'.join(self.companyAppRelation[company])] = scores
-        return specificRules
-
-
-    def _gen_xml_rules(self, trainData):
-        """
-        Match xml information in training data
-        Output
-        :return xmlGenRules : (host, key) -> value -> {app}
-        :return xmlSpecificRules
-        """
-        xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
-        xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
-        hostSecdomain = {}
-        for tbl, pkg, k, v in DataSetIter.iter_kv(trainData):
-            hostSecdomain[pkg.host] = pkg.secdomain
-            if if_version(v) == False and len(self.valueLabelCounter[consts.APP_RULE][v]) == 1:
-                for fieldName in [name for name, value in self.xmlFeatures[pkg.app] if value == v]:
-                    xmlGenRules[(pkg.secdomain, k)][v][fieldName] += 1
-                    xmlGenRules[(pkg.host, k)][v][fieldName] += 1
-                    xmlSpecificRules[(pkg.host, k)][v][pkg.app].add(tbl)
-
-        return xmlGenRules, xmlSpecificRules, hostSecdomain
-
-    @staticmethod
-    def gen_specific_rules_xml(xmlSpecificRules, specificRules, trackIds):
-        """
-        :param trackIds:
-        :param xmlSpecificRules:
-        :param specificRules : specific rules for apps
-             host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
-        """
-        for rule, v, app, tbls in flatten(xmlSpecificRules):
-            if v not in trackIds and len(re.sub('[0-9]', '', v)) < 2:
-                continue
-            host, key = rule
-            specificRules[host][key][v][app][consts.SCORE] = 1.0
-            specificRules[host][key][v][app][consts.SUPPORT] = tbls
         return specificRules
 
     def _infer_from_xml(self, specificRules, xmlGenRules, rmApps):
@@ -289,7 +328,7 @@ class KVClassifier(AbsClassifer):
                 self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
                 trackIds[pkg.trackId] = pkg.app
 
-        xmlGenRules, xmlSpecificRules, hostSecdomain = self.miner.txt_analysis(trainData)
+        xmlGenRules, xmlSpecificRules, hostSecdomain = self.miner.txt_analysis(self.valueLabelCounter, trainData)
         ##################
         # Count
         ##################
@@ -368,7 +407,7 @@ class KVClassifier(AbsClassifer):
             host, path = self.miner.classify_format(pkg)
             for regexObj, scores in self.rules[ruleType][host].iteritems():
                 if regexObj.search(path):
-                    label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT] ,scores[consts.SCORE]
+                    label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
                     if support > rst.score or (support == rst.score and confidence > fatherScore):
                         fatherScore = confidence
                         evidence = (host, regexObj.pattern)
