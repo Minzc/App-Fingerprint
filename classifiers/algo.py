@@ -165,7 +165,7 @@ class KVClassifier(AbsClassifer):
         generalRules = self.miner.prune(generalRules)
         for host in generalRules:
             generalRules[host] = self.miner.sort(generalRules[host], xmlGenRules)
-            if host == 'googleads.g.doubleclick.net:80':
+            if host == 'pubads.g.doubleclick.net:80':
                 print '[algo168]', generalRules[host]
 
         coverage = defaultdict(int)
@@ -187,7 +187,7 @@ class KVClassifier(AbsClassifer):
                     break
                 tmp.append(rule)
             prunedGenRules[host] = tmp
-            if host == 'googleads.g.doubleclick.net:80':
+            if host == 'pubads.g.doubleclick.net:80':
                 print '[algo190]', prunedGenRules[host]
         return prunedGenRules
 
@@ -207,6 +207,8 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for secdomain, k, label, v, tbls in flatten(featureTbl):
+            if secdomain == 'pubads.g.doubleclick.net:80':
+                print '[algo211]', secdomain, k, v
             cleanedK = k.replace("\t", "")
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[secdomain][k][label])
@@ -228,6 +230,8 @@ class KVClassifier(AbsClassifer):
         Rule = consts.Rule
         generalRules = defaultdict(list)
         for secdomain in keyScore:
+            if secdomain == 'pubads.g.doubleclick.net:80':
+                print '[algo234]', keyScore[secdomain]
             for key in keyScore[secdomain]:
                 labelNum = len(keyScore[secdomain][key][consts.LABEL])
                 score = keyScore[secdomain][key][consts.SCORE]
@@ -255,12 +259,12 @@ class KVClassifier(AbsClassifer):
 
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, key, value in self.miner.get_f(pkg):
-                if host == 'googleads.g.doubleclick.net:80':
+                if host == 'pubads.g.doubleclick.net:80':
                     print '[algo263]', generalRules[host], len(valueLabelCounter[value]) == 1 and len(value) != 1
                 for rule in [r for r in generalRules[host] if r.key == key]:
                     value = value.strip()
                     if len(valueLabelCounter[value]) == 1 and len(value) != 1:
-                        if host == 'googleads.g.doubleclick.net:80':
+                        if host == 'pubads.g.doubleclick.net:80':
                             print '[algo268] add a specific rule'
                         label = pkg.app if ruleType == consts.APP_RULE else pkg.company
                         specificRules[host][key][value][label][consts.SCORE] = rule.score
