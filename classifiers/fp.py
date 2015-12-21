@@ -129,7 +129,7 @@ def _gen_rules(transactions, tSupport, tConfidence):
         labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
         if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
             confidence = max(tag_dist.values()) * 1.0 / support
-            if '[HOST]:mt0.googleapis.com' in set(itemset):
+            if '[HOST]:www.sygic.com' in set(itemset):
                 print '[fp104]', tag_dist, confidence, tag_dist[labelIndex] * 1.0 / support
             if prune_path(itemset):
                 r = Rule(itemset, confidence, support, labelIndex)
@@ -278,7 +278,7 @@ class CMAR(AbsClassifer):
 
             for item in pathSeg:
                 if len(fList[item]) >= self.tSupport and prune_path(item) == False:
-                    if host is not None and 'mt0.googleapis.com' in host:
+                    if host is not None and 'www.sygic.com' in host:
                         print '[fp246] host', host, package.label, pathSeg, item
                     transactions.append(base + [item] + [package.label])
 
