@@ -95,7 +95,7 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False,
                 found_set = [item] + suffix
 
                 not_gen_rule = growth(found_set)
-                if '[HOST]:meijer.122.2o7.net' in found_set:
+                if '[HOST]:meijer.[NUM].2o[NUM].net' in found_set:
                     print '[FPGROWTH103]', found_set, support_dist, support
 
                 if not_gen_rule == False:

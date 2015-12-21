@@ -103,6 +103,7 @@ def change_support(compressDB, rules, support, cHosts):
         if r.support >= support:
             tmpRules.append(r)
     for host, tbls in cHosts.items():
+        host = re.sub('[0-9]+\.','[NUM].',host)
         if host not in compareHosts:
             print '[HOST]', host, tbls
     return tmpRules
