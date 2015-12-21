@@ -75,6 +75,8 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False,
         item_nodes.sort(key=lambda v: (items[v[0]], v[0]))
         debug_num = 0
 
+        if '[HOST]:www.sygic.com' in suffix:
+                print '[FPGROWTH79]', suffix, len(item_nodes)
 
         for item, nodes in item_nodes:
             assert items[item] >= debug_num
@@ -91,14 +93,14 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False,
                     support_dist[k] += v
 
             if '[HOST]:www.sygic.com' in suffix:
-                    print '[FPGROWTH94]', suffix, item, support_dist, support
+                print '[FPGROWTH94]', suffix, item, support_dist, support
 
             if support >= minimum_support and item not in suffix:
                 # New winner!
                 found_set = [item] + suffix
 
                 not_gen_rule = growth(found_set)
-                if '[HOST]:www.sygic.com' in found_set:
+                if '[HOST]:www.sygic.com' in found_set or '[PATH]:weather_service' in found_set:
                     print '[FPGROWTH103]', found_set, support_dist, support, not_gen_rule
 
                 if not_gen_rule == False:

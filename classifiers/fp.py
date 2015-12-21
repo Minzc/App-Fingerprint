@@ -129,7 +129,7 @@ def _gen_rules(transactions, tSupport, tConfidence):
         labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
         if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
             confidence = max(tag_dist.values()) * 1.0 / support
-            if '[HOST]:www.sygic.com' in set(itemset):
+            if '[HOST]:www.sygic.com' in set(itemset) or '[PATH]:weather_service' in set(itemset):
                 print '[fp104]', tag_dist, confidence, tag_dist[labelIndex] * 1.0 / support
             if prune_path(itemset):
                 r = Rule(itemset, confidence, support, labelIndex)
