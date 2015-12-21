@@ -46,6 +46,8 @@ class Path:
         sGenRules = sorted(genRules, key=compare, reverse=True)
         return sGenRules
 
+    def gen_txt_rule(self, xmlSpecificRules, specificRules, trackIds):
+        return specificRules
 
 
 class KVClassifier(AbsClassifer):
@@ -324,9 +326,7 @@ class KVClassifier(AbsClassifer):
 
         if self.inferFrmData:
             appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, trainData.rmapp)
-        # appSpecificRules = self.gen_specific_rules_xml(xmlSpecificRules, appSpecificRules, trackIds)
-        # companySpecificRules = self._generate_rules(trainData, companyGeneralRules,
-        #                                             self.valueLabelCounter[consts.COMPANY_RULE], consts.COMPANY_RULE)
+        appSpecificRules = self.miner.gen_txt_rule(xmlSpecificRules, appSpecificRules, trackIds)
         specificRules = self._merge_result(appSpecificRules)
         # specificRules = self.change_raw(specificRules, trainData)
         #############################

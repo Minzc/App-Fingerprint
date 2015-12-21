@@ -16,7 +16,7 @@ def classifier_factory(names, appType):
         elif name == consts.URI_CLASSIFIER:
             classifier = UriClassifier(appType)
         elif name == consts.KV_CLASSIFIER:
-            classifier = KVClassifier(appType, inferFrmData=True, sampleRate=1)
+            classifier = KVClassifier(appType, inferFrmData=True)
         elif name == consts.CMAR_CLASSIFIER:
             classifier = CMAR()
         classifiers.append((name, classifier))
