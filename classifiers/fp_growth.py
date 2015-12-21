@@ -90,13 +90,16 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False,
                 for k, v in node.clsses.items():
                     support_dist[k] += v
 
+            if '[HOST]:www.sygic.com' in suffix:
+                    print '[FPGROWTH94]', suffix, item, support_dist, support
+
             if support >= minimum_support and item not in suffix:
                 # New winner!
                 found_set = [item] + suffix
 
                 not_gen_rule = growth(found_set)
                 if '[HOST]:www.sygic.com' in found_set:
-                    print '[FPGROWTH103]', found_set, support_dist, support
+                    print '[FPGROWTH103]', found_set, support_dist, support, not_gen_rule
 
                 if not_gen_rule == False:
                     yield (found_set, support, support_dist) if include_support else found_set
