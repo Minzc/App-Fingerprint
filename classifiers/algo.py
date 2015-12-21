@@ -55,6 +55,17 @@ class Path:
         return specificRules
 
 
+class KV:
+    def __init__(self):
+        pass
+    @staticmethod
+    def get_f(package):
+        host = re.sub('[0-9]+\.','[NUM].',package.rawHost)
+        queries = package.queries
+        for k, vs in queries.items():
+            for v in vs:
+                yield (host, k, v )
+
 class KVClassifier(AbsClassifer):
     def __init__(self, appType, inferFrmData=True):
         def __create_dict():
@@ -62,7 +73,7 @@ class KVClassifier(AbsClassifer):
 
         self.name = consts.KV_CLASSIFIER
         self.compressedDB = {consts.APP_RULE: __create_dict(), consts.CATEGORY_RULE: __create_dict()}
-        self.valueLabelCounter = {consts.APP_RULE: defaultdict(set), consts.COMPANY_RULE: defaultdict(set)}
+        self.valueLabelCounter = {consts.APP_RULE: defaultdict(set), consts.CATEGORY_RULE: defaultdict(set)}
         self.rules = {}
         self.appType = appType
         self.xmlFeatures = load_xml_features()
@@ -200,30 +211,6 @@ class KVClassifier(AbsClassifer):
         #           specificRules[consts.APP_RULE][host][key][value][';'.join(self.companyAppRelation[company])] = scores
         return specificRules
 
-    def __compare(self, trainData, specificRules, hostSecdomain, appKeyScore):
-        """
-        Compare xml rules and learned rules
-        :param trainData
-        :param specificRules specific rules of app
-        """
-        xmlValueField = defaultdict(lambda: defaultdict(set))
-        xmlFieldValues = defaultdict(lambda: defaultdict(set))
-        for app in self.xmlFeatures:
-            for k, v in self.xmlFeatures[app]:
-                xmlFieldValues[app][k].add(v)
-                xmlValueField[app][v].add(k)
-        tmpRules = set()
-        for tbl, pkg, k, v in DataSetIter.iter_kv(trainData):
-            app = pkg.app
-            if not if_version(v) and v in xmlValueField[app] and len(self.valueLabelCounter[consts.APP_RULE][v]) == 1:
-                tmpRules.add((pkg.host, k, v, pkg.app))
-        for host, key, value, app in tmpRules:
-            if app not in specificRules[consts.APP_RULE][host][key][value]:
-                secdomain = hostSecdomain[host]
-                labelNum = len(appKeyScore[secdomain][key][consts.LABEL])
-                score = appKeyScore[secdomain][key][consts.SCORE]
-                print '[Host] {0:s} [key] {1:s} [Value] {2:s} [App] {3:s} [Num] {4:d} [Score] {5:f}' \
-                    .format(host, key, value, app, labelNum, score)
 
     def _gen_xml_rules(self, trainData):
         """
