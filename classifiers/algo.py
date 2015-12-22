@@ -103,6 +103,9 @@ class KV:
         """
         prunedK = {}
         for secdomain, keys in keys.items():
+            if secdomain == 'pubads.g.doubleclick.net:80':
+                for key in keys:
+                    print '[algo108]', key.labelNum, key.score
             keys = [key for key in keys if key.score > 1 and key.labelNum > 1]
             prunedK[secdomain] = keys
         return prunedK
@@ -239,7 +242,7 @@ class KVClassifier(AbsClassifer):
                 generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
         for secdomain in generalRules:
             if secdomain == 'pubads.g.doubleclick.net:80':
-                print '[algo234]', keyScore[secdomain]
+                print '[algo234]', generalRules[secdomain]
             generalRules[secdomain] = sorted(generalRules[secdomain], key=lambda rule: rule.score, reverse=True)
         return generalRules
 
