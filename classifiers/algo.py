@@ -405,6 +405,9 @@ class KVClassifier(AbsClassifer):
                     pass
 
                 if PATH not in key:
+                    if value == '2.3.1.iphone.org.aarp.aarpnewsapp':
+                        print '[algo409]', host, key, value
+
                     regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b', re.IGNORECASE)
                 else:
                     value = value.replace(PATH, '')
@@ -423,6 +426,8 @@ class KVClassifier(AbsClassifer):
             rst = consts.NULLPrediction
             host, path = self.miner.classify_format(pkg)
             for regexObj, scores in self.rules[ruleType][host].iteritems():
+                if host == 'pubads.g.doubleclick.net' and 'aarpnewsapp' in regexObj.pattern:
+                    print '[algo430]', regexObj.pattern, regexObj.search(path), path
                 if regexObj.search(path):
                     label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
                     if support > rst.score or (support == rst.score and confidence > fatherScore):
