@@ -105,7 +105,7 @@ class KV:
         for secdomain, keys in keys.items():
             if 'overstockcom' in secdomain:
                 for key in keys:
-                    print '[algo108]', key. host
+                    print '[algo108]', key, secdomain
             keys = [key for key in keys if key.score > 0.9 and key.labelNum > 1]
             prunedK[secdomain] = keys
         return prunedK
