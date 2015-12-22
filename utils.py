@@ -457,3 +457,13 @@ def process_agent( agent, app):
     agent = re.sub(r'([ :v])([0-9][_0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
     agent = re.sub(r'(^[0-9a-z]*)(.'+app+r'$)', r'[RANDOM]\2', agent)
     return agent
+
+ # def prune_path(item):
+        #     item = item.replace(PATH, '')
+        #     if if_version(item) == True:
+        #         return True
+        #     if len(re.sub('^[0-9]+$', '', item)) == 0:
+        #         return True
+        #     if len(item) == 1:
+        #         return True
+        #     return False

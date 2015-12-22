@@ -139,7 +139,7 @@ class KV:
 
 
 class KVClassifier(AbsClassifer):
-    def __init__(self, appType, inferFrmData=True):
+    def __init__(self, appType, minerType):
         def __create_dict():
             return defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(set))))
 
@@ -149,9 +149,11 @@ class KVClassifier(AbsClassifer):
         self.rules = {}
         self.appType = appType
 
-        self.inferFrmData = inferFrmData
-        self.miner = Path(1)
-        #self.miner = KV(scoreT=0.9, labelT=1)
+        if minerType == 1:
+            self.miner = Path(1)
+        elif minerType == 2:
+            self.miner = KV(scoreT=0.9, labelT=1)
+
         self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
             lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
                       consts.COMPANY_RULE: defaultdict(lambda: defaultdict(
@@ -374,10 +376,8 @@ class KVClassifier(AbsClassifer):
         #############################
         appSpecificRules = self._generate_rules(trainData, appGeneralRules, self.valueLabelCounter[consts.APP_RULE],
                                                 consts.APP_RULE)
-        print 'Infer from data', self.inferFrmData
 
-        if self.inferFrmData:
-            appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, trainData.rmapp)
+            # appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, trainData.rmapp)
         appSpecificRules = self.miner.gen_txt_rule(xmlSpecificRules, appSpecificRules, trackIds)
         specificRules = self._merge_result(appSpecificRules)
         #############################

@@ -1,14 +1,15 @@
 import re
 from classifier import AbsClassifer
 import operator
+
+from classifiers.agent import AgentClassifier
 from classifiers.uri import UriClassifier
 from const.dataset import DataSetIter
-from features.agent import AgentEncoder, AGENT, PATH, HOST
+from features.agent import AgentEncoder, AGENT, HOST
 from sqldao import SqlDao
 from fp_growth import find_frequent_itemsets
 from collections import defaultdict, namedtuple
 import const.consts as consts
-from utils import if_version
 
 FinalRule = namedtuple('Rule', 'agent, path, host, label, confidence, support')
 
@@ -20,8 +21,6 @@ def growth(foundSet):
     :return:
     """
     if len(foundSet) == 1 and HOST in foundSet[0]:
-        return True
-    if len(foundSet) == 1 and PATH in foundSet[0]:
         return True
     return False
 
@@ -41,16 +40,13 @@ class Rule:
 
     def export(self):
         agent = None
-        pathSeg = None
         host = None
         for string in self.itemSet:
             if HOST in string:
                 host = string
             if AGENT in string:
                 agent = string
-            if PATH in string:
-                pathSeg = string
-        return FinalRule(agent, pathSeg, host, self.label, self.confidence, self.support)
+        return FinalRule(agent, None, host, self.label, self.confidence, self.support)
 
 
 def prune_host(items):
@@ -59,17 +55,9 @@ def prune_host(items):
     return True
 
 
-def prune_path(items):
-    if len(items) == 1 and PATH in items[0]:
-        return False
-    return True
-
-
 def sort_key(item):
     if AGENT in item:
         return 1
-    elif PATH in item:
-        return 2
     else:
         return 3
 
@@ -131,11 +119,8 @@ def _gen_rules(transactions, tSupport, tConfidence):
         labelIndex = max(tag_dist.iteritems(), key=operator.itemgetter(1))[0]
         if tag_dist[labelIndex] * 1.0 / support >= tConfidence:
             confidence = max(tag_dist.values()) * 1.0 / support
-            if '[HOST]:www.sygic.com' in set(itemset) or '[PATH]:weather_service' in set(itemset):
-                print '[fp104]', tag_dist, confidence, tag_dist[labelIndex] * 1.0 / support
-            if prune_path(itemset):
-                r = Rule(itemset, confidence, support, labelIndex)
-                rules.add(r)
+            r = Rule(itemset, confidence, support, labelIndex)
+            rules.add(r)
 
     print ">>> Finish Rule Generating. Total number of rules is", len(rules)
     return rules
@@ -160,9 +145,6 @@ def _db_coverage(rules, compressDB, min_cover=3):
     rules = set()
     coverNum = defaultdict(int)
     for rule in tRules:
-        for item in rule.itemSet:
-            if '[PATH]:loader2.gif' in item:
-                print '[FP129]', rule.itemSet, rule.label
         for pkgNtbl in compressDB[rule.label]:
             package, tbl = pkgNtbl
             if coverNum[package] <= min_cover and rule.itemSet.issubset(package):
@@ -206,8 +188,6 @@ def _remove_duplicate(rules):
         node = root
         strSet, confidence, support, label = rule.itemLst, rule.confidence, rule.support, rule.label
         for item in strSet:
-            if '[PATH]:loader2.gif' in item:
-                print '[FP170]', strSet, label
             if item in node.children:
                 node = node.children[item]
                 if node.label == label:
@@ -255,20 +235,9 @@ class CMAR(AbsClassifer):
         Third from last is host.
         Do not use them as feature
         """
-
-        def prune_path(item):
-            item = item.replace(PATH, '')
-            if if_version(item) == True:
-                return True
-            if len(re.sub('^[0-9]+$', '', item)) == 0:
-                return True
-            if len(item) == 1:
-                return True
-            return False
-
         transactions = []
         for tbl, package in DataSetIter.iter_pkg(trainSet):
-            agent, pathSeg, host = self.encoder.get_f(package)
+            agent, host = self.encoder.get_f(package)
             base = []
 
             if host is not None and len(fList[host]) >= self.tSupport:
@@ -277,12 +246,6 @@ class CMAR(AbsClassifer):
                 base.append(agent)
 
             transactions.append(base + [package.label])
-
-            for item in pathSeg:
-                if len(fList[item]) >= self.tSupport and prune_path(item) == False:
-                    if host is not None and 'www.sygic.com' in host:
-                        print '[fp246] host', host, package.label, pathSeg, item
-                    transactions.append(base + [item] + [package.label])
 
         return transactions
 
@@ -303,18 +266,16 @@ class CMAR(AbsClassifer):
         cHosts = {}
         for ruleType in hostRules:
             for rule, tbls in hostRules[ruleType].items():
-                host, pathSeg, label = rule
-                if pathSeg is not None:
-                    if not pathSeg[-1].isalnum():
-                        pathSeg = pathSeg[:-1]
-                    if not pathSeg[0].isalnum():
-                        pathSeg = pathSeg[1:]
-                        # pathSeg = r'\b' + re.escape(pathSeg) + r'\b'
+                host, _, label = rule
                 cHosts[host] = tbls
             print "Total Number of Hosts is", len(cHosts)
         return cHosts
 
     def train(self, trainSet, ruleType):
+        def __train_agent():
+            agentC = AgentClassifier(inferFrmData=True)
+            agentC.train(trainSet, ruleType)
+
         self.encoder = AgentEncoder()
         compressDB = defaultdict(set)
         fList = defaultdict(set)
@@ -352,8 +313,6 @@ class CMAR(AbsClassifer):
         for label, patterns, agent, host, ruleType, support in sqldao.execute(SQL):
             counter += 1
             rule = []
-            if patterns is not None:
-                rule.append(patterns)
             if agent is not None:
                 rule.append(agent)
             if host is not None:

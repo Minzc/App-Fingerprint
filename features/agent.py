@@ -1,13 +1,12 @@
 # -*- encoding = utf-8 -*-
 from collections import defaultdict
-
 from const import consts
 from sqldao import SqlDao
 import re
 
 HOST = '[HOST]:'
 AGENT = '[AGENT]:'
-PATH = '[PATH]:'
+
 
 def load_agent():
     rules = defaultdict(set)
@@ -23,22 +22,21 @@ def load_agent():
     sqldao.close()
     return rules
 
+
 class AgentEncoder:
     def __init__(self):
         self.__agentF = load_agent()
 
     def get_f(self, package):
         agent = self.get_agent(package)
-        pathSegs = map(lambda x: PATH + x, set(filter(None,package.path.split('/'))))
-        pathSegs = map(lambda x: re.sub('[0-9]+$','[NUM].',x), pathSegs)
-        host = HOST + re.sub('[0-9]+\.','[NUM].',package.rawHost)
+        host = HOST + re.sub('[0-9]+\.', '[NUM].', package.rawHost)
         if agent:
             agent = AGENT + agent
-        return agent, pathSegs, host
+        return agent, host
 
     def get_f_list(self, package):
-        agent, pathSegs, host = self.get_f(package)
-        fList = [agent] + pathSegs + [host]
+        agent, host = self.get_f(package)
+        fList = [agent] + [host]
         return fList
 
     def get_agent(self, package):
@@ -51,17 +49,14 @@ class AgentEncoder:
 
     def change2Rule(self, strList):
         agent = None
-        pathSeg = None
         host = None
         for str in strList:
             if HOST in str:
                 host = str.replace(HOST, '')
             if AGENT in str:
                 agent = str.replace(AGENT, '')
-            if PATH in str:
-                pathSeg = str.replace(PATH, '')
 
-        return (pathSeg, agent, host)
+        return (agent, host)
 
     def changeRule2Para(self, agentRules, ruleType):
         params = []

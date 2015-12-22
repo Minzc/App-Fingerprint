@@ -24,8 +24,8 @@ USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
     #consts.AGENT_CLASSIFIER,
     consts.KV_CLASSIFIER,
-    #consts.URI_CLASSIFIER,
-    #consts.CMAR_CLASSIFIER,
+    consts.URI_CLASSIFIER,
+    consts.CMAR_CLASSIFIER,
 ]
 
 class PredictRst:
@@ -255,16 +255,13 @@ def test(testTbl, appType):
 
     rst = {}
     # classifiers = classifier_factory(USED_CLASSIFIERS, appType)
-    classifiers = classifier_factory([consts.KV_CLASSIFIER,consts.CMAR_CLASSIFIER], appType)
+    classifiers = classifier_factory([consts.URI_CLASSIFIER,consts.KV_CLASSIFIER,consts.CMAR_CLASSIFIER], appType)
     for name, classifier in classifiers:
         print ">>> [test#%s] " % name
         classifier.set_name(name)
         classifier.load_rules()
         tmprst = _use_classifier(classifier, testSet)
         rst = merge_rst(rst, tmprst)
-        # recall = sum([1 for i in rst.values() if
-        #               i[consts.APP_RULE][0] or i[consts.COMPANY_RULE][0] or i[consts.CATEGORY_RULE][0]])
-        # print ">>> Recognized: %s Test Size: %s" % (recall, testSize)
 
     print '>>> Start evaluating'
     inforTrack = evaluate(rst, testSet, testApps)
