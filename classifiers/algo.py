@@ -58,8 +58,10 @@ class Path:
 
 
 class KV:
-    def __init__(self):
+    def __init__(self, scoreT, labelT):
         self.xmlFeatures = load_xml_features()
+        self.scoreThreshold = scoreT
+        self.labelThreshold = labelT
 
     @staticmethod
     def get_f(package):
@@ -106,7 +108,7 @@ class KV:
             if 'overstockcom' in secdomain:
                 for key in keys:
                     print '[algo108]', key, secdomain
-            keys = [key for key in keys if key.score > 0.9 and key.labelNum > 1]
+            keys = [key for key in keys if key.score > self.scoreThreshold and key.labelNum > self.labelThreshold]
             prunedK[secdomain] = keys
         return prunedK
 
@@ -225,7 +227,7 @@ class KVClassifier(AbsClassifer):
         return keyScore
 
     @staticmethod
-    def _generate_keys(keyScore):
+    def _generate_keys(keyScore, keyApp):
         """
         Find interesting ( secdomain, key ) pairs
         Output
@@ -237,7 +239,7 @@ class KVClassifier(AbsClassifer):
         generalRules = defaultdict(list)
         for secdomain in keyScore:
             for key in keyScore[secdomain]:
-                labelNum = len(keyScore[secdomain][key][consts.LABEL])
+                labelNum = len(keyApp[key])
                 score = keyScore[secdomain][key][consts.SCORE]
                 generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
         for secdomain in generalRules:
@@ -335,15 +337,17 @@ class KVClassifier(AbsClassifer):
         """
 
         trackIds = {}
+        keyApp = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, k, v in self.miner.get_f(pkg):
+                keyApp[pkg.app].add(k)
                 self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
                 self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
                 self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
                 self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
                 trackIds[pkg.trackId] = pkg.app
-                if host == 'pubads.g.doubleclick.net' and k == 'an' and 'com.kbb.valuesapp' in v:
-                    print '[algo341]', self.compressedDB[consts.APP_RULE][host][k][pkg.app][v]
+                # if host == 'pubads.g.doubleclick.net' and k == 'an' and 'com.kbb.valuesapp' in v:
+                #     print '[algo341]', self.compressedDB[consts.APP_RULE][host][k][pkg.app][v]
 
         xmlGenRules, xmlSpecificRules, hostSecdomain = self.miner.txt_analysis(self.valueLabelCounter, trainData)
         ##################
@@ -355,8 +359,8 @@ class KVClassifier(AbsClassifer):
         #############################
         # Generate interesting keys
         #############################
-        appGeneralRules = self._generate_keys(appKeyScore)
-        companyGeneralRules = self._generate_keys(companyKeyScore)
+        appGeneralRules = self._generate_keys(appKeyScore, keyApp)
+        companyGeneralRules = self._generate_keys(companyKeyScore, keyApp)
         #############################
         # Pruning general rules
         #############################
