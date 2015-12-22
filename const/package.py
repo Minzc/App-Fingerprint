@@ -82,7 +82,7 @@ class Package:
 
     def set_host(self, host):
         host = host.lower()
-        self.rawHost = host
+        self.rawHost = host.replace(':80', '')
         self.host = host.split(':')[0].replace('www.', '').replace('http://', '')
         extracted = tldextract.extract(host)
         self.secdomain = None

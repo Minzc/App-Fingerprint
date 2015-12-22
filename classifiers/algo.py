@@ -355,7 +355,6 @@ class KVClassifier(AbsClassifer):
         #############################
         print ">>>[KV] Before pruning appGeneralRules", len(appGeneralRules)
         appGeneralRules = self._prune_general_rules(appGeneralRules, trainData, xmlGenRules)
-        print 'Finish Pruning App Rules'
         companyGeneralRules = self._prune_general_rules(companyGeneralRules, trainData, xmlGenRules)
         print ">>>[KV] appGeneralRules", len(appGeneralRules)
         print ">>>[KV] companyGeneralRules", len(companyGeneralRules)
