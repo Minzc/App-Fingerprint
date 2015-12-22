@@ -16,6 +16,7 @@ PATH = '[PATH]:'
 class Path:
     def __init__(self, scoreT):
         self.scoreThreshold = scoreT
+        self.name = 'P'
 
     def mine_host(self, trainSet, ruleType):
         uriClassifier = UriClassifier(consts.IOS)
@@ -56,7 +57,7 @@ class Path:
         """
         prunedK = {}
         for secdomain, keys in keys.items():
-            keys = [key for key in keys if key.score > self.scoreThreshold]
+            keys = [key for key in keys if key.score > self.scoreThreshold or secdomain in self.cHosts]
             prunedK[secdomain] = keys
         return prunedK
 
@@ -77,6 +78,7 @@ class KV:
         self.xmlFeatures = load_xml_features()
         self.scoreThreshold = scoreT
         self.labelThreshold = labelT
+        self.name = 'K'
 
     @staticmethod
     def get_f(package):
@@ -362,8 +364,8 @@ class KVClassifier(AbsClassifer):
                 self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
                 self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
                 trackIds[pkg.trackId] = pkg.app
-                # if host == 'pubads.g.doubleclick.net' and k == 'an' and 'com.kbb.valuesapp' in v:
-                #     print '[algo341]', self.compressedDB[consts.APP_RULE][host][k][pkg.app][v]
+        if self.miner.name == 'P':
+            self.miner.mine_host(trainData, rule_type)
 
         xmlGenRules, xmlSpecificRules, hostSecdomain = self.miner.txt_analysis(self.valueLabelCounter, trainData)
         ##################
