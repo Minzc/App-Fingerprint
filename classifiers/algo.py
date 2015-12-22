@@ -34,8 +34,10 @@ class Path:
     @staticmethod
     def get_f(package):
         host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
+        tmp = ''
         for index, pathSeg in enumerate(filter(None, package.path.split('/'))):
-            yield (host, PATH + str(index), pathSeg)
+            tmp = tmp + '/' + pathSeg
+            yield (host, PATH + str(index), tmp[1:])
 
     def classify_format(self, package):
         host = package.refer_rawHost if package.refer_rawHost else package.rawHost
