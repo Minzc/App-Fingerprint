@@ -129,8 +129,8 @@ class KV:
             if v not in trackIds and len(re.sub('[0-9]', '', v)) < 2:
                 continue
             host, key = rule
-            if host == 'pubads.g.doubleclick.net':
-                print '[algo129] add a text rule', host, key
+            if host == 'pubads.g.doubleclick.net' and key == 'an' and app == 'com.kbb.valuesapp':
+                print '[algo129] add a text rule', host, key, v
             specificRules[host][key][v][app][consts.SCORE] = 1.0
             specificRules[host][key][v][app][consts.SUPPORT] = tbls
         return specificRules
@@ -270,11 +270,11 @@ class KVClassifier(AbsClassifer):
                 for rule in [r for r in generalRules[host] if r.key == key]:
                     value = value.strip()
                     if len(valueLabelCounter[value]) == 1 and len(value) != 1:
-                        if host == 'pubads.g.doubleclick.net':
-                            print '[algo268] add a specific rule'
                         label = pkg.app if ruleType == consts.APP_RULE else pkg.company
                         specificRules[host][key][value][label][consts.SCORE] = rule.score
                         specificRules[host][key][value][label][consts.SUPPORT].add(tbl)
+                        if value == '1.1.16.iphone.com.kbb.valuesapp':
+                            print '[algo277]', specificRules[host][key][value]
 
         return specificRules
 
@@ -287,6 +287,8 @@ class KVClassifier(AbsClassifer):
         specificRules = {consts.APP_RULE: __create_dic(), consts.COMPANY_RULE: __create_dic()}
         for host, key, value, app, scoreType, score in flatten(appSpecificRules):
             specificRules[consts.APP_RULE][host][key][value][app][scoreType] = score
+            if value == '1.1.16.iphone.com.kbb.valuesapp':
+                print '[algo291]', host, key, value, specificRules[consts.APP_RULE][host][key][value]
             # specificRules[consts.COMPANY_RULE][host][key][value][self.appCompanyRelation[app]][scoreType] = score
         # for host in companySpecificRules:
         #   for key in companySpecificRules[host]:
@@ -442,6 +444,8 @@ class KVClassifier(AbsClassifer):
         for ruleType, patterns in specificRules.iteritems():
             for host in patterns:
                 for key in patterns[host]:
+                    if key == 'an' and host == 'pubads.g.doubleclick.net':
+                        print '[algo448]' ,patterns[host][key]
                     for value in patterns[host][key]:
                         for label in patterns[host][key][value]:
                             confidence = patterns[host][key][value][label][consts.SCORE]
