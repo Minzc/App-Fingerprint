@@ -276,6 +276,7 @@ class CMAR(AbsClassifer):
             agentC = AgentClassifier(inferFrmData=True)
             agentC.train(trainSet, ruleType)
 
+        __train_agent()
         self.encoder = AgentEncoder()
         compressDB = defaultdict(set)
         fList = defaultdict(set)
