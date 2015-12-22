@@ -150,8 +150,8 @@ class KVClassifier(AbsClassifer):
         self.appType = appType
 
         self.inferFrmData = inferFrmData
-        # self.miner = Path(1)
-        self.miner = KV(scoreT=0.9, labelT=1)
+        self.miner = Path(1)
+        #self.miner = KV(scoreT=0.9, labelT=1)
         self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
             lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
                       consts.COMPANY_RULE: defaultdict(lambda: defaultdict(
