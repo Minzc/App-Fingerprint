@@ -105,7 +105,7 @@ class KV:
         for secdomain, keys in keys.items():
             if secdomain == 'pubads.g.doubleclick.net:80':
                 for key in keys:
-                    print '[algo108]', key.labelNum, key.score
+                    print '[algo108]', key
             keys = [key for key in keys if key.score > 1 and key.labelNum > 1]
             prunedK[secdomain] = keys
         return prunedK
