@@ -106,7 +106,7 @@ class KV:
             if secdomain == 'pubads.g.doubleclick.net':
                 for key in keys:
                     print '[algo108]', key
-            keys = [key for key in keys if key.score > 1 and key.labelNum > 1]
+            keys = [key for key in keys if key.score > 0.9 and key.labelNum > 1]
             prunedK[secdomain] = keys
         return prunedK
 
@@ -266,7 +266,7 @@ class KVClassifier(AbsClassifer):
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, key, value in self.miner.get_f(pkg):
                 if host == 'pubads.g.doubleclick.net' and key == 'an' and pkg.app=='com.kbb.valuesapp':
-                    print '[algo263]',value, len(valueLabelCounter[value]), key,generalRules[host]
+                    print '[algo263]',value, len(valueLabelCounter[value]), key, generalRules[host]
                 for rule in [r for r in generalRules[host] if r.key == key]:
                     value = value.strip()
                     if host == 'pubads.g.doubleclick.net' and key == 'an' and pkg.app=='com.kbb.valuesapp':
