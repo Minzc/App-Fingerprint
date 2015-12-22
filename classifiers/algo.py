@@ -1,6 +1,8 @@
 import urllib
 import const.consts as consts
 import re
+
+from classifiers.uri import UriClassifier
 from sqldao import SqlDao
 from utils import load_xml_features, if_version, flatten
 from collections import defaultdict
@@ -14,6 +16,19 @@ PATH = '[PATH]:'
 class Path:
     def __init__(self, scoreT):
         self.scoreThreshold = scoreT
+
+    def mine_host(self, trainSet, ruleType):
+        uriClassifier = UriClassifier(consts.IOS)
+        print '[URI] Start Training'
+        hostRules, _ = uriClassifier.train(trainSet, ruleType, ifPersist=False)
+        print '[URI] Finish Training'
+        cHosts = {}
+        for ruleType in hostRules:
+            for rule, tbls in hostRules[ruleType].items():
+                host, _, label = rule
+                cHosts[host] = tbls
+            print "Total Number of Hosts is", len(cHosts)
+        self.cHosts = cHosts
 
     @staticmethod
     def get_f(package):
@@ -337,7 +352,6 @@ class KVClassifier(AbsClassifer):
         :param rule_type:
         :param trainData:
         """
-
         trackIds = {}
         keyApp = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
@@ -448,7 +462,7 @@ class KVClassifier(AbsClassifer):
         :param specificRules: specific rules for apps
             ruleType -> host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
         """
-        self._clean_db(rule_type)
+        # self._clean_db(rule_type)
         QUERY = consts.SQL_INSERT_KV_RULES
         sqldao = SqlDao()
         # Param rules
