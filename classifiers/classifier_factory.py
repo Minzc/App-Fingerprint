@@ -15,9 +15,9 @@ def classifier_factory(names, appType):
             classifier = AgentClassifier(inferFrmData=True)
         elif name == consts.URI_CLASSIFIER:
             # classifier = UriClassifier(appType)
-            classifier = KVClassifier(appType, 1)
+            classifier = KVClassifier(appType, consts.PATH_MINER)
         elif name == consts.KV_CLASSIFIER:
-            classifier = KVClassifier(appType, 2)
+            classifier = KVClassifier(appType, consts.KV_MINER)
         elif name == consts.CMAR_CLASSIFIER:
             classifier = CMAR()
         classifiers.append((name, classifier))

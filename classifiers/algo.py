@@ -165,9 +165,9 @@ class KVClassifier(AbsClassifer):
         self.rules = {}
         self.appType = appType
 
-        if minerType == 1:
+        if minerType == consts.PATH_MINER:
             self.miner = Path(1)
-        elif minerType == 2:
+        elif minerType == consts.KV_MINER:
             self.miner = KV(scoreT=0.9, labelT=1)
 
         self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
@@ -227,12 +227,12 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(featureTbl):
-            if host == 'www.thestreet.com':
-                print '[algo229]', k, label, v, tbls, len(valueLabelCounter[v]) == 1 and if_version(v) == False
 
             cleanedK = k.replace("\t", "")
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
+                if host == '[NUM].[NUM].[NUM].74' and label == 'com.yalantis.specialday':
+                    print '[algo237]', numOfValues
                 keyScore[host][cleanedK][consts.SCORE] += \
                     (len(tbls) - 1) / float(numOfValues * numOfValues * len(featureTbl[host][k]))
                 keyScore[host][cleanedK][consts.LABEL].add(label)
@@ -255,9 +255,6 @@ class KVClassifier(AbsClassifer):
                 labelNum = len(keyApp[key])
                 score = keyScore[secdomain][key][consts.SCORE]
                 generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
-        for secdomain in generalRules:
-            if secdomain == 'www.thestreet.com':
-                print '[algo234]', generalRules[secdomain]
             generalRules[secdomain] = sorted(generalRules[secdomain], key=lambda rule: rule.score, reverse=True)
         return generalRules
 
@@ -344,8 +341,6 @@ class KVClassifier(AbsClassifer):
         keyApp = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, k, v in self.miner.get_f(pkg):
-                if host == 'www.thestreet.com':
-                    print '[algo343]', k, v, host
                 keyApp[k].add(pkg.app)
                 self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
                 self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
