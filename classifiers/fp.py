@@ -62,7 +62,7 @@ def sort_key(item):
         return 3
 
 
-def change_support(compressDB, rules, support, cHosts):
+def change_support(compressDB, rules, support):
     """
     Change to table support and prune by table support
     :param cHosts:
@@ -81,21 +81,11 @@ def change_support(compressDB, rules, support, cHosts):
             if r.itemSet.issubset(features):
                 r.add_tbl(tbl)
     tmpRules = []
-    compareHosts = {}
     for r in rules:
         r.support = len(r.tblSupport)
-        #################################
-        for item in r.itemSet:
-            if HOST in item:
-                item = item.replace(HOST, '')
-                compareHosts[item] = r.tblSupport
-        #################################
         if r.support >= support:
             tmpRules.append(r)
-    for host, tbls in cHosts.items():
-        host = re.sub('[0-9]+\.','[NUM].',host)
-        if host not in compareHosts:
-            print '[HOST]', host, tbls
+
     return tmpRules
 
 
@@ -258,19 +248,6 @@ class CMAR(AbsClassifer):
         sqldao.close()
         print "Total Number of Rules is", len(params)
 
-    def getGoodHost(self, trainSet, ruleType):
-        uriClassifier = UriClassifier(consts.IOS)
-        print '[URI] Start Training'
-        hostRules, _ = uriClassifier.train(trainSet, ruleType, ifPersist=False)
-        print '[URI] Finish Training'
-        cHosts = {}
-        for ruleType in hostRules:
-            for rule, tbls in hostRules[ruleType].items():
-                host, _, label = rule
-                cHosts[host] = tbls
-            print "Total Number of Hosts is", len(cHosts)
-        return cHosts
-
     def train(self, trainSet, ruleType):
         def __train_agent():
             agentC = AgentClassifier(inferFrmData=True)
@@ -289,12 +266,10 @@ class CMAR(AbsClassifer):
             map(lambda f: fList[f].add(tbl), features)
             compressDB[pkg.label].add((features, tbl))
 
-        cHosts = self.getGoodHost(trainSet, ruleType)
-
         trainList = self._encode_data(trainSet, fList)
         ''' Rules format : (feature, confidence, support, label) '''
         rules = _gen_rules(trainList, self.tSupport, self.tConfidence)
-        rules = change_support(compressDB, rules, self.tSupport, cHosts)
+        rules = change_support(compressDB, rules, self.tSupport)
         ''' Prune duplicated rules'''
         print '[CMAR] Before pruning', len(rules)
         rules = _remove_duplicate(rules)

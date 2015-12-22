@@ -4,7 +4,7 @@ import re
 
 from classifiers.uri import UriClassifier
 from sqldao import SqlDao
-from utils import load_xml_features, if_version, flatten, get_label
+from utils import load_xml_features, if_version, flatten
 from collections import defaultdict
 from classifier import AbsClassifer
 from const.dataset import DataSetIter as DataSetIter
@@ -438,17 +438,16 @@ class KVClassifier(AbsClassifer):
             rst = consts.NULLPrediction
             host, path = self.miner.classify_format(pkg)
             for regexObj, scores in self.rules[ruleType][host].iteritems():
+                if host == 'pubads.g.doubleclick.net' and 'aarpnewsapp' in regexObj.pattern:
+                    print '[algo430]', regexObj.pattern, regexObj.search(path), path
                 if regexObj.search(path):
                     label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
                     if support > rst.score or (support == rst.score and confidence > fatherScore):
                         fatherScore = confidence
                         evidence = (host, regexObj.pattern)
                         rst = consts.Prediction(label, support, evidence)
-            predictRst[ruleType] = rst
-            if rst != consts.NULLPrediction and rst.label != get_label(pkg, ruleType):
-                print '[WRONG]', rst, pkg.app, pkg.label
-                print '=' * 10
 
+            predictRst[ruleType] = rst
         return predictRst
 
     def persist(self, specificRules, rule_type):

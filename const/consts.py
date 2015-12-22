@@ -50,6 +50,8 @@ URI_CLASSIFIER = "URI Rule"
 AGENT_CLASSIFIER = "Agent Rule"
 CMAR_CLASSIFIER = 'CMAR Rule'
 
+PATH_MINER = 'P'
+KV_MINER = 'K'
 #############EVALUATIONS###############
 DISCOVERED_APP = 'discoveried_app'
 DISCOVERED_APP_LIST = 'discoveried_app_list'

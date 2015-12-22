@@ -458,6 +458,15 @@ def process_agent( agent, app):
     agent = re.sub(r'(^[0-9a-z]*)(.'+app+r'$)', r'[RANDOM]\2', agent)
     return agent
 
+def get_label(pkg, ruleType):
+    if ruleType == consts.APP_RULE:
+        return pkg.app
+    elif ruleType == consts.COMPANY_RULE:
+        return pkg.company
+    elif ruleType == consts.CATEGORY_RULE:
+        return pkg.category
+    else:
+        assert "Rule Type Error"
  # def prune_path(item):
         #     item = item.replace(PATH, '')
         #     if if_version(item) == True:
