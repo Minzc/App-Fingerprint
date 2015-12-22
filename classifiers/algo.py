@@ -224,13 +224,16 @@ class KVClassifier(AbsClassifer):
         # secdomain -> app -> key -> value -> tbls
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
-        for secdomain, k, label, v, tbls in flatten(featureTbl):
+        for host, k, label, v, tbls in flatten(featureTbl):
+            if host == 'www.thestreet.com':
+                print '[algo229]', k, label, v, tbls, len(valueLabelCounter[v]) == 1 and if_version(v) == False
+
             cleanedK = k.replace("\t", "")
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
-                numOfValues = len(featureTbl[secdomain][k][label])
-                keyScore[secdomain][cleanedK][consts.SCORE] += \
-                    (len(tbls) - 1) / float(numOfValues * numOfValues * len(featureTbl[secdomain][k]))
-                keyScore[secdomain][cleanedK][consts.LABEL].add(label)
+                numOfValues = len(featureTbl[host][k][label])
+                keyScore[host][cleanedK][consts.SCORE] += \
+                    (len(tbls) - 1) / float(numOfValues * numOfValues * len(featureTbl[host][k]))
+                keyScore[host][cleanedK][consts.LABEL].add(label)
 
         return keyScore
 
@@ -251,7 +254,7 @@ class KVClassifier(AbsClassifer):
                 score = keyScore[secdomain][key][consts.SCORE]
                 generalRules[secdomain].append(Rule(secdomain, key, score, labelNum))
         for secdomain in generalRules:
-            if secdomain == 'pubads.g.doubleclick.net':
+            if secdomain == 'www.thestreet.com':
                 print '[algo234]', generalRules[secdomain]
             generalRules[secdomain] = sorted(generalRules[secdomain], key=lambda rule: rule.score, reverse=True)
         return generalRules
@@ -339,6 +342,8 @@ class KVClassifier(AbsClassifer):
         keyApp = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, k, v in self.miner.get_f(pkg):
+                if host == 'www.thestreet.com':
+                    print '[algo343]', k, v, host
                 keyApp[k].add(pkg.app)
                 self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
                 self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
@@ -449,8 +454,6 @@ class KVClassifier(AbsClassifer):
         for ruleType, patterns in specificRules.iteritems():
             for host in patterns:
                 for key in patterns[host]:
-                    if key == 'an' and host == 'pubads.g.doubleclick.net':
-                        print '[algo448]' ,patterns[host][key]
                     for value in patterns[host][key]:
                         for label in patterns[host][key][value]:
                             confidence = patterns[host][key][value][label][consts.SCORE]
