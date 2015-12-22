@@ -122,9 +122,6 @@ class KV:
         """
         prunedK = {}
         for secdomain, keys in keys.items():
-            if 'overstockcom' in secdomain:
-                for key in keys:
-                    print '[algo108]', key, secdomain
             keys = [key for key in keys if key.score > self.scoreThreshold and key.labelNum > self.labelThreshold]
             prunedK[secdomain] = keys
         return prunedK
@@ -148,8 +145,6 @@ class KV:
             if v not in trackIds and len(re.sub('[0-9]', '', v)) < 2:
                 continue
             host, key = rule
-            if 'overstockcom' in host and key == 'appid' and app == 'com.overstock.app':
-                print '[algo129] add a text rule', host, key, v
             specificRules[host][key][v][app][consts.SCORE] = 1.0
             specificRules[host][key][v][app][consts.SUPPORT] = tbls
         return specificRules
@@ -191,11 +186,7 @@ class KVClassifier(AbsClassifer):
         """
         generalRules = self.miner.prune(generalRules)
         for host in generalRules:
-            if 'overstockcom' in host:
-                print '[algo169]', generalRules[host], host
             generalRules[host] = self.miner.sort(generalRules[host], xmlGenRules)
-            if 'overstockcom' in host:
-                print '[algo171]', generalRules[host], host
 
         coverage = defaultdict(int)
         prunedGenRules = defaultdict(set)
@@ -216,8 +207,6 @@ class KVClassifier(AbsClassifer):
                     break
                 tmp.append(rule)
             prunedGenRules[host] = tmp
-            if host == 'pubads.g.doubleclick.net':
-                print '[algo190]', prunedGenRules[host]
         return prunedGenRules
 
     @staticmethod
@@ -236,8 +225,6 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for secdomain, k, label, v, tbls in flatten(featureTbl):
-            if secdomain == 'pubads.g.doubleclick.net':
-                print '[algo211]', secdomain, k, v
             cleanedK = k.replace("\t", "")
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[secdomain][k][label])
@@ -417,9 +404,6 @@ class KVClassifier(AbsClassifer):
                     pass
 
                 if PATH not in key:
-                    if value == '2.3.1.iphone.org.aarp.aarpnewsapp':
-                        print '[algo409]', host, key, value
-
                     regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b', re.IGNORECASE)
                 else:
                     value = value.replace(PATH, '')
@@ -446,7 +430,7 @@ class KVClassifier(AbsClassifer):
                         rst = consts.Prediction(label, support, evidence)
             predictRst[ruleType] = rst
             if rst != consts.NULLPrediction and rst.label != get_label(pkg, ruleType):
-                print '[WRONG]', rst, pkg.app, pkg.label
+                print '[WRONG]', rst, pkg.app, pkg.category
                 print '=' * 10
 
         return predictRst
