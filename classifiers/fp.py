@@ -274,6 +274,7 @@ class CMAR(AbsClassifer):
     def train(self, trainSet, ruleType):
         def __train_agent():
             agentC = AgentClassifier(inferFrmData=True)
+            agentC.set_name(consts.AGENT_CLASSIFIER)
             agentC.train(trainSet, ruleType)
 
         __train_agent()
