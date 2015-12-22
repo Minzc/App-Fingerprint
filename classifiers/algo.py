@@ -103,9 +103,9 @@ class KV:
         """
         prunedK = {}
         for secdomain, keys in keys.items():
-            if secdomain == 'pubads.g.doubleclick.net':
+            if 'overstockcom' in secdomain:
                 for key in keys:
-                    print '[algo108]', key
+                    print '[algo108]', key. host
             keys = [key for key in keys if key.score > 0.9 and key.labelNum > 1]
             prunedK[secdomain] = keys
         return prunedK
@@ -129,7 +129,7 @@ class KV:
             if v not in trackIds and len(re.sub('[0-9]', '', v)) < 2:
                 continue
             host, key = rule
-            if host == 'pubads.g.doubleclick.net' and key == 'an' and app == 'com.kbb.valuesapp':
+            if 'overstockcom' in host and key == 'appid' and app == 'com.overstock.app':
                 print '[algo129] add a text rule', host, key, v
             specificRules[host][key][v][app][consts.SCORE] = 1.0
             specificRules[host][key][v][app][consts.SUPPORT] = tbls
@@ -168,11 +168,11 @@ class KVClassifier(AbsClassifer):
         """
         generalRules = self.miner.prune(generalRules)
         for host in generalRules:
-            if host == 'pubads.g.doubleclick.net':
-                print '[algo169]', generalRules[host]
+            if 'overstockcom' in host:
+                print '[algo169]', generalRules[host], host
             generalRules[host] = self.miner.sort(generalRules[host], xmlGenRules)
-            if host == 'pubads.g.doubleclick.net':
-                print '[algo171]', generalRules[host]
+            if 'overstockcom' in host:
+                print '[algo171]', generalRules[host], host
 
         coverage = defaultdict(int)
         prunedGenRules = defaultdict(set)
