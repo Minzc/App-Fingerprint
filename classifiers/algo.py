@@ -340,7 +340,7 @@ class KVClassifier(AbsClassifer):
         keyApp = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, k, v in self.miner.get_f(pkg):
-                keyApp[pkg.app].add(k)
+                keyApp[k].add(pkg.app)
                 self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
                 self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
                 self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
