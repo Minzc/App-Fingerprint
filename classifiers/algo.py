@@ -266,9 +266,12 @@ class KVClassifier(AbsClassifer):
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, key, value in self.miner.get_f(pkg):
                 if host == 'pubads.g.doubleclick.net' and key == 'an' and pkg.app=='com.kbb.valuesapp':
-                    print '[algo263]',value, len(valueLabelCounter[value])
+                    print '[algo263]',value, len(valueLabelCounter[value]), key,generalRules[host]
                 for rule in [r for r in generalRules[host] if r.key == key]:
                     value = value.strip()
+                    if host == 'pubads.g.doubleclick.net' and key == 'an' and pkg.app=='com.kbb.valuesapp':
+                        print '[algo273]', value, len(valueLabelCounter[value]) == 1 and len(value) != 1
+
                     if len(valueLabelCounter[value]) == 1 and len(value) != 1:
                         label = pkg.app if ruleType == consts.APP_RULE else pkg.company
                         specificRules[host][key][value][label][consts.SCORE] = rule.score
