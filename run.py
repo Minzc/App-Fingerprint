@@ -152,6 +152,7 @@ def evaluate(rst, testSet, testApps):
             cPrdcts.set_appInfo(pkg.appInfo)
             predictions = rst[pkg.id]
             correctLabels = [0,0,0]
+            ifPredict = False
 
             for ruleType in VALID_LABEL:
                 predict = predictions[ruleType].label
@@ -159,10 +160,12 @@ def evaluate(rst, testSet, testApps):
                 correctLabels[ruleType] = 1 if label == predict else 0
 
                 if predict is not None:
-                    assert sum(correctLabels) <= 1
-                    cPrdcts.inc_total()
-                    cPrdcts.inc_correct(sum(correctLabels))
-                    break
+                    ifPredict = True
+
+            if ifPredict:
+                cPrdcts.inc_total()
+                if sum(correctLabels) > 0:
+                    cPrdcts.inc_correct(1)
 
         if cPrdcts.if_all_right():
             correctApp.add((cPrdcts.package, cPrdcts.trackId))
