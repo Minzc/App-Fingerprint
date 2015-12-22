@@ -265,8 +265,8 @@ class KVClassifier(AbsClassifer):
 
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, key, value in self.miner.get_f(pkg):
-                if host == 'pubads.g.doubleclick.net':
-                    print '[algo263]', generalRules[host], len(valueLabelCounter[value]) == 1 and len(value) != 1
+                if host == 'pubads.g.doubleclick.net' and key == 'an' and pkg.app=='com.kbb.valuesapp':
+                    print '[algo263]',value, len(valueLabelCounter[value])
                 for rule in [r for r in generalRules[host] if r.key == key]:
                     value = value.strip()
                     if len(valueLabelCounter[value]) == 1 and len(value) != 1:
@@ -337,6 +337,8 @@ class KVClassifier(AbsClassifer):
                 self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
                 self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
                 trackIds[pkg.trackId] = pkg.app
+                if host == 'pubads.g.doubleclick.net' and k == 'an' and 'com.kbb.valuesapp' in v:
+                    print '[algo341]', self.compressedDB[consts.APP_RULE][host][k][pkg.app][v]
 
         xmlGenRules, xmlSpecificRules, hostSecdomain = self.miner.txt_analysis(self.valueLabelCounter, trainData)
         ##################
