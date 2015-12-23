@@ -5,7 +5,7 @@ import re
 from classifiers.uri import UriClassifier
 from sqldao import SqlDao
 from utils import load_xml_features, if_version, flatten, get_label
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from classifier import AbsClassifer
 from const.dataset import DataSetIter as DataSetIter
 
@@ -34,10 +34,13 @@ class Path:
     @staticmethod
     def get_f(package):
         host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
-        tmp = ''
-        for index, pathSeg in enumerate(filter(None, package.path.split('/'))):
-            tmp = tmp + '/' + pathSeg
-            yield (host, PATH + str(index), tmp[1:])
+        tmp = []
+        for pathSeg in filter(None, package.path.split('/')):
+            key = PATH + '/'.join(tmp)
+            tmp.append(pathSeg)
+            value = '/'.join(tmp)
+            yield (host, key, value)
+
 
     def classify_format(self, package):
         host = package.refer_rawHost if package.refer_rawHost else package.rawHost
@@ -66,7 +69,8 @@ class Path:
     def sort(self, genRules, txtRules):
         def compare(genRule):
             ifTxtRule = 1 if (genRule.secdomain, genRule.key) in txtRules else 0
-            return (ifTxtRule, genRule.score, 100 - int(genRule.key.replace(PATH, '')))
+            length = len(genRule.key.split('/'))
+            return (ifTxtRule, genRule.score, 100 - length)
 
         sGenRules = sorted(genRules, key=compare, reverse=True)
         return sGenRules
@@ -193,12 +197,15 @@ class KVClassifier(AbsClassifer):
         coverage = defaultdict(int)
         prunedGenRules = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            kv = {}
             for host, key, value in self.miner.get_f(pkg):
-                if host in generalRules:
-                    for rule in generalRules[host]:
-                        if rule.key == key and coverage[tbl + '#' + str(pkg.id)] < 3:
-                            coverage[tbl + '#' + str(pkg.id)] += 1
-                            prunedGenRules[host].add(rule)
+                kv[key] = value
+
+            if host in generalRules:
+                for rule in generalRules[host]:
+                    if rule.key in kv and coverage[tbl + '#' + str(pkg.id)] < 3:
+                        coverage[tbl + '#' + str(pkg.id)] += 1
+                        prunedGenRules[host].add(rule)
 
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
