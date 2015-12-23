@@ -286,21 +286,23 @@ class KVClassifier(AbsClassifer):
                 for rule in [r for r in generalRules[host] if r.key == key]:
                     value = value.strip()
                     if len(valueLabelCounter[value]) == 1 and len(value) != 1:
-                        label = pkg.app if ruleType == consts.APP_RULE else pkg.company
+                        label = pkg.app if ruleType == consts.APP_RULE else pkg.category
                         specificRules[host][key][value][label][consts.SCORE] = rule.score
                         specificRules[host][key][value][label][consts.SUPPORT].add(tbl)
 
         return specificRules
 
     @staticmethod
-    def _merge_result(appSpecificRules):
+    def _merge_result(appSpecificRules, categorySpecificRules):
         def __create_dic():
             return defaultdict(lambda: defaultdict(
                 lambda: defaultdict(lambda: defaultdict(lambda: {consts.SCORE: 0, consts.SUPPORT: set()}))))
 
-        specificRules = {consts.APP_RULE: __create_dic(), consts.COMPANY_RULE: __create_dic()}
+        specificRules = {consts.APP_RULE: __create_dic(), consts.CATEGORY_RULE: __create_dic()}
         for host, key, value, app, scoreType, score in flatten(appSpecificRules):
             specificRules[consts.APP_RULE][host][key][value][app][scoreType] = score
+        for host, key, value, app, scoreType, score in flatten(categorySpecificRules):
+            specificRules[consts.CATEGORY_RULE][host][key][value][app][scoreType] = score
             # specificRules[consts.COMPANY_RULE][host][key][value][self.appCompanyRelation[app]][scoreType] = score
         # for host in companySpecificRules:
         #   for key in companySpecificRules[host]:
@@ -359,30 +361,32 @@ class KVClassifier(AbsClassifer):
         # Count
         ##################
         appKeyScore = self._score(self.compressedDB[consts.APP_RULE], self.valueLabelCounter[consts.APP_RULE])
-        companyKeyScore = self._score(self.compressedDB[consts.CATEGORY_RULE],
+        categoryKeyScore = self._score(self.compressedDB[consts.CATEGORY_RULE],
                                       self.valueLabelCounter[consts.CATEGORY_RULE])
         #############################
         # Generate interesting keys
         #############################
         appGeneralRules = self._generate_keys(appKeyScore, keyApp)
-        companyGeneralRules = self._generate_keys(companyKeyScore, keyApp)
+        categoryGeneralRules = self._generate_keys(categoryKeyScore, keyApp)
         #############################
         # Pruning general rules
         #############################
         print ">>>[KV] Before pruning appGeneralRules", len(appGeneralRules)
         appGeneralRules = self._prune_general_rules(appGeneralRules, trainData, xmlGenRules)
-        companyGeneralRules = self._prune_general_rules(companyGeneralRules, trainData, xmlGenRules)
+        categoryGeneralRules = self._prune_general_rules(categoryGeneralRules, trainData, xmlGenRules)
         print ">>>[KV] appGeneralRules", len(appGeneralRules)
-        print ">>>[KV] companyGeneralRules", len(companyGeneralRules)
+        print ">>>[KV] companyGeneralRules", len(categoryGeneralRules)
         #############################
         # Generate specific rules
         #############################
         appSpecificRules = self._generate_rules(trainData, appGeneralRules, self.valueLabelCounter[consts.APP_RULE],
                                                 consts.APP_RULE)
+        categorySpecifcRules = self._generate_rules(trainData, categoryGeneralRules, self.valueLabelCounter[consts.CATEGORY_RULE],
+                                                consts.CATEGORY_RULE)
 
-            # appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, trainData.rmapp)
+        # appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, trainData.rmapp)
         appSpecificRules = self.miner.gen_txt_rule(xmlSpecificRules, appSpecificRules, trackIds)
-        specificRules = self._merge_result(appSpecificRules)
+        specificRules = self._merge_result(appSpecificRules, categorySpecifcRules)
         #############################
         # Persist rules
         #############################
