@@ -14,9 +14,10 @@ PATH = '[PATH]:'
 
 
 class Path:
-    def __init__(self, scoreT):
+    def __init__(self, scoreT, dbcover):
         self.scoreThreshold = scoreT
         self.name = consts.PATH_MINER
+        self.dbcover = dbcover
 
     def mine_host(self, trainSet, ruleType):
         uriClassifier = UriClassifier(consts.IOS)
@@ -70,7 +71,7 @@ class Path:
         def compare(genRule):
             ifTxtRule = 1 if (genRule.secdomain, genRule.key) in txtRules else 0
             length = len(genRule.key.split('/'))
-            return (ifTxtRule, genRule.score, 100 - length)
+            return (ifTxtRule, genRule.score, length)
 
         sGenRules = sorted(genRules, key=compare, reverse=True)
         return sGenRules
@@ -80,10 +81,11 @@ class Path:
 
 
 class KV:
-    def __init__(self, scoreT, labelT):
+    def __init__(self, scoreT, labelT, dbcover):
         self.xmlFeatures = load_xml_features()
         self.scoreThreshold = scoreT
         self.labelThreshold = labelT
+        self.dbcover = dbcover
         self.name = consts.KV_MINER
 
     @staticmethod
@@ -170,9 +172,9 @@ class KVClassifier(AbsClassifer):
         self.appType = appType
 
         if minerType == consts.PATH_MINER:
-            self.miner = Path(1)
+            self.miner = Path(scoreT=1, dbcover=1)
         elif minerType == consts.KV_MINER:
-            self.miner = KV(scoreT=0.9, labelT=1)
+            self.miner = KV(scoreT=0.9, labelT=1, dbcover=3)
 
         self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
             lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
@@ -203,7 +205,7 @@ class KVClassifier(AbsClassifer):
 
             if host in generalRules:
                 for rule in generalRules[host]:
-                    if rule.key in kv and coverage[tbl + '#' + str(pkg.id)] < 3:
+                    if rule.key in kv and coverage[tbl + '#' + str(pkg.id)] < self.miner.dbcover:
                         coverage[tbl + '#' + str(pkg.id)] += 1
                         prunedGenRules[host].add(rule)
 
