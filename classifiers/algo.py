@@ -52,8 +52,7 @@ class Path:
     def txt_analysis(self, valueLabelCounter, trainData):
         xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
-        hostSecdomain = {}
-        return xmlGenRules, xmlSpecificRules, hostSecdomain
+        return xmlGenRules, xmlSpecificRules
 
     def prune(self, keys):
         """
@@ -111,16 +110,14 @@ class KV:
         """
         xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
-        hostSecdomain = {}
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, k, v in self.get_f(pkg):
-                hostSecdomain[host] = pkg.secdomain
                 if if_version(v) == False and len(valueLabelCounter[consts.APP_RULE][v]) == 1:
                     for fieldName in [name for name, value in self.xmlFeatures[pkg.app] if value == v]:
                         xmlGenRules[(host, k)][v][fieldName] += 1
                         xmlSpecificRules[(host, k)][v][pkg.app].add(tbl)
 
-        return xmlGenRules, xmlSpecificRules, hostSecdomain
+        return xmlGenRules, xmlSpecificRules
 
     def prune(self, keys):
         """
@@ -357,7 +354,7 @@ class KVClassifier(AbsClassifer):
                 self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
                 trackIds[pkg.trackId] = pkg.app
 
-        xmlGenRules, xmlSpecificRules, hostSecdomain = self.miner.txt_analysis(self.valueLabelCounter, trainData)
+        xmlGenRules, xmlSpecificRules = self.miner.txt_analysis(self.valueLabelCounter, trainData)
         ##################
         # Count
         ##################
