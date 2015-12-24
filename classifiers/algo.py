@@ -200,8 +200,8 @@ class KVClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 kv[key] = value
 
-            if pkg.host == 'audioroadshow.cbslocal.com':
-                print '[algo203]', kv, generalRules['audioroadshow.cbslocal.com']
+            if pkg.host == 'www.charmin.com':
+                print '[algo203]', kv, generalRules['www.charmin.com']
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -240,7 +240,7 @@ class KVClassifier(AbsClassifer):
             cleanedK = k.replace("\t", "")
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
-                if host == 'audioroadshow.cbslocal.com':
+                if host == 'www.charmin.com':
                     print '[algo237]', numOfValues, cleanedK, featureTbl[host][k][label]
                 keyScore[host][cleanedK][consts.SCORE] += \
                     (len(tbls) - 1) / float(numOfValues * numOfValues * len(featureTbl[host][k]))
@@ -260,14 +260,14 @@ class KVClassifier(AbsClassifer):
         Rule = consts.Rule
         generalRules = defaultdict(list)
         for host in keyScore:
-            if host == 'audioroadshow.cbslocal.com':
+            if host == 'www.charmin.com':
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
                 labelNum = len(keyApp[key])
                 score = keyScore[host][key][consts.SCORE]
                 generalRules[host].append(Rule(host, key, score, labelNum))
             generalRules[host] = sorted(generalRules[host], key=lambda rule: rule.score, reverse=True)
-        print '[algo267]', generalRules['audioroadshow.cbslocal.com']
+        print '[algo267]', generalRules['www.charmin.com']
         return generalRules
 
     def _generate_rules(self, trainData, generalRules, valueLabelCounter, ruleType):
