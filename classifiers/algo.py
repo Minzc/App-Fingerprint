@@ -35,7 +35,7 @@ class Path:
     @staticmethod
     def get_f(package):
         host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
-        tmp = []
+        tmp = [host]
         for pathSeg in filter(None, package.path.split('/')):
             key = PATH + '/'.join(tmp)
             tmp.append(pathSeg)
@@ -425,7 +425,7 @@ class KVClassifier(AbsClassifer):
                 if PATH not in key:
                     regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b', re.IGNORECASE)
                 else:
-                    value = value.replace(PATH, '')
+                    value = '/'.join(value.replace(PATH, '').split('/')[1:])
                     regexObj = re.compile(r'\b' + re.escape(value) + r'\b', re.IGNORECASE)
 
                 self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
