@@ -236,7 +236,8 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(featureTbl):
-
+            if host == 'login.constantcontact.com':
+                print '[algo240]', k, featureTbl[host][k][label]
             cleanedK = k.replace("\t", "")
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
