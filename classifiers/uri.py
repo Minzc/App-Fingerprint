@@ -50,7 +50,10 @@ class Node:
 
 class AppMiner:
     @staticmethod
-    def filter(node): return len(node.appInfos) == 1
+    def filter(node):
+        if 'ohmychef' in node.feature:
+            print '[uri]', node.appInfos
+        return len(node.appInfos) == 1
     @staticmethod
     def label(pkg): return pkg.appInfo.package
     @staticmethod
@@ -124,8 +127,8 @@ class UriClassifier(AbsClassifer):
             tmpR = defaultdict(set)
             for node in filter(miner.filter, hostNodes):
                 features = miner.features(self.fLib, node.appInfos)
-                if 'net.ohmychef.startup' == node.feature:
-                    print '[uri28]', check(features, node.feature)
+                if 'ohmychef' in node.feature:
+                    print '[uri128]', check(features, node.feature)
                 if check(features, node.feature):
                     tmpR[ruleType].add(node.feature)
 
