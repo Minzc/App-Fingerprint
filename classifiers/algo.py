@@ -241,7 +241,7 @@ class KVClassifier(AbsClassifer):
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
                 if host == 'audioroadshow.cbslocal.com':
-                    print '[algo237]', numOfValues, cleanedK
+                    print '[algo237]', numOfValues, cleanedK, featureTbl[host][k][label]
                 keyScore[host][cleanedK][consts.SCORE] += \
                     (len(tbls) - 1) / float(numOfValues * numOfValues * len(featureTbl[host][k]))
                 keyScore[host][cleanedK][consts.LABEL].add(label)
