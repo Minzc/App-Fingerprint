@@ -124,6 +124,8 @@ class UriClassifier(AbsClassifer):
             tmpR = defaultdict(set)
             for node in filter(miner.filter, hostNodes):
                 features = miner.features(self.fLib, node.appInfos)
+                if 'net.ohmychef.startup' == node.feature:
+                    print '[uri28]', check(features, node.feature)
                 if check(features, node.feature):
                     tmpR[ruleType].add(node.feature)
 
