@@ -11,6 +11,7 @@ from const.dataset import DataSetIter as DataSetIter
 
 DEBUG = False
 PATH = '[PATH]:'
+HOST = '[HOST]:'
 
 
 class Path:
@@ -35,10 +36,11 @@ class Path:
     @staticmethod
     def get_f(package):
         host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
-        tmp = [host]
-        for pathSeg in filter(None, package.path.split('/')):
+        fs = [host] + filter(None, package.path.split('/'))
+        tmp = []
+        for seg in fs:
             key = PATH + '/'.join(tmp)
-            tmp.append(pathSeg)
+            tmp.append(seg)
             value = '/'.join(tmp)
             yield (host, key, value)
 
@@ -422,11 +424,14 @@ class KVClassifier(AbsClassifer):
                 except:
                     pass
 
-                if PATH not in key:
-                    regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b', re.IGNORECASE)
+                if PATH in key:
+                    if value.count('/') == 0:
+                        regexObj = re.compile('.', re.IGNORECASE)
+                    else:
+                        value = '/'.join(value.split('/')[1:])
+                        regexObj = re.compile(r'\b' + re.escape(value) + r'\b', re.IGNORECASE)
                 else:
-                    value = '/'.join(value.replace(PATH, '').split('/')[1:])
-                    regexObj = re.compile(r'\b' + re.escape(value) + r'\b', re.IGNORECASE)
+                    regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b', re.IGNORECASE)
 
                 self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
                 self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
