@@ -202,8 +202,8 @@ class KVClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 kv[key] = value
 
-            if pkg.host == 'm.ohmychef.net':
-                print '[algo203]', kv, generalRules['m.ohmychef.net']
+            if pkg.host == 'usa.mag.edgesuite.net':
+                print '[algo203]', kv, generalRules['usa.mag.edgesuite.net']
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -238,12 +238,12 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(featureTbl):
-            if host == 'm.ohmychef.net':
+            if host == 'usa.mag.edgesuite.net':
                 print '[algo240]', k, featureTbl[host][k][label]
             cleanedK = k.replace("\t", "")
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
-                if host == 'm.ohmychef.net':
+                if host == 'usa.mag.edgesuite.net':
                     print '[algo237]', numOfValues, cleanedK, featureTbl[host][k][label]
                 keyScore[host][cleanedK][consts.SCORE] += \
                     (len(tbls) - 1) / float(numOfValues * numOfValues * len(featureTbl[host][k]))
@@ -263,14 +263,14 @@ class KVClassifier(AbsClassifer):
         Rule = consts.Rule
         generalRules = defaultdict(list)
         for host in keyScore:
-            if host == 'm.ohmychef.net':
+            if host == 'usa.mag.edgesuite.net':
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
                 labelNum = len(keyApp[key])
                 score = keyScore[host][key][consts.SCORE]
                 generalRules[host].append(Rule(host, key, score, labelNum))
             generalRules[host] = sorted(generalRules[host], key=lambda rule: rule.score, reverse=True)
-        print '[algo267]', generalRules['m.ohmychef.net']
+        print '[algo267]', generalRules['usa.mag.edgesuite.net']
         return generalRules
 
     def _generate_rules(self, trainData, generalRules, valueLabelCounter, ruleType):
