@@ -221,8 +221,11 @@ class KVClassifier(AbsClassifer):
                         coverage[tbl + '#' + str(pkg.id)] += 1
                         prunedGenRules[host].add(rule)
 
+
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
+            if host == 'usa.mag.edgesuite.net':
+                print '[algo228]', prunedGenRules[host]
             tmp = []
             for index, rule in enumerate(prunedGenRules[host]):
                 # if counter == 1 or prunedGenRules[host][index-1][2] - rule[2] >= 1:
