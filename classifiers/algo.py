@@ -33,26 +33,26 @@ class Path:
             print "Total Number of Hosts is", len(cHosts)
         self.cHosts = cHosts
 
-    @staticmethod
-    def get_f(package):
-        host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
-        fs = [host] + filter(None, package.path.split('/'))
-        tmp = []
-        for seg in fs:
-            key = PATH + '/'.join(tmp)
-            tmp.append(seg)
-            value = '/'.join(tmp)
-            yield (host, key, value)
     # @staticmethod
     # def get_f(package):
     #     host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
     #     fs = [host] + filter(None, package.path.split('/'))
     #     tmp = []
     #     for seg in fs:
+    #         key = PATH + '/'.join(tmp)
     #         tmp.append(seg)
-    #         key = host + ':' + PATH + str(len(tmp))
     #         value = '/'.join(tmp)
     #         yield (host, key, value)
+    @staticmethod
+    def get_f(package):
+        host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
+        fs = [host] + filter(None, package.path.split('/'))
+        tmp = []
+        for seg in fs:
+            tmp.append(seg)
+            key = host + ':' + PATH + str(len(tmp))
+            value = '/'.join(tmp)
+            yield (host, key, value)
 
 
     def classify_format(self, package):
@@ -212,8 +212,8 @@ class KVClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 kv[key] = value
 
-            if pkg.host == 'usa.mag.edgesuite.net':
-                print '[algo203]', kv, generalRules['usa.mag.edgesuite.net']
+            if pkg.host == 'media.npr.org':
+                print '[algo203]', kv, generalRules['media.npr.org']
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -248,12 +248,12 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(featureTbl):
-            if host == 'usa.mag.edgesuite.net':
+            if host == 'media.npr.org':
                 print '[algo240]', k, featureTbl[host][k][label]
             cleanedK = k.replace("\t", "")
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
-                if host == 'usa.mag.edgesuite.net':
+                if host == 'media.npr.org':
                     print '[algo237]', numOfValues, cleanedK, featureTbl[host][k][label]
                 keyScore[host][cleanedK][consts.SCORE] += \
                     (len(tbls) - 1) / float(numOfValues * numOfValues * len(featureTbl[host][k]))
@@ -273,14 +273,14 @@ class KVClassifier(AbsClassifer):
         Rule = consts.Rule
         generalRules = defaultdict(list)
         for host in keyScore:
-            if host == 'usa.mag.edgesuite.net':
+            if host == 'media.npr.org':
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
                 labelNum = len(keyApp[key])
                 score = keyScore[host][key][consts.SCORE]
                 generalRules[host].append(Rule(host, key, score, labelNum))
             generalRules[host] = sorted(generalRules[host], key=lambda rule: rule.score, reverse=True)
-        print '[algo267]', generalRules['usa.mag.edgesuite.net']
+        print '[algo267]', generalRules['media.npr.org']
         return generalRules
 
     def _generate_rules(self, trainData, generalRules, valueLabelCounter, ruleType):
