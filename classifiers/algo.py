@@ -233,6 +233,8 @@ class KVClassifier(AbsClassifer):
                     break
                 tmp.append(rule)
             prunedGenRules[host] = tmp
+            if host == 'usa.mag.edgesuite.net':
+                print '[algo237]', prunedGenRules[host]
         return prunedGenRules
 
     @staticmethod
