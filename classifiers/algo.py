@@ -50,7 +50,7 @@ class Path:
         tmp = []
         for seg in fs:
             tmp.append(seg)
-            key = PATH + str(len(tmp))
+            key = host + ':' + PATH + str(len(tmp))
             value = '/'.join(tmp)
             yield (host, key, value)
 
