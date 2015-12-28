@@ -33,26 +33,26 @@ class Path:
             print "Total Number of Hosts is", len(cHosts)
         self.cHosts = cHosts
 
-    # @staticmethod
-    # def get_f(package):
-    #     host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
-    #     fs = [host] + filter(None, package.path.split('/'))
-    #     tmp = []
-    #     for seg in fs:
-    #         key = PATH + '/'.join(tmp)
-    #         tmp.append(seg)
-    #         value = '/'.join(tmp)
-    #         yield (host, key, value)
     @staticmethod
     def get_f(package):
         host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
         fs = [host] + filter(None, package.path.split('/'))
         tmp = []
         for seg in fs:
+            key = PATH + '/'.join(tmp)
             tmp.append(seg)
-            key = host + ':' + PATH + str(len(tmp))
             value = '/'.join(tmp)
             yield (host, key, value)
+    # @staticmethod
+    # def get_f(package):
+    #     host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
+    #     fs = [host] + filter(None, package.path.split('/'))
+    #     tmp = []
+    #     for seg in fs:
+    #         tmp.append(seg)
+    #         key = host + ':' + PATH + str(len(tmp))
+    #         value = '/'.join(tmp)
+    #         yield (host, key, value)
 
 
     def classify_format(self, package):
