@@ -229,7 +229,7 @@ class KVClassifier(AbsClassifer):
             tmp = []
             for index, rule in enumerate(prunedGenRules[host]):
                 # if counter == 1 or prunedGenRules[host][index-1][2] - rule[2] >= 1:
-                if prunedGenRules[host][index - 1][2] - rule[2] >= 1:
+                if len(tmp) > 0 and prunedGenRules[host][index - 1][2] - rule[2] >= 1:
                     break
                 tmp.append(rule)
             prunedGenRules[host] = tmp
@@ -254,12 +254,12 @@ class KVClassifier(AbsClassifer):
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(featureTbl):
             if host == 'usa.mag.edgesuite.net':
-                print '[algo240]', k, featureTbl[host][k][label]
+                print '[algo257]', k, featureTbl[host][k][label]
             cleanedK = k.replace("\t", "")
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
                 if host == 'usa.mag.edgesuite.net':
-                    print '[algo237]', numOfValues, cleanedK, featureTbl[host][k][label]
+                    print '[algo62]', numOfValues, cleanedK, featureTbl[host][k][label]
                 keyScore[host][cleanedK][consts.SCORE] += \
                     (len(tbls) - 1) / float(numOfValues * numOfValues * len(featureTbl[host][k]))
                 keyScore[host][cleanedK][consts.LABEL].add(label)
