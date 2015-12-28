@@ -15,10 +15,11 @@ HOST = '[HOST]:'
 
 
 class Path:
-    def __init__(self, scoreT, dbcover):
+    def __init__(self, scoreT, dbcover, scoreGap):
         self.scoreThreshold = scoreT
         self.name = consts.PATH_MINER
         self.dbcover = dbcover
+        self.scoreGap = scoreGap
 
     def mine_host(self, trainSet, ruleType):
         uriClassifier = UriClassifier(consts.IOS)
@@ -92,11 +93,12 @@ class Path:
 
 
 class KV:
-    def __init__(self, scoreT, labelT, dbcover):
+    def __init__(self, scoreT, labelT, dbcover, scoreGap):
         self.xmlFeatures = load_xml_features()
         self.scoreThreshold = scoreT
         self.labelThreshold = labelT
         self.dbcover = dbcover
+        self.scoreGap = scoreGap
         self.name = consts.KV_MINER
 
     @staticmethod
@@ -181,9 +183,9 @@ class KVClassifier(AbsClassifer):
         self.appType = appType
 
         if minerType == consts.PATH_MINER:
-            self.miner = Path(scoreT=1, dbcover=1)
+            self.miner = Path(scoreT=1, dbcover=1, scoreGap=0.3)
         elif minerType == consts.KV_MINER:
-            self.miner = KV(scoreT=0.9, labelT=1, dbcover=3)
+            self.miner = KV(scoreT=0.9, labelT=1, dbcover=3, scoreGap=0.3)
 
         self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
             lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
@@ -229,7 +231,7 @@ class KVClassifier(AbsClassifer):
             tmp = []
             for index, rule in enumerate(prunedGenRules[host]):
                 # if counter == 1 or prunedGenRules[host][index-1][2] - rule[2] >= 1:
-                if len(tmp) > 0 and prunedGenRules[host][index - 1][2] - rule[2] >= 1:
+                if len(tmp) > 0 and prunedGenRules[host][index - 1][2] - rule[2] >= self.miner.scoreGap:
                     break
                 tmp.append(rule)
             prunedGenRules[host] = tmp
@@ -238,7 +240,7 @@ class KVClassifier(AbsClassifer):
         return prunedGenRules
 
     @staticmethod
-    def _score(featureTbl, valueLabelCounter):
+    def _score(featureTbl, valueLabelCounter, normalize):
         """
         Give score to every ( secdomain, key ) pairs
         Input
@@ -261,7 +263,7 @@ class KVClassifier(AbsClassifer):
                 if host == 'usa.mag.edgesuite.net':
                     print '[algo62]', numOfValues, cleanedK, featureTbl[host][k][label]
                 keyScore[host][cleanedK][consts.SCORE] += \
-                    (len(tbls) - 1) / float(numOfValues * numOfValues * len(featureTbl[host][k]))
+                    (len(tbls) - 1) / float(normalize * numOfValues * numOfValues * len(featureTbl[host][k]))
                 keyScore[host][cleanedK][consts.LABEL].add(label)
 
         print '[algo262]', keyScore['usa.mag.edgesuite.net']
@@ -371,7 +373,9 @@ class KVClassifier(AbsClassifer):
         self.miner.mine_host(trainData, rule_type)
         trackIds = {}
         keyApp = defaultdict(set)
+        tbls = set()
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            tbls.add(tbl)
             for host, k, v in self.miner.get_f(pkg):
                 keyApp[k].add(pkg.app)
                 self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
@@ -379,14 +383,16 @@ class KVClassifier(AbsClassifer):
                 self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
                 self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
                 trackIds[pkg.trackId] = pkg.app
+        normalizer = len(tbls) - 1
 
         xmlGenRules, xmlSpecificRules = self.miner.txt_analysis(self.valueLabelCounter, trainData)
         ##################
         # Count
         ##################
-        appKeyScore = self._score(self.compressedDB[consts.APP_RULE], self.valueLabelCounter[consts.APP_RULE])
+        appKeyScore = self._score(self.compressedDB[consts.APP_RULE], self.valueLabelCounter[consts.APP_RULE],
+                                  normalizer)
         categoryKeyScore = self._score(self.compressedDB[consts.CATEGORY_RULE],
-                                      self.valueLabelCounter[consts.CATEGORY_RULE])
+                                      self.valueLabelCounter[consts.CATEGORY_RULE], normalizer)
         #############################
         # Generate interesting keys
         #############################
