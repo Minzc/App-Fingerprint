@@ -266,7 +266,7 @@ class KVClassifier(AbsClassifer):
                     (len(tbls) - 1) / float(normalize * numOfValues * numOfValues * len(featureTbl[host][k]))
                 keyScore[host][cleanedK][consts.LABEL].add(label)
 
-        print '[algo262]', keyScore['googleads.g.doubleclick.net']
+        print '[algo269]', keyScore['googleads.g.doubleclick.net']
         return keyScore
 
     @staticmethod
