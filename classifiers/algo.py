@@ -181,8 +181,8 @@ class KVClassifier(AbsClassifer):
                              consts.CATEGORY_RULE: __create_dict()}
         self.valueLabelCounter = {consts.APP_RULE: defaultdict(set),
                                   consts.CATEGORY_RULE: defaultdict(set)}
-        self.hostLabelTable = {consts.APP_RULE: defaultdict(lambda : defaultdict()),
-                               consts.CATEGORY_RULE: defaultdict(lambda : defaultdict())}
+        self.hostLabelTable = {consts.APP_RULE: defaultdict(lambda : defaultdict(set)),
+                               consts.CATEGORY_RULE: defaultdict(lambda : defaultdict(set))}
         self.rules = {}
         self.appType = appType
 
