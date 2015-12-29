@@ -177,8 +177,12 @@ class KVClassifier(AbsClassifer):
             return defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(set))))
 
         self.name = consts.KV_CLASSIFIER
-        self.compressedDB = {consts.APP_RULE: __create_dict(), consts.CATEGORY_RULE: __create_dict()}
-        self.valueLabelCounter = {consts.APP_RULE: defaultdict(set), consts.CATEGORY_RULE: defaultdict(set)}
+        self.compressedDB = {consts.APP_RULE: __create_dict(),
+                             consts.CATEGORY_RULE: __create_dict()}
+        self.valueLabelCounter = {consts.APP_RULE: defaultdict(set),
+                                  consts.CATEGORY_RULE: defaultdict(set)}
+        self.hostLabelTable = {consts.APP_RULE: defaultdict(lambda : defaultdict()),
+                               consts.CATEGORY_RULE: defaultdict(lambda : defaultdict())}
         self.rules = {}
         self.appType = appType
 
@@ -240,7 +244,7 @@ class KVClassifier(AbsClassifer):
         return prunedGenRules
 
     @staticmethod
-    def _score(featureTbl, valueLabelCounter, normalize):
+    def _score(featureTbl, valueLabelCounter, hostLabelTbl):
         """
         Give score to every ( secdomain, key ) pairs
         Input
@@ -263,7 +267,9 @@ class KVClassifier(AbsClassifer):
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
                 keyScore[host][cleanedK][consts.SCORE] += \
-                    (len(tbls) - 1) / float(normalize * numOfValues * numOfValues * len(featureTbl[host][k]))
+                    (len(tbls) - 1) / float(hostLabelTbl[host][label]
+                                            * numOfValues * numOfValues
+                                            * len(featureTbl[host][k]))
                 keyScore[host][cleanedK][consts.LABEL].add(label)
 
         print '[algo269]', keyScore['googleads.g.doubleclick.net']
@@ -385,6 +391,8 @@ class KVClassifier(AbsClassifer):
                 self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
                 self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
                 self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
+                self.hostLabelTable[consts.APP_RULE][host][pkg.app].add(tbl)
+                self.hostLabelTable[consts.CATEGORY_RULE][host][pkg.category].add(tbl)
                 trackIds[pkg.trackId] = pkg.app
         normalizer = len(tbls) - 1
 
@@ -393,9 +401,10 @@ class KVClassifier(AbsClassifer):
         # Count
         ##################
         appKeyScore = self._score(self.compressedDB[consts.APP_RULE], self.valueLabelCounter[consts.APP_RULE],
-                                  normalizer)
+                                  self.hostLabelTable[consts.APP_RULE])
         categoryKeyScore = self._score(self.compressedDB[consts.CATEGORY_RULE],
-                                      self.valueLabelCounter[consts.CATEGORY_RULE], normalizer)
+                                      self.valueLabelCounter[consts.CATEGORY_RULE],
+                                       self.hostLabelTable[consts.CATEGORY_RULE])
         #############################
         # Generate interesting keys
         #############################
