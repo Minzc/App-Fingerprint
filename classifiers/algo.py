@@ -315,6 +315,8 @@ class KVClassifier(AbsClassifer):
                         label = pkg.app if ruleType == consts.APP_RULE else pkg.category
                         specificRules[host][key][value][label][consts.SCORE] = rule.score
                         specificRules[host][key][value][label][consts.SUPPORT].add(tbl)
+                        if pkg.host == 'googleads.g.doubleclick.net':
+                            print '[algo316]', host, key, value, label
 
         return specificRules
 
