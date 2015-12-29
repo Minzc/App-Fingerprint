@@ -260,7 +260,7 @@ class KVClassifier(AbsClassifer):
             cleanedK = k.replace("\t", "")
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
-                if host == 'googleads.g.doubleclick.net':
+                if host == 'googleads.g.doubleclick.net' and cleanedK == 'app_name':
                     print '[algo62]', numOfValues, cleanedK, featureTbl[host][k][label]
                 keyScore[host][cleanedK][consts.SCORE] += \
                     (len(tbls) - 1) / float(normalize * numOfValues * numOfValues * len(featureTbl[host][k]))
