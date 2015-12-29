@@ -267,7 +267,7 @@ class KVClassifier(AbsClassifer):
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
                 keyScore[host][cleanedK][consts.SCORE] += \
-                    (len(tbls) - 1) / float(hostLabelTbl[host][label]
+                    (len(tbls) - 1) / float(len(hostLabelTbl[host][label])
                                             * numOfValues * numOfValues
                                             * len(featureTbl[host][k]))
                 keyScore[host][cleanedK][consts.LABEL].add(label)
