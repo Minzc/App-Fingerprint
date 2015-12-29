@@ -214,8 +214,8 @@ class KVClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 kv[key] = value
 
-            if pkg.host == 'usa.mag.edgesuite.net':
-                print '[algo203]', kv, generalRules['usa.mag.edgesuite.net']
+            if pkg.host == 'googleads.g.doubleclick.net':
+                print '[algo203]', kv, generalRules['googleads.g.doubleclick.net']
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -226,7 +226,7 @@ class KVClassifier(AbsClassifer):
 
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
-            if host == 'usa.mag.edgesuite.net':
+            if host == 'googleads.g.doubleclick.net':
                 print '[algo228]', prunedGenRules[host]
             tmp = []
             for index, rule in enumerate(prunedGenRules[host]):
@@ -235,7 +235,7 @@ class KVClassifier(AbsClassifer):
                     break
                 tmp.append(rule)
             prunedGenRules[host] = tmp
-            if host == 'usa.mag.edgesuite.net':
+            if host == 'googleads.g.doubleclick.net':
                 print '[algo237]', prunedGenRules[host]
         return prunedGenRules
 
@@ -255,18 +255,18 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(featureTbl):
-            if host == 'usa.mag.edgesuite.net':
+            if host == 'googleads.g.doubleclick.net':
                 print '[algo257]', k, featureTbl[host][k][label]
             cleanedK = k.replace("\t", "")
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
-                if host == 'usa.mag.edgesuite.net':
+                if host == 'googleads.g.doubleclick.net':
                     print '[algo62]', numOfValues, cleanedK, featureTbl[host][k][label]
                 keyScore[host][cleanedK][consts.SCORE] += \
                     (len(tbls) - 1) / float(normalize * numOfValues * numOfValues * len(featureTbl[host][k]))
                 keyScore[host][cleanedK][consts.LABEL].add(label)
 
-        print '[algo262]', keyScore['usa.mag.edgesuite.net']
+        print '[algo262]', keyScore['googleads.g.doubleclick.net']
         return keyScore
 
     @staticmethod
@@ -281,7 +281,7 @@ class KVClassifier(AbsClassifer):
         Rule = consts.Rule
         generalRules = defaultdict(list)
         for host in keyScore:
-            if host == 'usa.mag.edgesuite.net':
+            if host == 'googleads.g.doubleclick.net':
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
                 labelNum = len(keyApp[key])
