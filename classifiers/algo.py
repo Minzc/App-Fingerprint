@@ -311,12 +311,13 @@ class KVClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 for rule in [r for r in generalRules[host] if r.key == key]:
                     value = value.strip()
+                    if pkg.host == 'googleads.g.doubleclick.net':
+                            print '[algo316]', host, key, value, label,len(valueLabelCounter[value]),len(value)
                     if len(valueLabelCounter[value]) == 1 and len(value) != 1:
                         label = pkg.app if ruleType == consts.APP_RULE else pkg.category
                         specificRules[host][key][value][label][consts.SCORE] = rule.score
                         specificRules[host][key][value][label][consts.SUPPORT].add(tbl)
-                        if pkg.host == 'googleads.g.doubleclick.net':
-                            print '[algo316]', host, key, value, label
+
 
         return specificRules
 
