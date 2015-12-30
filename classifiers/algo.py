@@ -262,7 +262,7 @@ class KVClassifier(AbsClassifer):
             # if host == 'googleads.g.doubleclick.net':
             #     print '[algo257]', k, featureTbl[host][k][label]
             cleanedK = k.replace("\t", "")
-            if host == 'googleads.g.doubleclick.net' and cleanedK == 'app_name':
+            if host == 'googleads.g.doubleclick.net' and cleanedK == 'ctime':
                 print '[algo262]', len(featureTbl[host][k][label]), len(hostLabelTbl[host][label]), cleanedK, featureTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(featureTbl[host][k])
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
@@ -271,7 +271,7 @@ class KVClassifier(AbsClassifer):
                                             * numOfValues * numOfValues
                                             * len(featureTbl[host][k]))
                 keyScore[host][cleanedK][consts.LABEL].add(label)
-            elif host == 'googleads.g.doubleclick.net' and cleanedK == 'app_name':
+            elif host == 'googleads.g.doubleclick.net' and cleanedK == 'ctime':
                 print '[algo276]', cleanedK, v, label
 
         print '[algo269]', keyScore['googleads.g.doubleclick.net']
@@ -320,7 +320,7 @@ class KVClassifier(AbsClassifer):
                 for rule in [r for r in generalRules[host] if r.key == key]:
                     value = value.strip()
                     if pkg.host == 'googleads.g.doubleclick.net':
-                            print '[algo316]', host, key, value, label,len(valueLabelCounter[value]),len(value)
+                        print '[algo316]', host, key, value, label,len(valueLabelCounter[value]),len(value)
                     if len(valueLabelCounter[value]) == 1 and len(value) != 1:
                         label = pkg.app if ruleType == consts.APP_RULE else pkg.category
                         specificRules[host][key][value][label][consts.SCORE] = rule.score
