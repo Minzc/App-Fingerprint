@@ -388,8 +388,6 @@ class KVClassifier(AbsClassifer):
         trackIds = {}
         keyApp = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
-            if pkg.refer_host:
-                continue
             for host, k, v in self.miner.get_f(pkg):
                 keyApp[host + '$' + k].add(pkg.app)
                 self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
@@ -481,7 +479,9 @@ class KVClassifier(AbsClassifer):
         for ruleType in self.rules:
             fatherScore = -1
             rst = consts.NULLPrediction
-            if pkg.refer_host is not None:
+            if pkg.refer_host:
+                pass
+            else:
                 host, path = self.miner.classify_format(pkg)
                 for regexObj, scores in self.rules[ruleType][host].iteritems():
                     if regexObj.search(path):
