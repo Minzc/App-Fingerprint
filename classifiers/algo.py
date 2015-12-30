@@ -111,6 +111,7 @@ class KV:
             for v in vs:
                 v = v.strip()
                 if if_version(v) == False and len(v) > 1:
+                    v = re.sub('[0-9]+x[0-9]+','', v)
                     yield (host, k, v)
 
     def classify_format(self, package):
