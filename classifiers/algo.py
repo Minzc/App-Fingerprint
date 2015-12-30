@@ -262,8 +262,8 @@ class KVClassifier(AbsClassifer):
             if host == 'googleads.g.doubleclick.net':
                 print '[algo257]', k, featureTbl[host][k][label]
             cleanedK = k.replace("\t", "")
-            if host == 'googleads.g.doubleclick.net' and cleanedK == 'app_name' and not (len(valueLabelCounter[v]) == 1 and if_version(v) == False):
-                print '[algo262]', len(featureTbl[host][k][label]), cleanedK, featureTbl[host][k][label]
+            if host == 'googleads.g.doubleclick.net' and cleanedK == 'app_name':
+                print '[algo262]', len(featureTbl[host][k][label]), len(hostLabelTbl[host][label]), cleanedK, featureTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), numOfValues
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
                 keyScore[host][cleanedK][consts.SCORE] += \
