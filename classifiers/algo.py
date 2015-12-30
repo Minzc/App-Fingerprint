@@ -263,7 +263,7 @@ class KVClassifier(AbsClassifer):
             #     print '[algo257]', k, featureTbl[host][k][label]
 
             if host == 'googleads.g.doubleclick.net' and k == 'ctime':
-                print '[algo262]', len(featureTbl[host][k][label]), len(hostLabelTbl[host][label]), cleanedK, featureTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(featureTbl[host][k])
+                print '[algo262]', len(featureTbl[host][k][label]), len(hostLabelTbl[host][label]), k, featureTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(featureTbl[host][k])
             if len(valueLabelCounter[v]) == 1:
                 numOfValues = len(featureTbl[host][k][label])
                 keyScore[host][k][consts.SCORE] += \
