@@ -5,7 +5,7 @@ import re
 from classifiers.uri import UriClassifier
 from sqldao import SqlDao
 from utils import load_xml_features, if_version, flatten, get_label
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from classifier import AbsClassifer
 from const.dataset import DataSetIter as DataSetIter
 
@@ -13,13 +13,13 @@ DEBUG = False
 PATH = '[PATH]:'
 HOST = '[HOST]:'
 
-
 class Path:
-    def __init__(self, scoreT, dbcover, scoreGap):
+    def __init__(self, scoreT, labelT, dbcover, scoreGap):
         self.scoreThreshold = scoreT
         self.name = consts.PATH_MINER
         self.dbcover = dbcover
         self.scoreGap = scoreGap
+        self.labelThreshold = labelT
 
     def mine_host(self, trainSet, ruleType):
         uriClassifier = UriClassifier(consts.IOS)
@@ -76,7 +76,7 @@ class Path:
         """
         prunedK = {}
         for secdomain, keys in keys.items():
-            keys = [key for key in keys if key.score > self.scoreThreshold or secdomain in self.cHosts]
+            keys = [key for key in keys if ( key.score > self.scoreThreshold and key.labelNum > self.labelThreshold ) or secdomain in self.cHosts]
             prunedK[secdomain] = keys
         return prunedK
 
@@ -191,7 +191,7 @@ class KVClassifier(AbsClassifer):
         self.appType = appType
 
         if minerType == consts.PATH_MINER:
-            self.miner = Path(scoreT=0.2, dbcover=1, scoreGap=0.3)
+            self.miner = Path(scoreT=0.2, labelT=0,dbcover=1, scoreGap=0.3)
         elif minerType == consts.KV_MINER:
             self.miner = KV(scoreT=0.5, labelT=0.3, dbcover=3, scoreGap=0.3)
 
@@ -224,8 +224,8 @@ class KVClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 kv[key] = value
 
-            if pkg.host == 'googleads.g.doubleclick.net':
-                print '[algo222]', kv, generalRules['googleads.g.doubleclick.net']
+            if pkg.host == 'www.aaa.com':
+                print '[algo222]', kv, generalRules['www.aaa.com']
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -236,7 +236,7 @@ class KVClassifier(AbsClassifer):
         # Prune by grouping
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
-            if host == 'googleads.g.doubleclick.net':
+            if host == 'www.aaa.com':
                 print '[algo228]', prunedGenRules[host]
             tmp = []
             for index, rule in enumerate(prunedGenRules[host]):
@@ -244,7 +244,7 @@ class KVClassifier(AbsClassifer):
                     break
                 tmp.append(rule)
             prunedGenRules[host] = tmp
-            if host == 'googleads.g.doubleclick.net':
+            if host == 'www.aaa.com':
                 print '[algo237]', prunedGenRules[host]
         return prunedGenRules
 
@@ -264,7 +264,7 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(hstKLblTbl):
-            if host == 'googleads.g.doubleclick.net' and k == 'app_num':
+            if host == 'www.aaa.com' and k == 'app_num':
                 print '[algo262]', len(hstKLblTbl[host][k][label]), len(hostLabelTbl[host][label]), k, hstKLblTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(hstKLblTbl[host][k])
             tbls = len(tbls)
             if len(valueLabelCounter[v]) == 1 and tbls > 1:
@@ -277,7 +277,7 @@ class KVClassifier(AbsClassifer):
                                             * numOfLabels)
                 keyScore[host][k][consts.LABEL].add(label)
 
-        print '[algo269]', keyScore['googleads.g.doubleclick.net']
+        print '[algo269]', keyScore['www.aaa.com']
         return keyScore
 
     @staticmethod
@@ -292,11 +292,11 @@ class KVClassifier(AbsClassifer):
         Rule = consts.Rule
         generalRules = defaultdict(list)
         for host in keyScore:
-            if host == 'googleads.g.doubleclick.net':
+            if host == 'www.aaa.com':
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
                 labelNum = len(keyApp[host + '$' + key]) / (1.0 * len(hostLabelTbl[host]))
-                if host == 'googleads.g.doubleclick.net':
+                if host == 'www.aaa.com':
                     print '[algo296]', labelNum, key, len(hostLabelTbl[host]), keyApp[host + '$' + key]
                 score = keyScore[host][key][consts.SCORE]
                 generalRules[host].append(Rule(host, key, score, labelNum))
