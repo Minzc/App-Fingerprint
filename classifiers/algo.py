@@ -208,6 +208,8 @@ class KVClassifier(AbsClassifer):
         :param xmlGenRules : {( host, key) }
         """
         generalRules = self.miner.prune(generalRules)
+
+        # Prune by coverage
         for host in generalRules:
             generalRules[host] = self.miner.sort(generalRules[host], xmlGenRules)
 
@@ -227,14 +229,13 @@ class KVClassifier(AbsClassifer):
                         coverage[tbl + '#' + str(pkg.id)] += 1
                         prunedGenRules[host].add(rule)
 
-
+        # Prune by grouping
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
             if host == 'googleads.g.doubleclick.net':
                 print '[algo228]', prunedGenRules[host]
             tmp = []
             for index, rule in enumerate(prunedGenRules[host]):
-                # if counter == 1 or prunedGenRules[host][index-1][2] - rule[2] >= 1:
                 if len(tmp) > 0 and prunedGenRules[host][index - 1][2] - rule[2] >= self.miner.scoreGap:
                     break
                 tmp.append(rule)
@@ -291,12 +292,8 @@ class KVClassifier(AbsClassifer):
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
                 labelNum = len(keyApp[host + '$' + key]) / (1.0 * len(hostLabelTbl[host]))
-
-                if key == 'app_name':
-                    print '[algo297]', host + '$' + key, keyApp[host + '$' + key]
-
                 if host == 'googleads.g.doubleclick.net':
-                    print '[algo296]', labelNum, key
+                    print '[algo296]', labelNum, key, len(hostLabelTbl[host]), keyApp[host + '$' + key]
                 score = keyScore[host][key][consts.SCORE]
                 generalRules[host].append(Rule(host, key, score, labelNum))
             generalRules[host] = sorted(generalRules[host], key=lambda rule: rule.score, reverse=True)
@@ -354,30 +351,30 @@ class KVClassifier(AbsClassifer):
         #           specificRules[consts.APP_RULE][host][key][value][';'.join(self.companyAppRelation[company])] = scores
         return specificRules
 
-    def _infer_from_xml(self, specificRules, xmlGenRules, rmApps):
-        print 'Start Infering'
-        xmlFieldValues = defaultdict(lambda: defaultdict(set))
-        for app in self.xmlFeatures:
-            for k, v in self.xmlFeatures[app]:
-                if len(v) != 0 and if_version(v) == False:
-                    xmlFieldValues[app][k].add(v)
-        interestedXmlRules = defaultdict(set)
-        for rule in xmlGenRules:
-            host, key = rule
-            if len(specificRules[host][key]) != 0:
-                for _, fieldName, _ in flatten(xmlGenRules[rule]):
-                    interestedXmlRules[fieldName].add((host, key, len(specificRules[host][key])))
-
-        for fieldName, rules in interestedXmlRules.items():
-            for app in rmApps:
-                if len(xmlFieldValues[app][fieldName]) == 1:
-                    for value in xmlFieldValues[app][fieldName]:
-                        rules = sorted(rules, key=lambda x: x[2], reverse=True)[:3]
-                        for rule in rules:
-                            host, key, score = rule
-                            specificRules[host][key][value][app][consts.SCORE] = 1.0
-                            specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
-        return specificRules
+    # def _infer_from_xml(self, specificRules, xmlGenRules, rmApps):
+    #     print 'Start Infering'
+    #     xmlFieldValues = defaultdict(lambda: defaultdict(set))
+    #     for app in self.xmlFeatures:
+    #         for k, v in self.xmlFeatures[app]:
+    #             if len(v) != 0 and if_version(v) == False:
+    #                 xmlFieldValues[app][k].add(v)
+    #     interestedXmlRules = defaultdict(set)
+    #     for rule in xmlGenRules:
+    #         host, key = rule
+    #         if len(specificRules[host][key]) != 0:
+    #             for _, fieldName, _ in flatten(xmlGenRules[rule]):
+    #                 interestedXmlRules[fieldName].add((host, key, len(specificRules[host][key])))
+    #
+    #     for fieldName, rules in interestedXmlRules.items():
+    #         for app in rmApps:
+    #             if len(xmlFieldValues[app][fieldName]) == 1:
+    #                 for value in xmlFieldValues[app][fieldName]:
+    #                     rules = sorted(rules, key=lambda x: x[2], reverse=True)[:3]
+    #                     for rule in rules:
+    #                         host, key, score = rule
+    #                         specificRules[host][key][value][app][consts.SCORE] = 1.0
+    #                         specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
+    #     return specificRules
 
     def train(self, trainData, rule_type):
         """
