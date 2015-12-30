@@ -481,14 +481,15 @@ class KVClassifier(AbsClassifer):
         for ruleType in self.rules:
             fatherScore = -1
             rst = consts.NULLPrediction
-            host, path = self.miner.classify_format(pkg)
-            for regexObj, scores in self.rules[ruleType][host].iteritems():
-                if regexObj.search(path):
-                    label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
-                    if support > rst.score or (support == rst.score and confidence > fatherScore):
-                        fatherScore = confidence
-                        evidence = (host, regexObj.pattern)
-                        rst = consts.Prediction(label, support, evidence)
+            if pkg.refer_host is not None:
+                host, path = self.miner.classify_format(pkg)
+                for regexObj, scores in self.rules[ruleType][host].iteritems():
+                    if regexObj.search(path):
+                        label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
+                        if support > rst.score or (support == rst.score and confidence > fatherScore):
+                            fatherScore = confidence
+                            evidence = (host, regexObj.pattern)
+                            rst = consts.Prediction(label, support, evidence)
             predictRst[ruleType] = rst
             if rst != consts.NULLPrediction and rst.label != get_label(pkg, ruleType):
                 print '[WRONG]', rst, pkg.app, pkg.category, ruleType
