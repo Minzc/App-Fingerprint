@@ -259,18 +259,20 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(featureTbl):
-            if host == 'googleads.g.doubleclick.net':
-                print '[algo257]', k, featureTbl[host][k][label]
+            # if host == 'googleads.g.doubleclick.net':
+            #     print '[algo257]', k, featureTbl[host][k][label]
             cleanedK = k.replace("\t", "")
             if host == 'googleads.g.doubleclick.net' and cleanedK == 'app_name':
-                print '[algo262]', len(featureTbl[host][k][label]), len(hostLabelTbl[host][label]), cleanedK, featureTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls) - 1
+                print '[algo262]', len(featureTbl[host][k][label]), len(hostLabelTbl[host][label]), cleanedK, featureTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(featureTbl[host][k])
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
                 keyScore[host][cleanedK][consts.SCORE] += \
-                    (len(tbls) - 1) / float(len(hostLabelTbl[host][label])
+                    len(tbls) / float(len(hostLabelTbl[host][label])
                                             * numOfValues * numOfValues
                                             * len(featureTbl[host][k]))
                 keyScore[host][cleanedK][consts.LABEL].add(label)
+            elif host == 'googleads.g.doubleclick.net' and cleanedK == 'app_name':
+                print '[algo276]', cleanedK, v, label
 
         print '[algo269]', keyScore['googleads.g.doubleclick.net']
         return keyScore
