@@ -77,7 +77,7 @@ class Package:
     def set_path(self, path):
         self.origPath = path
         path = urllib.unquote(path).lower()
-        if '?' in path:
+        if '?' not in path:
             path = path.replace(';','?', 1)
         path = path.replace(';', '&')
         self.queries = urlparse.parse_qs(urlparse.urlparse(path).query, True)
