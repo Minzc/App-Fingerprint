@@ -219,7 +219,7 @@ class KVClassifier(AbsClassifer):
                 kv[key] = value
 
             if pkg.host == 'googleads.g.doubleclick.net':
-                print '[algo203]', kv, generalRules['googleads.g.doubleclick.net']
+                print '[algo222]', kv, generalRules['googleads.g.doubleclick.net']
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -293,6 +293,8 @@ class KVClassifier(AbsClassifer):
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
                 labelNum = len(keyApp[host + '$' + key]) / 1.0 * len(hostLabelTbl[host][key])
+                if host == 'googleads.g.doubleclick.net':
+                    print '[algo296]', labelNum, key
                 score = keyScore[host][key][consts.SCORE]
                 generalRules[host].append(Rule(host, key, score, labelNum))
             generalRules[host] = sorted(generalRules[host], key=lambda rule: rule.score, reverse=True)
