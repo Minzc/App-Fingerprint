@@ -262,7 +262,7 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(hstKLblTbl):
-            if host == 'googleads.g.doubleclick.net' and k == 'ctime':
+            if host == 'googleads.g.doubleclick.net' and k == 'app_num':
                 print '[algo262]', len(hstKLblTbl[host][k][label]), len(hostLabelTbl[host][label]), k, hstKLblTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(hstKLblTbl[host][k])
             tbls = len(tbls)
             if len(valueLabelCounter[v]) == 1 and tbls > 1:
