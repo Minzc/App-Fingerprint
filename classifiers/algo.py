@@ -263,7 +263,7 @@ class KVClassifier(AbsClassifer):
                 print '[algo257]', k, featureTbl[host][k][label]
             cleanedK = k.replace("\t", "")
             if host == 'googleads.g.doubleclick.net' and cleanedK == 'app_name':
-                print '[algo262]', len(featureTbl[host][k][label]), len(hostLabelTbl[host][label]), cleanedK, featureTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), numOfValues
+                print '[algo262]', len(featureTbl[host][k][label]), len(hostLabelTbl[host][label]), cleanedK, featureTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls) - 1
             if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
                 numOfValues = len(featureTbl[host][k][label])
                 keyScore[host][cleanedK][consts.SCORE] += \
