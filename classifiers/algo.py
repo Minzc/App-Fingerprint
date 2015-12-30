@@ -43,7 +43,8 @@ class Path:
             key = PATH + '/'.join(tmp)
             tmp.append(seg)
             value = '/'.join(tmp)
-            yield (host, key, value)
+            if if_version(value) == False and len(value) > 1:
+                yield (host, key, value)
     # @staticmethod
     # def get_f(package):
     #     host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
@@ -108,7 +109,8 @@ class KV:
         for k, vs in queries.items():
             k = k.replace("\t", "")
             for v in vs:
-                if if_version(v) == False:
+                v = v.strip()
+                if if_version(v) == False and len(v) > 1:
                     yield (host, k, v)
 
     def classify_format(self, package):
@@ -128,7 +130,7 @@ class KV:
         xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, k, v in self.get_f(pkg):
-                if if_version(v) == False and len(valueLabelCounter[consts.APP_RULE][v]) == 1:
+                if len(valueLabelCounter[consts.APP_RULE][v]) == 1:
                     for fieldName in [name for name, value in self.xmlFeatures[pkg.app] if value == v]:
                         xmlGenRules[(host, k)][v][fieldName] += 1
                         xmlSpecificRules[(host, k)][v][pkg.app].add(tbl)
@@ -322,9 +324,7 @@ class KVClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 for rule in [r for r in generalRules[host] if r.key == key]:
                     value = value.strip()
-                    if pkg.host == 'googleads.g.doubleclick.net':
-                        print '[algo316]', host, key, value, label,len(valueLabelCounter[value]),len(value)
-                    if len(valueLabelCounter[value]) == 1 and len(value) != 1:
+                    if len(valueLabelCounter[value]) == 1:
                         label = pkg.app if ruleType == consts.APP_RULE else pkg.category
                         specificRules[host][key][value][label][consts.SCORE] = rule.score
                         specificRules[host][key][value][label][consts.SUPPORT].add(tbl)
