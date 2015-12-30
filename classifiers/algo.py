@@ -106,8 +106,10 @@ class KV:
         host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
         queries = package.queries
         for k, vs in queries.items():
+            k = k.replace("\t", "")
             for v in vs:
-                yield (host, k, v)
+                if if_version(v) == False:
+                    yield (host, k, v)
 
     def classify_format(self, package):
         host = package.refer_rawHost if package.refer_rawHost else package.rawHost
@@ -245,11 +247,11 @@ class KVClassifier(AbsClassifer):
         return prunedGenRules
 
     @staticmethod
-    def _score(featureTbl, valueLabelCounter, hostLabelTbl):
+    def _score(hstKLblTbl, valueLabelCounter, hostLabelTbl):
         """
         Give score to every ( secdomain, key ) pairs
         Input
-        :param featureTbl :
+        :param hstKLblTbl :
             Relationships between host, key, value and label(app or company) from training data
             { secdomain : { key : { label : {value} } } }
         :param valueLabelCounter :
@@ -259,18 +261,18 @@ class KVClassifier(AbsClassifer):
         # secdomain -> app -> key -> value -> tbls
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
-        for host, k, label, v, tbls in flatten(featureTbl):
-            # if host == 'googleads.g.doubleclick.net':
-            #     print '[algo257]', k, featureTbl[host][k][label]
-
+        for host, k, label, v, tbls in flatten(hstKLblTbl):
             if host == 'googleads.g.doubleclick.net' and k == 'ctime':
-                print '[algo262]', len(featureTbl[host][k][label]), len(hostLabelTbl[host][label]), k, featureTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(featureTbl[host][k])
-            if len(valueLabelCounter[v]) == 1:
-                numOfValues = len(featureTbl[host][k][label])
+                print '[algo262]', len(hstKLblTbl[host][k][label]), len(hostLabelTbl[host][label]), k, hstKLblTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(hstKLblTbl[host][k])
+            tbls = len(tbls)
+            if len(valueLabelCounter[v]) == 1 and tbls > 1:
+                numOfValues = len(hstKLblTbl[host][k][label])
+                numOfLabels = len(hstKLblTbl[host][k])
+                numOfTbls = len(hostLabelTbl[host][label]) - 1
                 keyScore[host][k][consts.SCORE] += \
-                    len(tbls) / float(len(hostLabelTbl[host][label])
+                    ( tbls - 1 ) / float(numOfTbls
                                             * numOfValues * numOfValues
-                                            * len(featureTbl[host][k]))
+                                            * numOfLabels)
                 keyScore[host][k][consts.LABEL].add(label)
 
         print '[algo269]', keyScore['googleads.g.doubleclick.net']
@@ -386,18 +388,15 @@ class KVClassifier(AbsClassifer):
         trackIds = {}
         keyApp = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
-            if pkg.refer_host:
-                for host, k, v in self.miner.get_f(pkg):
-                    k = k.replace("\t", "")
-                    if if_version(v) == False:
-                        keyApp[host + '$' + k].add(pkg.app)
-                        self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
-                        self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
-                        self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
-                        self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
-                        self.hostLabelTable[consts.APP_RULE][host][pkg.app].add(tbl)
-                        self.hostLabelTable[consts.CATEGORY_RULE][host][pkg.category].add(tbl)
-                        trackIds[pkg.trackId] = pkg.app
+            for host, k, v in self.miner.get_f(pkg):
+                keyApp[host + '$' + k].add(pkg.app)
+                self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
+                self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
+                self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
+                self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
+                self.hostLabelTable[consts.APP_RULE][host][pkg.app].add(tbl)
+                self.hostLabelTable[consts.CATEGORY_RULE][host][pkg.category].add(tbl)
+                trackIds[pkg.trackId] = pkg.app
 
         xmlGenRules, xmlSpecificRules = self.miner.txt_analysis(self.valueLabelCounter, trainData)
         ##################
