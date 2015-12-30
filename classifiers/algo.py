@@ -191,7 +191,7 @@ class KVClassifier(AbsClassifer):
         self.appType = appType
 
         if minerType == consts.PATH_MINER:
-            self.miner = Path(scoreT=0.2, labelT=0,dbcover=1, scoreGap=0.3)
+            self.miner = Path(scoreT=0.5, labelT=0,dbcover=1, scoreGap=0.3)
         elif minerType == consts.KV_MINER:
             self.miner = KV(scoreT=0.5, labelT=0.3, dbcover=3, scoreGap=0.3)
 
@@ -264,7 +264,7 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(hstKLblTbl):
-            if host == 'www.aaa.com' and k == 'app_num':
+            if host == 'www.aaa.com':
                 print '[algo262]', len(hstKLblTbl[host][k][label]), len(hostLabelTbl[host][label]), k, hstKLblTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(hstKLblTbl[host][k])
             tbls = len(tbls)
             if len(valueLabelCounter[v]) == 1 and tbls > 1:
