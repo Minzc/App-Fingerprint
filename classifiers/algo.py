@@ -292,7 +292,7 @@ class KVClassifier(AbsClassifer):
             if host == 'googleads.g.doubleclick.net':
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
-                labelNum = len(keyApp[host + '$' + key]) / 1.0 * len(hostLabelTbl[host][key])
+                labelNum = len(keyApp[host + '$' + key]) / (1.0 * len(hostLabelTbl[host][key]))
 
                 if key == 'app_name':
                     print '[algo297]', host + '$' + key, keyApp[host + '$' + key]
@@ -395,8 +395,6 @@ class KVClassifier(AbsClassifer):
                 k = k.replace("\t", "")
                 if if_version(v) == False:
                     keyApp[host + '$' + k].add(pkg.app)
-                    if k == 'app_name':
-                        print '[algo399]', host + '$' + k, keyApp[host + '$' + k]
                     self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
                     self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
                     self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
@@ -417,8 +415,8 @@ class KVClassifier(AbsClassifer):
         #############################
         # Generate interesting keys
         #############################
-        appGeneralRules = self._generate_keys(appKeyScore, keyApp, self.hostLabelTable[consts.APP_RULE])
-        categoryGeneralRules = self._generate_keys(categoryKeyScore, keyApp, self.hostLabelTable[consts.CATEGORY_RULE])
+        appGeneralRules = self._generate_keys(appKeyScore, keyApp, self.compressedDB[consts.APP_RULE])
+        categoryGeneralRules = self._generate_keys(categoryKeyScore, keyApp, self.compressedDB[consts.CATEGORY_RULE])
         #############################
         # Pruning general rules
         #############################
