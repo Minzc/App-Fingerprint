@@ -191,7 +191,7 @@ class KVClassifier(AbsClassifer):
         if minerType == consts.PATH_MINER:
             self.miner = Path(scoreT=0.2, dbcover=1, scoreGap=0.3)
         elif minerType == consts.KV_MINER:
-            self.miner = KV(scoreT=0.5, labelT=0.8, dbcover=3, scoreGap=0.3)
+            self.miner = KV(scoreT=0.5, labelT=0.3, dbcover=3, scoreGap=0.3)
 
         self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
             lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
