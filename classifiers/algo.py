@@ -261,18 +261,18 @@ class KVClassifier(AbsClassifer):
         for host, k, label, v, tbls in flatten(featureTbl):
             # if host == 'googleads.g.doubleclick.net':
             #     print '[algo257]', k, featureTbl[host][k][label]
-            cleanedK = k.replace("\t", "")
-            if host == 'googleads.g.doubleclick.net' and cleanedK == 'ctime':
+
+            if host == 'googleads.g.doubleclick.net' and k == 'ctime':
                 print '[algo262]', len(featureTbl[host][k][label]), len(hostLabelTbl[host][label]), cleanedK, featureTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(featureTbl[host][k])
             if len(valueLabelCounter[v]) == 1:
                 numOfValues = len(featureTbl[host][k][label])
-                keyScore[host][cleanedK][consts.SCORE] += \
+                keyScore[host][k][consts.SCORE] += \
                     len(tbls) / float(len(hostLabelTbl[host][label])
                                             * numOfValues * numOfValues
                                             * len(featureTbl[host][k]))
-                keyScore[host][cleanedK][consts.LABEL].add(label)
-            elif host == 'googleads.g.doubleclick.net' and cleanedK == 'ctime':
-                print '[algo276]', cleanedK, v, label
+                keyScore[host][k][consts.LABEL].add(label)
+            elif host == 'googleads.g.doubleclick.net' and k == 'ctime':
+                print '[algo276]', k, v, label
 
         print '[algo269]', keyScore['googleads.g.doubleclick.net']
         return keyScore
@@ -293,6 +293,10 @@ class KVClassifier(AbsClassifer):
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
                 labelNum = len(keyApp[host + '$' + key]) / 1.0 * len(hostLabelTbl[host][key])
+
+                if key == 'app_name':
+                    print '[algo297]', host + '$' + key, keyApp[host + '$' + key]
+
                 if host == 'googleads.g.doubleclick.net':
                     print '[algo296]', labelNum, key
                 score = keyScore[host][key][consts.SCORE]
@@ -388,8 +392,11 @@ class KVClassifier(AbsClassifer):
         keyApp = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, k, v in self.miner.get_f(pkg):
+                k = k.replace("\t", "")
                 if if_version(v) == False:
                     keyApp[host + '$' + k].add(pkg.app)
+                    if k == 'app_name':
+                        print '[algo399]', host + '$' + k, keyApp[host + '$' + k]
                     self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
                     self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
                     self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
