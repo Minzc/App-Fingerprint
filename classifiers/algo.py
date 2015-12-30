@@ -189,7 +189,7 @@ class KVClassifier(AbsClassifer):
         if minerType == consts.PATH_MINER:
             self.miner = Path(scoreT=0.2, dbcover=1, scoreGap=0.3)
         elif minerType == consts.KV_MINER:
-            self.miner = KV(scoreT=0.14, labelT=1, dbcover=3, scoreGap=0.3)
+            self.miner = KV(scoreT=0.5, labelT=0.8, dbcover=3, scoreGap=0.3)
 
         self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
             lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
@@ -264,7 +264,7 @@ class KVClassifier(AbsClassifer):
             cleanedK = k.replace("\t", "")
             if host == 'googleads.g.doubleclick.net' and cleanedK == 'ctime':
                 print '[algo262]', len(featureTbl[host][k][label]), len(hostLabelTbl[host][label]), cleanedK, featureTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(featureTbl[host][k])
-            if len(valueLabelCounter[v]) == 1 and if_version(v) == False:
+            if len(valueLabelCounter[v]) == 1:
                 numOfValues = len(featureTbl[host][k][label])
                 keyScore[host][cleanedK][consts.SCORE] += \
                     len(tbls) / float(len(hostLabelTbl[host][label])
@@ -278,7 +278,7 @@ class KVClassifier(AbsClassifer):
         return keyScore
 
     @staticmethod
-    def _generate_keys(keyScore, keyApp):
+    def _generate_keys(keyScore, keyApp, hostLabelTbl):
         """
         Find interesting ( secdomain, key ) pairs
         Output
@@ -292,7 +292,7 @@ class KVClassifier(AbsClassifer):
             if host == 'googleads.g.doubleclick.net':
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
-                labelNum = len(keyApp[key])
+                labelNum = len(keyApp[host + '$' + key]) / 1.0 * len(hostLabelTbl[host][key])
                 score = keyScore[host][key][consts.SCORE]
                 generalRules[host].append(Rule(host, key, score, labelNum))
             generalRules[host] = sorted(generalRules[host], key=lambda rule: rule.score, reverse=True)
@@ -384,19 +384,17 @@ class KVClassifier(AbsClassifer):
         self.miner.mine_host(trainData, rule_type)
         trackIds = {}
         keyApp = defaultdict(set)
-        tbls = set()
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
-            tbls.add(tbl)
             for host, k, v in self.miner.get_f(pkg):
-                keyApp[k].add(pkg.app)
-                self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
-                self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
-                self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
-                self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
-                self.hostLabelTable[consts.APP_RULE][host][pkg.app].add(tbl)
-                self.hostLabelTable[consts.CATEGORY_RULE][host][pkg.category].add(tbl)
-                trackIds[pkg.trackId] = pkg.app
-        normalizer = len(tbls) - 1
+                if if_version(v) == False:
+                    keyApp[host + '$' + k].add(pkg.app)
+                    self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
+                    self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
+                    self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
+                    self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
+                    self.hostLabelTable[consts.APP_RULE][host][pkg.app].add(tbl)
+                    self.hostLabelTable[consts.CATEGORY_RULE][host][pkg.category].add(tbl)
+                    trackIds[pkg.trackId] = pkg.app
 
         xmlGenRules, xmlSpecificRules = self.miner.txt_analysis(self.valueLabelCounter, trainData)
         ##################
@@ -410,8 +408,8 @@ class KVClassifier(AbsClassifer):
         #############################
         # Generate interesting keys
         #############################
-        appGeneralRules = self._generate_keys(appKeyScore, keyApp)
-        categoryGeneralRules = self._generate_keys(categoryKeyScore, keyApp)
+        appGeneralRules = self._generate_keys(appKeyScore, keyApp, self.hostLabelTable[consts.APP_RULE])
+        categoryGeneralRules = self._generate_keys(categoryKeyScore, keyApp, self.hostLabelTable[consts.CATEGORY_RULE])
         #############################
         # Pruning general rules
         #############################
