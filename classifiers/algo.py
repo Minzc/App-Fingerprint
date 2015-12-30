@@ -250,11 +250,11 @@ class KVClassifier(AbsClassifer):
         return prunedGenRules
 
     @staticmethod
-    def _score(hstKLblTbl, valueLabelCounter, hostLabelTbl):
+    def _score(hstKLblValue, valueLabelCounter, hostLabelTbl):
         """
         Give score to every ( secdomain, key ) pairs
         Input
-        :param hstKLblTbl :
+        :param hstKLblValue :
             Relationships between host, key, value and label(app or company) from training data
             { secdomain : { key : { label : {value} } } }
         :param valueLabelCounter :
@@ -264,13 +264,15 @@ class KVClassifier(AbsClassifer):
         # secdomain -> app -> key -> value -> tbls
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
-        for host, k, label, v, tbls in flatten(hstKLblTbl):
+        for host, k, label, v, tbls in flatten(hstKLblValue):
             if host == 'ad.mo.doubleclick.net':
-                print '[algo262]', len(hstKLblTbl[host][k][label]), len(hostLabelTbl[host][label]), k, hstKLblTbl[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(hstKLblTbl[host][k])
+                print '[algo262]', len(hstKLblValue[host][k][label]), len(hostLabelTbl[host][label]), k, hstKLblValue[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(hstKLblValue[host][k])
+                if len(hstKLblValue[host][k][label]) > 1:
+                    print '[algo271]', hstKLblValue[host][k][label]
             tbls = len(tbls)
             if len(valueLabelCounter[v]) == 1 and tbls > 1:
-                numOfValues = len(hstKLblTbl[host][k][label])
-                numOfLabels = len(hstKLblTbl[host][k])
+                numOfValues = len(hstKLblValue[host][k][label])
+                numOfLabels = len(hstKLblValue[host][k])
                 numOfTbls = len(hostLabelTbl[host][label]) - 1
                 keyScore[host][k][consts.SCORE] += \
                     ( tbls - 1 ) / float(numOfTbls
