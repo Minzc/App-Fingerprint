@@ -388,6 +388,8 @@ class KVClassifier(AbsClassifer):
         trackIds = {}
         keyApp = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
+            if pkg.refer_host:
+                continue
             for host, k, v in self.miner.get_f(pkg):
                 keyApp[host + '$' + k].add(pkg.app)
                 self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
