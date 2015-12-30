@@ -112,6 +112,8 @@ class KV:
                 v = v.strip()
                 if if_version(v) == False and len(v) > 1:
                     v = re.sub('[0-9]+x[0-9]+','', v)
+                    if '/' in v:
+                        v = v.split('/')[0]
                     yield (host, k, v)
 
     def classify_format(self, package):
@@ -267,8 +269,6 @@ class KVClassifier(AbsClassifer):
         for host, k, label, v, tbls in flatten(hstKLblValue):
             if host == 'ad.mo.doubleclick.net':
                 print '[algo262]', len(hstKLblValue[host][k][label]), len(hostLabelTbl[host][label]), k, hstKLblValue[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(hstKLblValue[host][k])
-                if len(hstKLblValue[host][k][label]) > 1:
-                    print '[algo271]', hstKLblValue[host][k][label]
             tbls = len(tbls)
             if len(valueLabelCounter[v]) == 1 and tbls > 1:
                 numOfValues = len(hstKLblValue[host][k][label])
