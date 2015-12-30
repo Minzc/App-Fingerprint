@@ -386,17 +386,18 @@ class KVClassifier(AbsClassifer):
         trackIds = {}
         keyApp = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
-            for host, k, v in self.miner.get_f(pkg):
-                k = k.replace("\t", "")
-                if if_version(v) == False:
-                    keyApp[host + '$' + k].add(pkg.app)
-                    self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
-                    self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
-                    self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
-                    self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
-                    self.hostLabelTable[consts.APP_RULE][host][pkg.app].add(tbl)
-                    self.hostLabelTable[consts.CATEGORY_RULE][host][pkg.category].add(tbl)
-                    trackIds[pkg.trackId] = pkg.app
+            if pkg.refer_host:
+                for host, k, v in self.miner.get_f(pkg):
+                    k = k.replace("\t", "")
+                    if if_version(v) == False:
+                        keyApp[host + '$' + k].add(pkg.app)
+                        self.compressedDB[consts.APP_RULE][host][k][pkg.app][v].add(tbl)
+                        self.compressedDB[consts.CATEGORY_RULE][host][k][pkg.category][v].add(tbl)
+                        self.valueLabelCounter[consts.APP_RULE][v].add(pkg.app)
+                        self.valueLabelCounter[consts.CATEGORY_RULE][v].add(pkg.category)
+                        self.hostLabelTable[consts.APP_RULE][host][pkg.app].add(tbl)
+                        self.hostLabelTable[consts.CATEGORY_RULE][host][pkg.category].add(tbl)
+                        trackIds[pkg.trackId] = pkg.app
 
         xmlGenRules, xmlSpecificRules = self.miner.txt_analysis(self.valueLabelCounter, trainData)
         ##################
