@@ -277,7 +277,8 @@ class KVClassifier(AbsClassifer):
                     '[Tbls]',len(tbls),\
                     '[Labels]',len(hstKLblValue[host][k]), \
                     '[Vc]',valueLabelCounter[v], \
-                    '[BV]', if_version(v)
+                    '[BV]', if_version(v), \
+                    '[Value]', keyScore[host][k][consts.SCORE]
             tbls = len(tbls)
             if len(valueLabelCounter[v]) == 1 and tbls > 1:
                 numOfValues = len(hstKLblValue[host][k][label])
