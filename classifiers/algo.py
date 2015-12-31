@@ -227,8 +227,8 @@ class KVClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 kv[key] = value
 
-            if pkg.host == 'ad.mo.doubleclick.net':
-                print '[algo222]', kv, generalRules['ad.mo.doubleclick.net']
+            if pkg.host == 'audioroadshow.cbslocal.com':
+                print '[algo222]', kv, generalRules['audioroadshow.cbslocal.com']
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -239,7 +239,7 @@ class KVClassifier(AbsClassifer):
         # Prune by grouping
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
-            if host == 'ad.mo.doubleclick.net':
+            if host == 'audioroadshow.cbslocal.com':
                 print '[algo228]', prunedGenRules[host]
             tmp = []
             for index, rule in enumerate(prunedGenRules[host]):
@@ -247,7 +247,7 @@ class KVClassifier(AbsClassifer):
                     break
                 tmp.append(rule)
             prunedGenRules[host] = tmp
-            if host == 'ad.mo.doubleclick.net':
+            if host == 'audioroadshow.cbslocal.com':
                 print '[algo237]', prunedGenRules[host]
         return prunedGenRules
 
@@ -267,7 +267,7 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(hstKLblValue):
-            if host == 'ad.mo.doubleclick.net':
+            if host == 'audioroadshow.cbslocal.com':
                 print '[algo262]', len(hstKLblValue[host][k][label]), len(hostLabelTbl[host][label]), k, hstKLblValue[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(hstKLblValue[host][k])
             tbls = len(tbls)
             if len(valueLabelCounter[v]) == 1 and tbls > 1:
@@ -280,7 +280,7 @@ class KVClassifier(AbsClassifer):
                                             * numOfLabels)
                 keyScore[host][k][consts.LABEL].add(label)
 
-        print '[algo269]', keyScore['ad.mo.doubleclick.net']
+        print '[algo269]', keyScore['audioroadshow.cbslocal.com']
         return keyScore
 
     @staticmethod
@@ -295,11 +295,11 @@ class KVClassifier(AbsClassifer):
         Rule = consts.Rule
         generalRules = defaultdict(list)
         for host in keyScore:
-            if host == 'ad.mo.doubleclick.net':
+            if host == 'audioroadshow.cbslocal.com':
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
                 labelNum = len(keyApp[host + '$' + key]) / (1.0 * len(hostLabelTbl[host]))
-                if host == 'ad.mo.doubleclick.net':
+                if host == 'audioroadshow.cbslocal.com':
                     print '[algo296]', labelNum, key, len(hostLabelTbl[host]), keyApp[host + '$' + key]
                 score = keyScore[host][key][consts.SCORE]
                 generalRules[host].append(Rule(host, key, score, labelNum))
