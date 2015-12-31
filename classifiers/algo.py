@@ -268,7 +268,7 @@ class KVClassifier(AbsClassifer):
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(hstKLblValue):
             if host == 'audioroadshow.cbslocal.com':
-                print '[algo262]', len(hstKLblValue[host][k][label]), len(hostLabelTbl[host][label]), k, hstKLblValue[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(hstKLblValue[host][k])
+                print '[algo262]', len(hstKLblValue[host][k][label]), len(hostLabelTbl[host][label]), k, hstKLblValue[host][k][label], (len(valueLabelCounter[v]) == 1 and if_version(v) == False), len(tbls),len(hstKLblValue[host][k]), len(valueLabelCounter[v]), if_version(v)
             tbls = len(tbls)
             if len(valueLabelCounter[v]) == 1 and tbls > 1:
                 numOfValues = len(hstKLblValue[host][k][label])
