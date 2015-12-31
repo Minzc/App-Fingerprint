@@ -214,9 +214,9 @@ class KVClassifier(AbsClassifer):
         :param trainData : { tbl : [ packet, packet, ... ] }
         :param xmlGenRules : {( host, key) }
         """
-        print '[algo217]', generalRules['audioroadshow.cbslocal.com']
+        print '[algo217]', generalRules['dcs.aaa.com']
         generalRules = self.miner.prune(generalRules)
-        print '[algo219]', generalRules['audioroadshow.cbslocal.com']
+        print '[algo219]', generalRules['dcs.aaa.com']
 
         # Prune by coverage
         for host in generalRules:
@@ -229,8 +229,8 @@ class KVClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 kv[key] = value
 
-            if pkg.host == 'audioroadshow.cbslocal.com':
-                print '[algo222]', kv, generalRules['audioroadshow.cbslocal.com']
+            if pkg.host == 'dcs.aaa.com':
+                print '[algo222]', kv, generalRules['dcs.aaa.com']
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -241,7 +241,7 @@ class KVClassifier(AbsClassifer):
         # Prune by grouping
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
-            if host == 'audioroadshow.cbslocal.com':
+            if host == 'dcs.aaa.com':
                 print '[algo228]', prunedGenRules[host]
             tmp = []
             for index, rule in enumerate(prunedGenRules[host]):
@@ -249,7 +249,7 @@ class KVClassifier(AbsClassifer):
                     break
                 tmp.append(rule)
             prunedGenRules[host] = tmp
-            if host == 'audioroadshow.cbslocal.com':
+            if host == 'dcs.aaa.com':
                 print '[algo237]', prunedGenRules[host]
         return prunedGenRules
 
@@ -269,7 +269,7 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(hstKLblValue):
-            if host == 'audioroadshow.cbslocal.com':
+            if host == 'dcs.aaa.com':
                 print '[algo262]', \
                     '[Value]',len(hstKLblValue[host][k][label]), \
                     '[AllTbls]',len(hostLabelTbl[host][label]), \
@@ -292,7 +292,7 @@ class KVClassifier(AbsClassifer):
                                             * numOfLabels)
                 keyScore[host][k][consts.LABEL].add(label)
 
-        print '[algo269]', keyScore['audioroadshow.cbslocal.com']
+        print '[algo269]', keyScore['dcs.aaa.com']
         return keyScore
 
     @staticmethod
@@ -307,11 +307,11 @@ class KVClassifier(AbsClassifer):
         Rule = consts.Rule
         generalRules = defaultdict(list)
         for host in keyScore:
-            if host == 'audioroadshow.cbslocal.com':
+            if host == 'dcs.aaa.com':
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
                 labelNum = len(keyApp[host + '$' + key]) / (1.0 * len(hostLabelTbl[host]))
-                if host == 'audioroadshow.cbslocal.com':
+                if host == 'dcs.aaa.com':
                     print '[algo296]', labelNum, key, len(hostLabelTbl[host]), keyApp[host + '$' + key]
                 score = keyScore[host][key][consts.SCORE]
                 generalRules[host].append(Rule(host, key, score, labelNum))
