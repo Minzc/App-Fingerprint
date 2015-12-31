@@ -76,7 +76,7 @@ class Path:
         """
         prunedK = {}
         for secdomain, keys in keys.items():
-            keys = [key for key in keys if ( key.score > self.scoreThreshold and key.labelNum > self.labelThreshold ) or secdomain in self.cHosts]
+            keys = [key for key in keys if ( key.score >= self.scoreThreshold and key.labelNum >= self.labelThreshold ) or secdomain in self.cHosts]
             prunedK[secdomain] = keys
         return prunedK
 
@@ -148,7 +148,7 @@ class KV:
         """
         prunedK = {}
         for secdomain, keys in keys.items():
-            keys = [key for key in keys if key.score > self.scoreThreshold and key.labelNum > self.labelThreshold]
+            keys = [key for key in keys if key.score >= self.scoreThreshold and key.labelNum >= self.labelThreshold]
             prunedK[secdomain] = keys
         return prunedK
 
@@ -214,7 +214,9 @@ class KVClassifier(AbsClassifer):
         :param trainData : { tbl : [ packet, packet, ... ] }
         :param xmlGenRules : {( host, key) }
         """
+        print '[algo217]', generalRules['audioroadshow.cbslocal.com']
         generalRules = self.miner.prune(generalRules)
+        print '[algo219]', generalRules['audioroadshow.cbslocal.com']
 
         # Prune by coverage
         for host in generalRules:
