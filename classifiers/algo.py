@@ -194,9 +194,9 @@ class KVClassifier(AbsClassifer):
         self.appType = appType
 
         if minerType == consts.PATH_MINER:
-            self.miner = Path(scoreT=0.5, labelT=0,dbcover=1, scoreGap=0.3)
+            self.miner = Path(scoreT=0.25, labelT=0,dbcover=1, scoreGap=0.3)
         elif minerType == consts.KV_MINER:
-            self.miner = KV(scoreT=0.25, labelT=0.3, dbcover=3, scoreGap=0.3)
+            self.miner = KV(scoreT=0.5, labelT=0.3, dbcover=3, scoreGap=0.3)
 
         self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
             lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
@@ -434,7 +434,7 @@ class KVClassifier(AbsClassifer):
         appGeneralRules = self._prune_general_rules(appGeneralRules, trainData, xmlGenRules)
         categoryGeneralRules = self._prune_general_rules(categoryGeneralRules, trainData, xmlGenRules)
         print ">>>[KV] appGeneralRules", len(appGeneralRules)
-        print ">>>[KV] companyGeneralRules", len(categoryGeneralRules)
+        print ">>>[KV] categoryGeneralRules", len(categoryGeneralRules)
         #############################
         # Generate specific rules
         #############################
