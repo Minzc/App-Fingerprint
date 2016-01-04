@@ -75,6 +75,18 @@ class CompanyMiner:
             features &= fLib[consts.COMPANY_RULE][appInfo.package]
         return features
 
+class CategoryMiner:
+    @staticmethod
+    def filter(node): return len(node.categories) == 1
+    @staticmethod
+    def label(pkg): return pkg.appInfo.category
+    @staticmethod
+    def features(fLib, appInfos):
+        appInfos = list(appInfos)
+        features = fLib[consts.CATEGORY_RULE][appInfos[0].package]
+        for appInfo in appInfos[1:]:
+            features &= fLib[consts.CATEGORY_RULE][appInfo.package]
+        return features
 
 
 def part(fs, target):
@@ -139,6 +151,7 @@ class UriClassifier(AbsClassifer):
         hostRules = defaultdict(lambda: defaultdict(set))
         __count(AppMiner, whole, consts.APP_RULE)
         __count(CompanyMiner, part, consts.COMPANY_RULE)
+        __count(CategoryMiner, part, consts.CATEGORY_RULE)
         return hostRules
 
     def __path_rules(self, trainSet):
