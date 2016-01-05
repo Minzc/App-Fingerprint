@@ -24,7 +24,7 @@ class Path:
     def mine_host(self, trainSet, ruleType):
         uriClassifier = UriClassifier(consts.IOS)
         print '[URI] Start Training'
-        hostRules, _ = uriClassifier.train(trainSet, ruleType, ifPersist=False)
+        hostRules, pathRules = uriClassifier.train(trainSet, ruleType, ifPersist=False)
         print '[URI] Finish Training'
         cHosts = {}
         for ruleType in hostRules:
@@ -32,7 +32,15 @@ class Path:
                 host, _, label = rule
                 cHosts[host] = tbls
             print "Total Number of Hosts is", len(cHosts)
+        cPath = {}
+        for ruleType in pathRules:
+            for rule, tbls in hostRules[ruleType].items():
+                _, path, label = rule
+                cPath[path] = tbls
+            print "Total Number of Path is", len(cPath)
+
         self.cHosts = cHosts
+        self.cPath = cPath
 
     @staticmethod
     def get_f(package):
@@ -76,7 +84,8 @@ class Path:
         """
         prunedK = {}
         for secdomain, keys in keys.items():
-            keys = [key for key in keys if ( key.score >= self.scoreThreshold and key.labelNum >= self.labelThreshold ) or secdomain in self.cHosts]
+            keys = [key for key in keys if ( key.score >= self.scoreThreshold and key.labelNum >= self.labelThreshold ) or
+                    secdomain in self.cHosts or key.key.split('/')[-1] in self.cPath]
             prunedK[secdomain] = keys
         return prunedK
 
@@ -194,7 +203,7 @@ class KVClassifier(AbsClassifer):
         self.appType = appType
 
         if minerType == consts.PATH_MINER:
-            self.miner = Path(scoreT=0.25, labelT=0,dbcover=1, scoreGap=0.3)
+            self.miner = Path(scoreT=0.5, labelT=0,dbcover=1, scoreGap=0.3)
         elif minerType == consts.KV_MINER:
             self.miner = KV(scoreT=0.5, labelT=0.3, dbcover=3, scoreGap=0.3)
 
