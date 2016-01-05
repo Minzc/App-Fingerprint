@@ -50,7 +50,10 @@ class Node:
 
 class AppMiner:
     @staticmethod
-    def filter(node): return len(node.appInfos) == 1
+    def filter(node):
+        if 'ohmychef' in node.feature:
+            print '[uri]', node.appInfos
+        return len(node.appInfos) == 1
     @staticmethod
     def label(pkg): return pkg.appInfo.package
     @staticmethod
@@ -72,6 +75,18 @@ class CompanyMiner:
             features &= fLib[consts.COMPANY_RULE][appInfo.package]
         return features
 
+class CategoryMiner:
+    @staticmethod
+    def filter(node): return len(node.categories) == 1
+    @staticmethod
+    def label(pkg): return pkg.appInfo.category
+    @staticmethod
+    def features(fLib, appInfos):
+        appInfos = list(appInfos)
+        features = fLib[consts.CATEGORY_RULE][appInfos[0].package]
+        for appInfo in appInfos[1:]:
+            features &= fLib[consts.CATEGORY_RULE][appInfo.package]
+        return features
 
 
 def part(fs, target):
@@ -124,6 +139,8 @@ class UriClassifier(AbsClassifer):
             tmpR = defaultdict(set)
             for node in filter(miner.filter, hostNodes):
                 features = miner.features(self.fLib, node.appInfos)
+                if 'ohmychef' in node.feature:
+                    print '[uri128]', check(features, node.feature)
                 if check(features, node.feature):
                     tmpR[ruleType].add(node.feature)
 
@@ -134,6 +151,7 @@ class UriClassifier(AbsClassifer):
         hostRules = defaultdict(lambda: defaultdict(set))
         __count(AppMiner, whole, consts.APP_RULE)
         __count(CompanyMiner, part, consts.COMPANY_RULE)
+        __count(CategoryMiner, part, consts.CATEGORY_RULE)
         return hostRules
 
     def __path_rules(self, trainSet):
@@ -163,7 +181,7 @@ class UriClassifier(AbsClassifer):
                 return True
         return False
 
-    def train(self, trainData, rule_type):
+    def train(self, trainData, rule_type, ifPersist = True):
         rawHost = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             rawHost[pkg.host].add(pkg.rawHost)
@@ -174,8 +192,10 @@ class UriClassifier(AbsClassifer):
         hostRules = self.__host_rules(trainData)
         pathRules = self.__path_rules(trainData)
 
-        self._persist(hostRules)
-        self._persist(pathRules)
+        if ifPersist:
+            self._persist(hostRules)
+            self._persist(pathRules)
+        return hostRules, pathRules
 
     def load_rules(self):
         QUERY = 'SELECT label, pattens, host, rule_type, support FROM patterns where agent IS  NULL and paramkey IS NULL'

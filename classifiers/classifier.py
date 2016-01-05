@@ -11,11 +11,6 @@ class AbsClassifer:
             predictRst = self.c(pkg)
             batchPredicts[pkg.id] = predictRst
 
-        for tbl, pkg in DataSetIter.iter_pkg(testSet):
-            predict = batchPredicts[pkg.id][consts.APP_RULE]
-            if predict.label  and predict.label != pkg.app:
-                print predict.evidence, predict.label, pkg.app
-                print '=' * 10
         return batchPredicts
   
     @abstractmethod

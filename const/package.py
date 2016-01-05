@@ -57,7 +57,10 @@ class Package:
 
     def set_refer(self, refer):
         self.refer_origpath = refer
-        url = urllib.unquote(refer).lower().replace(';', '?', 1).replace(';', '&')
+        url = urllib.unquote(refer).lower()
+        if '?' in url:
+            url = url.replace(';','?', 1)
+        url = url.replace(';', '&')
         parsed_url = urlparse.urlparse(url)
         query = urlparse.parse_qs(urlparse.urlparse(url).query, True)
         host = parsed_url.netloc
@@ -73,7 +76,10 @@ class Package:
 
     def set_path(self, path):
         self.origPath = path
-        path = urllib.unquote(path).lower().replace(';', '?', 1).replace(';', '&')
+        path = urllib.unquote(path).lower()
+        if '?' not in path:
+            path = path.replace(';','?', 1)
+        path = path.replace(';', '&')
         self.queries = urlparse.parse_qs(urlparse.urlparse(path).query, True)
         self.path = urlparse.urlparse(path).path
 
@@ -82,7 +88,7 @@ class Package:
 
     def set_host(self, host):
         host = host.lower()
-        self.rawHost = host
+        self.rawHost = host.replace(':80', '')
         self.host = host.split(':')[0].replace('www.', '').replace('http://', '')
         extracted = tldextract.extract(host)
         self.secdomain = None

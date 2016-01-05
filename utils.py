@@ -121,15 +121,6 @@ def app_clean(appname):
         appname = appname.replace('.' + extracted.suffix, '')
     return appname
 
-
-def agent_clean(agent):
-    agent = re.sub('[/]?[0-9][0-9.]*', ' ', agent)
-    agent = re.sub('\\([^\\)][^\\)]*$', ' ', agent)
-    agent = agent.replace(';', ' ').replace('(', ' ').replace(')', ' ').replace('/', ' ').replace('-', ' ').replace('_',
-                                                                                                                    ' ')
-    return agent
-
-
 def top_domain(host):
     """
     Return the topdomain of given host
@@ -457,3 +448,31 @@ def load_folder(folder):
             content = open(filePath).readlines()
             fileContents[f] = content
     return fileContents
+
+def process_agent( agent, app):
+    agent = re.sub(r'[a-z]?[0-9]+-[a-z]?[0-9]+-[a-z]?[0-9]+', r'[VERSION]', agent)
+    agent = re.sub(r'(/)([0-9]+)([ ;])', r'\1[VERSION]\3', agent)
+    agent = re.sub(r'/[0-9][.0-9]+', r'/[VERSION]', agent)
+    agent = re.sub(r'([ :v])([0-9][.0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
+    agent = re.sub(r'([ :v])([0-9][_0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
+    agent = re.sub(r'(^[0-9a-z]*)(.'+app+r'$)', r'[RANDOM]\2', agent)
+    return agent
+
+def get_label(pkg, ruleType):
+    if ruleType == consts.APP_RULE:
+        return pkg.app
+    elif ruleType == consts.COMPANY_RULE:
+        return pkg.company
+    elif ruleType == consts.CATEGORY_RULE:
+        return pkg.category
+    else:
+        assert "Rule Type Error"
+ # def prune_path(item):
+        #     item = item.replace(PATH, '')
+        #     if if_version(item) == True:
+        #         return True
+        #     if len(re.sub('^[0-9]+$', '', item)) == 0:
+        #         return True
+        #     if len(item) == 1:
+        #         return True
+        #     return False

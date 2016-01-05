@@ -5,7 +5,7 @@ import const.consts as consts
 import sys
 
 tbls = ['ios_packages_2015_09_14', 'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_08_12',
-        'ios_packages_2015_08_04']
+        'ios_packages_2015_08_04', 'ios_packages_2015_10_16','ios_packages_2015_10_21']
 
 
 def log(trainTbls, testTbl, output):

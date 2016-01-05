@@ -1,5 +1,7 @@
 # -*- encoding = utf-8 -*-
-from utils import unescape, flatten, load_info_features, load_folder
+from const import consts
+from sqldao import SqlDao
+from utils import unescape, flatten, load_info_features, load_folder, process_agent
 from collections import defaultdict
 #import const.consts as consts
 import re
@@ -34,33 +36,50 @@ class FRegex:
         self.cover = regexSet
 
 class Identifier:
-    def __init__(self, prefix, suffix):
-        self.rule = (prefix, suffix)
-        self.prefix = prefix
-        self.suffix = suffix
-        self.regex = re.compile(prefix + '([^/]+?)' + suffix)
+    def __init__(self, rule):
+        start = rule.find(consts.IDENTIFIER)
+        end = start + len(consts.IDENTIFIER)
+        prefix = r'^' + re.escape(rule[:start])
+        suffix = re.escape(rule[end:])+'$'
+        self.ruleStr = rule
+        self.prefix = re.compile(prefix)
+        self.suffix = re.compile(suffix)
         self.matched = defaultdict(set)
+        self.apps = set()
 
     def match(self, agent):
-        identifier = None
-        maxLen = len(agent)
-        for m in self.regex.finditer(agent):
-            if len(m.group(1)) < maxLen:
-                identifier = m.group(1)
-                maxLen = len(identifier)
-        return identifier
+        if self.prefix.search(agent) and self.suffix.search(agent):
+            agent = self.prefix.sub('', agent)
+            agent = self.suffix.sub('', agent)
+        else:
+            agent = None
+        return agent
 
-    def add_record(self, app, identifier):
-        self.matched[app].add(identifier)
+    def add_identifier(self, app, identifier):
+        self.apps.add(app)
+        self.matched[identifier].add(app)
 
     def weight(self):
-        return len(self.matched)
+        return len(self.apps)
 
+    def check(self, identifier):
+        return identifier in self.matched
 
+    def gen(self, identifier):
+        return self.prefix.pattern + re.escape(identifier) + self.suffix.pattern
+    # def match(self, agent):
+    #     identifier = None
+    #     maxLen = len(agent)
+    #     for m in self.regex.finditer(agent):
+    #         if len(m.group(1)) < maxLen:
+    #             identifier = m.group(1)
+    #             maxLen = len(identifier)
+    #     return identifier
 class AgentClassifier():
     def __init__(self, inferFrmData=True, sampleRate=1):
         self.rules = defaultdict(dict)
         self.appFeatures = load_info_features(self._parse_xml)
+
         self.valueApp = defaultdict(set)
         for app, features in self.appFeatures.items():
             for f in features.values():
@@ -87,6 +106,58 @@ class AgentClassifier():
                     features[key] = value
         return features
 
+    def persist(self, appRule, companyRule, hostAgent, ruleType):
+        """
+        Input
+        :param companyRule:
+        :param appRule : {regex: {app1, app2}}
+        :param ruleType : type of rules (App, Company, Category)
+        :param hostAgent: (host, regex) -> label
+        """
+        # self.clean_db(ruleType, consts.SQL_DELETE_AGENT_RULES)
+        # sqldao = SqlDao()
+
+        rules = {}
+        for regexStr, app in appRule.iteritems():
+            regexStr = regexStr.replace(re.escape(consts.VERSION), r'\b[a-z0-9-.]+\b')
+            regexObj = re.compile(regexStr, re.IGNORECASE)
+            rules[regexObj] = app
+        return rules
+
+
+
+    @staticmethod
+    def _company(patterns):
+        companyRule = {}
+        for fRegex, apps in patterns.iteritems():
+            if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCompany) == 1:
+                companyRule[fRegex] = list(fRegex.matchCompany)[0]
+        return companyRule
+
+    @staticmethod
+    def _app(identifierApps, extractors, hostCategory):
+        appRules = {}
+        hostAgentRule = {}
+
+        check = set()
+        for _, extractor in extractors:
+            for identifier, apps in extractor.matched.items():
+                if len(apps) == 1:
+                    app = list(apps)[0]
+                    appRules[extractor.gen(identifier)] = app
+                    if len(identifierApps[identifier]) > 1:
+                        check.add(identifier)
+
+        for identifier in check:
+            print '[CHECK]',identifier, identifierApps[identifier]
+
+        # for fRegex, apps in patterns.iteritems():
+        #     if len(apps) > 1 and fRegex.rawF is not None and len(fRegex.matchCategory) == 1:
+        #         for host in fRegex.matchRecord:
+        #             if len(fRegex.matchRecord[host]) == 1 and len(hostCategory[host]) == 1:
+        #                 hostAgentRule[(host, fRegex.regexObj.pattern)] = list(fRegex.matchRecord[host])[0]
+        return appRules, hostAgentRule
+
     @staticmethod
     def _gen_features(f):
         """
@@ -106,158 +177,153 @@ class AgentClassifier():
         featureSet.add(f.replace(' ', ''))
         return featureSet
 
-    def _gen_regex(self, featureStr):
-        if not featureStr[-1].isalnum():
-            featureStr = featureStr[:-1]
-        if not featureStr[0].isalnum():
-            featureStr = featureStr[1:]
+    def __compose_idextractor(self, agentTuples):
+        sortFunc = lambda x:len(x[1])
+        extractors = {}
+        for appAgent in agentTuples.values():
+            for app, agent in appAgent:
+                for key, v in sorted(self.appFeatures[app].items(), key=sortFunc, reverse=True):
+                    ifMatch = False
+                    for value in self._gen_features(v):
+                        if value not in STOPWORDS and value in agent:
+                            tmp = agent.replace(value, consts.IDENTIFIER, 1)
+                            # prefix, suffix = self.getPrefixNSuffix(agent)
+                            if tmp not in extractors:
+                                extractors[tmp] = Identifier(tmp)
+                            extractors[tmp].add_identifier(app, value)
+                            ifMatch = True
+                            break
+                    if ifMatch == True:
+                        break
+        return extractors
 
-        regex = []
-        regexStr1 = r'^' + re.escape(featureStr + '/')
-        regexStr2 = r'\b' + re.escape(featureStr) + r' \b[vr]?[0-9.]+\b'
-        regexStr3 = r'\b' + re.escape(featureStr + '/')
-        regexStr4 = r'\b' + re.escape(featureStr) + r'\b'
-        regex.append(regexStr1)
-        regex.append(regexStr2)
-        regex.append(regexStr3)
-        regex.append(regexStr4)
-        self.regexCover[regexStr1].add(regexStr3)
-        self.regexCover[regexStr1].add(regexStr4)
-        self.regexCover[regexStr2].add(regexStr4)
-        self.regexCover[regexStr3].add(regexStr4)
-        return regex
+    def _prune(self, regexLabel):
+        """
+        :param regexLabel: FRegex -> apps
+        :return:
+        """
 
-    def process_agent(self, agent, app):
-        agent = re.sub(r'[a-z]?[0-9]+-[a-z]?[0-9]+-[a-z]?[0-9]+', r'[VERSION]', agent)
-        agent = re.sub(r'(/)([0-9]+)([ ;])', r'\1[VERSION]\3', agent)
-        agent = re.sub(r'/[0-9][.0-9]+', r'/[VERSION]', agent)
-        agent = re.sub(r'([ :])([0-9][.0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
-        agent = re.sub(r'([ :])([0-9][_0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
-        agent = re.sub(r'(^[0-9a-z]*)(.'+app+r'$)', r'[RANDOM]\2', agent)
-        return agent
-
-    def getPrefixNSuffix(self, rule):
-        def get_seg(start, stop):
-            # print '[get seg]', start, stop, rule[start:stop]
-            tmp = rule[start:stop]
-            tmp = tmp.replace(u'\0', '[VERSION]').replace(u'\1', '[RANDOM]')
-            return re.escape(tmp)
-
-        rule = rule.replace('[VERSION]', u'\0')
-        rule = rule.replace('[RANDOM]', u'\1')
-
-        start = rule.find('[IDENTIFIER]')
-        end = start + len('[IDENTIFIER]')
-
-        ############# PREFIX #################
-        prefixStart = start - 1
-        prefixStop = start
-
-        while prefixStart > 0:
-            if rule[prefixStart].isalnum() != True and rule[prefixStart] not in {' ', '.'}:
-                break
+        def sortPattern(regexAppItem):
+            fRgex, apps = regexAppItem
+            f = fRgex.regexStr
+            if f in invRegexCover:
+                return len(invRegexCover[f])
             else:
-                prefixStart -= 1
+                return 0
 
-        prefix = get_seg(prefixStart, prefixStop)
-        if prefixStop == 0:
-            prefix = r'^' + prefix
-        if prefix == '':
-            print '[ERROR]', prefixStart, prefixStop, rule
+        invRegexCover = defaultdict(set)
+        for regexStr, regexStrs in self.regexCover.items():
+            for string in regexStrs:
+                invRegexCover[string].add(regexStr)
+        regexLabel = sorted(regexLabel.items(), key=sortPattern, reverse=True)
+        rst = defaultdict(set)
+        pruned = defaultdict(set)
+        for fRegex, apps in regexLabel:
+            apps = frozenset(apps)
+            for regexStr in invRegexCover[fRegex.regexStr]:
+                pruned[apps].add(regexStr)
+            if fRegex.regexStr not in pruned[apps]:
+                rst[fRegex] = apps
+        return rst
 
-        ############# SUFFIX #################
-        suffixStart = end
-        suffixStop = end
+    def _count(self, agentTuples, extractors):
+        """
+        Count regex
+        :param appAgent: app -> (host, agent) -> tbls
+        """
+        identifierApps = defaultdict(set)
+        notDisAgent = set()
+        for _, appAgent in agentTuples.items():
+            for app, agent in appAgent:
+                ifMatch = False
+                for key, extractor in extractors:
+                    identifier = extractor.match(agent)
+                    if identifier:
+                        ifMatch = True
+                        extractor.add_identifier(app, identifier)
+                        identifierApps[identifier].add(app)
 
+                if ifMatch == False:
+                    notDisAgent.add(agent)
+        return identifierApps, extractors
 
-        while suffixStop < len(rule):
-            if rule[suffixStop].isalnum() != True and rule[suffixStop] not in {' ', '.'}:
-                break
-            else:
-                suffixStop += 1
-        suffix = get_seg(suffixStart, suffixStop + 1)
-        if suffixStop == len(rule):
-            suffix = suffix+r'$'
-
-        return prefix, suffix
-
+    def _infer_from_xml(self, appFeatureRegex, agentTuples):
+        for app, features in filter(lambda x: x[0] not in agentTuples, self.appFeatures.items()):
+            for f in features.values():
+                if len(self.valueApp[f]) == 1 and f not in STOPWORDS:
+                    for featureStr in self._gen_features(f):
+                        for regexStr in self._gen_regex(featureStr):
+                            appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
     def train(self, agentTuples):
-        extractors = defaultdict(set)
-        for _, appAgent in agentTuples.items():
-            for app, agent in appAgent:
-                agent = self.process_agent(agent, app)
-                for key, value in sorted(self.appFeatures[app].items(), key=lambda x:len(x[1]), reverse=True):
-                    if value not in STOPWORDS and value in agent:
-                        agent = agent.replace(value, '[IDENTIFIER]')
-                        prefix, suffix = self.getPrefixNSuffix(agent)
-                        if (prefix, suffix) not in extractors: extractors[(prefix, suffix)] = Identifier(prefix, suffix)
-                        extractors[(prefix, suffix)].add_record(app, value)
-                        break
+        newAgentTuples = defaultdict(set)
+        for tbl, tuples in agentTuples.items():
+            for app, agent in tuples:
+                newAgentTuples[tbl].add((app, process_agent(agent, app)))
 
+        '''
+        Compose regular expression
+        '''
+        extractors = self.__compose_idextractor(newAgentTuples)
         extractors = sorted(extractors.items(), key=lambda x: x[1].weight(), reverse=True)
 
-        generalForms = defaultdict(set)
+        print 'Infer From Data Is', self.inferFrmData
+        # if self.inferFrmData:
+        #     self._infer_from_xml(appFeatureRegex, agentTuples)
+
+        '''
+        Count regex
+        '''
+        identifierApps, extractors = self._count(newAgentTuples, extractors)
+
+        print "Finish Counter"
+
+        hostCategory = defaultdict(set)
+        # identifierApps, extractors = self._prune(regexApp)
+        appRule, hostAgent = self._app(identifierApps, extractors, hostCategory)
+        #companyRule = self._company(regexApp)
+
+
+        print "Finish Pruning"
+
+        # hostAgent = self._add_host(regexApp, hostCategory)
+        # hostAgent = self.change_raw(hostAgent, trainSet)
+
+        rules = self.persist(appRule, {}, hostAgent, consts.APP_RULE)
+
+        identifierApps = set()
         for _, appAgent in agentTuples.items():
             for app, agent in appAgent:
-                # if agent == 'Heat%20Tool/21 CFNetwork/711.4.6 Darwin/14.0.0'.lower():
-                #     print '[136]', self.process_agent(agent, app)
-                agent = self.process_agent(agent, app)
-                for key, extractor in extractors:
-                    identifier = None
-                    if extractor.weight() > 10:
-                        identifier = extractor.match(agent)
-                    if identifier:
-                        print '[identifier]', identifier, '[agent]', agent, '[rules]', key, '[weight]', extractor.weight()
-                        generalForms[identifier].add(app)
-        for identifier, apps in sorted(generalForms.items(), key=lambda x: len(x[1])):
-            print identifier, ','.join(apps)
+                for regexObj, pApp in rules.items():
+                    if regexObj.match(agent):
+                        identifierApps.add(app)
+                        print 'MATCH [Predict]', pApp, '[AGENT]', agent, '[RULE]', regexObj.pattern
+                        if app != pApp:
+                            print 'ERROR [Predict]', pApp, '[APP]', app, '[RULE]', regexObj.pattern, '[AGENT]', agent
+
+        print '[FINISH]', len(identifierApps)
 
 
-    # def classify(self, testSet):
-    #     def wrap_predict(predicts):
-    #         wrapPredicts = {}
-    #         for ruleType, predict in predicts.items():
-    #             label, evidence = predict
-    #             wrapPredicts[ruleType] = consts.Prediction(label, 1.0, evidence) if label else consts.NULLPrediction
-    #         return wrapPredicts
-    #
-    #     compressed = defaultdict(lambda: defaultdict(set))
-    #     for tbl, pkg in DataSetIter.iter_pkg(testSet):
-    #         compressed[pkg.agent][pkg.rawHost].add(pkg)
-    #
-    #     batchPredicts = {}
-    #     for agent, host, pkgs in flatten(compressed):
-    #         assert (type(pkgs) == set, "Type of pkgs is not correct" + str(type(pkgs)))
-    #         predict = wrap_predict(self.c((agent, host)))
-    #         for pkg in pkgs:
-    #             batchPredicts[pkg.id] = predict
-    #             l = predict[consts.APP_RULE].label
-    #             if l is not None and l != pkg.app:
-    #                 print '>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', predict[
-    #                     consts.APP_RULE]
-    #     return batchPredicts
-    #
-    # def c(self, pkgInfo):
-    #     agent, host = pkgInfo
-    #     rst = {}
-    #     for ruleType in self.rules:
-    #         longestWord = ''
-    #         rstLabel = None
-    #         for agentF, regxNlabel in self.rules[ruleType].items():
-    #             regex, label = regxNlabel
-    #             if regex.search(agent) and len(longestWord) < len(agentF):
-    #                 rstLabel = label
-    #                 longestWord = agentF
-    #
-    #         for agentF, regxNlabel in self.rulesHost[ruleType][host].items():
-    #             regex, label = regxNlabel
-    #             if regex.search(agent) and len(longestWord) < len(agentF):
-    #                 rstLabel = label
-    #                 longestWord = agentF
-    #         rst[ruleType] = (rstLabel, longestWord)
-    #     return rst
-    #
+    def c(self, pkgInfo):
+        agent, host = pkgInfo
+        rst = {}
+        for ruleType in self.rules:
+            longestWord = ''
+            rstLabel = None
+            for agentF, regxNlabel in self.rules[ruleType].items():
+                regex, label = regxNlabel
+                if regex.search(agent) and len(longestWord) < len(agentF):
+                    rstLabel = label
+                    longestWord = agentF
+
+            for agentF, regxNlabel in self.rulesHost[ruleType][host].items():
+                regex, label = regxNlabel
+                if regex.search(agent) and len(longestWord) < len(agentF):
+                    rstLabel = label
+                    longestWord = agentF
+            rst[ruleType] = (rstLabel, longestWord)
+        return rst
+
     # @staticmethod
     # def change_raw(rules, trainSet):
     #     tmpRules = {}

@@ -9,21 +9,23 @@ from const.dataset import DataSetIter as DataSetIter
 from classifiers.classifier_factory import classifier_factory
 
 LIMIT = None
-INSERT = False
+INSERT = True
 PRUNE = False
-SAMPLERATE = 0.5
+SAMPLERATE = 1
+TRAIN_LABEL = consts.APP_RULE
 
 VALID_LABEL = {
     consts.APP_RULE,
     #consts.COMPANY_RULE,
-    #consts.CATEGORY_RULE
+    consts.CATEGORY_RULE
 }
 
 USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
-    consts.AGENT_CLASSIFIER,
+    #consts.AGENT_CLASSIFIER,
     #consts.KV_CLASSIFIER,
-    #consts.URI_CLASSIFIER,
+    consts.URI_CLASSIFIER,
+    #consts.CMAR_CLASSIFIER,
 ]
 
 class PredictRst:
@@ -107,12 +109,12 @@ def train(trainTbls, appType):
     """
     # trainTbls = []
     trainSet = DataSetFactory.get_traindata(tbls=trainTbls, sampleRate=SAMPLERATE, appType=appType, LIMIT=LIMIT)
-    trainSet.set_label(consts.APP_RULE)
+    trainSet.set_label(TRAIN_LABEL)
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
     for name, classifier in classifiers:
         classifier.set_name(name)
         print ">>> [train#%s] " % name
-        classifier.train(trainSet, consts.APP_RULE)
+        classifier.train(trainSet, TRAIN_LABEL)
 
     print '>>> Finish training all classifiers'
 
@@ -150,6 +152,7 @@ def evaluate(rst, testSet, testApps):
             cPrdcts.set_appInfo(pkg.appInfo)
             predictions = rst[pkg.id]
             correctLabels = [0,0,0]
+            ifPredict = False
 
             for ruleType in VALID_LABEL:
                 predict = predictions[ruleType].label
@@ -157,10 +160,12 @@ def evaluate(rst, testSet, testApps):
                 correctLabels[ruleType] = 1 if label == predict else 0
 
                 if predict is not None:
-                    assert sum(correctLabels) <= 1
-                    cPrdcts.inc_total()
-                    cPrdcts.inc_correct(sum(correctLabels))
-                    break
+                    ifPredict = True
+
+            if ifPredict:
+                cPrdcts.inc_total()
+                if sum(correctLabels) > 0:
+                    cPrdcts.inc_correct(1)
 
         if cPrdcts.if_all_right():
             correctApp.add((cPrdcts.package, cPrdcts.trackId))
@@ -207,9 +212,12 @@ def _use_classifier(classifier, testSet):
             rst[pkgId][ruleType] = predict
 
     for tbl, pkg in DataSetIter.iter_pkg(testSet):
-        predict = rst[pkg.id][consts.APP_RULE]
-        if predict.label is not None and predict.label != pkg.app:
-            wrongApp.add(pkg.app)
+        for ruleType in rst[pkg.id]:
+            if ruleType in VALID_LABEL:
+                predict = rst[pkg.id][ruleType]
+                if predict.label is not None:
+                    wrongApp.add(pkg.app)
+
 
     print '====', classifier.name, '====', '[WRONG]', len(wrongApp)
     return rst
@@ -248,19 +256,15 @@ def test(testTbl, appType):
     testSet = DataSetFactory.get_traindata(tbls=[testTbl], sampleRate=1.0, appType=appType, LIMIT=LIMIT)
     testApps = testSet.apps
 
-    testSize = testSet.get_size()[testTbl]
-
     rst = {}
-    classifiers = classifier_factory(USED_CLASSIFIERS, appType)
+    # classifiers = classifier_factory(USED_CLASSIFIERS, appType)
+    classifiers = classifier_factory([consts.URI_CLASSIFIER,consts.KV_CLASSIFIER,consts.CMAR_CLASSIFIER], appType)
     for name, classifier in classifiers:
         print ">>> [test#%s] " % name
         classifier.set_name(name)
         classifier.load_rules()
         tmprst = _use_classifier(classifier, testSet)
         rst = merge_rst(rst, tmprst)
-        # recall = sum([1 for i in rst.values() if
-        #               i[consts.APP_RULE][0] or i[consts.COMPANY_RULE][0] or i[consts.CATEGORY_RULE][0]])
-        # print ">>> Recognized: %s Test Size: %s" % (recall, testSize)
 
     print '>>> Start evaluating'
     inforTrack = evaluate(rst, testSet, testApps)

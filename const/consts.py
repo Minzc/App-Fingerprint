@@ -30,9 +30,9 @@ SQL_INSERT_HOST_RULES = 'INSERT INTO patterns (label, support, confidence, host,
 SQL_DELETE_HOST_RULES = 'DELETE FROM patterns WHERE paramkey IS NULL and pattens IS NULL and agent IS NULL and rule_type=%s'
 SQL_SELECT_HOST_RULES = 'SELECT host, label, rule_type, support FROM patterns WHERE paramkey is NULL and pattens is NULL and agent IS NULL'
 
-SQL_INSERT_CMAR_RULES = 'INSERT INTO patterns (label, pattens, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
+SQL_INSERT_CMAR_RULES = 'INSERT INTO patterns (label, pattens, agent, confidence, support, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s, %s)'
 SQL_DELETE_CMAR_RULES = 'DELETE FROM patterns WHERE pattens IS NOT NULL and rule_type = %s'
-SQL_SELECT_CMAR_RULES = 'SELECT label, pattens, host, rule_type, support FROM patterns where pattens is not NULL'
+SQL_SELECT_CMAR_RULES = 'SELECT label, pattens, agent, host, rule_type, support FROM patterns where paramkey is NULL'
 
 SQL_DELETE_KV_RULES = 'DELETE FROM patterns WHERE paramkey IS NOT NULL and rule_type=%s'
 SQL_INSERT_KV_RULES = 'INSERT INTO patterns (label, support, confidence, host, paramkey, paramvalue, rule_type) VALUES (%s, %s, %s, %s, %s, %s, %s)'
@@ -40,7 +40,7 @@ SQL_SELECT_KV_RULES = 'SELECT paramkey, paramvalue, host, label, confidence, rul
 
 SQL_INSERT_AGENT_RULES = 'INSERT INTO patterns (label, support, confidence, agent, host, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
 SQL_DELETE_AGENT_RULES = 'DELETE FROM patterns WHERE agent IS NOT NULL and rule_type=%s'
-SQL_SELECT_AGENT_RULES = 'SELECT host, agent , label, rule_type FROM patterns WHERE agent IS NOT NULL'
+SQL_SELECT_AGENT_RULES = 'SELECT host, agent , label, rule_type FROM patterns WHERE agent IS NOT NULL and host is NULL'
 
 SQL_UPDATE_PKG = "UPDATE %s SET classified = %s WHERE id = %s"
 #############CLASSIFIER NAMES###############
@@ -48,7 +48,10 @@ HEAD_CLASSIFIER = "Header Rule"
 KV_CLASSIFIER = "KV Rule"
 URI_CLASSIFIER = "URI Rule"
 AGENT_CLASSIFIER = "Agent Rule"
+CMAR_CLASSIFIER = 'CMAR Rule'
 
+PATH_MINER = 'P'
+KV_MINER = 'K'
 #############EVALUATIONS###############
 DISCOVERED_APP = 'discoveried_app'
 DISCOVERED_APP_LIST = 'discoveried_app_list'
@@ -57,3 +60,8 @@ PRECISION = 'precision'
 RECALL = 'recall'
 F1SCORE = 'f1'
 RESULT = 'rst'
+IDENTIFIER = '[IDENTIFIER]'
+VERSION = '[VERSION]'
+
+
+
