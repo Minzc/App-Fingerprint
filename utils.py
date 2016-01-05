@@ -143,22 +143,6 @@ def lower_all(strs):
             rst.append(astr)
     return rst
 
-
-def process_path(path):
-    import urlparse
-    import urllib
-    path = urllib.unquote(path).lower().replace(';', '?', 1).replace(';', '&')
-    querys = urlparse.parse_qs(urlparse.urlparse(path).query, True)
-    path = urlparse.urlparse(path).path
-    return path, querys
-
-
-def none2str(astr):
-    if astr:
-        return astr
-    return ''
-
-
 def add_appinfo(packages, app_type):
     appInfos = AppInfos
     for package in packages:
@@ -220,6 +204,8 @@ def load_exp_app():
     expApp = {consts.IOS: set(), consts.ANDROID: set()}
     appInfos = AppInfos
     for line in open("resource/exp_app.txt"):
+        if line.startswith('#'):
+            continue
         app_type, app = line.lower().strip().split(':')
         if app_type == consts.IOS_STR:
             app_type = consts.IOS

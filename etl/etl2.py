@@ -35,7 +35,9 @@ class ETL:
         self.INSERT_HOST = 'INSERT INTO host (app, host) VALUES(%s, %s)'
         exp_apps = []
         for ln in open(exp_apps_path):
-          exp_apps.append(ln.strip())
+            if ln.startswith('#'):
+                continue
+            exp_apps.append(ln.strip())
         self._get_app_info(exp_apps)
         self.app_type = app_type
 
