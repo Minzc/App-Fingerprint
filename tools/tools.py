@@ -4,10 +4,10 @@ import sys
 from sqldao import SqlDao
 from collections import defaultdict
 
-def stat_classify_rst():
+def stat_classify_rst(tbl):
     target = {'/pep/gcc':'gsp1.apple.com', '/assets/com_apple_MobileAsset_Duet/com_apple_MobileAsset_Duet.xml':'mesu.apple.com'}
     sqldao = SqlDao()
-    SQL = 'select app, path, hst, agent from ios_packages_2015_08_10 where classified = 3'
+    SQL = 'select app, path, hst, agent from %s where classified = 3' % tbl
     https = defaultdict(dict)
     for app, path, host, agent in sqldao.execute(SQL):
         https[app][path] = host
@@ -32,6 +32,6 @@ def stat_classify_rst():
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print 'error'
-    elif 'stat':
-        stat_classify_rst()
+    elif sys.argv[1] == 'stat':
+        stat_classify_rst(sys.argv[2])
 
