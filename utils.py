@@ -204,7 +204,6 @@ def load_exp_app():
     expApp = {consts.IOS: set(), consts.ANDROID: set()}
     appInfos = AppInfos
     for line in open("resource/exp_app.txt"):
-        print line
         if line.startswith('#'):
             continue
         app_type, app = line.lower().strip().split(':')
