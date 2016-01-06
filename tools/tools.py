@@ -10,7 +10,7 @@ def stat_classify_rst(tbl):
     SQL = 'select app, path, hst, agent from %s where classified = 3' % tbl
     https = defaultdict(dict)
     for app, path, host, agent in sqldao.execute(SQL):
-        https[app][path] = host
+        https[app][path] = host+'$'+agent
 
     badapps = set()
     for app in https:
