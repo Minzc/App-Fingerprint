@@ -49,6 +49,7 @@ class Path:
         tmp = []
         for seg in fs:
             key = PATH + '/'.join(tmp)
+            if len(tmp) > 0: key = key + '/'
             tmp.append(seg)
             value = '/'.join(tmp)
             if if_version(value) == False and len(value) > 1:
