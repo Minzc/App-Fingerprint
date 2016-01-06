@@ -306,9 +306,6 @@ class CMAR(AbsClassifer):
         """
         labelRsts = {}
 
-        if package.app == 'com.worldofbeer.worldofbeer':
-            print package.agent
-
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
             max_confidence = 0
@@ -318,7 +315,9 @@ class CMAR(AbsClassifer):
                     if rule.search(package.agent) and confidence > max_confidence:  # and confidence > max_confidence:
                         max_confidence = confidence
                         rst = consts.Prediction(label, confidence, rule)
-
+                    if package.app == 'com.worldofbeer.worldofbeer' and label == 'com.worldofbeer.worldofbeer':
+                        print '[cmar319]', rule.pattern, package.agent, rule.search(package.agent)
+                        
             labelRsts[rule_type] = rst
             if rule_type == consts.CATEGORY_RULE and rst != consts.NULLPrediction and rst.label != package.category:
                 print '[WRONG]', rst, package.app, package.category
