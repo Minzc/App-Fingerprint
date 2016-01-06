@@ -289,8 +289,12 @@ class CMAR(AbsClassifer):
         SQL = consts.SQL_SELECT_CMAR_RULES
         for label, patterns, agent, host, ruleType, support in sqldao.execute(SQL):
             counter += 1
-            assert agent is not None
-            rule = re.compile(agent, re.IGNORECASE)
+            rule = []
+            if agent is not None:
+                rule.append(agent)
+            if host is not None:
+                rule.append(host)
+            rule = frozenset(rule)
             if host is not None:
                 self.rules[ruleType][host][rule] = (label, support)
             else:
@@ -305,19 +309,20 @@ class CMAR(AbsClassifer):
         Return {type:[(label, confidence)]}
         """
         labelRsts = {}
-
+        features = frozenset(self.encoder.get_f_list(package))
         for rule_type, rules in self.rules.iteritems():
             rst = consts.NULLPrediction
-            max_confidence = 0
-            for host in [HOST + re.sub('[0-9]+$', '[NUM]', package.rawHost), '']:
-                for rule, label_confidence in rules[host].iteritems():
-                    label, confidence = label_confidence
-                    if rule.search(package.agent) and confidence > max_confidence:  # and confidence > max_confidence:
-                        max_confidence = confidence
-                        rst = consts.Prediction(label, confidence, rule)
-                    if package.app == 'com.worldofbeer.worldofbeer' and label == 'com.worldofbeer.worldofbeer':
-                        print '[cmar319]', rule.pattern, package.agent, rule.search(package.agent)
-                        
+            if not package.refer_rawHost:
+                max_confidence = 0
+                for host in [HOST + re.sub('[0-9]+$', '[NUM]', package.rawHost), '']:
+                    for rule, label_confidence in rules[host].iteritems():
+                        label, confidence = label_confidence
+                        if package.app == 'com.worldofbeer.worldofbeer' and label == 'com.worldofbeer.worldofbeer':
+                            print '[fp321]', features, rule
+                        if rule.issubset(features) and confidence > max_confidence:  # and confidence > max_confidence:
+                            max_confidence = confidence
+                            rst = consts.Prediction(label, confidence, rule)
+
             labelRsts[rule_type] = rst
             if rule_type == consts.CATEGORY_RULE and rst != consts.NULLPrediction and rst.label != package.category:
                 print '[WRONG]', rst, package.app, package.category
