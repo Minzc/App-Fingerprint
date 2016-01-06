@@ -319,6 +319,8 @@ class CMAR(AbsClassifer):
                         label, confidence = label_confidence
                         if package.app == 'com.worldofbeer.worldofbeer' and label == 'com.worldofbeer.worldofbeer':
                             print '[fp321]', features, rule, rule.issubset(features)
+                        if rule.issubset(features):
+                            print '[fp323]', features, rule
                         if rule.issubset(features) and confidence > max_confidence:  # and confidence > max_confidence:
                             max_confidence = confidence
                             rst = consts.Prediction(label, confidence, rule)
