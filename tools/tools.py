@@ -7,7 +7,7 @@ from collections import defaultdict
 def stat_classify_rst():
     target = {'/pep/gcc':'gsp1.apple.com', '/assets/com_apple_MobileAsset_Duet/com_apple_MobileAsset_Duet.xml':'mesu.apple.com'}
     sqldao = SqlDao()
-    SQL = 'select app, path, host, agent from ios_packages_2015_08_10 where classified = 3'
+    SQL = 'select app, path, hst, agent from ios_packages_2015_08_10 where classified = 3'
     https = defaultdict(dict)
     for app, path, host, agent in sqldao.execute(SQL):
         https[app][path] = host
