@@ -431,7 +431,7 @@ class KVClassifier(AbsClassifer):
                                   self.hostLabelTable[consts.APP_RULE])
         categoryKeyScore = self._score(self.compressedDB[consts.APP_RULE],
                                       self.valueLabelCounter[consts.CATEGORY_RULE],
-                                       self.hostLabelTable[consts.CATEGORY_RULE])
+                                       self.hostLabelTable[consts.APP_RULE])
         #############################
         # Generate interesting keys
         #############################
