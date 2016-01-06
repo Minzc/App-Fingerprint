@@ -23,7 +23,7 @@ def stat_classify_rst():
                 badapps.add(app)
 
     for app in badapps:
-        print https[app]
+        print app, https[app]
     print '=' * 10
     print 'Total', len(https), 'Can not find', len(badapps)
 
