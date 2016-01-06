@@ -223,9 +223,9 @@ class KVClassifier(AbsClassifer):
         :param trainData : { tbl : [ packet, packet, ... ] }
         :param xmlGenRules : {( host, key) }
         """
-        print '[algo217]', generalRules['dcs.aaa.com']
+        print '[algo217]', generalRules['en.wikipedia.org']
         generalRules = self.miner.prune(generalRules)
-        print '[algo219]', generalRules['dcs.aaa.com']
+        print '[algo219]', generalRules['en.wikipedia.org']
 
         # Prune by coverage
         for host in generalRules:
@@ -238,8 +238,8 @@ class KVClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 kv[key] = value
 
-            if pkg.host == 'dcs.aaa.com':
-                print '[algo222]', kv, generalRules['dcs.aaa.com']
+            if pkg.host == 'en.wikipedia.org':
+                print '[algo222]', kv, generalRules['en.wikipedia.org']
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -250,7 +250,7 @@ class KVClassifier(AbsClassifer):
         # Prune by grouping
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
-            if host == 'dcs.aaa.com':
+            if host == 'en.wikipedia.org':
                 print '[algo228]', prunedGenRules[host]
             tmp = []
             for index, rule in enumerate(prunedGenRules[host]):
@@ -258,7 +258,7 @@ class KVClassifier(AbsClassifer):
                     break
                 tmp.append(rule)
             prunedGenRules[host] = tmp
-            if host == 'dcs.aaa.com':
+            if host == 'en.wikipedia.org':
                 print '[algo237]', prunedGenRules[host]
         return prunedGenRules
 
@@ -278,7 +278,7 @@ class KVClassifier(AbsClassifer):
         # secdomain -> key -> (label, score)
         keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(hstKLblValue):
-            if host == 'dcs.aaa.com':
+            if host == 'en.wikipedia.org':
                 print '[algo262]', \
                     '[Value]',len(hstKLblValue[host][k][label]), \
                     '[AllTbls]',len(hostLabelTbl[host][label]), \
@@ -301,7 +301,7 @@ class KVClassifier(AbsClassifer):
                                             * numOfLabels)
                 keyScore[host][k][consts.LABEL].add(label)
 
-        print '[algo269]', keyScore['dcs.aaa.com']
+        print '[algo269]', keyScore['en.wikipedia.org']
         return keyScore
 
     @staticmethod
@@ -316,11 +316,11 @@ class KVClassifier(AbsClassifer):
         Rule = consts.Rule
         generalRules = defaultdict(list)
         for host in keyScore:
-            if host == 'dcs.aaa.com':
+            if host == 'en.wikipedia.org':
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
                 labelNum = len(keyApp[host + '$' + key]) / (1.0 * len(hostLabelTbl[host]))
-                if host == 'dcs.aaa.com':
+                if host == 'en.wikipedia.org':
                     print '[algo296]', labelNum, key, len(hostLabelTbl[host]), keyApp[host + '$' + key]
                 score = keyScore[host][key][consts.SCORE]
                 generalRules[host].append(Rule(host, key, score, labelNum))
