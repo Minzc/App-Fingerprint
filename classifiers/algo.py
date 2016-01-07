@@ -1,7 +1,6 @@
 import urllib
 import const.consts as consts
 import re
-
 from classifiers.uri import UriClassifier
 from sqldao import SqlDao
 from utils import load_xml_features, if_version, flatten, get_label
@@ -12,6 +11,7 @@ from const.dataset import DataSetIter as DataSetIter
 DEBUG = False
 PATH = '[PATH]:'
 HOST = '[HOST]:'
+
 
 class Path:
     def __init__(self, scoreT, labelT, dbcover, scoreGap):
@@ -54,6 +54,7 @@ class Path:
             value = '/'.join(tmp)
             if if_version(value) == False and len(value) > 1:
                 yield (host, key, value)
+
     # @staticmethod
     # def get_f(package):
     #     host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
@@ -85,7 +86,7 @@ class Path:
         """
         prunedK = {}
         for secdomain, keys in keys.items():
-            keys = [key for key in keys if ( key.score >= self.scoreThreshold and key.labelNum >= self.labelThreshold ) or
+            keys = [key for key in keys if (key.score >= self.scoreThreshold and key.labelNum >= self.labelThreshold) or
                     secdomain in self.cHosts or key.key.split('/')[-1] in self.cPath]
             prunedK[secdomain] = keys
         return prunedK
@@ -121,7 +122,7 @@ class KV:
             for v in vs:
                 v = v.strip()
                 if if_version(v) == False and len(v) > 1:
-                    v = re.sub('[0-9]+x[0-9]+','', v)
+                    v = re.sub('[0-9]+x[0-9]+', '', v)
                     if '/' in v:
                         v = v.split('/')[0]
                     yield (host, k, v)
@@ -188,6 +189,7 @@ class KV:
     def mine_host(self, trainSet, ruleType):
         pass
 
+
 class KVClassifier(AbsClassifer):
     def __init__(self, appType, minerType):
         def __create_dict():
@@ -198,13 +200,13 @@ class KVClassifier(AbsClassifer):
                              consts.CATEGORY_RULE: __create_dict()}
         self.valueLabelCounter = {consts.APP_RULE: defaultdict(set),
                                   consts.CATEGORY_RULE: defaultdict(set)}
-        self.hostLabelTable = {consts.APP_RULE: defaultdict(lambda : defaultdict(set)),
-                               consts.CATEGORY_RULE: defaultdict(lambda : defaultdict(set))}
+        self.hostLabelTable = {consts.APP_RULE: defaultdict(lambda: defaultdict(set)),
+                               consts.CATEGORY_RULE: defaultdict(lambda: defaultdict(set))}
         self.rules = {}
         self.appType = appType
 
         if minerType == consts.PATH_MINER:
-            self.miner = Path(scoreT=0.5, labelT=0,dbcover=1, scoreGap=0.3)
+            self.miner = Path(scoreT=0.5, labelT=0, dbcover=1, scoreGap=0.3)
         elif minerType == consts.KV_MINER:
             self.miner = KV(scoreT=0.5, labelT=0.3, dbcover=3, scoreGap=0.3)
 
@@ -264,46 +266,55 @@ class KVClassifier(AbsClassifer):
         return prunedGenRules
 
     @staticmethod
-    def _score(hstKLblValue, valueLabelCounter, hostLabelTbl):
+    def _score(hstKLblValue, vAppCounter, vCategoryCounter, hostLabelTbl):
         """
         Give score to every ( secdomain, key ) pairs
         Input
         :param hstKLblValue :
             Relationships between host, key, value and label(app or company) from training data
             { secdomain : { key : { label : {value} } } }
-        :param valueLabelCounter :
+        :param vAppCounter :
             Relationships between labels(app or company)
             { app : {label} }
         """
         # secdomain -> app -> key -> value -> tbls
         # secdomain -> key -> (label, score)
-        keyScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
+        appKScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
+        categoryKScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(hstKLblValue):
             if host == 'www.gannett-tv.com':
                 print '[algo262]', \
-                    '[Value]',len(hstKLblValue[host][k][label]), \
-                    '[AllTbls]',len(hostLabelTbl[host][label]), \
-                    '[Key]',k,\
-                    '[V]',hstKLblValue[host][k][label], \
-                    '[B]',(len(valueLabelCounter[v]) == 1 and if_version(v) == False), \
-                    '[Tbls]',len(tbls),\
-                    '[Labels]',len(hstKLblValue[host][k]), \
-                    '[Vc]',valueLabelCounter[v], \
+                    '[Value]', len(hstKLblValue[host][k][label]), \
+                    '[AllTbls]', len(hostLabelTbl[host][label]), \
+                    '[Key]', k, \
+                    '[V]', hstKLblValue[host][k][label], \
+                    '[B]', (len(vAppCounter[v]) == 1 and if_version(v) == False), \
+                    '[Tbls]', len(tbls), \
+                    '[Labels]', len(hstKLblValue[host][k]), \
+                    '[Vc]', vAppCounter[v], \
                     '[BV]', if_version(v), \
-                    '[Value]', keyScore[host][k][consts.SCORE]
+                    '[Value]', appKScore[host][k][consts.SCORE]
             tbls = len(tbls)
-            if len(valueLabelCounter[v]) == 1 and tbls > 1:
+            if tbls > 1:
                 numOfValues = len(hstKLblValue[host][k][label])
                 numOfLabels = len(hstKLblValue[host][k])
                 numOfTbls = len(hostLabelTbl[host][label]) - 1
-                keyScore[host][k][consts.SCORE] += \
-                    ( tbls - 1 ) / float(numOfTbls
-                                            * numOfValues * numOfValues
-                                            * numOfLabels)
-                keyScore[host][k][consts.LABEL].add(label)
+                if len(vAppCounter[v]) == 1:
+                    appKScore[host][k][consts.SCORE] += \
+                        (tbls - 1) / float(numOfTbls
+                                           * numOfValues * numOfValues
+                                           * numOfLabels)
+                    appKScore[host][k][consts.LABEL].add(label)
+                elif len(vCategoryCounter[v]) == 1:
+                    categoryKScore[host][k][consts.SCORE] += \
+                        (tbls - 1) / float(numOfTbls
+                                           * numOfValues * numOfValues
+                                           * numOfLabels)
+                    categoryKScore[host][k][consts.LABEL].add(label)
 
-        print '[algo269]', keyScore['www.gannett-tv.com']
-        return keyScore
+        print '[algo269APP]', appKScore['www.gannett-tv.com']
+        print '[algo269CAT]', categoryKScore['www.gannett-tv.com']
+        return appKScore, categoryKScore
 
     @staticmethod
     def _generate_keys(keyScore, keyApp, hostLabelTbl):
@@ -353,7 +364,6 @@ class KVClassifier(AbsClassifer):
                         label = pkg.app if ruleType == consts.APP_RULE else pkg.category
                         specificRules[host][key][value][label][consts.SCORE] = rule.score
                         specificRules[host][key][value][label][consts.SUPPORT].add(tbl)
-
 
         return specificRules
 
@@ -427,11 +437,10 @@ class KVClassifier(AbsClassifer):
         ##################
         # Count
         ##################
-        appKeyScore = self._score(self.compressedDB[consts.APP_RULE], self.valueLabelCounter[consts.APP_RULE],
-                                  self.hostLabelTable[consts.APP_RULE])
-        categoryKeyScore = self._score(self.compressedDB[consts.APP_RULE],
-                                      self.valueLabelCounter[consts.CATEGORY_RULE],
-                                       self.hostLabelTable[consts.APP_RULE])
+        appKeyScore, categoryKeyScore = self._score(self.compressedDB[consts.APP_RULE],
+                                                    self.valueLabelCounter[consts.APP_RULE],
+                                                    self.valueLabelCounter[consts.CATEGORY_RULE],
+                                                    self.hostLabelTable[consts.APP_RULE])
         #############################
         # Generate interesting keys
         #############################
@@ -450,8 +459,9 @@ class KVClassifier(AbsClassifer):
         #############################
         appSpecificRules = self._generate_rules(trainData, appGeneralRules, self.valueLabelCounter[consts.APP_RULE],
                                                 consts.APP_RULE)
-        categorySpecifcRules = self._generate_rules(trainData, categoryGeneralRules, self.valueLabelCounter[consts.CATEGORY_RULE],
-                                                consts.CATEGORY_RULE)
+        categorySpecifcRules = self._generate_rules(trainData, categoryGeneralRules,
+                                                    self.valueLabelCounter[consts.CATEGORY_RULE],
+                                                    consts.CATEGORY_RULE)
 
         # appSpecificRules = self._infer_from_xml(appSpecificRules, xmlGenRules, trainData.rmapp)
         appSpecificRules = self.miner.gen_txt_rule(xmlSpecificRules, appSpecificRules, trackIds)

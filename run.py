@@ -166,6 +166,8 @@ def evaluate(rst, testSet, testApps):
                 cPrdcts.inc_total()
                 if sum(correctLabels) > 0:
                     cPrdcts.inc_correct(1)
+                else:
+                    print '[ERROR]', predictions, pkg.app
 
         if cPrdcts.if_all_right():
             correctApp.add((cPrdcts.package, cPrdcts.trackId))
