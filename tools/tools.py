@@ -8,7 +8,8 @@ def stat_classify_rst(tbl):
     target = {'/pep/gcc':'gsp1.apple.com',
               '/assets/com_apple_MobileAsset_Duet/com_apple_MobileAsset_Duet.xml':'mesu.apple.com',
               '/configurations/pep/pipeline/pipeline0.html':'configuration.apple.com',
-              'captive.apple.com':'captive.apple.com'}
+              '/bag':'init-p01st.push.apple.com'}
+
     sqldao = SqlDao()
     SQL = 'select app, path, hst, agent from %s where classified = 3' % tbl
     https = defaultdict(dict)
