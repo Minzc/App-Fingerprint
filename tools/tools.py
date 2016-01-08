@@ -31,8 +31,13 @@ def stat_all():
         for app in badapps:
             counter[app].add(tbl)
 
+    rCounter = defaultdict(set)
     for app in counter:
         print '[BAD APP]', app, counter[app]
+        rCounter[len(counter[app])].add(app)
+    print '=' * 10
+    for number, apps in rCounter.items():
+        print number, len(apps)
 
 def stat_classify_rst(tbl):
     target = {'/pep/gcc':'gsp1.apple.com',
