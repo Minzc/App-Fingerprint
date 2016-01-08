@@ -30,9 +30,9 @@ def stat_all():
                 badapps.add(app)
         for app in badapps:
             counter[app].add(tbl)
+
     for app in counter:
-        if len(counter[app]) == len(tbls):
-            print '[BAD APP]', app
+        print '[BAD APP]', app, counter[app]
 
 def stat_classify_rst(tbl):
     target = {'/pep/gcc':'gsp1.apple.com',
