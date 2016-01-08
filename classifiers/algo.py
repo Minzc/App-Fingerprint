@@ -519,6 +519,10 @@ class KVClassifier(AbsClassifer):
             else:
                 host, path = self.miner.classify_format(pkg)
                 for regexObj, scores in self.rules[ruleType][host].iteritems():
+
+                    if pkg.app == 'com.ally.auto' and pkg.host == 'metrics.ally.com':
+                        print '[algo523]', regexObj.search(path), regexObj.pattern, path
+
                     if regexObj.search(path):
                         label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
                         if support > rst.score or (support == rst.score and confidence > fatherScore):
