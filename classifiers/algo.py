@@ -226,9 +226,9 @@ class KVClassifier(AbsClassifer):
         :param trainData : { tbl : [ packet, packet, ... ] }
         :param xmlGenRules : {( host, key) }
         """
-        print '[algo217]', generalRules['www.gannett-tv.com']
+        print '[algo217]', generalRules['www.adtpulse.com']
         generalRules = self.miner.prune(generalRules)
-        print '[algo219]', generalRules['www.gannett-tv.com']
+        print '[algo219]', generalRules['www.adtpulse.com']
 
         # Prune by coverage
         for host in generalRules:
@@ -241,8 +241,8 @@ class KVClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 kv[key] = value
 
-            if pkg.host == 'www.gannett-tv.com':
-                print '[algo222]', kv, generalRules['www.gannett-tv.com']
+            if pkg.host == 'www.adtpulse.com':
+                print '[algo222]', kv, generalRules['www.adtpulse.com']
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -253,7 +253,7 @@ class KVClassifier(AbsClassifer):
         # Prune by grouping
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
-            if host == 'www.gannett-tv.com':
+            if host == 'www.adtpulse.com':
                 print '[algo228]', prunedGenRules[host]
             tmp = []
             for index, rule in enumerate(prunedGenRules[host]):
@@ -261,7 +261,7 @@ class KVClassifier(AbsClassifer):
                     break
                 tmp.append(rule)
             prunedGenRules[host] = tmp
-            if host == 'www.gannett-tv.com':
+            if host == 'www.adtpulse.com':
                 print '[algo237]', prunedGenRules[host]
         return prunedGenRules
 
@@ -282,7 +282,7 @@ class KVClassifier(AbsClassifer):
         appKScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         categoryKScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
         for host, k, label, v, tbls in flatten(hstKLblValue):
-            if host == 'www.gannett-tv.com':
+            if host == 'www.adtpulse.com':
                 print '[algo262]', \
                     '[Value]', len(hstKLblValue[host][k][label]), \
                     '[AllTbls]', len(hostLabelTbl[host][label]), \
@@ -312,8 +312,8 @@ class KVClassifier(AbsClassifer):
                                            * numOfLabels)
                     categoryKScore[host][k][consts.LABEL].add(label)
 
-        print '[algo269APP]', appKScore['www.gannett-tv.com']
-        print '[algo269CAT]', categoryKScore['www.gannett-tv.com']
+        print '[algo269APP]', appKScore['www.adtpulse.com']
+        print '[algo269CAT]', categoryKScore['www.adtpulse.com']
         return appKScore, categoryKScore
 
     @staticmethod
@@ -328,11 +328,11 @@ class KVClassifier(AbsClassifer):
         Rule = consts.Rule
         generalRules = defaultdict(list)
         for host in keyScore:
-            if host == 'www.gannett-tv.com':
+            if host == 'www.adtpulse.com':
                 print '[algo261]', keyScore[host]
             for key in keyScore[host]:
                 labelNum = len(keyApp[host + '$' + key]) / (1.0 * len(hostLabelTbl[host]))
-                if host == 'www.gannett-tv.com':
+                if host == 'www.adtpulse.com':
                     print '[algo296]', labelNum, key, len(hostLabelTbl[host]), keyApp[host + '$' + key]
                 score = keyScore[host][key][consts.SCORE]
                 generalRules[host].append(Rule(host, key, score, labelNum))
