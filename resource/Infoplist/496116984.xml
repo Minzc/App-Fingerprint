@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DTSDKBuild</key>
+	<string>8H7</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleVersion</key>
+	<string>2.2.1</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.ggwan.BaokuLib4</string>
+	<key>CFBundleExecutable</key>
+	<string>BaokuLib4</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.2.1</string>
+	<key>CFBundleName</key>
+	<string>BaokuLib4</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundlePackageType</key>
+	<string>FMWK</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvmgcc42</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>BuildMachineOSBuild</key>
+	<string>10J869</string>
+	<key>DTXcodeBuild</key>
+	<string>4A2002a</string>
+	<key>DTPlatformBuild</key>
+	<string>8H7</string>
+	<key>MinimumOSVersion</key>
+	<string>4.0</string>
+	<key>DTXcode</key>
+	<string>0402</string>
+	<key>DTPlatformVersion</key>
+	<string>4.3</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>zh_CN</string>
+	<key>DTSDKName</key>
+	<string>iphoneos4.3</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+</dict>
+</plist>

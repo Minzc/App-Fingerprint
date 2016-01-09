@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>8.3</string>
+	<key>CFBundleName</key>
+	<string>Creative Shape</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.3</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon57x57</string>
+				<string>AppIcon60x60</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Creative Shape</string>
+	<key>DTSDKBuild</key>
+	<string>12F69</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.5</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14D136</string>
+	<key>DTPlatformBuild</key>
+	<string>12F69</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6D1002</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Babelfish.ttf</string>
+		<string>Ziggy Zoe.ttf</string>
+		<string>Dahrlin Regular.ttf</string>
+		<string>Early Tickertape.ttf</string>
+		<string>Earwig Factory.ttf</string>
+		<string>Eppy Evans Round.ttf</string>
+		<string>Gas Huffer Phat.ttf</string>
+		<string>Happy Happy Joy Joy.ttf</string>
+		<string>HardlyWorthit.ttf</string>
+		<string>JoeJack.ttf</string>
+		<string>John Doe.ttf</string>
+		<string>Ozone.ttf</string>
+		<string>BabOonjaZzbaSsoOn.ttf</string>
+		<string>Candy Randy.ttf</string>
+		<string>Heartless Valiumwhore.ttf</string>
+		<string>Oogie Boogies.ttf</string>
+		<string>PartyBalloons.ttf</string>
+		<string>Poison Berries.ttf</string>
+		<string>abrazoscriptssibolditalic.ttf</string>
+		<string>AIRSTREA.ttf</string>
+		<string>HelveticaNeueLTPro-Ex.otf</string>
+		<string>HelveticaNeueLTPro-ThCn.otf</string>
+		<string>HelveticaNeueLTPro-ThEx.otf</string>
+		<string>KUNSTLER.TTF</string>
+		<string>VLADIMIR.TTF</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>1.5.1</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UILaunchImageFile</key>
+	<string>LaunchImage</string>
+	<key>FacebookAppID</key>
+	<string>178536132348332</string>
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-800-Portrait-736h</string>
+			<key>UILaunchImageSize</key>
+			<string>{414, 736}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>8.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-800-667h</string>
+			<key>UILaunchImageSize</key>
+			<string>{375, 667}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>8.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-568h</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+	</array>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>FacebookDisplayName</key>
+	<string>InstaShaper</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.2012gpower.instashaper</string>
+	<key>DTXcode</key>
+	<string>0631</string>
+	<key>CFBundleExecutable</key>
+	<string>Creative Shape</string>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon57x57</string>
+				<string>AppIcon60x60</string>
+				<string>AppIcon72x72</string>
+				<string>AppIcon76x76</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLIconFile</key>
+			<string>icon@2x</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb178536132348332</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>wx2adb694eb685e185</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>gpisf</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

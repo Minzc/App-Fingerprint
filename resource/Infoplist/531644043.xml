@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>8.3</string>
+	<key>CFBundleName</key>
+	<string>KXTicket</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.3</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Icon.png</string>
+				<string>Icon@2x.png</string>
+				<string>Icon_120x120.png</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>酷讯机票</string>
+	<key>RSA public key</key>
+	<string>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCWg2Nk8fqsbsVqNgCJqsgts9Ma1YZ6lZj4kQoO5VZluV+Oc9TxbSdBz+FukYKGm6l5sSdfs+BIy4E5+MgZP0eUB31dQxhybSboGUIxMh86r1XuBSaHTPVagXwBxrxgvTY0I1hD9PqRm85r8RzmO/qZsDIf88hhgP3fC9puI9J1uwIDAQAB</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<key>DTSDKBuild</key>
+	<string>12F69</string>
+	<key>CFBundleShortVersionString</key>
+	<string>5.4.0</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14B25</string>
+	<key>DTPlatformBuild</key>
+	<string>12F69</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6D570</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>zh_CN</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleVersion</key>
+	<string>5.4.0</string>
+	<key>MinimumOSVersion</key>
+	<string>5.1.1</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>CFBundleIdentifier</key>
+	<string>com.kuxun.flight</string>
+	<key>RSA private key</key>
+	<string>MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBALNPWtejD9SZ/O7rkB7XDhKBW4vaFlWZKDR93x4zZTYwImoMK5qhCj94JevvMf//ojz6dg2mFREsvLTiKkgt0sBwlulhQHB+/raEQSUC4Tw4N/63d/nBfgerxaISf2I4gOwuMvwU+p17nr765Xi+lL9hvCR2yfUI2gVZygaoqus1AgMBAAECgYA17UHG5JWYPQ+i01muzMLAsgLUVqys5bj/wHNf49kmqOdQuYRLpu8sE3hkMrX45ernJ/RlOnPPjILca8CHoLBnCor8682Gn4BYMY9BXn/BqgT9N73vU7tbseULMU7Re0xcNK1thWYhAYcUKrs/QxZFydc0BQIyvYLkNFk9LjeyQQJBAOrb3LFaz6GUcPwvQB/xAQg8LrH94e05bCgUU/SSdIzeqRRLMdIf/BAC/X0kR9sHDB8kqkLC3QEPnBAvkFD7TCkCQQDDc2mzAiUtOpUZap5I/HAoIVUxuedjFCsfhFn1KwCbHV84bsnIZ5MclhjNHveAiVnLhx0m7sHKrCBNjx3Y20gtAkACZb4p/VBTSO2iVWUlLlOhXuPnIz1UK5rkCdkVjQ0thvRY5a+bgoITM8Scq2skXD0OcFRgnBafdSZVr/acLQSJAkBSTKrZYbHd1akqxqZX/VQM0dxZz/oK0ldGMije/3iF2FxcGuqEpHhhtSJEXSHC0hMpjH9OAYNAoDIJ9pWO1ucRAkEA0OpN91iWNPvnoeNm+RvAgoVhlTraiR5kIQqNNENh2zK8dokIFNDFWxgiw/aBhAQOXlam5GpwSUgvQANMXYUqng==</string>
+	<key>DTXcode</key>
+	<string>0630</string>
+	<key>CFBundleExecutable</key>
+	<string>KXTicket</string>
+	<key>UMP public key</key>
+	<string>MIIDNDCCAp2gAwIBAgICLVkwDQYJKoZIhvcNAQEFBQAwPTEOMAwGA1UEBhMFQ0hJTkExKzApBgNVBAMTIkNISU5BVEVMRUNPTSBDRVJUSUZJQ0FURSBBVVRIT1JJVFkwHhcNMDEwMzIxMTA0NzEzWhcNMDMwMzIxMTA0NzEzWjBcMQswCQYDVQQGEwJDTjERMA8GA1UEChMItPPBrLXn0MUxETAPBgNVBAgTCFNoZW55YW5nMRQwEgYDVQQDEwsxOTIuMTY4LjIuMjERMA8GA1UEBxMIU2hlbnlhbmcwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMZYC7inporVKJCo0pPWdOBjADxzPRF1719G2YskDHVDEuqt6sBRWX+65dXs1AVKROKmi6jdzAQSlp7z3brsB4skHMo9sqdQgPolgZvCersKJFHgTbjjNyCoTyOjwOeRsfcqSJaiehQwPW4fLpNQW/lbvOuFrP8Tn0xWZvOunVPDAgMBAAGjggEiMIIBHjAJBgNVHRMEAjAAMEYGA1UdHwQ/MD0wO6A5oDeGNWxkYXA6Ly8yMDIuMTAzLjY1LjE4L291PWNhLG91PXN5c3RlbSxvdT1jYTEsbz1jdCxjPUNOMC8GCCsGAQUFBwEBBCMwITAfBggrBgEFBQcwAYYTLDIwMi4xMDMuNjUuMTg6OTAwMzAPBghghkgBhvhDDAQDAgEBMBIGCGCGSAGG+EMOBAYWBDI3RjkwGQYIYIZIAYb4QxAEDRYLMTkyLjE2OC4yLjIwEAYIYIZIAYb4QxEEBBYCTlQwGgYIYIZIAYb4QxkEDhYMOTe9ybfRt/7O8cb3MBkGCGCGSAGG+EMbBA0WCzE5Mi4xNjguMi4yMA8GCGCGSAGG+EMaBAMCAQMwDQYJKoZIhvcNAQEFBQADgYEAckkH/Vem5+kXPSGgkowjPwv47XXNbD0hGRMTVXm5PC2kY/wNApQh3lv7Tf5k3UQEoFBACxf6XJtuxf6S0uKBS4ySMKdpbMbOUvtwu6ycQUQTRAs1EBgoh1zyuafU2D3iyHQM8etHxaSePXZOZXFkkvBJemyPz23HAyIn5SKQ2Es=</string>
+	<key>KUXUN private key</key>
+	<string>MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAKwkzb5QmlpqolRFdHpxso0k+v9MYsX0tv97ANcztywCYHbTdwV/bQ2KJzxTWVDo2pgHAQdpjtjbgaaEfhNLLEUtwAJKtMIIQOG80VaOveccYwE0mPZLnZn2IngAdp7BriD2M2jP1yx2lrEH
+nykjHcPTdRhmMjFcIt9sFw4yvweXAgMBAAECgYBmJqjYqKgPw3t0moqWJmYYD7vKR5/NbHwzeuBy08N8oCRyHuZgIs+p2zORPryfoK4mzPE1XtRfp1J2Z+UQuekYYpSs
+DUCMSwkY1RHW3cIHXTCQE0EBEqlil45V0P5OPotqfrtR+gJlOpLp0MoY3y+0LlsdnSrUPxzE3W+5iwIZMQJBAN4ebAd6mNyptZOw62rFXgD9uzVBVOvTkETP4jS9FDle
++PTBvZ6holefB1VvJ9H0IgFZiXBxNoHgR7wyGxb7OkMCQQDGZuRH6PyAxjaPZ1qRaI1TN5TVKqfJs4sP749BzcthGuVtdCOet0n5Gl04dhzgdqqq3czPEjbBWDkr+Uic
+zPodAkBLxA7PgkcwRgd1CI1VD1vgdKxuHwnro2/7uPmNSc3jP/0l6AxZVwM8ZjenMdJgcKlE0pjqLQQNy0ZM8L6C2VFnAkARKwAf9No8rmo0OIZOxNRN2iZn17wTKRUk
+eN9Vm2A48+HcectHRacCBjUA2L+g8MPN60l4taPFUUQJORX+c4JFAkEAulQGt95veQyAL0T+7qfdMSCZHC6ZtarATtozoRhsS07weP+IUmo4g/xicVz1U0t21gg8EzcpGaQE/4IsEYqDHw==</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>h5app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>h5app</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>weibo</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>wb575936250</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>weixin</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>wx6afa2c09d8c46818</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.kuxun.plane</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kxplane</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

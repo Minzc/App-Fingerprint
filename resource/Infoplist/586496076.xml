@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIViewControllerIdentifiersToNibNames</key>
+	<dict>
+		<key>UIViewController-WgX-y9-mdf</key>
+		<string>UIViewController-WgX-y9-mdf</string>
+		<key>UIViewController-IPO-mB-imp</key>
+		<string>UIViewController-IPO-mB-imp</string>
+		<key>UIViewController-wA7-I5-HY0</key>
+		<string>UIViewController-wA7-I5-HY0</string>
+		<key>UIViewController-GDi-YP-hha</key>
+		<string>UIViewController-GDi-YP-hha</string>
+		<key>UIViewController-akt-gI-Vmf</key>
+		<string>UIViewController-akt-gI-Vmf</string>
+		<key>UIViewController-cTB-qs-jfb</key>
+		<string>UIViewController-cTB-qs-jfb</string>
+		<key>UIViewController-MYP-BZ-FQJ</key>
+		<string>UIViewController-MYP-BZ-FQJ</string>
+		<key>UIViewController-xmH-SY-Eb4</key>
+		<string>UIViewController-xmH-SY-Eb4</string>
+	</dict>
+	<key>UIStoryboardDesignatedEntryPointIdentifier</key>
+	<string>UIViewController-GDi-YP-hha</string>
+	<key>UIStoryboardVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

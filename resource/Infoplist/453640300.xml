@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>gamekit</string>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>tj_version</key>
+	<string>2.9.0</string>
+	<key>DTPlatformVersion</key>
+	<string>8.1</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>CFBundleName</key>
+	<string>PocoCamera</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.1</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Icon.png</string>
+				<string>Icon@2x.png</string>
+				<string>Icon@2x.png</string>
+				<string>appicon-60@2x.png</string>
+				<string>Icon-72.png</string>
+				<string>Icon-72@2x.png</string>
+				<string>Icon-76.png</string>
+				<string>Icon-76@2x.png</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UIRequiresPersistentWiFi</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>POCO相机</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<true/>
+	<key>show_version</key>
+	<string>2.9.0</string>
+	<key>DTSDKBuild</key>
+	<string>12B411</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.9.0</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14D136</string>
+	<key>SignerIdentity</key>
+	<string>Apple iPhone OS Application Siging</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6A1052c</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>zh_CN</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>HansHand.TTF</string>
+		<string>Nexa Bold.otf</string>
+		<string>Helvetica CE 35 Thin Italic.ttf</string>
+		<string>Roboto Bold.ttf</string>
+		<string>Roboto Regular.ttf</string>
+		<string>Helvetica CE 35 Thin.ttf</string>
+		<string>Myriad Pro Regular.ttf</string>
+		<string>Myriad Pro Light.ttf</string>
+		<string>Myriad Pro.otf</string>
+		<string>Aurora BdCn BT.ttf</string>
+		<string>Futura Md BT.TTF</string>
+		<string>Blokletters Balpen.ttf</string>
+		<string>Andes.TTF</string>
+		<string>Edo SZ.ttf</string>
+		<string>CabinSketch.otf</string>
+		<string>Abraham Lincoln.ttf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>2.9.0.3</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>DTPlatformBuild</key>
+	<string>12B411</string>
+	<key>MinimumOSVersion</key>
+	<string>5.1.1</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.poco.camera</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon@2x.png</string>
+		<string>Icon@2x.png</string>
+		<string>appicon-60@2x.png</string>
+		<string>Icon-72.png</string>
+		<string>Icon-72@2x.png</string>
+		<string>Icon-76.png</string>
+		<string>Icon-76@2x.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0610</string>
+	<key>CFBundleExecutable</key>
+	<string>PocoCamera</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>PocoCamera</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>cn.poco.camera</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>wx792cf8aad35e4488</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>sinasso.poco.camera</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>sinaweibosso.2565898187</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>sina.poco.camera</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>wb2565898187</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>pocoworldbeauty</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>tencent100246299</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>CameraEdit</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

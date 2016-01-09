@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>VideoCookbookPatisserie</string>
+	<key>DTSDKName</key>
+	<string>iphoneos6.0</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Cookbook</string>
+	<key>DTSDKBuild</key>
+	<string>10A403</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.3</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>Pushwoosh_APPID</key>
+	<string>0B1B8-B9DEE</string>
+	<key>BuildMachineOSBuild</key>
+	<string>12C60</string>
+	<key>DTPlatformBuild</key>
+	<string>10A403</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>FS Lola-Regular.otf</string>
+		<string>FS Lola</string>
+		<string>FS Lola-MediumItalic.otf</string>
+		<string>FS Lola-Italic.otf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>1.3</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>DTXcodeBuild</key>
+	<string>4G2008a</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow_iPhone</string>
+	<key>CFBundleIdentifier</key>
+	<string>au.com.futuragroup.vcb.patisserie</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon@2x.png</string>
+		<string>Icon-72.png</string>
+		<string>Icon-72@2x.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0452</string>
+	<key>CFBundleExecutable</key>
+	<string>VideoCookbookPatisserie</string>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindow_iPad</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string></string>
+</dict>
+</plist>
