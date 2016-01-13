@@ -142,7 +142,7 @@ class AgentClassifier(AbsClassifer):
                 if len(apps) == 1:
                     for app in apps:
                         if app == 'com.stocktouch.stocktouch':
-                            print '[AGENT145]', identifier, extractor.gen(identifier, app), extractor.prefix, extractor.suffix
+                            print '[AGENT145]', identifier, extractor.gen(identifier, app), extractor.prefix.pattern, extractor.suffix.pattern
                         appRules[extractor.gen(identifier, app)] = apps
                     if len(identifierApps[identifier]) > 1:
                         check.add(identifier)
