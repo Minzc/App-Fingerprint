@@ -209,7 +209,7 @@ def _clean_db(rule_type):
 
 
 class CMAR(AbsClassifer):
-    def __init__(self, min_cover=3, tSupport=2, tConfidence=1.0):
+    def __init__(self, min_cover=3, tSupport=1, tConfidence=1.0):
         # feature, app, host
         self.rules = defaultdict(lambda: defaultdict(lambda: defaultdict()))
         self.min_cover = min_cover
@@ -252,7 +252,7 @@ class CMAR(AbsClassifer):
         def __train_agent():
             agentC = AgentClassifier(inferFrmData=True)
             agentC.set_name(consts.AGENT_CLASSIFIER)
-            agentC.train(trainSet, ruleType)
+            agentC.train(trainSet, ruleType, False)
 
         __train_agent()
         self.encoder = AgentEncoder()

@@ -17,15 +17,16 @@ TRAIN_LABEL = consts.APP_RULE
 VALID_LABEL = {
     consts.APP_RULE,
     #consts.COMPANY_RULE,
-    consts.CATEGORY_RULE
+    #consts.CATEGORY_RULE
 }
 
 USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
-    #consts.AGENT_CLASSIFIER,
-    #consts.KV_CLASSIFIER,
-    consts.URI_CLASSIFIER,
+    consts.AGENT_CLASSIFIER,
     #consts.CMAR_CLASSIFIER,
+    #consts.KV_CLASSIFIER,
+    #consts.URI_CLASSIFIER,
+
 ]
 
 class PredictRst:

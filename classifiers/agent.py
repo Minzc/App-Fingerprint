@@ -121,6 +121,7 @@ class AgentClassifier(AbsClassifer):
 
         for regexStr, apps in appRule.iteritems():
             regexStr = regexStr.replace(re.escape(consts.VERSION), r'\b[a-z0-9-.]+\b')
+            regexStr = regexStr.replace(re.escape(consts.RANDOM), r'[0-9a-z]*')
             for app in apps:
                 params.append((app, 1, 1, regexStr, None, consts.APP_RULE))
 
@@ -135,10 +136,10 @@ class AgentClassifier(AbsClassifer):
         check = set()
         for _, extractor in extractors:
             for identifier, apps in extractor.matched.items():
-                categories = {appInfos[app].category for app in apps}
+                # categories = {appInfos[app].category for app in apps}
                 # All rules related to the same category are considered as
                 # candidate features
-                if len(categories) == 1:
+                if len(apps) == 1:
                     for app in apps:
                         appRules[extractor.gen(identifier, app)] = apps
                     if len(identifierApps[identifier]) > 1:
@@ -219,7 +220,7 @@ class AgentClassifier(AbsClassifer):
     #                     for regexStr in self._gen_regex(featureStr):
     #                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
-    def train(self, trainSet, ruleType):
+    def train(self, trainSet, ruleType, ifPersist = True):
         agentTuples = defaultdict(set)
         appInfos = {}
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
@@ -249,9 +250,10 @@ class AgentClassifier(AbsClassifer):
         # identifierApps, extractors = self._prune(regexApp)
         appRule, hostAgent = self._app(identifierApps, extractors, appInfos)
 
-        print "Finish Pruning"
+        if ifPersist:
+            print "Finish Pruning"
 
-        self.persist(appRule, consts.APP_RULE)
+            self.persist(appRule, consts.APP_RULE)
 
     def load_rules(self):
         self.rules = {consts.APP_RULE: {}, consts.COMPANY_RULE: {}, consts.CATEGORY_RULE: {}}
