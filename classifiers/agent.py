@@ -203,11 +203,12 @@ class AgentClassifier(AbsClassifer):
         for _, appAgent in agentTuples.items():
             for app, agent in appAgent:
                 ifMatch = False
-                for key, extractor in filter(lambda x: x[1].weight() > 2, extractors):
+                for key, extractor in extractors:
                     identifier = extractor.match(agent)
                     if identifier:
                         ifMatch = True
-                        extractor.add_identifier(app, identifier)
+                        if extractor.weight() > 2:
+                            extractor.add_identifier(app, identifier)
                         identifierApps[identifier].add(app)
 
                 if ifMatch == False:
