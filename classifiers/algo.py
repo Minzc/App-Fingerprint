@@ -55,17 +55,6 @@ class Path:
             if if_version(value) == False and len(value) > 1:
                 yield (host, key, value)
 
-    # @staticmethod
-    # def get_f(package):
-    #     host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
-    #     fs = [host] + filter(None, package.path.split('/'))
-    #     tmp = []
-    #     for seg in fs:
-    #         tmp.append(seg)
-    #         key = host + ':' + PATH + str(len(tmp))
-    #         value = '/'.join(tmp)
-    #         yield (host, key, value)
-
 
     def classify_format(self, package):
         host = package.refer_rawHost if package.refer_rawHost else package.rawHost
@@ -378,14 +367,6 @@ class KVClassifier(AbsClassifer):
             specificRules[consts.APP_RULE][host][key][value][app][scoreType] = score
         for host, key, value, app, scoreType, score in flatten(categorySpecificRules):
             specificRules[consts.CATEGORY_RULE][host][key][value][app][scoreType] = score
-            # specificRules[consts.COMPANY_RULE][host][key][value][self.appCompanyRelation[app]][scoreType] = score
-        # for host in companySpecificRules:
-        #   for key in companySpecificRules[host]:
-        #     for value in companySpecificRules[host][key]:
-        #       for company, scores in companySpecificRules[host][key][value].iteritems():
-        #         if len(specificRules[consts.COMPANY_RULE][host][key][value]) == 0:
-        #           specificRules[consts.COMPANY_RULE][host][key][value][company] = scores
-        #           specificRules[consts.APP_RULE][host][key][value][';'.join(self.companyAppRelation[company])] = scores
         return specificRules
 
     # def _infer_from_xml(self, specificRules, xmlGenRules, rmApps):

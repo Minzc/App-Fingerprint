@@ -81,25 +81,24 @@ def generate_agent_rules(vulnID=100000):
     return ipsRules
 
 
-def generate_path_rules(vulnID=200000):
-    trainedClassifiers = [consts.URI_CLASSIFIER]
-
-    appType = consts.IOS
-    classifier = classifier_factory(trainedClassifiers, appType)[0][1]
-    classifier.load_rules()
-    ipsRules = []
-    cRules = classifier.rules
-    for host in cRules[consts.APP_RULE]:
-        if '' not in cRules[consts.APP_RULE][host]:
-            for pathSegObj, labelInfo in cRules[consts.APP_RULE][host].items():
-                if len(pathSegObj.pattern.split('\n')) == 1:
-                    label, support = labelInfo
-                    rule = Rule(vulnID, label, IOS_GROUP, 30 + support)
-                    rule.add_feature_str(PCRE, host, 'host')
-                    rule.add_feature_str(PCRE, pathSegObj.pattern, 'uri')
-                    vulnID += 1
-                    ipsRules.append(rule)
-    return ipsRules
+# def generate_path_rules(vulnID=200000):
+#     trainedClassifiers = [consts.KV_CLASSIFIER]
+#     appType = consts.IOS
+#     classifier = classifier_factory(trainedClassifiers, appType)[0][1]
+#     classifier.load_rules()
+#
+#     ipsRules = []
+#     rules = classifier.rules
+#     for host in rules[consts.APP_RULE]:
+#         for regexObj, scores in rules[consts.APP_RULE][host].iteritems():
+#             label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
+#             if len(regexObj.pattern.split('\n')) == 1 and '=' in regexObj.pattern:
+#                 rule = Rule(vulnID, label, IOS_GROUP, 30 + support)
+#                 rule.add_feature_str(PCRE, re.escape(host), 'host', HTTP_GET)
+#                 rule.add_feature_str(PCRE, regexObj.pattern, 'uri', HTTP_GET)
+#                 ipsRules.append(rule)
+#                 vulnID += 1
+#     return ipsRules
 
 
 def generate_kv_rules(vulnID=300000):
@@ -114,7 +113,12 @@ def generate_kv_rules(vulnID=300000):
         for regexObj, scores in rules[consts.APP_RULE][host].iteritems():
             label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
             if len(regexObj.pattern.split('\n')) == 1:
-                rule = Rule(vulnID, label, IOS_GROUP, 20 + support)
+                if '=' in regexObj.pattern:
+                    support += 30
+                else:
+                    support += 20
+
+                rule = Rule(vulnID, label, IOS_GROUP, support)
                 rule.add_feature_str(PCRE, re.escape(host), 'host', HTTP_GET)
                 rule.add_feature_str(PCRE, regexObj.pattern, 'uri', HTTP_GET)
                 ipsRules.append(rule)
@@ -123,21 +127,21 @@ def generate_kv_rules(vulnID=300000):
     return ipsRules
 
 
-def generate_host_rules(vulnID=400000):
-    trainedClassifiers = [consts.URI_CLASSIFIER]
-    appType = consts.IOS
-    classifier = classifier_factory(trainedClassifiers, appType)[0][1]
-    classifier.load_rules()
-    ipsRules = []
-    cRules = classifier.rules
-    for host in cRules[consts.APP_RULE]:
-        if '' in cRules[consts.APP_RULE][host]:
-            label, support = cRules[consts.APP_RULE][host]['']
-            rule = Rule(vulnID, label, IOS_GROUP, 10 + support)
-            rule.add_feature_str(PCRE, host, 'host')
-            vulnID += 1
-            ipsRules.append(rule)
-    return ipsRules
+# def generate_host_rules(vulnID=400000):
+#     trainedClassifiers = [consts.URI_CLASSIFIER]
+#     appType = consts.IOS
+#     classifier = classifier_factory(trainedClassifiers, appType)[0][1]
+#     classifier.load_rules()
+#     ipsRules = []
+#     cRules = classifier.rules
+#     for host in cRules[consts.APP_RULE]:
+#         if '' in cRules[consts.APP_RULE][host]:
+#             label, support = cRules[consts.APP_RULE][host]['']
+#             rule = Rule(vulnID, label, IOS_GROUP, 10 + support)
+#             rule.add_feature_str(PCRE, host, 'host')
+#             vulnID += 1
+#             ipsRules.append(rule)
+#     return ipsRules
 
 
 if __name__ == '__main__':
@@ -151,20 +155,20 @@ if __name__ == '__main__':
     if args.t == 'agent':
         rules = generate_agent_rules()
         output_rules(args.p + '_agent.rule', rules)
-    elif args.t == 'host':
-        rules = generate_host_rules()
-        output_rules(args.p + '_host.rule', rules)
-    elif args.t == 'path':
-        rules = generate_path_rules()
-        output_rules(args.p + '_cmar.rule', rules)
+    # elif args.t == 'host':
+    #     rules = generate_host_rules()
+    #     output_rules(args.p + '_host.rule', rules)
+    # elif args.t == 'path':
+    #     rules = generate_path_rules()
+    #     output_rules(args.p + '_cmar.rule', rules)
     elif args.t == 'kv':
         rules = generate_kv_rules()
         output_rules(args.p + '_kv.rule', rules)
     elif args.t == 'all':
         rules = generate_agent_rules()
-        rules += generate_path_rules()
+        # rules += generate_path_rules()
         rules += generate_kv_rules()
-        rules += generate_host_rules()
+        # rules += generate_host_rules()
         output_rules(args.p + '_all.rule', rules)
     else:
         parser.print_help()
