@@ -139,10 +139,10 @@ class AgentClassifier(AbsClassifer):
                 # categories = {appInfos[app].category for app in apps}
                 # All rules related to the same category are considered as
                 # candidate features
-                if len(apps) == 1:
+                if len(identifierApps[identifier]) == 1:
                     for app in apps:
                         if app == 'com.speaktoit.assistant':
-                            print '[AGENT145]', identifier, extractor.gen(identifier, app), extractor.prefix.pattern, extractor.suffix.pattern
+                            print '[AGENT145]', identifier, '[RULE]', extractor.gen(identifier, app), '[PREFIX]',extractor.prefix.pattern, '[SUFFIX]',extractor.suffix.pattern, '[APPS]',len(identifierApps[identifier])
                         appRules[extractor.gen(identifier, app)] = apps
                     if len(identifierApps[identifier]) > 1:
                         check.add(identifier)
