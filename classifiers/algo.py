@@ -44,7 +44,7 @@ class Path:
 
     @staticmethod
     def get_f(package):
-        host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
+        host = re.sub('[0-9]+\.', '[0-9]+.', package.rawHost)
         fs = [host] + filter(None, package.path.split('/'))
         tmp = []
         for seg in fs:
@@ -58,7 +58,7 @@ class Path:
 
     def classify_format(self, package):
         host = package.refer_rawHost if package.refer_rawHost else package.rawHost
-        host = re.sub('[0-9]+\.', '[NUM].', host)
+        host = re.sub('[0-9]+\.', '[0-9]+.', host)
         path = package.refer_origpath if package.refer_rawHost else package.origPath
         return host, path
 
@@ -104,7 +104,7 @@ class KV:
 
     @staticmethod
     def get_f(package):
-        host = re.sub('[0-9]+\.', '[NUM].', package.rawHost)
+        host = re.sub('[0-9]+\.', '[0-9]+.', package.rawHost)
         queries = package.queries
         for k, vs in queries.items():
             k = k.replace("\t", "")
@@ -118,7 +118,7 @@ class KV:
 
     def classify_format(self, package):
         host = package.refer_rawHost if package.refer_rawHost else package.rawHost
-        host = re.sub('[0-9]+\.', '[NUM].', host)
+        host = re.sub('[0-9]+\.', '[0-9]+.', host)
         path = package.refer_origpath if package.refer_rawHost else package.origPath
         return host, path
 
@@ -500,7 +500,9 @@ class KVClassifier(AbsClassifer):
             else:
                 host, path = self.miner.classify_format(pkg)
                 for regexObj, scores in self.rules[ruleType][host].iteritems():
-
+                    hostRegex = re.compile(host)
+                    print hostRegex.pattern, pkg.rawHost
+                    assert hostRegex.search(pkg.rawHost)
                     if pkg.app == 'com.ally.auto' and pkg.host == 'metrics.ally.com':
                         print '[algo523]', regexObj.search(path), regexObj.pattern, path
 
