@@ -141,7 +141,7 @@ class AgentClassifier(AbsClassifer):
                 # candidate features
                 if len(apps) == 1:
                     for app in apps:
-                        if app == 'com.stocktouch.stocktouch':
+                        if app == 'com.speaktoit.assistant':
                             print '[AGENT145]', identifier, extractor.gen(identifier, app), extractor.prefix.pattern, extractor.suffix.pattern
                         appRules[extractor.gen(identifier, app)] = apps
                     if len(identifierApps[identifier]) > 1:
