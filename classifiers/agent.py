@@ -14,25 +14,25 @@ STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', '
 
 STOPWORDS = {'iphone', 'app'}
 
-class FRegex:
-    def __init__(self, featureStr, regexStr, rawF):
-        self.featureStr = featureStr
-        self.regexStr = regexStr
-        self.rawF = rawF
-        self.regexObj = re.compile(regexStr, re.IGNORECASE)
-        self.matchRecord = defaultdict(lambda: defaultdict(set))
-        self.matchCategory = set()
-        self.matchCompany = set()
-        self.cover = set()
-
-    def set_match_record(self, host, app, tbls, category, company):
-        for tbl in tbls:
-            self.matchRecord[host][app].add(tbl)
-        self.matchCategory.add(category)
-        self.matchCompany.add(company)
-
-    def set_cover(self, regexSet):
-        self.cover = regexSet
+# class FRegex:
+#     def __init__(self, featureStr, regexStr, rawF):
+#         self.featureStr = featureStr
+#         self.regexStr = regexStr
+#         self.rawF = rawF
+#         self.regexObj = re.compile(regexStr, re.IGNORECASE)
+#         self.matchRecord = defaultdict(lambda: defaultdict(set))
+#         self.matchCategory = set()
+#         self.matchCompany = set()
+#         self.cover = set()
+#
+#     def set_match_record(self, host, app, tbls, category, company):
+#         for tbl in tbls:
+#             self.matchRecord[host][app].add(tbl)
+#         self.matchCategory.add(category)
+#         self.matchCompany.add(company)
+#
+#     def set_cover(self, regexSet):
+#         self.cover = regexSet
 
 class Identifier:
     def __init__(self, rule):
@@ -203,7 +203,7 @@ class AgentClassifier(AbsClassifer):
         for _, appAgent in agentTuples.items():
             for app, agent in appAgent:
                 ifMatch = False
-                for key, extractor in extractors:
+                for key, extractor in filter(lambda x: x[1].weight() > 2, extractors):
                     identifier = extractor.match(agent)
                     if identifier:
                         ifMatch = True
