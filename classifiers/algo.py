@@ -137,7 +137,8 @@ class KV:
                     for fieldName in [name for name, value in self.xmlFeatures[pkg.app] if value == v]:
                         xmlGenRules[(host, k)][v][fieldName] += 1
                         xmlSpecificRules[(host, k)][v][pkg.app].add(tbl)
-
+        xmlGenRules = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+        xmlSpecificRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
         return xmlGenRules, xmlSpecificRules
 
     def prune(self, keys):
