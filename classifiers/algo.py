@@ -356,6 +356,8 @@ class KVClassifier(AbsClassifer):
                         specificRules[host][key][value][label][consts.SCORE] = rule.score
                         specificRules[host][key][value][label][consts.SUPPORT].add(tbl)
 
+        specificRules = defaultdict(lambda: defaultdict(
+            lambda: defaultdict(lambda: defaultdict(lambda: {consts.SCORE: 0, consts.SUPPORT: set()}))))
         return specificRules
 
     @staticmethod
