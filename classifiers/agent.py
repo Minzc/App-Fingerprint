@@ -66,7 +66,7 @@ class Identifier:
     def add_identifier(self, app, identifier, host):
         self.apps.add(app)
         self.matched[identifier].add(app)
-        self.match2[identifier].add(app, host)
+        self.match2[identifier].add((app, host))
 
     def weight(self):
         return len(self.apps)
