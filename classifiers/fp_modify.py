@@ -95,7 +95,7 @@ def _encode_data(packages=None, minimum_support = 2):
 
 def _gen_rules(transactions, tSupport, tConfidence, featureIndx, appIndx):
     '''
-    Generate encoded rules
+    Generate encoded prune
     Input
     - transactions : encoded transaction
     - tSupport     : frequent pattern support
@@ -118,7 +118,7 @@ def _gen_rules(transactions, tSupport, tConfidence, featureIndx, appIndx):
           confidence = max(tag_dist.values()) * 1.0 / support
           rules.add((ruleStrSet, confidence, support, appIndx[labelIndex]))
     
-    print ">>> Finish Rule Generating. Total number of rules is", len(rules)
+    print ">>> Finish Rule Generating. Total number of prune is", len(rules)
     return rules
 
 def _remove_duplicate(rawRules):
@@ -130,7 +130,7 @@ def _remove_duplicate(rawRules):
   for rule in rawRules:
     rules[rule[3]].append(rule)
   prunedRules = []
-  print 'Total number of rules', len(rawRules)
+  print 'Total number of prune', len(rawRules)
   for label in rules:
     '''From large to small set'''
     sortedRules = sorted(rules[label], key = lambda x: len(x[0]), reverse = True)
@@ -149,7 +149,7 @@ def _remove_duplicate(rawRules):
 
 def _prune_rules(tRules, trainData, min_cover = 1):
   '''
-  Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
+  Input t_rules: ( prune, confidence, support, class_label ), get from _gen_rules
   Input packages: list of packets
   Return
   - specificRules host -> ruleStrSet -> label -> {consts.SUPPORT, consts.SCORE}
@@ -222,8 +222,8 @@ class CMAR(AbsClassifer):
     encodedpackages, appIndx, featureIndx, packageNInfo = _encode_data(packages)
     ''' Rules format : (feature, confidence, support, label) '''
     rules = _gen_rules(encodedpackages, self.tSupport, self.tConfidence, featureIndx, appIndx)
-    ''' Prune duplicated rules'''
-    #rules = _remove_duplicate(rules)
+    ''' Prune duplicated prune'''
+    #prune = _remove_duplicate(prune)
     ''' feature, app, host '''
     specificRules = _prune_rules(rules, trainData, self.min_cover)
     ''' change encoded features back to string '''
@@ -247,7 +247,7 @@ class CMAR(AbsClassifer):
       patterns = frozenset(map(lambda x: x.strip(), patterns.split(",")))
       self.rules[ruleType][host][patterns] = (label, support)
     sqldao.close()
-    print '>>>[CMAR] Totaly number of rules is', counter
+    print '>>>[CMAR] Totaly number of prune is', counter
     for ruleType in self.rules:
       print '>>>[CMAR] Rule Type %s Number of Rules %s' % (ruleType, len(self.rules[ruleType]))
     
@@ -261,7 +261,7 @@ class CMAR(AbsClassifer):
   def _count(self, specificRules, trainData):
     '''
     Input
-    - rules
+    - prune
         specificRules[rule.host][ruleStrSet][label][consts.SCORE] = rule.support
     Return {type:[(label, confidence)]}
     '''

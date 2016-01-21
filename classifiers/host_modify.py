@@ -131,7 +131,7 @@ class HostApp(AbsClassifer):
       counter += 1
       regexObj =  re.compile(r'^' + re.escape(host) + r'$')
       self.rules[ruleType][host] = (label, support, regexObj)
-    print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
+    print '>>> [Host Rules#loadRules] total number of prune is', counter, 'Type of Rules', len(self.rules)
     sqldao.close()
 
   
@@ -155,7 +155,7 @@ class HostApp(AbsClassifer):
   def classify(self, pkg):
     '''
     Input
-    - self.rules : {ruleType: {host : (label, support, regexObj)}}
+    - self.prune : {ruleType: {host : (label, support, regexObj)}}
     - pkg : http packet
     '''
     rst = {}

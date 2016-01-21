@@ -205,7 +205,7 @@ class UriClassifier(AbsClassifer):
             counter += 1
             pathSegObj = re.compile(pathSeg, re.IGNORECASE) if pathSeg is not None else ''
             self.rules[ruleType][host][pathSegObj] = (label, support)
-        print '>>> [URI Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
+        print '>>> [URI Rules#loadRules] total number of prune is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
 
     def c(self, package):
@@ -281,11 +281,11 @@ class UriClassifier(AbsClassifer):
 #             for host, pathSeg in iter_branch(hNode):
 #                 tmpR[consts.APP_RULE][host].add(pathSeg)
 #
-#         rules = defaultdict(lambda: defaultdict(set))
+#         prune = defaultdict(lambda: defaultdict(set))
 #         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
 #             if pkg.host in tmpR[consts.APP_RULE]:
 #                 pkgFs = set(get_f(pkg)[2:])
 #                 for pathSeg in tmpR[consts.APP_RULE][pkg.host]:
 #                     if pathSeg in pkgFs:
-#                         rules[consts.APP_RULE][(pkg.rawHost, pathSeg, pkg.label)].add(tbl)
-#         return rules
+#                         prune[consts.APP_RULE][(pkg.rawHost, pathSeg, pkg.label)].add(tbl)
+#         return prune

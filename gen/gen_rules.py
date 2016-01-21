@@ -88,9 +88,9 @@ def generate_agent_rules(vulnID=100000):
 #     classifier.load_rules()
 #
 #     ipsRules = []
-#     rules = classifier.rules
-#     for host in rules[consts.APP_RULE]:
-#         for regexObj, scores in rules[consts.APP_RULE][host].iteritems():
+#     prune = classifier.prune
+#     for host in prune[consts.APP_RULE]:
+#         for regexObj, scores in prune[consts.APP_RULE][host].iteritems():
 #             label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
 #             if len(regexObj.pattern.split('\n')) == 1 and '=' in regexObj.pattern:
 #                 rule = Rule(vulnID, label, IOS_GROUP, 30 + support)
@@ -133,7 +133,7 @@ def generate_kv_rules(vulnID=300000):
 #     classifier = classifier_factory(trainedClassifiers, appType)[0][1]
 #     classifier.load_rules()
 #     ipsRules = []
-#     cRules = classifier.rules
+#     cRules = classifier.prune
 #     for host in cRules[consts.APP_RULE]:
 #         if '' in cRules[consts.APP_RULE][host]:
 #             label, support = cRules[consts.APP_RULE][host]['']
@@ -156,19 +156,19 @@ if __name__ == '__main__':
         rules = generate_agent_rules()
         output_rules(args.p + '_agent.rule', rules)
     # elif args.t == 'host':
-    #     rules = generate_host_rules()
-    #     output_rules(args.p + '_host.rule', rules)
+    #     prune = generate_host_rules()
+    #     output_rules(args.p + '_host.rule', prune)
     # elif args.t == 'path':
-    #     rules = generate_path_rules()
-    #     output_rules(args.p + '_cmar.rule', rules)
+    #     prune = generate_path_rules()
+    #     output_rules(args.p + '_cmar.rule', prune)
     elif args.t == 'kv':
         rules = generate_kv_rules()
         output_rules(args.p + '_kv.rule', rules)
     elif args.t == 'all':
         rules = generate_agent_rules()
-        # rules += generate_path_rules()
+        # prune += generate_path_rules()
         rules += generate_kv_rules()
-        # rules += generate_host_rules()
+        # prune += generate_host_rules()
         output_rules(args.p + '_all.rule', rules)
     else:
         parser.print_help()

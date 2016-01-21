@@ -6,8 +6,8 @@ from sqldao import SqlDao
 import sys
 
 TRAIN_SELECT_QUERY = 'select app, hst, name from packages group by app, hst'
-TRAIN_INSERT_QUERY = 'insert into rules (app, hst) values (%s, %s)'
-TRAIN_INSERT_CMP_QUERY = 'insert into rules (app, company, hst) values (%s,%s, %s)'
+TRAIN_INSERT_QUERY = 'insert into prune (app, hst) values (%s, %s)'
+TRAIN_INSERT_CMP_QUERY = 'insert into prune (app, company, hst) values (%s,%s, %s)'
 TEST_SELECT_QUERY = 'select app, company, hst from test_rules'
 
 def test_train(writedb):
@@ -131,7 +131,7 @@ def test_agent(writedb):
 	print len(rst)
 
 	if writedb:
-		query = 'insert into rules (app, agent) values (%s, %s)'
+		query = 'insert into prune (app, agent) values (%s, %s)'
 		for app,agent,x in rst:
 			sqldao.execute(query, (app,agent))
 	sqldao.close()

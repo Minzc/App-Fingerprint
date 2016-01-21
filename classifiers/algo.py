@@ -166,7 +166,7 @@ class KV:
         """
         :param trackIds:
         :param xmlSpecificRules:
-        :param specificRules : specific rules for apps
+        :param specificRules : specific prune for apps
              host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
         """
         for rule, v, app, tbls in flatten(xmlSpecificRules):
@@ -211,7 +211,7 @@ class KVClassifier(AbsClassifer):
     def _prune_general_rules(self, generalRules, trainData, xmlGenRules):
         """
         1. PK by coverage
-        2. Prune by xml rules
+        2. Prune by xml prune
         Input
         :param generalRules : {secdomain : [(secdomain, key, score, labelNum), rule, rule]}
         :param trainData : { tbl : [ packet, packet, ... ] }
@@ -332,7 +332,7 @@ class KVClassifier(AbsClassifer):
 
     def _generate_rules(self, trainData, generalRules, valueLabelCounter, ruleType):
         """
-        Generate specific rules
+        Generate specific prune
         Input
         :param trainData : { tbl : [ packet, packet, packet, ... ] }
         :param generalRules :
@@ -341,7 +341,7 @@ class KVClassifier(AbsClassifer):
         :param valueLabelCounter : Relationships between value and labels
 
         Output
-        :return specificRules : specific rules for apps
+        :return specificRules : specific prune for apps
             { host : { key : { value : { label : { rule.score, support : { tbl, tbl, tbl } } } } } }
         """
         specificRules = defaultdict(lambda: defaultdict(
@@ -356,8 +356,6 @@ class KVClassifier(AbsClassifer):
                         specificRules[host][key][value][label][consts.SCORE] = rule.score
                         specificRules[host][key][value][label][consts.SUPPORT].add(tbl)
 
-        specificRules = defaultdict(lambda: defaultdict(
-            lambda: defaultdict(lambda: defaultdict(lambda: {consts.SCORE: 0, consts.SUPPORT: set()}))))
         return specificRules
 
     @staticmethod
@@ -387,12 +385,12 @@ class KVClassifier(AbsClassifer):
     #             for _, fieldName, _ in flatten(xmlGenRules[rule]):
     #                 interestedXmlRules[fieldName].add((host, key, len(specificRules[host][key])))
     #
-    #     for fieldName, rules in interestedXmlRules.items():
+    #     for fieldName, prune in interestedXmlRules.items():
     #         for app in rmApps:
     #             if len(xmlFieldValues[app][fieldName]) == 1:
     #                 for value in xmlFieldValues[app][fieldName]:
-    #                     rules = sorted(rules, key=lambda x: x[2], reverse=True)[:3]
-    #                     for rule in rules:
+    #                     prune = sorted(prune, key=lambda x: x[2], reverse=True)[:3]
+    #                     for rule in prune:
     #                         host, key, score = rule
     #                         specificRules[host][key][value][app][consts.SCORE] = 1.0
     #                         specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
@@ -432,7 +430,7 @@ class KVClassifier(AbsClassifer):
         appGeneralRules = self._generate_keys(appKeyScore, keyApp, self.hostLabelTable[consts.APP_RULE])
         categoryGeneralRules = self._generate_keys(categoryKeyScore, keyApp, self.hostLabelTable[consts.CATEGORY_RULE])
         #############################
-        # Pruning general rules
+        # Pruning general prune
         #############################
         print ">>>[KV] Before pruning appGeneralRules", len(appGeneralRules)
         appGeneralRules = self._prune_general_rules(appGeneralRules, trainData, xmlGenRules)
@@ -440,7 +438,7 @@ class KVClassifier(AbsClassifer):
         print ">>>[KV] appGeneralRules", len(appGeneralRules)
         print ">>>[KV] categoryGeneralRules", len(categoryGeneralRules)
         #############################
-        # Generate specific rules
+        # Generate specific prune
         #############################
         appSpecificRules = self._generate_rules(trainData, appGeneralRules, self.valueLabelCounter[consts.APP_RULE],
                                                 consts.APP_RULE)
@@ -452,7 +450,7 @@ class KVClassifier(AbsClassifer):
         appSpecificRules = self.miner.gen_txt_rule(xmlSpecificRules, appSpecificRules, trackIds)
         specificRules = self._merge_result(appSpecificRules, categorySpecifcRules)
         #############################
-        # Persist rules
+        # Persist prune
         #############################
         self.persist(specificRules, rule_type)
         return self
@@ -491,7 +489,7 @@ class KVClassifier(AbsClassifer):
                 self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
                 self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
                 self.rules[rule_type][host][regexObj][consts.LABEL] = label
-        print '>>> [KV Rules#Load Rules] total number of rules is', counter
+        print '>>> [KV Rules#Load Rules] total number of prune is', counter
         sqldao.close()
 
     def c(self, pkg):
@@ -526,13 +524,13 @@ class KVClassifier(AbsClassifer):
     def persist(self, specificRules, rule_type):
         """
         :param rule_type:
-        :param specificRules: specific rules for apps
+        :param specificRules: specific prune for apps
             ruleType -> host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
         """
         # self._clean_db(rule_type)
         QUERY = consts.SQL_INSERT_KV_RULES
         sqldao = SqlDao()
-        # Param rules
+        # Param prune
         params = []
         for ruleType, patterns in specificRules.iteritems():
             for host in patterns:
@@ -545,3 +543,24 @@ class KVClassifier(AbsClassifer):
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
         print ">>> [KVRules] Total Number of Rules is %s Rule type is %s" % (len(params), rule_type)
+
+    def p(self, pkg):
+        predictRst = {}
+        for ruleType in self.rules:
+            fatherScore = -1
+            predictRst[ruleType] = consts.NULLPrediction
+            if not pkg.refer_host:
+                rst = consts.NULLPrediction
+                host, path = self.miner.classify_format(pkg)
+                for regexObj, scores in self.rules[ruleType][host].iteritems():
+                    hostRegex = re.compile(host)
+                    assert hostRegex.search(pkg.rawHost)
+                    label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
+                    if regexObj.search(path):
+                        if support > rst.score or (support == rst.score and confidence > fatherScore):
+                            fatherScore = confidence
+                            evidence = (host, regexObj.pattern, label, support, confidence)
+                            rst = consts.Prediction(label, support, evidence)
+                predictRst[ruleType] = rst
+
+        return predictRst

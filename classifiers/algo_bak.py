@@ -33,7 +33,7 @@ class KVClassifier(AbsClassifer):
     def _prune_general_rules(generalRules, trainData, xmlGenRules):
         """
         1. PK by coverage
-        2. Prune by xml rules
+        2. Prune by xml prune
         Input
         :param generalRules : {secdomain : [(secdomain, key, score, labelNum), rule, rule]}
         :param trainData : { tbl : [ packet, packet, ... ] }
@@ -131,7 +131,7 @@ class KVClassifier(AbsClassifer):
     @staticmethod
     def _generate_rules(trainData, generalRules, valueLabelCounter, ruleType):
         """
-        Generate specific rules
+        Generate specific prune
         Input
         :param trainData : { tbl : [ packet, packet, packet, ... ] }
         :param generalRules :
@@ -140,7 +140,7 @@ class KVClassifier(AbsClassifer):
         :param valueLabelCounter : Relationships between value and labels
 
         Output
-        :return specificRules : specific rules for apps
+        :return specificRules : specific prune for apps
             { host : { key : { value : { label : { rule.score, support : { tbl, tbl, tbl } } } } } }
         """
         specificRules = defaultdict(lambda: defaultdict(
@@ -177,9 +177,9 @@ class KVClassifier(AbsClassifer):
 
     def __compare(self, trainData, specificRules, hostSecdomain, appKeyScore):
         """
-        Compare xml rules and learned rules
+        Compare xml prune and learned prune
         :param trainData
-        :param specificRules specific rules of app
+        :param specificRules specific prune of app
         """
         xmlValueField = defaultdict(lambda: defaultdict(set))
         xmlFieldValues = defaultdict(lambda: defaultdict(set))
@@ -226,7 +226,7 @@ class KVClassifier(AbsClassifer):
         """
         :param trackIds:
         :param xmlSpecificRules:
-        :param specificRules : specific rules for apps
+        :param specificRules : specific prune for apps
              host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
         """
         for rule, v, app, tbls in flatten(xmlSpecificRules):
@@ -290,7 +290,7 @@ class KVClassifier(AbsClassifer):
         appGeneralRules = self._generate_keys(appKeyScore)
         companyGeneralRules = self._generate_keys(companyKeyScore)
         #############################
-        # Pruning general rules
+        # Pruning general prune
         #############################
         print ">>>[KV] Before pruning appGeneralRules", len(appGeneralRules)
         appGeneralRules = self._prune_general_rules(appGeneralRules, trainData, xmlGenRules)
@@ -298,7 +298,7 @@ class KVClassifier(AbsClassifer):
         print ">>>[KV] appGeneralRules", len(appGeneralRules)
         print ">>>[KV] companyGeneralRules", len(companyGeneralRules)
         #############################
-        # Generate specific rules
+        # Generate specific prune
         #############################
         appSpecificRules = self._generate_rules(trainData, appGeneralRules, self.valueLabelCounter[consts.APP_RULE],
                                                 consts.APP_RULE)
@@ -312,7 +312,7 @@ class KVClassifier(AbsClassifer):
         specificRules = self._merge_result(appSpecificRules)
         specificRules = self.change_raw(specificRules, trainData)
         #############################
-        # Persist rules
+        # Persist prune
         #############################
         self.persist(specificRules, rule_type)
         self.__init__(self.appType)
@@ -343,7 +343,7 @@ class KVClassifier(AbsClassifer):
                 self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
                 self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
                 self.rules[rule_type][host][regexObj][consts.LABEL] = label
-        print '>>> [KV Rules#Load Rules] total number of rules is', counter
+        print '>>> [KV Rules#Load Rules] total number of prune is', counter
         sqldao.close()
 
     def c(self, pkg):
@@ -378,13 +378,13 @@ class KVClassifier(AbsClassifer):
     def persist(self, specificRules, rule_type):
         """
         :param rule_type:
-        :param specificRules: specific rules for apps
+        :param specificRules: specific prune for apps
             ruleType -> host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
         """
         self._clean_db(rule_type)
         QUERY = consts.SQL_INSERT_KV_RULES
         sqldao = SqlDao()
-        # Param rules
+        # Param prune
         params = []
         for ruleType, patterns in specificRules.iteritems():
             for host in patterns:

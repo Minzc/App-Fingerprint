@@ -103,7 +103,7 @@ def load_data_set(trainTbls, appType):
 def train(trainTbls, appType):
     """
     1. Load data from database from given tables
-    2. Train classifiers, prune and persist rules in database
+    2. Train classifiers, prune and persist prune in database
     Input
     :param trainTbls: A list of tables used to train classifiers
     :parm appType: android or ios
@@ -260,8 +260,8 @@ def test(testTbl, appType):
     testApps = testSet.apps
 
     rst = {}
-    # classifiers = classifier_factory(USED_CLASSIFIERS, appType)
-    classifiers = classifier_factory([consts.URI_CLASSIFIER,consts.KV_CLASSIFIER,consts.CMAR_CLASSIFIER], appType)
+    classifiers = classifier_factory(USED_CLASSIFIERS, appType)
+    #classifiers = classifier_factory([consts.URI_CLASSIFIER,consts.KV_CLASSIFIER,consts.CMAR_CLASSIFIER], appType)
     for name, classifier in classifiers:
         print ">>> [test#%s] " % name
         classifier.set_name(name)

@@ -134,7 +134,7 @@ class HostApp(AbsClassifer):
             counter += 1
             regexObj = re.compile(r'\b' + re.escape(host) + r'\b')
             self.rules[ruleType][host] = (label, support, regexObj)
-        print '>>> [Host Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
+        print '>>> [Host Rules#loadRules] total number of prune is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
 
     def count_support(self, trainData):
@@ -183,7 +183,7 @@ class HostApp(AbsClassifer):
     def c(self, host):
         """
         Input
-        - self.rules : {ruleType: {host : (label, support, regexObj)}}
+        - self.prune : {ruleType: {host : (label, support, regexObj)}}
         """
         rst = {}
         for ruleType in self.rules:

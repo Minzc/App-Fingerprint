@@ -165,7 +165,7 @@ class CMAR(AbsClassifer):
       patterns = frozenset(map(lambda x: x.strip(), patterns.split(",")))
       self.rules[ruleType][host][patterns] = (label, support)
     sqldao.close()
-    print '>>>[CMAR] Totaly number of rules is', counter
+    print '>>>[CMAR] Totaly number of prune is', counter
     for ruleType in self.rules:
       print '>>>[CMAR] Rule Type %s Number of Rules %s' % (ruleType, len(self.rules[ruleType]))
 

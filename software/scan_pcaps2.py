@@ -51,8 +51,8 @@ def processPcaps(jobList, rules, testDir):
 
 		elif (detection == ""):
 
-			detection = "No rules triggered"
-			ret.append("[" + f + "] Failed_Detection: No rules triggered")
+			detection = "No prune triggered"
+			ret.append("[" + f + "] Failed_Detection: No prune triggered")
 
 		else:
 			ret.append("[" + f + "] Failed_Detection: " + detection)
@@ -95,7 +95,7 @@ for i in range(0, numThreads):
 	
 		if ("Correct_Detection" in r):
 			correct = correct + 1
-		elif ("No rules triggered" in r):
+		elif ("No prune triggered" in r):
 			failed = failed + 1
 		else:
 			wrong = wrong + 1

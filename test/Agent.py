@@ -111,7 +111,7 @@ class AgentClassifier():
         Input
         :param companyRule:
         :param appRule : {regex: {app1, app2}}
-        :param ruleType : type of rules (App, Company, Category)
+        :param ruleType : type of prune (App, Company, Category)
         :param hostAgent: (host, regex) -> label
         """
         # self.clean_db(ruleType, consts.SQL_DELETE_AGENT_RULES)
@@ -325,17 +325,17 @@ class AgentClassifier():
         return rst
 
     # @staticmethod
-    # def change_raw(rules, trainSet):
+    # def change_raw(prune, trainSet):
     #     tmpRules = {}
     #     hostDict = {}
-    #     for rule, app in rules.items():
+    #     for rule, app in prune.items():
     #         hostDict[rule[0]] = set()
     #
     #     for tbl, pkg in DataSetIter.iter_pkg(trainSet):
     #         if pkg.host in hostDict:
     #             hostDict[pkg.host].add(pkg.rawHost)
     #
-    #     for rule, app in rules.items():
+    #     for rule, app in prune.items():
     #         host, regexObj = rule
     #         for rawHost in hostDict[host]:
     #             tmpRules[(rawHost, regexObj)] = app

@@ -95,7 +95,7 @@ from const.dataset import DataSetIter as DataSetIter
 #         tree_path = [package.host, package.app + '$' + package.company, package.path]
 #         _add_node(root, tree_path, package.company)
 #
-#     QUERY = 'INSERT INTO rules (hst, path, company, app) VALUES (%s,%s,%s,%s)'
+#     QUERY = 'INSERT INTO prune (hst, path, company, app) VALUES (%s,%s,%s,%s)'
 #     for hstnode in root.get_all_child():
 #         companies = set()
 #         packages = set()
@@ -110,7 +110,7 @@ from const.dataset import DataSetIter as DataSetIter
 #                 for i in range(pathnode.get_counter()):
 #                     features = [p for p in pathnode.get_value().split('/') if len(p) > 0]
 #                     records.append([appnode.get_value(), features])
-#         rules = pathtree(records, tfidf)
+#         prune = pathtree(records, tfidf)
 #         company = '$'.join(companies)
 #
 #         if (len(packages) == 1 or len(companies) == 1):
@@ -120,7 +120,7 @@ from const.dataset import DataSetIter as DataSetIter
 #             if hstnode.label[maxlabel] * 1.0 / sum(hstnode.label.values()) >= 0.9:
 #                 sqldao.execute(QUERY, (hstnode.get_value(), '', maxlabel, ''))
 #
-#         for f, app in rules.items():
+#         for f, app in prune.items():
 #             app, company = app.split('$')
 #             sqldao.execute(QUERY, (hstnode.get_value(), f, company, app))
 #     sqldao.close()
@@ -135,7 +135,7 @@ from const.dataset import DataSetIter as DataSetIter
 #         _add_node(root, record[1], record[0])
 #
 #     queue = root.get_all_child()
-#     rules = {}
+#     prune = {}
 #
 #     while len(queue):
 #         node = queue[0]
@@ -152,13 +152,13 @@ from const.dataset import DataSetIter as DataSetIter
 #                     score = tfidf[f][app]
 #                     bestf = f
 #                 node = node.get_all_child()[0]
-#             rules[bestf] = maxlabel
+#             prune[bestf] = maxlabel
 #         elif node.label[maxlabel] > sumv * 0.9:
-#             rules[node.get_value()] = maxlabel
+#             prune[node.get_value()] = maxlabel
 #         else:
 #             for child in node.get_all_child():
 #                 queue.append(child)
-#     return rules
+#     return prune
 
 test_str = {'Market_RoyalFarms_001'.lower()}
 
@@ -315,7 +315,7 @@ class PathApp(AbsClassifer):
             patterns = frozenset([patterns.strip()])
             self.rules[ruleType][host][patterns] = (label, support)
         sqldao.close()
-        print '>>>[CMAR] Totaly number of rules is', counter
+        print '>>>[CMAR] Totaly number of prune is', counter
         for ruleType in self.rules:
             print '>>>[CMAR] Rule Type %s Number of Rules %s' % (ruleType, len(self.rules[ruleType]))
 

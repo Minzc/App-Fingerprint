@@ -18,7 +18,7 @@ def load_agent():
         if AGENT in agentF:
             agentF = agentF.replace(AGENT, '')
         rules[label].add(re.compile(agentF))
-    print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(rules)
+    print '>>> [Agent Rules#loadRules] total number of prune is', counter, 'Type of Rules', len(rules)
     sqldao.close()
     return rules
 

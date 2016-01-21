@@ -91,7 +91,7 @@ def change_support(compressDB, rules, support):
 
 def _gen_rules(transactions, tSupport, tConfidence):
     """
-    Generate encoded rules
+    Generate encoded prune
     Input
     - transactions : encoded transaction
     - tSupport     : frequent pattern support
@@ -112,13 +112,13 @@ def _gen_rules(transactions, tSupport, tConfidence):
             r = Rule(itemset, confidence, support, labelIndex)
             rules.add(r)
 
-    print ">>> Finish Rule Generating. Total number of rules is", len(rules)
+    print ">>> Finish Rule Generating. Total number of prune is", len(rules)
     return rules
 
 
 def _db_coverage(rules, compressDB, min_cover=3):
     """
-    Input t_rules: ( rules, confidence, support, class_label ), get from _gen_rules
+    Input t_rules: ( prune, confidence, support, class_label ), get from _gen_rules
     Input packages: list of packets
     Return
     - specificRules host -> ruleStrSet -> label -> {consts.SUPPORT, consts.SCORE}
@@ -270,7 +270,7 @@ class CMAR(AbsClassifer):
         ''' Rules format : (feature, confidence, support, label) '''
         rules = _gen_rules(trainList, self.tSupport, self.tConfidence)
         rules = change_support(compressDB, rules, self.tSupport)
-        ''' Prune duplicated rules'''
+        ''' Prune duplicated prune'''
         print '[CMAR] Before pruning', len(rules)
         rules = _remove_duplicate(rules)
         print '[CMAR] After pruning', len(rules)
@@ -300,7 +300,7 @@ class CMAR(AbsClassifer):
             else:
                 self.rules[ruleType][''][rule] = (label, support)
         sqldao.close()
-        print '>>>[CMAR] Totaly number of rules is', counter
+        print '>>>[CMAR] Totaly number of prune is', counter
         for ruleType in self.rules:
             print '>>>[CMAR] Rule Type %s Number of Rules %s' % (ruleType, len(self.rules[ruleType]))
 
