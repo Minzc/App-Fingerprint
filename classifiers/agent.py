@@ -14,7 +14,7 @@ STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', '
 
 STOPWORDS = {'iphone', 'app'}
 
-
+# This is a test
 # class FRegex:
 #     def __init__(self, featureStr, regexStr, rawF):
 #         self.featureStr = featureStr
@@ -93,11 +93,7 @@ def _parse_xml(filePath):
 
 def load_lexical():
     appFeatures = load_info_features(_parse_xml)
-    potentialId = defaultdict(set)
-    for app, features in appFeatures.items():
-        for f in features.values():
-            potentialId[f].add(app)
-    return appFeatures, potentialId
+    return appFeatures
 
 
 class AgentClassifier(AbsClassifer):
@@ -117,7 +113,7 @@ class AgentClassifier(AbsClassifer):
         :param hostAgent: (host, regex) -> label
         """
         sqldao = SqlDao()
-        QUERY = 'INSERT INTO patterns (host, prefix, identifer, suffix, label, support, confidence, rule_type) VALUES (%s, %s, %s, %s, %s, %s)'
+        QUERY = 'INSERT INTO patterns (host, prefix, identifier, suffix, label, support, confidence, rule_type, label_type) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
         params = []
 
         for rule in appRule:
@@ -125,7 +121,7 @@ class AgentClassifier(AbsClassifer):
             prefix = format(prefix)
             identifier = format(identifier)
             suffix = format(suffix)
-            params.append((host, prefix, identifier, label, suffix, 1, score, 3))
+            params.append((host, prefix, identifier, suffix,label, 1, score, 3, consts.APP_RULE))
 
         sqldao.executeBatch(QUERY, params)
         sqldao.close()
@@ -134,25 +130,15 @@ class AgentClassifier(AbsClassifer):
     def _app(potentialId, potentialHost, extractors):
         appRules = set()
         for _, extractor in extractors:
-            for identifier, apps, host in extractor.match2.items():
-                # categories = {appInfos[app].category for app in apps}
-                # All prune related to the same category are considered as
-                # candidate features
-                if len(potentialId[identifier]) == 1:
-                    assert len(apps) == 1
-                    app = list(apps)
-                    if app == 'com.speaktoit.assistant':
-                        print '[AGENT145]', identifier, '[RULE]', extractor.gen(identifier,
-                                                                                app), '[PREFIX]', extractor.prefix.pattern, '[SUFFIX]', extractor.suffix.pattern, '[APPS]', len(
-                            potentialId[identifier])
-                    r = consts.NewRule(None, extractor.prefix.pattern, identifier, extractor.suffix.pattern, 100, app)
-                    appRules.add(r)
+            for identifier, records in extractor.match2.items():
+                for app, host in records:
+                    if len(potentialId[identifier]) == 1:
+                        r = consts.NewRule(None, extractor.prefix.pattern, identifier, extractor.suffix.pattern, 100, app)
+                        appRules.add(r)
 
-                elif len(potentialId[identifier]) > 1 and len(potentialHost[host]) == 1:
-                    assert len(apps) == 1
-                    app = list(apps)
-                    r = consts.NewRule(host, extractor.prefix.pattern, identifier, extractor.suffix.pattern, 100, app)
-                    appRules.add(r)
+                    elif len(potentialId[identifier]) > 1 and len(potentialHost[host]) == 1:
+                        r = consts.NewRule(host, extractor.prefix.pattern, identifier, extractor.suffix.pattern, 100, app)
+                        appRules.add(r)
 
         # for identifier in check:
         #     print '[CHECK]',identifier, identifierApps[identifier]
@@ -226,7 +212,8 @@ class AgentClassifier(AbsClassifer):
             trainData[tbl].add((pkg.app, process_agent(pkg.agent, pkg.app), pkg.host))
             potentialHost[pkg.host].add(pkg.app)
 
-        appFeatures, potentialId = load_lexical()
+        appFeatures = load_lexical()
+        potentialId = defaultdict(set)
 
         '''
         Compose regular expression
@@ -257,16 +244,16 @@ class AgentClassifier(AbsClassifer):
         self.rulesHost = {consts.APP_RULE: defaultdict(dict),
                           consts.COMPANY_RULE: defaultdict(dict),
                           consts.CATEGORY_RULE: defaultdict(dict)}
-        QUERY = 'SELECT host, prefix, identifer, suffix, label, support, confidence, rule_type FROM patterns WHERE rule_type = 3'
+        QUERY = 'SELECT host, prefix, identifier, suffix, label, support, confidence, rule_type, label_type FROM patterns WHERE rule_type = 3'
         sqldao = SqlDao()
         counter = 0
-        for host, prefix, identifer, suffix, label, support, confidence, ruleType in sqldao.execute(QUERY):
+        for host, prefix, identifer, suffix, label, support, confidence, ruleType, labelType in sqldao.execute(QUERY):
             counter += 1
             agentRegex = gen_regex(prefix, identifer, suffix, label)
             if host is None:
-                self.rules[ruleType][agentRegex] = (re.compile(agentRegex), label)
+                self.rules[labelType][agentRegex] = (re.compile(agentRegex), label)
             else:
-                self.rulesHost[ruleType][host][agentRegex] = (re.compile(agentRegex), label)
+                self.rulesHost[labelType][host][agentRegex] = (re.compile(agentRegex), label)
         print '>>> [Agent Rules#loadRules] total number of prune is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
 
