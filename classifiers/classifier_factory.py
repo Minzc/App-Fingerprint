@@ -1,5 +1,5 @@
 from classifiers.agent import AgentClassifier
-from classifiers.algo import KVClassifier
+from classifiers.algo import QueryClassifier
 from classifiers.head import HeaderClassifier
 import const.consts as consts
 from classifiers.uri import UriClassifier
@@ -15,10 +15,11 @@ def classifier_factory(names, appType):
             classifier = AgentClassifier(inferFrmData=True)
         elif name == consts.URI_CLASSIFIER:
             # classifier = UriClassifier(appType)
-            classifier = KVClassifier(appType, consts.PATH_MINER)
+            classifier = QueryClassifier(appType, consts.PATH_MINER)
         elif name == consts.KV_CLASSIFIER:
-            classifier = KVClassifier(appType, consts.KV_MINER)
+            classifier = QueryClassifier(appType, consts.KV_MINER)
         elif name == consts.CMAR_CLASSIFIER:
             classifier = CMAR()
         classifiers.append((name, classifier))
     return classifiers
+

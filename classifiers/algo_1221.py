@@ -256,7 +256,7 @@ class KVClassifier(AbsClassifer):
             Rule = ( secdomain, key, score, labelNum ) defined in consts/consts.py
             {secdomain : [Rule, Rule, Rule, ... ]}
         """
-        Rule = consts.Rule
+        Rule = consts.QueryKey
         generalRules = defaultdict(list)
         for secdomain in keyScore:
             for key in keyScore[secdomain]:

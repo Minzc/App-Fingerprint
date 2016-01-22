@@ -9,7 +9,7 @@ from const.dataset import DataSetIter as DataSetIter
 from classifiers.classifier_factory import classifier_factory
 
 LIMIT = None
-INSERT = True
+INSERT = False
 PRUNE = False
 SAMPLERATE = 1
 TRAIN_LABEL = consts.APP_RULE
@@ -22,9 +22,9 @@ VALID_LABEL = {
 
 USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
-    consts.AGENT_CLASSIFIER,
+    # consts.AGENT_CLASSIFIER,
     #consts.CMAR_CLASSIFIER,
-    #consts.KV_CLASSIFIER,
+    consts.KV_CLASSIFIER,
     #consts.URI_CLASSIFIER,
 
 ]

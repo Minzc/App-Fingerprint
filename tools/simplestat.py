@@ -33,8 +33,8 @@ def stat_post_content():
 
 
 def stat_pos_content_kv():
-    from classifiers.algo import KVClassifier
-    classifier = KVClassifier(consts.IOS, inferFrmData = True, sampleRate = 1)
+    from classifiers.algo import QueryClassifier
+    classifier = QueryClassifier(consts.IOS, inferFrmData = True, sampleRate = 1)
     classifier.load_rules()
     specificRules = classifier.rules[consts.APP_RULE]
     paramKeys = set()

@@ -133,11 +133,11 @@ class AgentClassifier(AbsClassifer):
             for identifier, records in extractor.match2.items():
                 for app, host in records:
                     if len(potentialId[identifier]) == 1:
-                        r = consts.NewRule(None, extractor.prefix.pattern, identifier, extractor.suffix.pattern, 100, app)
+                        r = consts.Rule(None, extractor.prefix.pattern, identifier, extractor.suffix.pattern, 100, app)
                         appRules.add(r)
 
                     elif len(potentialId[identifier]) > 1 and len(potentialHost[host]) == 1:
-                        r = consts.NewRule(host, extractor.prefix.pattern, identifier, extractor.suffix.pattern, 100, app)
+                        r = consts.Rule(host, extractor.prefix.pattern, identifier, extractor.suffix.pattern, 100, app)
                         appRules.add(r)
 
         # for identifier in check:

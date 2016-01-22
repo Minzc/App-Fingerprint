@@ -1,8 +1,9 @@
 from collections import namedtuple
 
 Prediction = namedtuple('Prediction', 'label, score, evidence')
-Rule = namedtuple('Rule', 'secdomain, key, score, labelNum')
-NewRule = namedtuple('Rule', 'host, prefix, identifier, suffix, score, label')
+QueryKey = namedtuple('Rule', 'secdomain, key, score, labelNum, hostNum')
+Rule = namedtuple('Rule', 'host, prefix, identifier, suffix, score, label')
+
 
 NULLPrediction = Prediction(None, -1, None)
 
@@ -66,5 +67,4 @@ IDENTIFIER = '[IDENTIFIER]'
 VERSION = '[VERSION]'
 RANDOM = '[RANDOM]'
 
-
-
+TestBaseLine = False

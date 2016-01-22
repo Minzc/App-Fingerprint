@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.getcwd())
-from classifiers.algo import KVClassifier
+from classifiers.algo import QueryClassifier
 from classifiers.fp import CMAR
 from classifiers.utils import load_pkgs
 from classifiers.host import HostApp

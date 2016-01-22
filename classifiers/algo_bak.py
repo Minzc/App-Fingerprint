@@ -67,7 +67,7 @@ class KVClassifier(AbsClassifer):
                     print ifKeepRule, host, ruleScores[(host, iKey)]
 
                 if ifKeepRule[0]:
-                    rule = consts.Rule(host, iKey, ruleScores[(host, iKey)], ruleLabelNum[(host, iKey)])
+                    rule = consts.QueryKey(host, iKey, ruleScores[(host, iKey)], ruleLabelNum[(host, iKey)])
                     prunedGenRules[host].append(rule)
 
         for host, rules in prunedGenRules.items():
@@ -115,7 +115,7 @@ class KVClassifier(AbsClassifer):
             Rule = ( secdomain, key, score, labelNum ) defined in consts/consts.py
             {secdomain : [Rule, Rule, Rule, ... ]}
         """
-        Rule = consts.Rule
+        Rule = consts.QueryKey
         generalRules = defaultdict(list)
         for secdomain in keyScore:
             for key in keyScore[secdomain]:
