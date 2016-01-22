@@ -16,18 +16,19 @@ TRAIN_LABEL = consts.APP_RULE
 
 VALID_LABEL = {
     consts.APP_RULE,
-    #consts.COMPANY_RULE,
-    #consts.CATEGORY_RULE
+    # consts.COMPANY_RULE,
+    # consts.CATEGORY_RULE
 }
 
 USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
-    # consts.AGENT_CLASSIFIER,
-    #consts.CMAR_CLASSIFIER,
-    consts.KV_CLASSIFIER,
-    #consts.URI_CLASSIFIER,
+    consts.AGENT_CLASSIFIER,
+    # consts.CMAR_CLASSIFIER,
+    # consts.KV_CLASSIFIER,
+    # consts.URI_CLASSIFIER,
 
 ]
+
 
 class PredictRst:
     def __init__(self):
@@ -42,7 +43,7 @@ class PredictRst:
         self.__correct += n
 
     def inc_total(self):
-        self.__predict +=1
+        self.__predict += 1
 
     @property
     def total(self):
@@ -67,13 +68,14 @@ class PredictRst:
     def if_all_right(self):
         return self.__predict == self.__correct and self.__predict > 0
 
+
 def merge_rst(rst, tmprst):
     for pkg_id, predictions in tmprst.iteritems():
         if pkg_id not in rst:
             rst[pkg_id] = predictions
         else:
             for rule_type in VALID_LABEL:
-                if rst[pkg_id][rule_type].label == None:
+                if rst[pkg_id][rule_type].label is None:
                     rst[pkg_id][rule_type] = tmprst[pkg_id][rule_type]
     return rst
 
@@ -82,8 +84,8 @@ def load_data_set(trainTbls, appType):
     """
   Load data from given table
   Input
-  - trainTbls : a list of tables
-  - appType : IOS or ANDROID
+  :param trainTbls : a list of tables
+  :param appType : IOS or ANDROID
   Output
   - record : {table_name : [list of packages]}
   """
@@ -124,12 +126,13 @@ def evaluate(rst, testSet, testApps):
     """
   Compare predictions with test data set
   Input:
-  - rst : Predictions got from test. {pkgId : {ruleType : prediction}}
-  - testSet : Test data set. {pkgId : pacakge}
-  - testApps : Tested apps
+  :param  rst : Predictions got from test. {pkgId : {ruleType : prediction}}
+  :param  testSet : Test data set. {pkgId : pacakge}
+  :param  testApps : Tested apps
   Output:
   - InforTrack : contains evaluation information
   """
+
     # app_rst, record_id
     def get_label(pkg, ruleType):
         if ruleType == consts.APP_RULE:
@@ -140,6 +143,7 @@ def evaluate(rst, testSet, testApps):
             return pkg.category
         else:
             assert "Rule Type Error"
+
     inforTrack = {consts.DISCOVERED_APP: 0.0, consts.PRECISION: 0.0, consts.RECALL: 0.0}
     correct, recall = 0, 0
     wrongApp, correctApp, detectedApp = set(), set(), set()
@@ -152,7 +156,7 @@ def evaluate(rst, testSet, testApps):
         for pkg in pkgs:
             cPrdcts.set_appInfo(pkg.appInfo)
             predictions = rst[pkg.id]
-            correctLabels = [0,0,0]
+            correctLabels = [0, 0, 0]
             ifPredict = False
 
             for ruleType in VALID_LABEL:
@@ -221,7 +225,6 @@ def _use_classifier(classifier, testSet):
                 if predict.label is not None:
                     wrongApp.add(pkg.app)
 
-
     print '====', classifier.name, '====', '[WRONG]', len(wrongApp)
     return rst
 
@@ -241,7 +244,7 @@ def _insert_rst(testSet, DB, inforTrack):
     detectedApps = {app for app, _ in inforTrack[consts.DISCOVERED_APP_LIST]}
     for tbl, pkg in DataSetIter.iter_pkg(testSet):
         if pkg.app not in detectedApps:
-            params.append(( 3, pkg.id))
+            params.append((3, pkg.id))
 
     sqldao.executeBatch(QUERY, params)
     sqldao.close()
@@ -261,7 +264,7 @@ def test(testTbl, appType):
 
     rst = {}
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
-    #classifiers = classifier_factory([consts.URI_CLASSIFIER,consts.KV_CLASSIFIER,consts.CMAR_CLASSIFIER], appType)
+    # classifiers = classifier_factory([consts.URI_CLASSIFIER,consts.KV_CLASSIFIER,consts.CMAR_CLASSIFIER], appType)
     for name, classifier in classifiers:
         print ">>> [test#%s] " % name
         classifier.set_name(name)

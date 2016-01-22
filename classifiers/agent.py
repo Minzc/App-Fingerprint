@@ -14,26 +14,6 @@ STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', '
 
 STOPWORDS = {'iphone', 'app'}
 
-# This is a test
-# class FRegex:
-#     def __init__(self, featureStr, regexStr, rawF):
-#         self.featureStr = featureStr
-#         self.regexStr = regexStr
-#         self.rawF = rawF
-#         self.regexObj = re.compile(regexStr, re.IGNORECASE)
-#         self.matchRecord = defaultdict(lambda: defaultdict(set))
-#         self.matchCategory = set()
-#         self.matchCompany = set()
-#         self.cover = set()
-#
-#     def set_match_record(self, host, app, tbls, category, company):
-#         for tbl in tbls:
-#             self.matchRecord[host][app].add(tbl)
-#         self.matchCategory.add(category)
-#         self.matchCompany.add(company)
-#
-#     def set_cover(self, regexSet):
-#         self.cover = regexSet
 
 def gen_regex(prefix, identifier, suffix, app):
     if identifier != app:
@@ -96,35 +76,36 @@ def load_lexical():
     return appFeatures
 
 
+def persist(appRule, ruleType):
+    def convert_regex(regexStr):
+        regexStr = regexStr.replace(re.escape(consts.VERSION), r'\b[a-z0-9-.]+\b')
+        regexStr = regexStr.replace(re.escape(consts.RANDOM), r'[0-9a-z]*')
+        return regexStr
+
+    """
+    Input
+    :param companyRule:
+    :param appRule : {regex: {app1, app2}}
+    :param ruleType : type of prune (App, Company, Category)
+    :param hostAgent: (host, regex) -> label
+    """
+    sqldao = SqlDao()
+    params = []
+
+    for rule in appRule:
+        host, prefix, identifier, suffix, score, label = rule
+        prefix = convert_regex(prefix)
+        identifier = convert_regex(identifier)
+        suffix = convert_regex(suffix)
+        params.append((host, prefix, identifier, suffix, label, 1, score, 3, consts.APP_RULE))
+
+    sqldao.executeBatch(consts.SQL_INSERT_AGENT_RULES, params)
+    sqldao.close()
+
+
 class AgentClassifier(AbsClassifer):
     def __init__(self, inferFrmData=True):
         self.rules = defaultdict(dict)
-
-    def persist(self, appRule, ruleType):
-        def format(regexStr):
-            regexStr = regexStr.replace(re.escape(consts.VERSION), r'\b[a-z0-9-.]+\b')
-            regexStr = regexStr.replace(re.escape(consts.RANDOM), r'[0-9a-z]*')
-            return regexStr
-        """
-        Input
-        :param companyRule:
-        :param appRule : {regex: {app1, app2}}
-        :param ruleType : type of prune (App, Company, Category)
-        :param hostAgent: (host, regex) -> label
-        """
-        sqldao = SqlDao()
-        QUERY = 'INSERT INTO patterns (host, prefix, identifier, suffix, label, support, confidence, rule_type, label_type) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-        params = []
-
-        for rule in appRule:
-            host, prefix, identifier, suffix, score, label = rule
-            prefix = format(prefix)
-            identifier = format(identifier)
-            suffix = format(suffix)
-            params.append((host, prefix, identifier, suffix,label, 1, score, 3, consts.APP_RULE))
-
-        sqldao.executeBatch(QUERY, params)
-        sqldao.close()
 
     @staticmethod
     def _app(potentialId, potentialHost, extractors):
@@ -178,7 +159,7 @@ class AgentClassifier(AbsClassifer):
                         extractors[tmp].add_identifier(app, value, host)
                         ifMatch = True
                         break
-                    if ifMatch == True:
+                    if ifMatch:
                         break
         return extractors
 
@@ -195,7 +176,6 @@ class AgentClassifier(AbsClassifer):
                         if extractor.weight() > 2:
                             extractor.add_identifier(app, identifier, host)
                         potentialId[identifier].add(app)
-
 
     # def _infer_from_xml(self, appFeatureRegex, agentTuples):
     #     for app, features in filter(lambda x: x[0] not in agentTuples, self.appFeatures.items()):
@@ -237,24 +217,31 @@ class AgentClassifier(AbsClassifer):
         if ifPersist:
             print "Finish Pruning"
 
-            self.persist(appRule, consts.APP_RULE)
+            persist(appRule, consts.APP_RULE)
 
     def load_rules(self):
-        self.rules = {consts.APP_RULE: {}, consts.COMPANY_RULE: {}, consts.CATEGORY_RULE: {}}
-        self.rulesHost = {consts.APP_RULE: defaultdict(dict),
-                          consts.COMPANY_RULE: defaultdict(dict),
-                          consts.CATEGORY_RULE: defaultdict(dict)}
-        QUERY = 'SELECT host, prefix, identifier, suffix, label, support, confidence, rule_type, label_type FROM patterns WHERE rule_type = 3'
+        self.rules = {
+            consts.APP_RULE: {},
+            consts.COMPANY_RULE: {},
+            consts.CATEGORY_RULE: {}
+        }
+        self.rulesHost = {
+            consts.APP_RULE: defaultdict(dict),
+            consts.COMPANY_RULE: defaultdict(dict),
+            consts.CATEGORY_RULE: defaultdict(dict)
+        }
+
         sqldao = SqlDao()
         counter = 0
-        for host, prefix, identifer, suffix, label, support, confidence, ruleType, labelType in sqldao.execute(QUERY):
+        for host, prefix, identifer, suffix, label, support, confidence, ruleType, labelType in sqldao.execute(
+                consts.SQL_SELECT_AGENT_RULES):
             counter += 1
             agentRegex = gen_regex(prefix, identifer, suffix, label)
             if host is None:
                 self.rules[labelType][agentRegex] = (re.compile(agentRegex), label)
             else:
                 self.rulesHost[labelType][host][agentRegex] = (re.compile(agentRegex), label)
-        print '>>> [Agent Rules#loadRules] total number of prune is', counter, 'Type of Rules', len(self.rules)
+        print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
         sqldao.close()
 
     def classify(self, testSet):
