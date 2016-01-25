@@ -33,11 +33,10 @@ class Path:
         hostRules, pathRules = uriClassifier.train(trainSet, ruleType, ifPersist=False)
         print('[URI] Finish Training')
         cHosts = {}
-        for ruleType in hostRules:
-            for rule, tbls in hostRules[ruleType].items():
-                host, _, label = rule
-                cHosts[host] = tbls
-            print("Total Number of Hosts is", len(cHosts))
+        for rule, tbls in hostRules[consts.APP_RULE].items():
+            host, _, label = rule
+            cHosts[host] = tbls
+        print("Total Number of Hosts is", len(cHosts))
         cPath = {}
         for ruleType in pathRules:
             for rule, tbls in hostRules[ruleType].items():
@@ -270,7 +269,7 @@ class QueryClassifier(AbsClassifer):
         self.appType = appType
 
         if minerType == consts.PATH_MINER:
-            self.miner = Path(scoreT=0.8, labelT=0, dbcover=1, scoreGap=0.3)
+            self.miner = Path(scoreT=0.9, labelT=0, dbcover=1, scoreGap=0.3)
         elif minerType == consts.KV_MINER:
             self.miner = KV(scoreT=0.5, labelT=0.3, dbcover=3, scoreGap=0.3)
 
