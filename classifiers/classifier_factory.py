@@ -1,5 +1,6 @@
 from classifiers.agent import AgentClassifier
 from classifiers.algo import QueryClassifier
+from classifiers.baseline import BaseLineClassifier
 from classifiers.head import HeaderClassifier
 import const.consts as consts
 from classifiers.uri import UriClassifier
@@ -18,6 +19,8 @@ def classifier_factory(names, appType):
             classifier = QueryClassifier(appType, consts.PATH_MINER)
         elif name == consts.KV_CLASSIFIER:
             classifier = QueryClassifier(appType, consts.KV_MINER)
+        elif name == consts.BL_CLASSIFIER:
+            classifier = BaseLineClassifier(appType, consts.KV_MINER)
         elif name == consts.CMAR_CLASSIFIER:
             classifier = CMAR()
         classifiers.append((name, classifier))

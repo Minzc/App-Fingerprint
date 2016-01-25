@@ -68,3 +68,6 @@ VERSION = '[VERSION]'
 RANDOM = '[RANDOM]'
 
 TestBaseLine = True
+
+
+BL_CLASSIFIER = 'bl'

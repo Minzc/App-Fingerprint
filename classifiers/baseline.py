@@ -133,10 +133,6 @@ class KV:
         :return xmlGenRules : (host, key) -> value -> {app}
         :return xmlSpecificRules
         """
-        for fieldName in [name for name, value in self.lexicalIds[app] if value == v
-        and len(self.potentialId[value]) == 1]:
-            xmlGenRules[(host, k)][v][fieldName] += 1
-            xmlSpecificRules[(host, k)][v][app].add(tbl)
         for fieldName in [name for name, value in self.lexicalIds[app] if value in v
         and len(self.potentialId[value]) == 1]:
             return consts.Rule(host, k, None, "\b", 1, None)
@@ -263,7 +259,7 @@ def _score(hstKLblValue, vAppCounter, vCategoryCounter, hostLabelTbl):
     return appKScore, categoryKScore
 
 
-class QueryClassifier(AbsClassifer):
+class BaseLineClassifier(AbsClassifer):
     def __init__(self, appType, minerType):
         self.name = consts.KV_CLASSIFIER
         self.rules = {}
@@ -432,6 +428,7 @@ class QueryClassifier(AbsClassifer):
         self.miner.mine_host(trainData, rule_type)
         trackIds = {}
         baseLine = defaultdict(set)
+        coverage = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
             for host, k, v in self.miner.get_f(pkg):
                 insert_record(host, k, v, pkg.app, consts.APP_RULE, tbl)
@@ -440,48 +437,46 @@ class QueryClassifier(AbsClassifer):
                 lexicalR = self.miner.txt_analysis(k, v, host, pkg.app, tbl, lexicalKey, lexicalRules)
                 if lexicalR:
                     baseLine[lexicalR.host].add(lexicalR)
+                    coverage[lexicalR].add(pkg.app)
 
-        ##################
-        # Count
-        ##################
-        appKeyScore, categoryKeyScore = _score(compressedDB[consts.APP_RULE],
-                                               valueLabelCounter[consts.APP_RULE],
-                                               valueLabelCounter[consts.CATEGORY_RULE],
-                                               hostLabelTable[consts.APP_RULE])
-        #############################
-        # Generate interesting keys
-        #############################
-        appGeneralRules = _generate_keys(appKeyScore, hostLabelTable[consts.APP_RULE])
-        categoryGeneralRules = _generate_keys(categoryKeyScore, hostLabelTable[consts.CATEGORY_RULE])
-        #############################
-        # Pruning general prune
-        #############################
-        print(">>>[KV] Before pruning appGeneralRules", len(appGeneralRules))
-        appGeneralRules = self._prune_general_rules(appGeneralRules, trainData, lexicalKey)
-        categoryGeneralRules = self._prune_general_rules(categoryGeneralRules, trainData, lexicalKey)
-        print(">>>[KV] appGeneralRules", len(appGeneralRules))
-        print(">>>[KV] categoryGeneralRules", len(categoryGeneralRules))
+        # Coverage
+        after, before = 0, 0
+        for host in baseLine:
+            before += len(baseLine[host])
+            baseLine[host] = {lexicalR for lexicalR in baseLine[host] if len(coverage[lexicalR]) > 1}
+            after += len(baseLine[host])
+        print('[Before Coverage]', before)
+        print('[After Coverage]', after)
+
+        # Precision
+        error = defaultdict(set)
+        for host, rules in baseLine.items():
+            for rule in rules:
+                for label in compressedDB[consts.APP_RULE][host][rule.prefix]:
+                    for value in compressedDB[consts.APP_RULE][host][rule.prefix][label]:
+                        if len(valueLabelCounter[consts.APP_RULE][value]) > 1:
+                            error[rule].add(label)
+        after, before = 0, 0
+        for host in baseLine:
+            before += len(baseLine[host])
+            baseLine[host] = {lexicalR for lexicalR in baseLine[host]
+                              if 1.0 * len(error[lexicalR]) / len(coverage[lexicalR]) > 0.1}
+            after += len(baseLine[host])
+        print('[Before Accuracy]', before)
+        print('[After Accuracy]', after)
+
         #############################
         # Generate specific prune
         #############################
-        if consts.TestBaseLine:
-            appGeneralRules = baseLine
+        appGeneralRules = baseLine
 
         appSpecificRules = self._generate_rules(compressedDB[consts.APP_RULE], appGeneralRules,
                                                 valueLabelCounter[consts.APP_RULE])
 
         # categorySpecifcRules = self._generate_rules(compressedDB[consts.CATEGORY_RULE], categoryGeneralRules,
         #                                             valueLabelCounter[consts.CATEGORY_RULE])
-        categorySpecifcRules = specificRules = defaultdict(lambda: defaultdict(
+        categorySpecifcRules = defaultdict(lambda: defaultdict(
             lambda: defaultdict(lambda: defaultdict(lambda: {consts.SCORE: 0, consts.SUPPORT: set()}))))
-        # appSpecificRules = self._generate_rules(trainData, appGeneralRules,
-        #                                         valueLabelCounter[consts.APP_RULE], consts.APP_RULE)
-        #
-        # categorySpecifcRules = self._generate_rules(trainData, categoryGeneralRules,
-        #                                             valueLabelCounter[consts.CATEGORY_RULE], consts.CATEGORY_RULE)
-
-        # appSpecificRules = self._infer_from_xml(appSpecificRules, lexicalKey, trainData.rmapp)
-        appSpecificRules = self.miner.gen_txt_rule(lexicalRules, appSpecificRules, trackIds)
         specificRules = self._merge_result(appSpecificRules, categorySpecifcRules)
         #############################
         # Persist prune

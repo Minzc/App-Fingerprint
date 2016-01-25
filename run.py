@@ -24,8 +24,9 @@ USED_CLASSIFIERS = [
     # consts.HEAD_CLASSIFIER,
     consts.AGENT_CLASSIFIER,
     # consts.CMAR_CLASSIFIER,
-    # consts.KV_CLASSIFIER,
+    #consts.KV_CLASSIFIER,
     # consts.URI_CLASSIFIER,
+    consts.BL_CLASSIFIER
 
 ]
 
