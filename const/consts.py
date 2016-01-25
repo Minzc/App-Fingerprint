@@ -12,6 +12,7 @@ ERROR = 'e'
 SCORE = 's'
 SUPPORT = 't'
 REGEX_OBJ = 'r'
+EVIDENCE = '1'
 
 #############TYPE###############
 APP_RULE = 0
@@ -52,6 +53,8 @@ KV_CLASSIFIER = "KV Rule"
 URI_CLASSIFIER = "URI Rule"
 AGENT_CLASSIFIER = "Agent Rule"
 CMAR_CLASSIFIER = 'CMAR Rule'
+Query_BL_CLASSIFIER = 'Query_bl'
+Agent_BL_CLASSIFIER = 'Agent_bl'
 
 PATH_MINER = 'P'
 KV_MINER = 'K'
@@ -67,7 +70,6 @@ IDENTIFIER = '[IDENTIFIER]'
 VERSION = '[VERSION]'
 RANDOM = '[RANDOM]'
 
-TestBaseLine = True
+TestBaseLine = False
 
 
-BL_CLASSIFIER = 'bl'

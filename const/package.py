@@ -8,10 +8,11 @@ class Package:
     def set_method(self, method):
         self.method = method
 
-    def __init__(self):
+    def __init__(self, DB):
         self.json = None
         self.form = None
         self.content = None
+        self.tbl = DB
 
     def set_tbl(self, tbl):
         self.tbl = tbl

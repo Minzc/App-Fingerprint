@@ -1,4 +1,6 @@
 # -*- coding=utf-8 -*-
+import utils
+from prune.prune import Prune
 from sqldao import SqlDao
 from utils import load_pkgs, load_exp_app
 from collections import defaultdict
@@ -20,15 +22,20 @@ VALID_LABEL = {
     # consts.CATEGORY_RULE
 }
 
-USED_CLASSIFIERS = [
-    # consts.HEAD_CLASSIFIER,
-    consts.AGENT_CLASSIFIER,
-    # consts.CMAR_CLASSIFIER,
-    #consts.KV_CLASSIFIER,
-    # consts.URI_CLASSIFIER,
-    consts.BL_CLASSIFIER
+if not consts.TestBaseLine:
+    USED_CLASSIFIERS = [
+        # consts.HEAD_CLASSIFIER,
+        #consts.AGENT_CLASSIFIER,
+        #consts.KV_CLASSIFIER,
+        consts.URI_CLASSIFIER,
 
-]
+    ]
+else:
+     USED_CLASSIFIERS = [
+         consts.Agent_BL_CLASSIFIER,
+         consts.Query_BL_CLASSIFIER
+
+    ]
 
 
 class PredictRst:
@@ -119,8 +126,12 @@ def train(trainTbls, appType):
         classifier.set_name(name)
         print ">>> [train#%s] " % name
         classifier.train(trainSet, TRAIN_LABEL)
-
     print '>>> Finish training all classifiers'
+    if not consts.TestBaseLine:
+        #prune = Prune(appType)
+        #prune.prune(trainSet)
+        print '>>> Finish pruning all rules'
+
 
 
 def evaluate(rst, testSet, testApps):
@@ -265,7 +276,6 @@ def test(testTbl, appType):
 
     rst = {}
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
-    # classifiers = classifier_factory([consts.URI_CLASSIFIER,consts.KV_CLASSIFIER,consts.CMAR_CLASSIFIER], appType)
     for name, classifier in classifiers:
         print ">>> [test#%s] " % name
         classifier.set_name(name)
@@ -284,7 +294,7 @@ def test(testTbl, appType):
 def cross_batch_test(trainTbls, testTbl, appType, ifTrain=True):
     print '>>> Start training'
     if ifTrain:
-        _clean_up()
+        utils.clean_rules()
         train(trainTbls, appType)
     print '>>> Start testing'
     inforTrack = test(testTbl, appType)

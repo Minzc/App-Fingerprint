@@ -164,7 +164,7 @@ def load_pkgs(DB, appType, limit, filterFunc=lambda x: True):
     print '[UTILS]', QUERY
 
     for pkgid, app, add_header, path, refer, host, agent, dst, method, raw in sqldao.execute(QUERY):
-        package = Package()
+        package = Package(DB)
         package.set_app(app)
         package.set_path(path.decode('utf-8'))
         package.set_id(pkgid)
@@ -174,7 +174,6 @@ def load_pkgs(DB, appType, limit, filterFunc=lambda x: True):
         package.set_agent(agent.decode('utf-8'))
         package.set_dst(dst)
         package.set_content(raw)
-        package.set_tbl(DB)
         package.set_method(method)
 
         if filterFunc(package):
@@ -462,3 +461,9 @@ def get_label(pkg, ruleType):
         #     if len(item) == 1:
         #         return True
         #     return False
+
+def clean_rules():
+    sqldao = SqlDao()
+    sqldao.execute(consts.SQL_CLEAN_ALL_RULES)
+    sqldao.close()
+    print consts.SQL_CLEAN_ALL_RULES

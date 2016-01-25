@@ -270,7 +270,7 @@ class QueryClassifier(AbsClassifer):
         self.appType = appType
 
         if minerType == consts.PATH_MINER:
-            self.miner = Path(scoreT=0.5, labelT=0, dbcover=1, scoreGap=0.3)
+            self.miner = Path(scoreT=0.8, labelT=0, dbcover=1, scoreGap=0.3)
         elif minerType == consts.KV_MINER:
             self.miner = KV(scoreT=0.5, labelT=0.3, dbcover=3, scoreGap=0.3)
 
@@ -354,6 +354,7 @@ class QueryClassifier(AbsClassifer):
                             specificRules[host][rule.prefix][value][label] = {
                                 consts.SCORE   : rule.score,
                                 consts.SUPPORT : hstKLblValue[host][rule.prefix][label][value]
+                                #consts.SUPPORT : rule.hostNum
                             }
         return specificRules
 
@@ -472,7 +473,7 @@ class QueryClassifier(AbsClassifer):
 
         # categorySpecifcRules = self._generate_rules(compressedDB[consts.CATEGORY_RULE], categoryGeneralRules,
         #                                             valueLabelCounter[consts.CATEGORY_RULE])
-        categorySpecifcRules = specificRules = defaultdict(lambda: defaultdict(
+        categorySpecifcRules = defaultdict(lambda: defaultdict(
             lambda: defaultdict(lambda: defaultdict(lambda: {consts.SCORE: 0, consts.SUPPORT: set()}))))
         # appSpecificRules = self._generate_rules(trainData, appGeneralRules,
         #                                         valueLabelCounter[consts.APP_RULE], consts.APP_RULE)
@@ -522,6 +523,7 @@ class QueryClassifier(AbsClassifer):
                 self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
                 self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
                 self.rules[rule_type][host][regexObj][consts.LABEL] = label
+                self.rules[rule_type][host][regexObj][consts.EVIDENCE] = (key, value, host, label, confidence, rule_type, support)
         print('>>> [KV Rules#Load Rules] total number of prune is', counter)
         sqldao.close()
 
@@ -530,9 +532,7 @@ class QueryClassifier(AbsClassifer):
         for ruleType in self.rules:
             fatherScore = -1
             rst = consts.NULLPrediction
-            if pkg.refer_host:
-                pass
-            else:
+            if not pkg.refer_host:
                 host, path = classify_format(pkg)
                 for regexObj, scores in self.rules[ruleType][host].iteritems():
                     hostRegex = re.compile(host)
@@ -542,10 +542,10 @@ class QueryClassifier(AbsClassifer):
 
                     if regexObj.search(path):
                         label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
-                        if support > rst.score or (support == rst.score and confidence > fatherScore):
-                            fatherScore = confidence
+                        if confidence > rst.score or (confidence == rst.score and support > fatherScore):
+                            fatherScore = support
                             evidence = (host, regexObj.pattern)
-                            rst = consts.Prediction(label, support, evidence)
+                            rst = consts.Prediction(label, confidence, evidence)
             predictRst[ruleType] = rst
             if rst != consts.NULLPrediction and rst.label != get_label(pkg, ruleType):
                 print('[WRONG]', rst, pkg.app, pkg.category, ruleType)
@@ -588,10 +588,8 @@ class QueryClassifier(AbsClassifer):
                     assert hostRegex.search(pkg.rawHost)
                     label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
                     if regexObj.search(path):
-                        if support > rst.score or (support == rst.score and confidence > fatherScore):
-                            fatherScore = confidence
-                            evidence = (host, regexObj.pattern, label, support, confidence)
-                            rst = consts.Prediction(label, support, evidence)
+                        if confidence > rst.score or (confidence == rst.score and support > fatherScore):
+                            fatherScore = support
+                            rst = consts.Prediction(label, confidence, scores[consts.EVIDENCE])
                 predictRst[ruleType] = rst
-
         return predictRst

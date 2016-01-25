@@ -76,7 +76,7 @@ def load_lexical():
     return appFeatures
 
 
-def persist(appRule, ruleType):
+def persist(appRule, ruleType, lexicalIds):
     def convert_regex(regexStr):
         regexStr = regexStr.replace(re.escape(consts.VERSION), r'\b[a-z0-9-.]+\b')
         regexStr = regexStr.replace(re.escape(consts.RANDOM), r'[0-9a-z]*')
@@ -97,15 +97,13 @@ def persist(appRule, ruleType):
         prefix = convert_regex(prefix)
         identifier = convert_regex(identifier)
         suffix = convert_regex(suffix)
-        if label in identifier:
-            prefix = suffix = r'\b'
         params.append((host, prefix, identifier, suffix, label, 1, score, 3, consts.APP_RULE))
 
     sqldao.executeBatch(consts.SQL_INSERT_AGENT_RULES, params)
     sqldao.close()
 
 
-class AgentClassifier(AbsClassifer):
+class AgentBLClassifier(AbsClassifer):
     def __init__(self, inferFrmData=True):
         self.rules = defaultdict(dict)
 
@@ -149,12 +147,14 @@ class AgentClassifier(AbsClassifer):
     def __compose_idextractor(self, agentTuples, appFeatures):
         sortFunc = lambda x: len(x[1])
         checkValue = lambda value: value not in STOPWORDS and value in agent
+        matchedValue = set()
         extractors = {}
         for appAgent in agentTuples.values():
             for app, agent, host in appAgent:
                 for key, v in sorted(appFeatures[app].items(), key=sortFunc, reverse=True):
                     ifMatch = False
                     for value in filter(checkValue, self._gen_features(v)):
+                        matchedValue.add(value)
                         tmp = agent.replace(value, consts.IDENTIFIER, 1)
                         if tmp not in extractors: extractors[tmp] = Identifier(tmp)
                         extractors[tmp].add_identifier(app, value, host)
@@ -162,7 +162,7 @@ class AgentClassifier(AbsClassifer):
                         break
                     if ifMatch:
                         break
-        return extractors
+        return extractors, matchedValue
 
     def __count(self, agentTuples, extractors, appFeatures, lexicalIds):
         """
@@ -176,9 +176,7 @@ class AgentClassifier(AbsClassifer):
                     identifier = extractor.match(agent)
                     if identifier:
                         potentialId[identifier].add(app)
-                        if extractor.weight() > 2:
-                            if '/' not in identifier:
-                                extractor.add_identifier(app, identifier, host)
+
         return potentialId
 
     # def _infer_from_xml(self, appFeatureRegex, agentTuples):
@@ -201,13 +199,15 @@ class AgentClassifier(AbsClassifer):
         for appLexicalId in appFeatures.values():
             for lexicalId in appLexicalId.values():
                 lexicalIds.add(lexicalId)
+
         '''
         Compose regular expression
         '''
-        extractors = self.__compose_idextractor(trainData, appFeatures)
+        extractors, matchedValue = self.__compose_idextractor(trainData, appFeatures)
         extractors = sorted(extractors.items(), key=lambda x: x[1].weight(), reverse=True)
 
-        #     self._infer_from_xml(appFeatureRegex, trainData)
+        for value in matchedValue:
+            lexicalIds.add(value)
 
         '''
         Count regex
@@ -221,8 +221,8 @@ class AgentClassifier(AbsClassifer):
         appRule = self._app(potentialId, potentialHost, extractors)
 
         if ifPersist:
-            persist(appRule, consts.APP_RULE)
-
+            print "Finish Pruning"
+            persist(appRule, consts.APP_RULE, lexicalIds)
 
     def load_rules(self):
         self.rules = {
@@ -279,8 +279,28 @@ class AgentClassifier(AbsClassifer):
         rst = {}
         for ruleType in self.rules:
             longestWord = ''
-            matchRule = None
             rstLabel = None
+            for lexicalR, regxNlabel in self.rules[ruleType].items():
+                regex, label = regxNlabel
+                if regex.search(agent) and len(longestWord) < len(lexicalR.identifier):
+                    rstLabel = label
+                    longestWord = lexicalR.identifier
+
+            for lexicalR, regxNlabel in self.rulesHost[ruleType][host].items():
+                regex, label = regxNlabel
+                if regex.search(agent) and len(longestWord) < len(lexicalR.identifier):
+                    rstLabel = label
+                    longestWord = lexicalR.identifier
+            rst[ruleType] = (rstLabel, longestWord)
+        return rst
+
+    def p(self, pkgInfo):
+        agent, host = pkgInfo
+        rst = {}
+        for ruleType in self.rules:
+            longestWord = ''
+            rstLabel = None
+            matchRule = None
             for lexicalR, regxNlabel in self.rules[ruleType].items():
                 regex, label = regxNlabel
                 if regex.search(agent) and len(longestWord) < len(lexicalR.identifier):
@@ -298,25 +318,54 @@ class AgentClassifier(AbsClassifer):
             rst[ruleType] = (rstLabel, matchRule)
         return rst
 
-    def classify2(self, testSet):
-        def wrap_predict(predicts):
-            wrapPredicts = {}
-            for ruleType, predict in predicts.items():
-                label, evidence = predict
-                wrapPredicts[ruleType] = consts.Prediction(label, 1.0, evidence) if label else consts.NULLPrediction
-            return wrapPredicts
 
-        compressed = defaultdict(lambda: defaultdict(set))
-        rt = defaultdict(lambda: defaultdict(set))
-        for tbl, pkg in DataSetIter.iter_pkg(testSet):
-            compressed[pkg.agent][pkg.rawHost].add(pkg)
-            rt[pkg.agent][pkg.rawHost].add((pkg, tbl))
 
-        batchPredicts = {}
-        for agent, host, pkgs in flatten(compressed):
-            assert (type(pkgs) == set, "Type of pkgs is not correct" + str(type(pkgs)))
-            predict = wrap_predict(self.c((agent, host)))
-            for pkg in pkgs:
-                if predict[consts.APP_RULE].label == pkg.app:
-                    batchPredicts[pkg.tbl + '#' + str(pkg.id)] = predict[consts.APP_RULE]
-        return batchPredicts
+
+        # @staticmethod
+        # def change_raw(prune, trainSet):
+        #     tmpRules = {}
+        #     hostDict = {}
+        #     for rule, app in prune.items():
+        #         hostDict[rule[0]] = set()
+        #
+        #     for tbl, pkg in DataSetIter.iter_pkg(trainSet):
+        #         if pkg.host in hostDict:
+        #             hostDict[pkg.host].add(pkg.rawHost)
+        #
+        #     for rule, app in prune.items():
+        #         host, regexObj = rule
+        #         for rawHost in hostDict[host]:
+        #             tmpRules[(rawHost, regexObj)] = app
+        #     return tmpRules
+
+
+
+        #
+        # def _prune(self, regexLabel):
+        #     """
+        #     :param regexLabel: FRegex -> apps
+        #     :return:
+        #     """
+        #
+        #     def sortPattern(regexAppItem):
+        #         fRgex, apps = regexAppItem
+        #         f = fRgex.regexStr
+        #         if f in invRegexCover:
+        #             return len(invRegexCover[f])
+        #         else:
+        #             return 0
+        #
+        #     invRegexCover = defaultdict(set)
+        #     for regexStr, regexStrs in self.regexCover.items():
+        #         for string in regexStrs:
+        #             invRegexCover[string].add(regexStr)
+        #     regexLabel = sorted(regexLabel.items(), key=sortPattern, reverse=True)
+        #     rst = defaultdict(set)
+        #     pruned = defaultdict(set)
+        #     for fRegex, apps in regexLabel:
+        #         apps = frozenset(apps)
+        #         for regexStr in invRegexCover[fRegex.regexStr]:
+        #             pruned[apps].add(regexStr)
+        #         if fRegex.regexStr not in pruned[apps]:
+        #             rst[fRegex] = apps
+        #     return rst
