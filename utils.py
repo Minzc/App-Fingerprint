@@ -4,7 +4,10 @@
 
 import re
 import string
+
+import const.sql
 import tldextract
+from const import conf
 from sqldao import SqlDao
 from const.package import Package
 import random
@@ -19,12 +22,6 @@ extract = tldextract.TLDExtract(
     cache_file=False)
 
 max_wordlen, min_wordlen = 100, 2
-
-
-def rever_map(mapObj):
-    """ revert the key value of a map """
-    return {v: k for k, v in mapObj.items()}
-
 
 def stratified_r_sample(N, records):
     strata = {}
@@ -158,9 +155,9 @@ def load_pkgs(DB, appType, limit, filterFunc=lambda x: True):
     records = []
     sqldao = SqlDao()
     if not limit:
-        QUERY = consts.SQL_SELECT_HTTP_PKGS % DB
+        QUERY = const.sql.SQL_SELECT_HTTP_PKGS % DB
     else:
-        QUERY = consts.SQL_SELECT_HTTP_PKGS_LIMIT % (DB, limit)
+        QUERY = const.sql.SQL_SELECT_HTTP_PKGS_LIMIT % (DB, limit)
     print '[UTILS]', QUERY
 
     for pkgid, app, add_header, path, refer, host, agent, dst, method, raw in sqldao.execute(QUERY):
@@ -464,6 +461,45 @@ def get_label(pkg, ruleType):
 
 def clean_rules():
     sqldao = SqlDao()
-    sqldao.execute(consts.SQL_CLEAN_ALL_RULES)
+    sqldao.execute(const.sql.SQL_CLEAN_ALL_RULES)
     sqldao.close()
-    print consts.SQL_CLEAN_ALL_RULES
+    print const.sql.SQL_CLEAN_ALL_RULES
+
+
+def load_data_set(trainTbls, appType):
+    """
+  Load data from given table
+  Input
+  :param trainTbls : a list of tables
+  :param appType : IOS or ANDROID
+  Output
+  - record : {table_name : [list of packages]}
+  """
+    print 'Loading data set', trainTbls
+    expApp = load_exp_app()
+
+    def _keep_exp_app(package):
+        return package.app in expApp[appType]
+
+    records = {}
+    for tbl in trainTbls:
+        records[tbl] = load_pkgs(limit=conf.package_limit, filterFunc=_keep_exp_app, DB=tbl, appType=appType)
+
+    return records
+
+
+def _clean_up():
+    sqldao = SqlDao()
+    sqldao.execute(const.sql.SQL_CLEAN_ALL_RULES)
+    sqldao.close()
+    print const.sql.SQL_CLEAN_ALL_RULES
+
+def get_label(pkg, ruleType):
+    if ruleType == consts.APP_RULE:
+        return pkg.app
+    elif ruleType == consts.COMPANY_RULE:
+        return pkg.company
+    elif ruleType == consts.CATEGORY_RULE:
+        return pkg.category
+    else:
+        assert "Rule Type Error"

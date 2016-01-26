@@ -1,6 +1,7 @@
 import pyshark
 import sys
 
+from const import sql
 from sqldao import SqlDao
 import consts
 from utils import loadfile
@@ -244,9 +245,12 @@ class ETL:
         for k, v in pkgInfo.items():
             if v == None:
                 pkgInfo[k] = ""
-	    raw = None
         return pkgInfo
 
+def create_tbl(tableName):
+    sqldao = SqlDao()
+    sqldao.execute(sql.SQL_CREATE_PACKAGE, tableName)
+    sqldao.close()
 
 if __name__ == '__main__':
     if len(sys.argv) < 4:
@@ -254,12 +258,17 @@ if __name__ == '__main__':
       sys.exit()
     path = sys.argv[1]
     tablename = sys.argv[2]
+
+    create_tbl(tablename)
+
     app_type = sys.argv[3]
     if app_type == 'ios':
       app_type = consts.IOS
     else:
       app_type = consts.ANDROID
+
     exp_app_path = None
+
     if len(sys.argv) == 5:
       exp_app_path = sys.argv[4]
 

@@ -15,7 +15,6 @@ def classifier_factory(names, appType):
         elif name == consts.AGENT_CLASSIFIER:
             classifier = AgentClassifier(inferFrmData=True)
         elif name == consts.URI_CLASSIFIER:
-            # classifier = UriClassifier(appType)
             classifier = QueryClassifier(appType, consts.PATH_MINER)
         elif name == consts.KV_CLASSIFIER:
             classifier = QueryClassifier(appType, consts.KV_MINER)

@@ -1,5 +1,7 @@
 # -*- encoding = utf-8 -*-
 from collections import defaultdict
+
+import const.sql
 from const import consts
 from sqldao import SqlDao
 import re
@@ -10,7 +12,7 @@ AGENT = '[AGENT]:'
 
 def load_agent():
     rules = defaultdict(set)
-    QUERY = consts.SQL_SELECT_AGENT_RULES
+    QUERY = const.sql.SQL_SELECT_AGENT_RULES
     sqldao = SqlDao()
     counter = 0
     for host, agentF, label, ruleType in sqldao.execute(QUERY):

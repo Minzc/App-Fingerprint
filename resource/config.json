@@ -1,0 +1,19 @@
+{
+    "query": {
+        "score": 0.0,
+        "label": 0.0
+    },
+    "path": {
+        "score": 0.0,
+        "label": 0.0
+    },
+    "agent": {
+        "support": 2.0
+    },
+    "sample" : 1.0,
+    "package.limit" : 0.0,
+    "baseline" : false,
+    "insert": false,
+    "ruleset": "pattern"
+}
+

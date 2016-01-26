@@ -1,19 +1,16 @@
 # -*- coding=utf-8 -*-
-import utils
-from prune.prune import Prune
-from sqldao import SqlDao
-from utils import load_pkgs, load_exp_app
-from collections import defaultdict
-import const.consts as consts
 import argparse
+from collections import defaultdict
+
+import const.conf
+import const.consts as consts
+import utils
+from classifiers.classifier_factory import classifier_factory
+from const.conf import INSERT
 from const.dataset import DataSetFactory as DataSetFactory
 from const.dataset import DataSetIter as DataSetIter
-from classifiers.classifier_factory import classifier_factory
+from sqldao import SqlDao
 
-LIMIT = None
-INSERT = False
-PRUNE = False
-SAMPLERATE = 1
 TRAIN_LABEL = consts.APP_RULE
 
 VALID_LABEL = {
@@ -22,12 +19,12 @@ VALID_LABEL = {
     # consts.CATEGORY_RULE
 }
 
-if not consts.TestBaseLine:
+if not const.conf.TestBaseLine:
     USED_CLASSIFIERS = [
         # consts.HEAD_CLASSIFIER,
         #consts.AGENT_CLASSIFIER,
-        #consts.KV_CLASSIFIER,
-        consts.URI_CLASSIFIER,
+        consts.KV_CLASSIFIER,
+        #consts.URI_CLASSIFIER,
 
     ]
 else:
@@ -88,28 +85,6 @@ def merge_rst(rst, tmprst):
     return rst
 
 
-def load_data_set(trainTbls, appType):
-    """
-  Load data from given table
-  Input
-  :param trainTbls : a list of tables
-  :param appType : IOS or ANDROID
-  Output
-  - record : {table_name : [list of packages]}
-  """
-    print 'Loading data set', trainTbls
-    expApp = load_exp_app()
-
-    def _keep_exp_app(package):
-        return package.app in expApp[appType]
-
-    records = {}
-    for tbl in trainTbls:
-        records[tbl] = load_pkgs(limit=LIMIT, filterFunc=_keep_exp_app, DB=tbl, appType=appType)
-
-    return records
-
-
 def train(trainTbls, appType):
     """
     1. Load data from database from given tables
@@ -118,8 +93,7 @@ def train(trainTbls, appType):
     :param trainTbls: A list of tables used to train classifiers
     :parm appType: android or ios
     """
-    # trainTbls = []
-    trainSet = DataSetFactory.get_traindata(tbls=trainTbls, sampleRate=SAMPLERATE, appType=appType, LIMIT=LIMIT)
+    trainSet = DataSetFactory.get_traindata(tbls=trainTbls, appType=appType)
     trainSet.set_label(TRAIN_LABEL)
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
     for name, classifier in classifiers:
@@ -127,14 +101,15 @@ def train(trainTbls, appType):
         print ">>> [train#%s] " % name
         classifier.train(trainSet, TRAIN_LABEL)
     print '>>> Finish training all classifiers'
-    if not consts.TestBaseLine:
+
+    if not const.conf.TestBaseLine:
         #prune = Prune(appType)
         #prune.prune(trainSet)
         print '>>> Finish pruning all rules'
 
 
 
-def evaluate(rst, testSet, testApps):
+def _evaluate(rst, testSet, testApps):
     """
   Compare predictions with test data set
   Input:
@@ -146,17 +121,9 @@ def evaluate(rst, testSet, testApps):
   """
 
     # app_rst, record_id
-    def get_label(pkg, ruleType):
-        if ruleType == consts.APP_RULE:
-            return pkg.app
-        elif ruleType == consts.COMPANY_RULE:
-            return pkg.company
-        elif ruleType == consts.CATEGORY_RULE:
-            return pkg.category
-        else:
-            assert "Rule Type Error"
 
-    inforTrack = {consts.DISCOVERED_APP: 0.0, consts.PRECISION: 0.0, consts.RECALL: 0.0}
+
+    inforTrack = {}
     correct, recall = 0, 0
     wrongApp, correctApp, detectedApp = set(), set(), set()
     appPkgs = defaultdict(set)
@@ -173,7 +140,7 @@ def evaluate(rst, testSet, testApps):
 
             for ruleType in VALID_LABEL:
                 predict = predictions[ruleType].label
-                label = get_label(pkg, ruleType)
+                label = utils.get_label(pkg, ruleType)
                 correctLabels[ruleType] = 1 if label == predict else 0
 
                 if predict is not None:
@@ -204,40 +171,33 @@ def evaluate(rst, testSet, testApps):
     print '[TEST] Total Detect Number of App:', len(detectedApp)
     print '[TEST] Total Number of App:', len(testApps)
 
-    precision = correct * 1.0 / recall
-    recall = recall * 1.0 / testSet.get_size().values()[0]
+    #precision = correct * 1.0 / recall
+    #recall = recall * 1.0 / testSet.get_size().values()[0]
+    precision = len(correctApp) * 1.0 / (len(correctApp) + len(wrongApp))
+    recall = (len(correctApp) + len(wrongApp)) * 1.0 / len(testApps)
     f1Score = 2.0 * precision * recall / (precision + recall)
     inforTrack[consts.DISCOVERED_APP] = len(correctApp.difference(wrongApp)) * 1.0 / len(testApps)
     inforTrack[consts.PRECISION] = precision
     inforTrack[consts.RECALL] = recall
     inforTrack[consts.F1SCORE] = f1Score
     inforTrack[consts.DISCOVERED_APP_LIST] = detectedApp
+    inforTrack[consts.RESULT] = rst
     return inforTrack
 
 
-def _use_classifier(classifier, testSet):
+def _classify(classifier, testSet):
     """
     Use trained classifer on the given test data set
     Input
     - classifier : classifier used on the data set
     - testSet : testData set {pkgId : package}
     """
-    wrongApp = set()
     batchPredicts = classifier.classify(testSet)
     rst = defaultdict(dict)
 
     for pkgId, predicts in batchPredicts.items():
         for ruleType, predict in filter(lambda x: x[0] in VALID_LABEL, predicts.items()):
             rst[pkgId][ruleType] = predict
-
-    for tbl, pkg in DataSetIter.iter_pkg(testSet):
-        for ruleType in rst[pkg.id]:
-            if ruleType in VALID_LABEL:
-                predict = rst[pkg.id][ruleType]
-                if predict.label is not None:
-                    wrongApp.add(pkg.app)
-
-    print '====', classifier.name, '====', '[WRONG]', len(wrongApp)
     return rst
 
 
@@ -263,15 +223,8 @@ def _insert_rst(testSet, DB, inforTrack):
     print 'Finish inserting %s items' % len(params)
 
 
-def _clean_up():
-    sqldao = SqlDao()
-    sqldao.execute(consts.SQL_CLEAN_ALL_RULES)
-    sqldao.close()
-    print consts.SQL_CLEAN_ALL_RULES
-
-
 def test(testTbl, appType):
-    testSet = DataSetFactory.get_traindata(tbls=[testTbl], sampleRate=1.0, appType=appType, LIMIT=LIMIT)
+    testSet = DataSetFactory.get_traindata(tbls=[testTbl], appType=appType)
     testApps = testSet.apps
 
     rst = {}
@@ -280,20 +233,19 @@ def test(testTbl, appType):
         print ">>> [test#%s] " % name
         classifier.set_name(name)
         classifier.load_rules()
-        tmprst = _use_classifier(classifier, testSet)
+        tmprst = _classify(classifier, testSet)
         rst = merge_rst(rst, tmprst)
 
     print '>>> Start evaluating'
-    inforTrack = evaluate(rst, testSet, testApps)
-    inforTrack[consts.RESULT] = rst
+    inforTrack = _evaluate(rst, testSet, testApps)
     if INSERT:
         _insert_rst(testSet, testTbl, inforTrack)
     return inforTrack
 
 
-def cross_batch_test(trainTbls, testTbl, appType, ifTrain=True):
-    print '>>> Start training'
+def train_test(trainTbls, testTbl, appType, ifTrain=True):
     if ifTrain:
+        print '>>> Start training'
         utils.clean_rules()
         train(trainTbls, appType)
     print '>>> Start testing'
@@ -323,4 +275,4 @@ if __name__ == '__main__':
             appType = consts.IOS
         elif args.apptype.lower() == 'android':
             appType = consts.ANDROID
-        cross_batch_test(args.train, args.test, appType)
+        train_test(args.train, args.test, appType)

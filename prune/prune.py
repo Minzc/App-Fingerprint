@@ -7,6 +7,7 @@ from collections import defaultdict
 
 import re
 
+import const.sql
 import utils
 from classifiers.classifier_factory import classifier_factory
 from const import consts
@@ -67,7 +68,7 @@ def agent_persist(appRule, ruleType):
             prefix = suffix = r'\b'
         params.append((host, prefix, identifier, suffix, label, 1, score, 3, consts.APP_RULE))
 
-    sqldao.executeBatch(consts.SQL_INSERT_AGENT_RULES, params)
+    sqldao.executeBatch(const.sql.SQL_INSERT_AGENT_RULES, params)
     sqldao.close()
 
 def query_persist(specificRules, rule_type):
@@ -76,7 +77,7 @@ def query_persist(specificRules, rule_type):
     :param specificRules: specific prune for apps
         ruleType -> host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
     """
-    QUERY = consts.SQL_INSERT_KV_RULES
+    QUERY = const.sql.SQL_INSERT_KV_RULES
     sqldao = SqlDao()
     # Param prune
     params = []

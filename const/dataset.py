@@ -1,3 +1,4 @@
+from const import conf
 from utils import load_pkgs, load_exp_app
 import random
 import const.consts as consts
@@ -62,7 +63,7 @@ class DataSetFactory:
         pass
 
     @staticmethod
-    def get_traindata(tbls, sampleRate, appType, LIMIT):
+    def get_traindata(tbls, appType):
         """
         Load data from given table
         :param sampleRate:
@@ -78,19 +79,19 @@ class DataSetFactory:
         def _keep_exp_app(package):
             return package.app in sampledApps
 
-        print '[TRAIN FACTORY] Loading data set', tbls, 'SAMPLE RATE is', sampleRate
+        print '[TRAIN FACTORY] Loading data set', tbls, 'SAMPLE RATE is', conf.sample_rate
         expApp = load_exp_app()[appType]
 
         # Do sample
         print '[TRAIN FACTORY] Before Sample', len(expApp)
-        sampledApps = {app for app in expApp if random.uniform(0, 1) <= sampleRate}
+        sampledApps = {app for app in expApp if random.uniform(0, 1) <= conf.sample_rate}
         rmApps = expApp - sampledApps
         print '[TRAIN FACTORY] After Sample', len(sampledApps)
 
         dataSet = DataSet(tbls, rmApps)
 
         for tbl in tbls:
-            pkgs = load_pkgs(limit=LIMIT, filterFunc=_keep_exp_app, DB=tbl, appType=appType)
+            pkgs = load_pkgs(limit=conf.package_limit, filterFunc=_keep_exp_app, DB=tbl, appType=appType)
             dataSet.set_data(tbl, pkgs)
 
 

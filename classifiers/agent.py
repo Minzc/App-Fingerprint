@@ -1,4 +1,5 @@
 # -*- encoding = utf-8 -*-
+import const.sql
 from utils import unescape, flatten, load_info_features, process_agent
 from sqldao import SqlDao
 from collections import defaultdict
@@ -101,7 +102,7 @@ def persist(appRule, ruleType):
             prefix = suffix = r'\b'
         params.append((host, prefix, identifier, suffix, label, 1, score, 3, consts.APP_RULE))
 
-    sqldao.executeBatch(consts.SQL_INSERT_AGENT_RULES, params)
+    sqldao.executeBatch(const.sql.SQL_INSERT_AGENT_RULES, params)
     sqldao.close()
 
 
@@ -239,7 +240,7 @@ class AgentClassifier(AbsClassifer):
         sqldao = SqlDao()
         counter = 0
         for host, prefix, identifier, suffix, label, support, confidence, ruleType, labelType in sqldao.execute(
-                consts.SQL_SELECT_AGENT_RULES):
+                const.sql.SQL_SELECT_AGENT_RULES):
             counter += 1
             agentRegex = gen_regex(prefix, identifier, suffix, label)
             lexicalR = consts.Rule(host, prefix, identifier, suffix, support, label)

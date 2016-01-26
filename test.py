@@ -1,4 +1,5 @@
-from run import cross_batch_test
+from const import conf
+from run import train_test
 from run import USED_CLASSIFIERS
 from run import train
 import const.consts as consts
@@ -28,7 +29,7 @@ def test(testTbl):
             trainTbls.append(tbl)
 
     print trainTbls, testTbl
-    inforTrack = cross_batch_test(trainTbls, testTbl, consts.IOS, ifTrain=True)
+    inforTrack = train_test(trainTbls, testTbl, consts.IOS, ifTrain=True)
     output = _output_rst(inforTrack)
     log(trainTbls, testTbl, output)
     _compare_rst(inforTrack[consts.DISCOVERED_APP_LIST], inforTrack[consts.RESULT])
@@ -88,16 +89,39 @@ def _output_rst(inforTrack):
 
 
 def auto_test():
-    for testTbl in tbls:
-        trainTbls = []
-        for tbl in tbls:
-            if tbl != testTbl:
-                trainTbls.append(tbl)
+    totalPrecision = []
+    totalRecall = []
+    for score in range(1,10):
+        for labelT in range(1,10):
+            conf.query_scoreT = score / 10.0
+            conf.query_labelT = labelT / 10.0
 
-        print trainTbls, testTbl
-        inforTrack = cross_batch_test(trainTbls, testTbl, consts.IOS)
-        output = _output_rst(inforTrack)
-        log(trainTbls, testTbl, output)
+            if labelT == 0.3:
+                continue
+
+            for testTbl in tbls:
+                if testTbl == 'ios_packages_2015_08_12':
+                    continue
+
+                trainTbls = []
+                for tbl in tbls:
+                    if tbl != testTbl:
+                        trainTbls.append(tbl)
+
+                print trainTbls, testTbl, conf.query_scoreT, conf.query_labelT
+                inforTrack = train_test(trainTbls, testTbl, consts.IOS, True)
+                totalPrecision.append(inforTrack[consts.PRECISION])
+                totalRecall.append(inforTrack[consts.RECALL])
+                output = _output_rst(inforTrack)
+                log(trainTbls, testTbl, output)
+            recall = sum(totalRecall) * 1.0 / len(totalRecall)
+            precision = sum(totalPrecision) * 1.0 / len(totalPrecision)
+            f1Score = 2.0 * precision * recall / (precision + recall)
+            output = "# Precision : %s Recall: %s F1: %s Score: %s LabelT: %s" % \
+                     (precision, recall, f1Score, conf.query_scoreT, conf.query_labelT)
+            log([], '', output)
+
+
 
 
 def gen_rules():

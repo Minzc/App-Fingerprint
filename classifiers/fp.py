@@ -3,7 +3,6 @@ from classifier import AbsClassifer
 import operator
 
 from classifiers.agent import AgentClassifier
-from classifiers.uri import UriClassifier
 from const.dataset import DataSetIter
 from features.agent import AgentEncoder, AGENT, HOST
 from sqldao import SqlDao

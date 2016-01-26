@@ -6,6 +6,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import urllib
 import const.consts as consts
 import re
+
+import const.sql
 from classifiers.uri import UriClassifier
 from sqldao import SqlDao
 from utils import load_xml_features, if_version, flatten, get_label
@@ -486,15 +488,15 @@ class BaseLineClassifier(AbsClassifer):
 
     @staticmethod
     def _clean_db(rule_type):
-        print('>>> [KVRULES]', consts.SQL_DELETE_KV_RULES % rule_type)
+        print('>>> [KVRULES]', const.sql.SQL_DELETE_KV_RULES % rule_type)
         sqldao = SqlDao()
-        sqldao.execute(consts.SQL_DELETE_KV_RULES % rule_type)
+        sqldao.execute(const.sql.SQL_DELETE_KV_RULES % rule_type)
         sqldao.commit()
         sqldao.close()
 
     def load_rules(self):
         sqldao = SqlDao()
-        QUERY = consts.SQL_SELECT_KV_RULES
+        QUERY = const.sql.SQL_SELECT_KV_RULES
         counter = 0
         for key, value, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
             if len(value.split('\n')) == 1 and ';' not in label:
@@ -554,7 +556,7 @@ class BaseLineClassifier(AbsClassifer):
         :param specificRules: specific prune for apps
             ruleType -> host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
         """
-        QUERY = consts.SQL_INSERT_KV_RULES
+        QUERY = const.sql.SQL_INSERT_KV_RULES
         sqldao = SqlDao()
         # Param prune
         params = []

@@ -4,9 +4,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import urllib
+
+import const.conf
 import const.consts as consts
 import re
+
+import const.sql
 from classifiers.uri import UriClassifier
+from const import conf
 from sqldao import SqlDao
 from utils import load_xml_features, if_version, flatten, get_label
 
@@ -20,12 +25,13 @@ HOST = '[HOST]:'
 
 
 class Path:
-    def __init__(self, scoreT, labelT, dbcover, scoreGap):
-        self.scoreThreshold = scoreT
+    def __init__(self, dbcover, scoreGap):
+        self.scoreThreshold = conf.path_scoreT
+        self.labelThreshold = conf.path_labelT
         self.name = consts.PATH_MINER
         self.dbcover = dbcover
         self.scoreGap = scoreGap
-        self.labelThreshold = labelT
+
 
     def mine_host(self, trainSet, ruleType):
         uriClassifier = UriClassifier(consts.IOS)
@@ -97,14 +103,14 @@ def classify_format(package):
 
 
 class KV:
-    def __init__(self, scoreT, labelT, dbcover, scoreGap):
+    def __init__(self, dbcover, scoreGap):
         self.lexicalIds = load_xml_features()
         self.potentialId = defaultdict(set)
         for app, fields in self.lexicalIds.items():
             for _, value in fields:
                 self.potentialId[value].add(app)
-        self.scoreThreshold = scoreT
-        self.labelThreshold = labelT
+        self.scoreThreshold = conf.query_scoreT
+        self.labelThreshold = conf.query_labelT
         self.dbcover = dbcover
         self.scoreGap = scoreGap
         self.name = consts.KV_MINER
@@ -269,9 +275,9 @@ class QueryClassifier(AbsClassifer):
         self.appType = appType
 
         if minerType == consts.PATH_MINER:
-            self.miner = Path(scoreT=0.9, labelT=0, dbcover=1, scoreGap=0.3)
+            self.miner = Path(dbcover=1, scoreGap=0.3)
         elif minerType == consts.KV_MINER:
-            self.miner = KV(scoreT=0.5, labelT=0.3, dbcover=3, scoreGap=0.3)
+            self.miner = KV(dbcover=3, scoreGap=0.3)
 
         self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
             lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
@@ -464,7 +470,7 @@ class QueryClassifier(AbsClassifer):
         #############################
         # Generate specific prune
         #############################
-        if consts.TestBaseLine:
+        if const.conf.TestBaseLine:
             appGeneralRules = baseLine
 
         appSpecificRules = self._generate_rules(compressedDB[consts.APP_RULE], appGeneralRules,
@@ -491,15 +497,15 @@ class QueryClassifier(AbsClassifer):
 
     @staticmethod
     def _clean_db(rule_type):
-        print('>>> [KVRULES]', consts.SQL_DELETE_KV_RULES % rule_type)
+        print('>>> [KVRULES]', const.sql.SQL_DELETE_KV_RULES % rule_type)
         sqldao = SqlDao()
-        sqldao.execute(consts.SQL_DELETE_KV_RULES % rule_type)
+        sqldao.execute(const.sql.SQL_DELETE_KV_RULES % rule_type)
         sqldao.commit()
         sqldao.close()
 
     def load_rules(self):
         sqldao = SqlDao()
-        QUERY = consts.SQL_SELECT_KV_RULES
+        QUERY = const.sql.SQL_SELECT_KV_RULES
         counter = 0
         for key, value, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
             if len(value.split('\n')) == 1 and ';' not in label:
@@ -558,7 +564,7 @@ class QueryClassifier(AbsClassifer):
         :param specificRules: specific prune for apps
             ruleType -> host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
         """
-        QUERY = consts.SQL_INSERT_KV_RULES
+        QUERY = const.sql.SQL_INSERT_KV_RULES
         sqldao = SqlDao()
         # Param prune
         params = []
