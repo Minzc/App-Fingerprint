@@ -16,39 +16,39 @@ from const import conf
 # SQL_SELECT_CMAR_RULES = 'SELECT label, pattens, agent, host, rule_type, support FROM patterns where paramkey is NULL'
 
 
-SQL_SELECT_HTTP_PKGS = ('select id, app, add_header, path, refer, hst, agent, dst, method,raw'
-                        'from %s '
-                        "where method='GET' or method='POST'")
-SQL_SELECT_HTTP_PKGS_LIMIT = ("select id, app, add_header, path, refer, hst, agent, dst, method,raw"
-                              "from %s"
-                              "where method='GET' or method='POST' limit %s")
+SQL_SELECT_HTTP_PKGS = (' SELECT id, app, add_header, path, refer, hst, agent, dst, method,raw '
+                        ' FROM %s '
+                        " WHERE method='GET' or method='POST'")
+SQL_SELECT_HTTP_PKGS_LIMIT = (" SELECT id, app, add_header, path, refer, hst, agent, dst, method,raw "
+                              " FROM %s"
+                              " WHERE method='GET' or method='POST' limit %s")
 ############################
 SQL_CLEAN_ALL_RULES = 'DELETE FROM {}'.format(conf.ruleSet)
 ############################
-SQL_DELETE_KV_RULES = ('DELETE FROM {}'
-                       'WHERE paramkey IS NOT NULL and rule_type=%s').format(conf.ruleSet)
+SQL_DELETE_KV_RULES = (' DELETE FROM {}'
+                       ' WHERE paramkey IS NOT NULL and rule_type=%s').format(conf.ruleSet)
 
-SQL_INSERT_KV_RULES = ('INSERT INTO {} (label, support, confidence, host, paramkey, paramvalue, rule_type)'
-                       'VALUES (%s, %s, %s, %s, %s, %s, %s)').format(conf.ruleSet)
+SQL_INSERT_KV_RULES = (' INSERT INTO {} (label, support, confidence, host, paramkey, paramvalue, rule_type)'
+                       ' VALUES (%s, %s, %s, %s, %s, %s, %s)').format(conf.ruleSet)
 
-SQL_SELECT_KV_RULES = ('SELECT paramkey, paramvalue, host, label, confidence, rule_type, support'
-                       'FROM {}'
-                       'WHERE paramkey IS NOT NULL').format(conf.ruleSet)
+SQL_SELECT_KV_RULES = (' SELECT paramkey, paramvalue, host, label, confidence, rule_type, support'
+                       ' FROM {}'
+                       ' WHERE paramkey IS NOT NULL').format(conf.ruleSet)
 ############################
-SQL_INSERT_AGENT_RULES = ('INSERT INTO {} (host, prefix, identifier, suffix, label, support, confidence, rule_type, label_type)'
-                          'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)').format(conf.ruleSet)
+SQL_INSERT_AGENT_RULES = (' INSERT INTO {} (host, prefix, identifier, suffix, label, support, confidence, rule_type, label_type)'
+                          ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)').format(conf.ruleSet)
 
-SQL_DELETE_AGENT_RULES = ('DELETE FROM {}'
-                          'WHERE agent IS NOT NULL and rule_type=%s').format(conf.ruleSet)
+SQL_DELETE_AGENT_RULES = (' DELETE FROM {}'
+                          ' WHERE agent IS NOT NULL and rule_type=%s').format(conf.ruleSet)
 
-SQL_SELECT_AGENT_RULES = ('SELECT host, prefix, identifier, suffix, label, support, confidence, rule_type, label_type\n'
-                          'FROM {}'
-                          'WHERE rule_type = 3').format(conf.ruleSet)
+SQL_SELECT_AGENT_RULES = (' SELECT host, prefix, identifier, suffix, label, support, confidence, rule_type, label_type'
+                          ' FROM {}'
+                          ' WHERE rule_type = 3').format(conf.ruleSet)
 ############################
-SQL_UPDATE_PKG = ('UPDATE %s SET classified = %s'
-                  'WHERE id = %s')
+SQL_UPDATE_PKG = (' UPDATE %s SET classified = %s'
+                  ' WHERE id = %s')
 ############################
-SQL_CREATE_PATTERN = ('CREATE TABLE `{}` ('
+SQL_CREATE_PATTERN = (' CREATE TABLE `{}` ('
                       '  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,'
                       '  `label` VARCHAR(100) DEFAULT NULL,'
                       '  `pattens` VARCHAR(2000) DEFAULT NULL,'
@@ -64,9 +64,9 @@ SQL_CREATE_PATTERN = ('CREATE TABLE `{}` ('
                       '  `suffix` VARCHAR(2000) DEFAULT NULL,'
                       '  `label_type` INT(11) DEFAULT NULL,'
                       '  PRIMARY KEY (`id`)'
-                      ') ENGINE=InnoDB AUTO_INCREMENT=19671453 DEFAULT CHARSET=latin1;').format(conf.ruleSet)
+                      ' ) ENGINE=InnoDB AUTO_INCREMENT=19671453 DEFAULT CHARSET=latin1;').format(conf.ruleSet)
 ############################
-SQL_CREATE_PACKAGE= ('CREATE TABLE `%s` ('
+SQL_CREATE_PACKAGE= (' CREATE TABLE `%s` ('
                      '  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,'
                      '  `app` varchar(100) NOT NULL DEFAULT \'\','
                      '  `add_header` varchar(1000) DEFAULT NULL,'
@@ -90,4 +90,4 @@ SQL_CREATE_PACKAGE= ('CREATE TABLE `%s` ('
                      '  `classified` int(11) DEFAULT NULL,'
                      '  `raw` varchar(3000) DEFAULT NULL,'
                      '  PRIMARY KEY (`id`)'
-                     ') ENGINE=InnoDB AUTO_INCREMENT=303489 DEFAULT CHARSET=utf8;')
+                     ' ) ENGINE=InnoDB AUTO_INCREMENT=303489 DEFAULT CHARSET=utf8;')

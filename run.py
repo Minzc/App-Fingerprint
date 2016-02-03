@@ -9,6 +9,7 @@ from classifiers.classifier_factory import classifier_factory
 from const.conf import INSERT
 from const.dataset import DataSetFactory as DataSetFactory
 from const.dataset import DataSetIter as DataSetIter
+from prune.prune import Prune
 from sqldao import SqlDao
 
 TRAIN_LABEL = consts.APP_RULE
@@ -22,7 +23,7 @@ VALID_LABEL = {
 if not const.conf.TestBaseLine:
     USED_CLASSIFIERS = [
         # consts.HEAD_CLASSIFIER,
-        #consts.AGENT_CLASSIFIER,
+        consts.AGENT_CLASSIFIER,
         consts.KV_CLASSIFIER,
         #consts.URI_CLASSIFIER,
 

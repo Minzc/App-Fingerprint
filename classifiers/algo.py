@@ -458,15 +458,15 @@ class QueryClassifier(AbsClassifer):
         # Generate interesting keys
         #############################
         appGeneralRules = _generate_keys(appKeyScore, hostLabelTable[consts.APP_RULE])
-        categoryGeneralRules = _generate_keys(categoryKeyScore, hostLabelTable[consts.CATEGORY_RULE])
+        #categoryGeneralRules = _generate_keys(categoryKeyScore, hostLabelTable[consts.CATEGORY_RULE])
         #############################
         # Pruning general prune
         #############################
         print(">>>[KV] Before pruning appGeneralRules", len(appGeneralRules))
         appGeneralRules = self._prune_general_rules(appGeneralRules, trainData, lexicalKey)
-        categoryGeneralRules = self._prune_general_rules(categoryGeneralRules, trainData, lexicalKey)
+        #categoryGeneralRules = self._prune_general_rules(categoryGeneralRules, trainData, lexicalKey)
         print(">>>[KV] appGeneralRules", len(appGeneralRules))
-        print(">>>[KV] categoryGeneralRules", len(categoryGeneralRules))
+        #print(">>>[KV] categoryGeneralRules", len(categoryGeneralRules))
         #############################
         # Generate specific prune
         #############################

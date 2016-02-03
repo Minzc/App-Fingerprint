@@ -91,35 +91,27 @@ def _output_rst(inforTrack):
 def auto_test():
     totalPrecision = []
     totalRecall = []
-    for score in range(1,10):
-        for labelT in range(1,10):
-            conf.query_scoreT = score / 10.0
-            conf.query_labelT = labelT / 10.0
+    for testTbl in tbls:
+        if testTbl == 'ios_packages_2015_08_12':
+            continue
 
-            if labelT == 0.3:
-                continue
+        trainTbls = []
+        for tbl in tbls:
+            if tbl != testTbl:
+                trainTbls.append(tbl)
 
-            for testTbl in tbls:
-                if testTbl == 'ios_packages_2015_08_12':
-                    continue
-
-                trainTbls = []
-                for tbl in tbls:
-                    if tbl != testTbl:
-                        trainTbls.append(tbl)
-
-                print trainTbls, testTbl, conf.query_scoreT, conf.query_labelT
-                inforTrack = train_test(trainTbls, testTbl, consts.IOS, True)
-                totalPrecision.append(inforTrack[consts.PRECISION])
-                totalRecall.append(inforTrack[consts.RECALL])
-                output = _output_rst(inforTrack)
-                log(trainTbls, testTbl, output)
-            recall = sum(totalRecall) * 1.0 / len(totalRecall)
-            precision = sum(totalPrecision) * 1.0 / len(totalPrecision)
-            f1Score = 2.0 * precision * recall / (precision + recall)
-            output = "# Precision : %s Recall: %s F1: %s Score: %s LabelT: %s" % \
-                     (precision, recall, f1Score, conf.query_scoreT, conf.query_labelT)
-            log([], '', output)
+        print trainTbls, testTbl, conf.path_scoreT, conf.path_labelT
+        inforTrack = train_test(trainTbls, testTbl, consts.IOS, True)
+        totalPrecision.append(inforTrack[consts.PRECISION])
+        totalRecall.append(inforTrack[consts.RECALL])
+        output = _output_rst(inforTrack)
+        log(trainTbls, testTbl, output)
+    recall = sum(totalRecall) * 1.0 / len(totalRecall)
+    precision = sum(totalPrecision) * 1.0 / len(totalPrecision)
+    f1Score = 2.0 * precision * recall / (precision + recall)
+    output = "# Precision : %s Recall: %s F1: %s Score: %s LabelT: %s" % \
+             (precision, recall, f1Score, conf.path_scoreT, conf.path_labelT)
+    log([], '', output)
 
 
 

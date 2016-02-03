@@ -1,5 +1,6 @@
 # -*- encoding = utf-8 -*-
 import const.sql
+from const import conf
 from utils import unescape, flatten, load_info_features, process_agent
 from sqldao import SqlDao
 from collections import defaultdict
@@ -109,11 +110,15 @@ def persist(appRule, ruleType):
 class AgentClassifier(AbsClassifer):
     def __init__(self, inferFrmData=True):
         self.rules = defaultdict(dict)
+        self.threshold = conf.agent_support
 
     @staticmethod
     def _app(potentialId, potentialHost, extractors):
         appRules = set()
         for _, extractor in extractors:
+            if extractor.weight() <= conf.agent_support:
+                continue
+
             for identifier, records in extractor.match2.items():
                 for app, host in records:
                     if len(potentialId[identifier]) == 1:
@@ -170,6 +175,7 @@ class AgentClassifier(AbsClassifer):
         Count regex
         :param appAgent: app -> (host, agent) -> tbls
         """
+        print '[Agent175] threshold', conf.agent_support
         potentialId = defaultdict(set)
         for _, appAgent in agentTuples.items():
             for app, agent, host in appAgent:
@@ -177,8 +183,8 @@ class AgentClassifier(AbsClassifer):
                     identifier = extractor.match(agent)
                     if identifier:
                         potentialId[identifier].add(app)
-                        if extractor.weight() > 2:
-                            if '/' not in identifier:
+                        if extractor.weight() > conf.agent_support:
+                            if '/' not in identifier and ':' not in identifier:
                                 extractor.add_identifier(app, identifier, host)
         return potentialId
 

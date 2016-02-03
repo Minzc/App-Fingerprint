@@ -38,7 +38,7 @@ class Prune:
             rst = self.queryClassifier.p(pkg)[consts.APP_RULE]
             if rst[0] != None and coverage[tbl + '#' + str(pkg.id)] < 1:
                 coverage[tbl + '#' + str(pkg.id)] += 1
-                key, value, host, label, confidence, rule_type, support = rst[1]
+                key, value, host, label, confidence, rule_type, support = rst[2]
                 specificRules[host][key][value][label][consts.SCORE] = confidence
                 specificRules[host][key][value][label][consts.SUPPORT] = support
         query_persist(specificRules, consts.APP_RULE)
@@ -71,7 +71,7 @@ def agent_persist(appRule, ruleType):
     sqldao.executeBatch(const.sql.SQL_INSERT_AGENT_RULES, params)
     sqldao.close()
 
-def query_persist(specificRules, rule_type):
+def query_persist(patterns, ruleType):
     """
     :param rule_type:
     :param specificRules: specific prune for apps
@@ -81,15 +81,14 @@ def query_persist(specificRules, rule_type):
     sqldao = SqlDao()
     # Param prune
     params = []
-    for ruleType, patterns in specificRules.iteritems():
-        for host in patterns:
-            for key in patterns[host]:
-                for value in patterns[host][key]:
-                    for label in patterns[host][key][value]:
-                        confidence = patterns[host][key][value][label][consts.SCORE]
-                        support = patterns[host][key][value][label][consts.SUPPORT]
-                        params.append((label, support, confidence, host, key, value, ruleType))
+    for host in patterns:
+        for key in patterns[host]:
+            for value in patterns[host][key]:
+                for label in patterns[host][key][value]:
+                    confidence = patterns[host][key][value][label][consts.SCORE]
+                    support = patterns[host][key][value][label][consts.SUPPORT]
+                    params.append((label, support, confidence, host, key, value, ruleType))
     sqldao.executeBatch(QUERY, params)
     sqldao.close()
-    print(">>> [KVRules] Total Number of Rules is %s Rule type is %s" % (len(params), rule_type))
+    print(">>> [KVRules] Total Number of Rules is %s Rule type is %s" % (len(params), ruleType))
 

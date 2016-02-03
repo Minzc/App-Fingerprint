@@ -1,12 +1,11 @@
-#import mysql.connector
 import pymysql.cursors
 class SqlDao:
     def __init__(self):
       try:
-        self.cnx=pymysql.connect(user='root',password='123',host='127.0.0.1',db='fortinet', charset='utf8')
+        self.cnx=pymysql.connect(user='zicun',password='5636595',host='127.0.0.1',db='fortinet', charset='utf8')
         self.cursor = self.cnx.cursor()
       except:
-        self.cnx=pymysql.connect(user='root',password='123',host='127.0.0.1',db='fortinet', charset='utf8')
+        self.cnx=pymysql.connect(user='zicun',password='5636595',host='127.0.0.1',db='fortinet', charset='utf8')
         self.cursor = self.cnx.cursor()
     
     def executeBatch(self, query, params):
@@ -23,7 +22,6 @@ class SqlDao:
             if param == None:
                 self.cursor.execute(query)
             else:
-                # print param
                 self.cursor.execute(query, param)
                 self.cnx.commit()
             return self.cursor
