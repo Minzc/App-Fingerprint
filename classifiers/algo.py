@@ -208,7 +208,7 @@ def _generate_keys(keyScore, hostLabelTbl):
         for key in keyScore[host]:
             labelNum = len(keyScore[host][key][consts.LABEL]) / (1.0 * len(hostLabelTbl[host]))
             if host == 'metrics.ally.com':
-                print('[algo296]', labelNum, key, len(hostLabelTbl[host]), keyScore[host][key][consts.LABEL])
+                if conf.debug: print('[algo296]', labelNum, key, len(hostLabelTbl[host]), keyScore[host][key][consts.LABEL])
             score = keyScore[host][key][consts.SCORE]
             generalRules[host].add(consts.QueryKey(host, key, score, labelNum, len(hostNum[key])))
         generalRules[host] = sorted(list(generalRules[host]), key=lambda rule: rule.score, reverse=True)
@@ -251,7 +251,7 @@ def _score(hstKLblValue, vAppCounter, vCategoryCounter, hostLabelTbl):
         appKScore[host][k][consts.LABEL].add(label)
         categoryKScore[host][k][consts.LABEL].add(label)
         if host == 'metrics.ally.com':
-            print('[algo262]',
+            if conf.debug: print('[algo262]',
                   '[Value]', len(hstKLblValue[host][k][label]),
                   '[AllTbls]', len(hostLabelTbl[host][label]),
                   '[Key]', k,
@@ -263,8 +263,8 @@ def _score(hstKLblValue, vAppCounter, vCategoryCounter, hostLabelTbl):
                   '[BV]', if_version(v),
                   '[Value]', appKScore[host][k][consts.SCORE])
 
-    print('[algo269APP]', appKScore['metrics.ally.com'])
-    print('[algo269CAT]', categoryKScore['metrics.ally.com'])
+    if conf.debug: print('[algo269APP]', appKScore['metrics.ally.com'])
+    if conf.debug: print('[algo269CAT]', categoryKScore['metrics.ally.com'])
     return appKScore, categoryKScore
 
 
@@ -295,9 +295,9 @@ class QueryClassifier(AbsClassifer):
         :param trainData : { tbl : [ packet, packet, ... ] }
         :param xmlGenRules : {( host, key) }
         """
-        print('[algo217]', generalRules['metrics.ally.com'])
+        if conf.debug: print('[algo217]', generalRules['metrics.ally.com'])
         generalRules = self.miner.prune(generalRules)
-        print('[algo219]', generalRules['metrics.ally.com'])
+        if conf.debug: print('[algo219]', generalRules['metrics.ally.com'])
 
         # Prune by coverage
         for host in generalRules:
@@ -311,7 +311,7 @@ class QueryClassifier(AbsClassifer):
                 kv[key] = value
 
             if pkg.host == 'metrics.ally.com':
-                print('[algo222]', kv, generalRules['metrics.ally.com'])
+                if conf.debug: print('[algo222]', kv, generalRules['metrics.ally.com'])
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -323,7 +323,7 @@ class QueryClassifier(AbsClassifer):
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
             if host == 'metrics.ally.com':
-                print('[algo228]', prunedGenRules[host])
+                if conf.debug: print('[algo228]', prunedGenRules[host])
             tmp = set()
             for index, rule in enumerate(prunedGenRules[host]):
                 if len(tmp) > 0 and prunedGenRules[host][index - 1].score - rule.score >= self.miner.scoreGap:
@@ -331,7 +331,7 @@ class QueryClassifier(AbsClassifer):
                 tmp.add(consts.Rule(host, rule.key, None, "\b", rule.score, None))
             prunedGenRules[host] = tmp
             if host == 'metrics.ally.com':
-                print('[algo237]', prunedGenRules[host])
+                if conf.debug: print('[algo237]', prunedGenRules[host])
         return prunedGenRules
 
     def _generate_rules(self, hstKLblValue, generalRules, valueLabelCounter):
@@ -497,7 +497,7 @@ class QueryClassifier(AbsClassifer):
 
     @staticmethod
     def _clean_db(rule_type):
-        print('>>> [KVRULES]', const.sql.SQL_DELETE_KV_RULES % rule_type)
+        if conf.debug: print('>>> [KVRULES]', const.sql.SQL_DELETE_KV_RULES % rule_type)
         sqldao = SqlDao()
         sqldao.execute(const.sql.SQL_DELETE_KV_RULES % rule_type)
         sqldao.commit()
@@ -516,20 +516,24 @@ class QueryClassifier(AbsClassifer):
                 except:
                     pass
 
-                if PATH in key:
+                valid = False
+                if PATH in key and self.miner.name == consts.PATH_MINER:
+                    valid = True
                     if value.count('/') == 0:
                         regexObj = re.compile('.', re.IGNORECASE)
                     else:
                         value = '/'.join(value.split('/')[1:])
                         regexObj = re.compile(r'\b' + re.escape(value) + r'\b', re.IGNORECASE)
-                else:
+                elif PATH not in key and self.miner.name == consts.KV_MINER:
+                    valid = True
                     regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b', re.IGNORECASE)
 
-                self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
-                self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
-                self.rules[rule_type][host][regexObj][consts.LABEL] = label
-                self.rules[rule_type][host][regexObj][consts.EVIDENCE] = (key, value, host, label, confidence, rule_type, support)
-        print('>>> [KV Rules#Load Rules] total number of prune is', counter)
+                if valid:
+                    self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
+                    self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
+                    self.rules[rule_type][host][regexObj][consts.LABEL] = label
+                    self.rules[rule_type][host][regexObj][consts.EVIDENCE] = (key, value, host, label, confidence, rule_type, support)
+        if conf.debug: print('>>> [KV Rules#Load Rules] total number of prune is', counter)
         sqldao.close()
 
     def c(self, pkg):
@@ -543,7 +547,7 @@ class QueryClassifier(AbsClassifer):
                     hostRegex = re.compile(host)
                     assert hostRegex.search(pkg.rawHost)
                     if pkg.app == 'com.ally.auto' and pkg.host == 'metrics.ally.com':
-                        print('[algo523]', regexObj.search(path), regexObj.pattern, path)
+                        if conf.debug: print('[algo523]', regexObj.search(path), regexObj.pattern, path)
 
                     if regexObj.search(path):
                         label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
@@ -553,8 +557,8 @@ class QueryClassifier(AbsClassifer):
                             rst = consts.Prediction(label, confidence, evidence)
             predictRst[ruleType] = rst
             if rst != consts.NULLPrediction and rst.label != get_label(pkg, ruleType):
-                print('[WRONG]', rst, pkg.app, pkg.category, ruleType)
-                print('=' * 10)
+                if conf.debug: print('[WRONG]', rst, pkg.app, pkg.category, ruleType)
+                if conf.debug: print('=' * 10)
 
         return predictRst
 

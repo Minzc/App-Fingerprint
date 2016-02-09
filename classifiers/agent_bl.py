@@ -176,7 +176,8 @@ class AgentBLClassifier(AbsClassifer):
                 for key, extractor in extractors:
                     identifier = extractor.match(agent)
                     if identifier:
-                        potentialId[identifier].add(app)
+                        if '/' not in identifier and ':' not in identifier:
+                            potentialId[identifier].add(app)
 
         return potentialId
 

@@ -9,7 +9,6 @@ from classifiers.classifier_factory import classifier_factory
 from const.conf import INSERT
 from const.dataset import DataSetFactory as DataSetFactory
 from const.dataset import DataSetIter as DataSetIter
-from prune.prune import Prune
 from sqldao import SqlDao
 
 TRAIN_LABEL = consts.APP_RULE
@@ -23,9 +22,9 @@ VALID_LABEL = {
 if not const.conf.TestBaseLine:
     USED_CLASSIFIERS = [
         # consts.HEAD_CLASSIFIER,
-        consts.AGENT_CLASSIFIER,
         consts.KV_CLASSIFIER,
-        #consts.URI_CLASSIFIER,
+        consts.AGENT_CLASSIFIER,
+        consts.URI_CLASSIFIER,
 
     ]
 else:
@@ -86,16 +85,14 @@ def merge_rst(rst, tmprst):
     return rst
 
 
-def train(trainTbls, appType):
+def train(trainSet, appType):
     """
     1. Load data from database from given tables
     2. Train classifiers, prune and persist prune in database
     Input
-    :param trainTbls: A list of tables used to train classifiers
+    :param trainSet: A list of tables used to train classifiers
     :parm appType: android or ios
     """
-    trainSet = DataSetFactory.get_traindata(tbls=trainTbls, appType=appType)
-    trainSet.set_label(TRAIN_LABEL)
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
     for name, classifier in classifiers:
         classifier.set_name(name)
@@ -103,10 +100,6 @@ def train(trainTbls, appType):
         classifier.train(trainSet, TRAIN_LABEL)
     print '>>> Finish training all classifiers'
 
-    if not const.conf.TestBaseLine:
-        #prune = Prune(appType)
-        #prune.prune(trainSet)
-        print '>>> Finish pruning all rules'
 
 
 
@@ -122,8 +115,6 @@ def _evaluate(rst, testSet, testApps):
   """
 
     # app_rst, record_id
-
-
     inforTrack = {}
     correct, recall = 0, 0
     wrongApp, correctApp, detectedApp = set(), set(), set()
@@ -172,13 +163,15 @@ def _evaluate(rst, testSet, testApps):
     print '[TEST] Total Detect Number of App:', len(detectedApp)
     print '[TEST] Total Number of App:', len(testApps)
 
-    #precision = correct * 1.0 / recall
-    #recall = recall * 1.0 / testSet.get_size().values()[0]
+    instance_precision = correct * 1.0 / recall
+    instance_recall = recall * 1.0 / testSet.get_size().values()[0]
     precision = len(correctApp) * 1.0 / (len(correctApp) + len(wrongApp))
     recall = (len(correctApp) + len(wrongApp)) * 1.0 / len(testApps)
     f1Score = 2.0 * precision * recall / (precision + recall)
     inforTrack[consts.DISCOVERED_APP] = len(correctApp.difference(wrongApp)) * 1.0 / len(testApps)
     inforTrack[consts.PRECISION] = precision
+    inforTrack[consts.INSTANCE_PRECISION] = instance_precision
+    inforTrack[consts.INSTANCE_RECALL] = instance_recall
     inforTrack[consts.RECALL] = recall
     inforTrack[consts.F1SCORE] = f1Score
     inforTrack[consts.DISCOVERED_APP_LIST] = detectedApp
@@ -248,7 +241,9 @@ def train_test(trainTbls, testTbl, appType, ifTrain=True):
     if ifTrain:
         print '>>> Start training'
         utils.clean_rules()
-        train(trainTbls, appType)
+        trainSet = DataSetFactory.get_traindata(tbls=trainTbls, appType=appType)
+        trainSet.set_label(TRAIN_LABEL)
+        train(trainSet, appType)
     print '>>> Start testing'
     inforTrack = test(testTbl, appType)
 

@@ -21,7 +21,7 @@ class Package:
         self.label = label
 
     def set_id(self, id):
-        self.id = id
+        self.id = self.tbl + '$' + str(id)
 
     def set_dst(self, dst):
         self.dst = dst

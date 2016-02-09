@@ -28,3 +28,5 @@ with open("resource/config.json") as f:
     assert type(INSERT) == bool
 
     ruleSet = j["ruleset"]
+
+    debug = j["debug"]
