@@ -30,3 +30,14 @@ with open("resource/config.json") as f:
     ruleSet = j["ruleset"]
 
     debug = j["debug"]
+
+    ensamble = j["ensamble"]
+
+    if j["mode"] == "l":
+        db_user = j["db"]["local"]["username"]
+        db_pwd = j["db"]["local"]["password"]
+    else:
+        db_user = j["db"]["server"]["username"]
+        db_pwd = j["db"]["server"]["password"]
+
+    mode = j["mode"]

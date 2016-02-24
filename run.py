@@ -6,6 +6,7 @@ import const.conf
 import const.consts as consts
 import utils
 from classifiers.classifier_factory import classifier_factory
+from const import conf
 from const.conf import INSERT
 from const.dataset import DataSetFactory as DataSetFactory
 from const.dataset import DataSetIter as DataSetIter
@@ -22,16 +23,14 @@ VALID_LABEL = {
 if not const.conf.TestBaseLine:
     USED_CLASSIFIERS = [
         # consts.HEAD_CLASSIFIER,
-        consts.KV_CLASSIFIER,
         consts.AGENT_CLASSIFIER,
-        consts.URI_CLASSIFIER,
-
+        #consts.URI_CLASSIFIER,
+        #consts.KV_CLASSIFIER,
     ]
 else:
      USED_CLASSIFIERS = [
          consts.Agent_BL_CLASSIFIER,
          consts.Query_BL_CLASSIFIER
-
     ]
 
 
@@ -74,14 +73,33 @@ class PredictRst:
         return self.__predict == self.__correct and self.__predict > 0
 
 
-def merge_rst(rst, tmprst):
+def pipeline(rst, tmprst):
     for pkg_id, predictions in tmprst.iteritems():
         if pkg_id not in rst:
-            rst[pkg_id] = predictions
-        else:
+            rst[pkg_id] = {}
             for rule_type in VALID_LABEL:
-                if rst[pkg_id][rule_type].label is None:
-                    rst[pkg_id][rule_type] = tmprst[pkg_id][rule_type]
+                rst[pkg_id][rule_type] = {}
+
+        for rule_type in VALID_LABEL:
+            label = tmprst[pkg_id][rule_type].label
+            if len(rst[pkg_id][rule_type]) == 0 and label is not None:
+                rst[pkg_id][rule_type][label] = 1
+    return rst
+
+def vote_rst(rst, tmprst):
+    for pkg_id, predictions in tmprst.iteritems():
+        if pkg_id not in rst:
+            rst[pkg_id] = {}
+            for rule_type in VALID_LABEL:
+                rst[pkg_id][rule_type] = {}
+
+        for rule_type in VALID_LABEL:
+            label = tmprst[pkg_id][rule_type].label
+            if label is not None:
+                if label not in rst[pkg_id][rule_type]:
+                    rst[pkg_id][rule_type][label] = 1
+                else:
+                    rst[pkg_id][rule_type][label] += 1
     return rst
 
 
@@ -131,12 +149,12 @@ def _evaluate(rst, testSet, testApps):
             ifPredict = False
 
             for ruleType in VALID_LABEL:
-                predict = predictions[ruleType].label
+                predict = None
+                if len(predictions[ruleType]) > 0:
+                    ifPredict = True
+                    predict = max(predictions[ruleType].items(), key=lambda x:x[1])[0]
                 label = utils.get_label(pkg, ruleType)
                 correctLabels[ruleType] = 1 if label == predict else 0
-
-                if predict is not None:
-                    ifPredict = True
 
             if ifPredict:
                 cPrdcts.inc_total()
@@ -228,7 +246,10 @@ def test(testTbl, appType):
         classifier.set_name(name)
         classifier.load_rules()
         tmprst = _classify(classifier, testSet)
-        rst = merge_rst(rst, tmprst)
+        if conf.ensamble == "pipeline":
+            rst = pipeline(rst, tmprst)
+        elif conf.ensamble == "vote":
+            rst = pipeline(rst, tmprst)
 
     print '>>> Start evaluating'
     inforTrack = _evaluate(rst, testSet, testApps)

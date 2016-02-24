@@ -5,7 +5,11 @@ from run import train
 import const.consts as consts
 import sys
 
-tbls = ['ios_packages_2015_09_14', 'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_08_12',
+if conf.mode == 'l':
+    # tbls = ['ios_packages_2015_09_14', 'ios_packages_2015_08_10']
+    tbls = [ 'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_09_14', 'ios_packages_2015_08_12']
+else:
+    tbls = ['ios_packages_2015_09_14', 'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_08_12',
          'ios_packages_2015_08_04', 'ios_packages_2015_10_16','ios_packages_2015_10_21']
 #tbls = ['chi_ios_packages_2015_07_20','chi_ios_packages_2015_09_24','chi_ios_packages_2015_12_15']
 
@@ -93,35 +97,40 @@ def _output_rst(inforTrack):
 
 
 def auto_test():
-    totalPrecision = []
-    totalRecall = []
-    instancePrecisions = []
-    instanceRecalls = []
-    for testTbl in tbls:
-        if testTbl == 'ios_packages_2015_08_12':
-            continue
+    for path_scoreT in range(1,2,2):
+        for path_labelT in range(0,60,10):
+            conf.agent_support = path_labelT
+            totalPrecision = []
+            totalRecall = []
+            instancePrecisions = []
+            instanceRecalls = []
 
-        trainTbls = []
-        for tbl in tbls:
-            if tbl != testTbl:
-                trainTbls.append(tbl)
+            for testTbl in tbls:
+                if testTbl == 'ios_packages_2015_08_12':
+                    continue
 
-        print trainTbls, testTbl, conf.path_scoreT, conf.path_labelT
-        inforTrack = train_test(trainTbls, testTbl, consts.IOS, True)
-        totalPrecision.append(inforTrack[consts.PRECISION])
-        totalRecall.append(inforTrack[consts.RECALL])
-        instancePrecisions.append(inforTrack[consts.INSTANCE_PRECISION])
-        instanceRecalls.append(inforTrack[consts.INSTANCE_RECALL])
-        output = _output_rst(inforTrack)
-        log(trainTbls, testTbl, output)
-    recall = sum(totalRecall) * 1.0 / len(totalRecall)
-    instanceRecall = sum(instanceRecalls) * 1.0 / len(instanceRecalls)
-    precision = sum(totalPrecision) * 1.0 / len(totalPrecision)
-    instancePrecision = sum(instancePrecisions) * 1.0 / len(instancePrecisions)
-    f1Score = 2.0 * precision * recall / (precision + recall)
-    output = "# Precision : %s Recall: %s F1: %s InstanceP: %s InstanceR: %s Score: %s LabelT: %s" % \
-             (precision, recall, f1Score, instancePrecision, instanceRecall, conf.path_scoreT, conf.path_labelT)
-    log([], '', output)
+                trainTbls = []
+                for tbl in tbls:
+                    if tbl != testTbl:
+                        trainTbls.append(tbl)
+
+                print trainTbls, testTbl, conf.agent_support#, conf.path_labelT
+                inforTrack = train_test(trainTbls, testTbl, consts.IOS, True)
+                totalPrecision.append(inforTrack[consts.PRECISION])
+                totalRecall.append(inforTrack[consts.RECALL])
+                instancePrecisions.append(inforTrack[consts.INSTANCE_PRECISION])
+                instanceRecalls.append(inforTrack[consts.INSTANCE_RECALL])
+                output = _output_rst(inforTrack)
+                log(trainTbls, testTbl, output)
+
+            recall = sum(totalRecall) * 1.0 / len(totalRecall)
+            instanceRecall = sum(instanceRecalls) * 1.0 / len(instanceRecalls)
+            precision = sum(totalPrecision) * 1.0 / len(totalPrecision)
+            instancePrecision = sum(instancePrecisions) * 1.0 / len(instancePrecisions)
+            f1Score = 2.0 * precision * recall / (precision + recall)
+            output = "# Precision : %s Recall: %s F1: %s InstanceP: %s InstanceR: %s Score: %s LabelT: %s" % \
+                     (precision, recall, f1Score, instancePrecision, instanceRecall, conf.agent_support, conf.path_labelT)
+            log([], '', output)
 
 
 

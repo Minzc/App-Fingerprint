@@ -8,13 +8,26 @@
         "label": 0.9
     },
     "agent": {
-        "support": 0.0
+        "support": 2.0
     },
     "sample" : 1.0,
     "package.limit" : 0.0,
     "baseline" : false,
     "insert": false,
     "ruleset": "patterns",
-    "debug" : false
+    "debug" : false,
+    "ensamble":"pipeline",
+    "mode":"l",
+    "db" : {
+        "local":{
+            "username" : "root",
+            "password" : "123"
+        },
+
+        "server":{
+            "username" : "zicun",
+            "password" : "5636595"
+        }
+    }
 }
 
