@@ -1,4 +1,4 @@
-from classifiers.agent_compare import AgentClassifier
+from classifiers.agent import AgentClassifier
 from classifiers.agent_bl import AgentBLClassifier
 from classifiers.algo import QueryClassifier
 from classifiers.baseline import BaseLineClassifier
@@ -19,7 +19,7 @@ def classifier_factory(names, appType):
         elif name == consts.KV_CLASSIFIER:
             classifier = QueryClassifier(appType, consts.KV_MINER)
         elif name == consts.Query_BL_CLASSIFIER:
-            classifier = BaseLineClassifier(appType, consts.KV_MINER)
+            classifier = BaseLineClassifier(appType, consts.KV_MINER);
         elif name == consts.Agent_BL_CLASSIFIER:
             classifier = AgentBLClassifier(inferFrmData=True)
         elif name == consts.CMAR_CLASSIFIER:

@@ -7,7 +7,7 @@ import sys
 
 if conf.mode == 'l':
     # tbls = ['ios_packages_2015_09_14', 'ios_packages_2015_08_10']
-    tbls = [ 'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_09_14', 'ios_packages_2015_08_12']
+    tbls = [ 'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_09_14', 'ios_packages_2015_08_12', 'ios_packages_2015_08_04']
 else:
     tbls = ['ios_packages_2015_09_14', 'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_08_12',
          'ios_packages_2015_08_04', 'ios_packages_2015_10_16','ios_packages_2015_10_21']
@@ -97,9 +97,10 @@ def _output_rst(inforTrack):
 
 
 def auto_test():
-    for path_scoreT in range(1,2,2):
-        for path_labelT in range(0,60,10):
-            conf.agent_support = path_labelT
+    for path_scoreT in range(1,10,2):
+        for path_labelT in range(1,10,2):
+            conf.path_labelT = path_labelT / 10.0
+            conf.path_scoreT = path_scoreT / 10.0
             totalPrecision = []
             totalRecall = []
             instancePrecisions = []
@@ -114,7 +115,7 @@ def auto_test():
                     if tbl != testTbl:
                         trainTbls.append(tbl)
 
-                print trainTbls, testTbl, conf.agent_support#, conf.path_labelT
+                print trainTbls, testTbl, conf.path_labelT, conf.path_scoreT
                 inforTrack = train_test(trainTbls, testTbl, consts.IOS, True)
                 totalPrecision.append(inforTrack[consts.PRECISION])
                 totalRecall.append(inforTrack[consts.RECALL])
@@ -129,9 +130,40 @@ def auto_test():
             instancePrecision = sum(instancePrecisions) * 1.0 / len(instancePrecisions)
             f1Score = 2.0 * precision * recall / (precision + recall)
             output = "# Precision : %s Recall: %s F1: %s InstanceP: %s InstanceR: %s Score: %s LabelT: %s" % \
-                     (precision, recall, f1Score, instancePrecision, instanceRecall, conf.agent_support, conf.path_labelT)
+                     (precision, recall, f1Score, instancePrecision, instanceRecall, conf.path_scoreT, conf.path_labelT)
             log([], '', output)
+def auto_test2():
+    totalPrecision = []
+    totalRecall = []
+    instancePrecisions = []
+    instanceRecalls = []
 
+    for testTbl in tbls:
+        if testTbl == 'ios_packages_2015_08_12':
+            continue
+
+        trainTbls = []
+        for tbl in tbls:
+            if tbl != testTbl:
+                trainTbls.append(tbl)
+
+        print trainTbls, testTbl, conf.agent_support#, conf.path_labelT
+        inforTrack = train_test(trainTbls, testTbl, consts.IOS, True)
+        totalPrecision.append(inforTrack[consts.PRECISION])
+        totalRecall.append(inforTrack[consts.RECALL])
+        instancePrecisions.append(inforTrack[consts.INSTANCE_PRECISION])
+        instanceRecalls.append(inforTrack[consts.INSTANCE_RECALL])
+        output = _output_rst(inforTrack)
+        log(trainTbls, testTbl, output)
+
+    recall = sum(totalRecall) * 1.0 / len(totalRecall)
+    instanceRecall = sum(instanceRecalls) * 1.0 / len(instanceRecalls)
+    precision = sum(totalPrecision) * 1.0 / len(totalPrecision)
+    instancePrecision = sum(instancePrecisions) * 1.0 / len(instancePrecisions)
+    f1Score = 2.0 * precision * recall / (precision + recall)
+    output = "# Precision : %s Recall: %s F1: %s InstanceP: %s InstanceR: %s Score: %s LabelT: %s" % \
+             (precision, recall, f1Score, instancePrecision, instanceRecall, conf.agent_support, conf.path_labelT)
+    log([], '', output)
 
 
 

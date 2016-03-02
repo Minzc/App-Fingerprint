@@ -24,8 +24,8 @@ if not const.conf.TestBaseLine:
     USED_CLASSIFIERS = [
         # consts.HEAD_CLASSIFIER,
         consts.AGENT_CLASSIFIER,
-        #consts.URI_CLASSIFIER,
-        #consts.KV_CLASSIFIER,
+        consts.KV_CLASSIFIER,
+        consts.URI_CLASSIFIER,
     ]
 else:
      USED_CLASSIFIERS = [
@@ -240,16 +240,27 @@ def test(testTbl, appType):
     testApps = testSet.apps
 
     rst = {}
+    rst2 = {}
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
     for name, classifier in classifiers:
         print ">>> [test#%s] " % name
         classifier.set_name(name)
         classifier.load_rules()
         tmprst = _classify(classifier, testSet)
-        if conf.ensamble == "pipeline":
-            rst = pipeline(rst, tmprst)
-        elif conf.ensamble == "vote":
-            rst = pipeline(rst, tmprst)
+        # if conf.ensamble == "pipeline":
+        rst = pipeline(rst, tmprst)
+        # elif conf.ensamble == "vote":
+        rst2 = vote_rst(rst2, tmprst)
+
+    assert len(rst2) == len(rst)
+    for pkgid in rst:
+        print(rst[pkgid][consts.APP_RULE])
+        print(rst2[pkgid][consts.APP_RULE])
+        assert None not in rst[pkgid][consts.APP_RULE]
+        if len(rst[pkgid][consts.APP_RULE]) > 0:
+            assert None not in rst2[pkgid][consts.APP_RULE]
+            assert len(rst2[pkgid][consts.APP_RULE]) > 0
+
 
     print '>>> Start evaluating'
     inforTrack = _evaluate(rst, testSet, testApps)

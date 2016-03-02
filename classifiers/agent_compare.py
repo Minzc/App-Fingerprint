@@ -1,5 +1,4 @@
 # -*- encoding = utf-8 -*-
-import string
 
 import const.sql
 from const import conf
@@ -15,8 +14,6 @@ from const.dataset import DataSetIter as DataSetIter
 VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier',
                   'CFBundleDisplayName', 'CFBundleURLSchemes'}
 STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName'}
-
-STOPWORDS = {'iphone', 'app'}
 
 SPLITTER = re.compile("[" + r'''!"#$%&'()*+,\-/:;<=>?@[\]^_`{|}~ ''' + "]")
 
@@ -152,7 +149,20 @@ class AgentClassifier(AbsClassifer):
         return featureSet
 
 
-    def __count(self, agentTuples, extractors):
+    def __check(self, identifier, unticorr):
+        for w in unticorr:
+            if w in identifier:
+                print('##', identifier, w)
+                return None
+        if '/' in identifier[:-1]:
+            return None
+        if ':' in identifier:
+            return None
+        if ';' in identifier[:-1]:
+            return None
+        return identifier
+
+    def __count(self, agentTuples, extractors, unticorr):
         """
         Count regex
         :param appAgent: app -> (host, agent) -> tbls
@@ -163,13 +173,13 @@ class AgentClassifier(AbsClassifer):
             for app, agent, host in appAgent:
                 for key, extractor in extractors:
                     identifier = extractor.match(agent)
-                    if 'emergencyradiofree' in agent:
-                        print('###', extractor.identifier.pattern, identifier, agent)
+                    # if 'emergencyradiofree' in agent:
+                    #     print('###', extractor.identifier.pattern, identifier, agent)
                     if identifier:
                         tmp = SPLITTER.sub('', identifier)
                         potentialId[tmp].add(app)
                         if extractor.weight() > conf.agent_support:
-                            if '/' not in identifier[:-1] and ':' not in identifier and ';' not in identifier[:-1]:
+                            if self.__check(identifier, unticorr[app]):
                                 extractor.add_identifier(app, identifier, host)
                                 break
         return potentialId
@@ -191,7 +201,7 @@ class AgentClassifier(AbsClassifer):
             D += 1
             for app, agent, host in tps:
                 words = SPLITTER.split(agent)
-                print(agent, words)
+                # print(agent, words)
                 for word in set(words):
                     word = word.strip()
                     if len(word) > 1:
@@ -200,13 +210,16 @@ class AgentClassifier(AbsClassifer):
                 labels[app] += 1
 
         corr = defaultdict(set)
+        unticorr = defaultdict(set)
         for appWord, count in cooccur.items():
             app, word = appWord
             value = ( count * D * 1.0 ) / (labels[app] * features[word])
             #print(app, word, value)
             if value > threshold:
                 corr[app].add(word)
-        return corr
+            else:
+                unticorr[app].add(word)
+        return corr, unticorr
 
     def find_boundary(self, trainData, corr):
         boundary = defaultdict(set)
@@ -236,7 +249,7 @@ class AgentClassifier(AbsClassifer):
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             trainData[tbl].add((pkg.app, process_agent(pkg.agent, pkg.app), pkg.host))
             potentialHost[pkg.host].add(pkg.app)
-        corr = self.cal_corr(trainData, 0.001)
+        corr, unticorr = self.cal_corr(trainData, 0.001)
         boundary = self.find_boundary(trainData, corr)
         extractors = {}
         for b, v in boundary.items():
@@ -250,7 +263,7 @@ class AgentClassifier(AbsClassifer):
         Count regex
         '''
         print 'Len extractors', len(extractors), 'Len agent', len(trainData)
-        potentialId  = self.__count(trainData, extractors)
+        potentialId  = self.__count(trainData, extractors, unticorr)
 
         print "Finish Counter"
 
