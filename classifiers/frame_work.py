@@ -1,66 +1,77 @@
 # -*- encoding = utf-8 -*-
+from __future__ import absolute_import, division, print_function, unicode_literals
 from abc import abstractmethod, ABCMeta
 
-import const.sql
-from const import conf
-from utils import flatten, process_agent
-from sqldao import SqlDao
+from utils import process_agent
 from collections import defaultdict
 import const.consts as consts
-from classifier import AbsClassifer
 import re
-import urllib
-from const.dataset import DataSetIter as DataSetIter
+from const.dataset import DataSetIter as DataSetIter, DataSetFactory
 
 SPLITTER = re.compile("[" + r'''!"#$%&'()*+,\-/:;<=>?@[\]^_`{|}~ ''' + "]")
 
-def process_agent(agent, app):
-    agent = re.sub(r'[a-z]?[0-9]+-[a-z]?[0-9]+-[a-z]?[0-9]+', r'[VERSION]', agent)
-    agent = re.sub(r'(/)([0-9]+)([ ;])', r'\1[VERSION]\3', agent)
-    agent = re.sub(r'/[0-9][.0-9]+', r'/[VERSION]', agent)
-    agent = re.sub(r'([ :v])([0-9][.0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
-    agent = re.sub(r'([ :v])([0-9][_0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
-    agent = re.sub(r'(^[0-9a-z]*)(.'+app+r'$)', r'[RANDOM]\2', agent)
-    return agent
 class FrameWork:
     __metaclass__ = ABCMeta
     @abstractmethod
     def reformat(self, trainSet):
         return
+    def score(self, trainSet):
+        return
 
 class Agent(FrameWork):
-
     def reformat(self, trainSet):
+        trainData = set()
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
-            agent = process_agent(pkg.agent, pkg.app)
-            words = SPLITTER.split(data)
-        return words
+            trainData.add((
+                pkg.app,
+                tuple(['^'] + filter(lambda item: len(item) > 1,
+                       map(lambda item: item.strip(),
+                            SPLITTER.split(process_agent(pkg.agent, pkg.app)))) + ['$']),
+                pkg.host,
+                tbl
+            ))
+        return trainData
 
-    def cal_corr(self, trainData, threshold):
-        labels = defaultdict(int)
+    def find_frequent_context(self, trainData):
+        corr, stopwords = self.cal_idf(trainData, 0.7)
+        trainSet = set()
+        for app, items, host, tbl in trainData:
+            startIndex = -1
+            for i, word in enumerate(items):
+                if startIndex == -1 and word in corr:
+                    startIndex = i-1
+                if startIndex != -1 and word not in corr:
+                    endIndex = i
+                    print('#', items, (items[startIndex], items[endIndex], items[startIndex: endIndex]))
+                    trainSet.add(
+                        (tbl, host, (items[startIndex], items[endIndex]), items[startIndex + 1 : endIndex])
+                    )
+                    startIndex = -1
+        return trainSet
+
+    def cal_idf(self, trainData, threshold):
+        appCounter = defaultdict(int)
         features = defaultdict(int)
-        cooccur = defaultdict(int)
-        D = 0
-        for tbl, tps in trainData.items():
-            D += 1
-            for app, agent, host in tps:
-                words = SPLITTER.split(agent)
-                # print(agent, words)
-                for word in set(words):
-                    word = word.strip()
-                    if len(word) > 1:
-                        features[word] += 1
-                        cooccur[(app, word)] +=1
-                labels[app] += 1
-
-        corr = defaultdict(set)
-        unticorr = defaultdict(set)
-        for appWord, count in cooccur.items():
-            app, word = appWord
-            value = ( count * D * 1.0 ) / (labels[app] * features[word])
-            #print(app, word, value)
-            if value > threshold:
-                corr[app].add(word)
+        cooccur = defaultdict(set)
+        for app, items, host, tbl in trainData:
+            for item in set(items):
+                features[item] += 1
+                cooccur[item].add(app)
+            appCounter[app] += 1
+        corr = set()
+        stopwords = set()
+        for item, apps in cooccur.items():
+            value = len(apps) / len(appCounter)
+            if value < threshold:
+                print(item, value)
+                corr.add(item)
             else:
-                unticorr[app].add(word)
-        return corr, unticorr
+                stopwords.add(item)
+        return corr, stopwords
+
+trainTbls = ['ios_packages_2015_09_14', 'ios_packages_2015_08_10']
+trainSet = DataSetFactory.get_traindata(tbls=trainTbls, appType=consts.IOS)
+agent = Agent()
+trainSet = agent.reformat(trainSet)
+for tbl, host, key, value in trainSet:
+    print('>>>', tbl, host, key, value)

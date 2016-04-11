@@ -18,7 +18,7 @@ class Rule:
         trackID = AppInfos.get(consts.IOS, name).trackId
         self.vulnID = vulnID
         self.group = group
-        self.attachID = 1
+        self.attachID = vulnID
         self.revision = 1
         self.group = group
         self.protocol = 'tcp'
@@ -64,7 +64,11 @@ def generate_agent_rules(vulnID=100000):
         if len(agentFeature) > 1:
             regex, label = regxNlabel
             rule = Rule(vulnID, label, IOS_GROUP, 41 - 1 / float(len(agentFeature)))
-            patternRegex = re.escape('User-Agent:') + '.*' + regex.pattern
+            if '^' in regex.pattern:
+                patternRegex = re.escape('User-Agent:') + '\W*' + regex.pattern.replace('^', '').replace('$','\W')
+            else:
+                patternRegex = re.escape('User-Agent:') + '.*' + regex.pattern.replace('$','\W')
+
             rule.add_feature_str(PCRE, patternRegex, 'header')
             ipsRules.append(rule)
             vulnID += 1
@@ -73,7 +77,10 @@ def generate_agent_rules(vulnID=100000):
         for agentFeature, regexNlabel in classifier.rulesHost[consts.APP_RULE][host].items():
             regex, label = regexNlabel
             rule = Rule(vulnID, label, IOS_GROUP, 41 - 1 / float(len(agentFeature)))
-            patternRegex = re.escape('User-Agent:') + '.*' + regex.pattern
+            if '^' in regex.pattern:
+                patternRegex = re.escape('User-Agent:') + '\W*' + regex.pattern.replace('^', '').replace('$','\W')
+            else:
+                patternRegex = re.escape('User-Agent:') + '.*' + regex.pattern.replace('$','\W')
             rule.add_feature_str(PCRE, host, 'host')
             rule.add_feature_str(PCRE, patternRegex, 'header')
             ipsRules.append(rule)
@@ -113,10 +120,7 @@ def generate_kv_rules(vulnID=300000):
         for regexObj, scores in rules[consts.APP_RULE][host].iteritems():
             label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
             if len(regexObj.pattern.split('\n')) == 1:
-                if '=' in regexObj.pattern:
-                    support += 30
-                else:
-                    support += 20
+                support += 30
 
                 rule = Rule(vulnID, label, IOS_GROUP, support)
                 rule.add_feature_str(PCRE, re.escape(host), 'host', HTTP_GET)
@@ -127,21 +131,27 @@ def generate_kv_rules(vulnID=300000):
     return ipsRules
 
 
-# def generate_host_rules(vulnID=400000):
-#     trainedClassifiers = [consts.URI_CLASSIFIER]
-#     appType = consts.IOS
-#     classifier = classifier_factory(trainedClassifiers, appType)[0][1]
-#     classifier.load_rules()
-#     ipsRules = []
-#     cRules = classifier.prune
-#     for host in cRules[consts.APP_RULE]:
-#         if '' in cRules[consts.APP_RULE][host]:
-#             label, support = cRules[consts.APP_RULE][host]['']
-#             rule = Rule(vulnID, label, IOS_GROUP, 10 + support)
-#             rule.add_feature_str(PCRE, host, 'host')
-#             vulnID += 1
-#             ipsRules.append(rule)
-#     return ipsRules
+def generate_uri_rules(vulnID=400000):
+    trainedClassifiers = [consts.URI_CLASSIFIER]
+    appType = consts.IOS
+    classifier = classifier_factory(trainedClassifiers, appType)[0][1]
+    classifier.load_rules()
+
+    ipsRules = []
+    rules = classifier.rules
+    for host in rules[consts.APP_RULE]:
+        for regexObj, scores in rules[consts.APP_RULE][host].iteritems():
+            label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
+            if len(regexObj.pattern.split('\n')) == 1:
+                support += 20
+
+                rule = Rule(vulnID, label, IOS_GROUP, support)
+                rule.add_feature_str(PCRE, re.escape(host), 'host', HTTP_GET)
+                rule.add_feature_str(PCRE, regexObj.pattern, 'uri', HTTP_GET)
+                ipsRules.append(rule)
+                vulnID += 1
+
+    return ipsRules
 
 
 if __name__ == '__main__':
@@ -168,6 +178,7 @@ if __name__ == '__main__':
         rules = generate_agent_rules()
         # prune += generate_path_rules()
         rules += generate_kv_rules()
+        rules += generate_uri_rules()
         # prune += generate_host_rules()
         output_rules(args.p + '_all.rule', rules)
     else:

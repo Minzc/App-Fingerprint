@@ -270,15 +270,20 @@ def load_xml_features():
     from const.app_info import AppInfos
     folder = './resource/Infoplist/'
     appFeatures = defaultdict(set)
+    missed = set()
     for f in listdir(folder):
         filePath = join(folder, f)
         if isfile(filePath):
             trackId = f[0:-4]
-            app = AppInfos.get(consts.IOS, trackId).package
-            features = _parse_xml2(filePath)
-            features.add((u'PACKAGE_NAME', app))
-            features.add((u'TRACK_ID', trackId))
-            appFeatures[app] = features
+            try:
+                app = AppInfos.get(consts.IOS, trackId).package
+                features = _parse_xml2(filePath)
+                features.add((u'PACKAGE_NAME', app))
+                features.add((u'TRACK_ID', trackId))
+                appFeatures[app] = features
+            except:
+                missed.add(f)
+    print "[DO NOT HAVE IOS_INFO]", len(missed)
     return appFeatures
 
 

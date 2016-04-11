@@ -1,11 +1,11 @@
 import pyshark
 import sys
 
+import const.consts as consts
 from const import sql
+from const.app_info import AppInfos
 from sqldao import SqlDao
-import consts
 from utils import loadfile
-from app_info import AppInfos
 
 
 class ETLConsts:

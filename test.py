@@ -1,17 +1,24 @@
+import utils
 from const import conf
+from const.dataset import DataSetFactory
 from run import train_test
-from run import USED_CLASSIFIERS
 from run import train
+import run
 import const.consts as consts
 import sys
 
+tbls = []
 if conf.mode == 'l':
-    # tbls = ['ios_packages_2015_09_14', 'ios_packages_2015_08_10']
-    tbls = [ 'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_09_14', 'ios_packages_2015_08_12', 'ios_packages_2015_08_04']
+    tbls = ['ios_packages_2015_09_14', 'ios_packages_2015_08_10']
+    #tbls = [ 'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_09_14', 'ios_packages_2015_08_12', 'ios_packages_2015_08_04']
 else:
-    tbls = ['ios_packages_2015_09_14', 'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_08_12',
+    if conf.region == "us":
+        tbls = ['ios_packages_2015_09_14', 'ios_packages_2015_08_10', 'ios_packages_2015_06_08', 'ios_packages_2015_08_12',
          'ios_packages_2015_08_04', 'ios_packages_2015_10_16','ios_packages_2015_10_21']
-#tbls = ['chi_ios_packages_2015_07_20','chi_ios_packages_2015_09_24','chi_ios_packages_2015_12_15']
+    elif conf.region == "cn":
+        tbls = ['chi_ios_packages_2015_07_20','chi_ios_packages_2015_09_24','chi_ios_packages_2015_12_15']
+    elif conf.region == "ca":
+        tbls = ['ca_ios_packages_2015_05_04', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22']
 
 
 def log(trainTbls, testTbl, output):
@@ -21,7 +28,7 @@ def log(trainTbls, testTbl, output):
     fw = open('autotest_ios.txt', 'a')
     fw.write(dateStr + ' ' + timeStr + '\n')
     fw.write(str(trainTbls) + ' ' + testTbl + '\n')
-    fw.write(str(USED_CLASSIFIERS) + '\n')
+    fw.write(str(run.USED_CLASSIFIERS) + '\n')
     fw.write(output + '\n')
     fw.write('=' * 20 + '\n')
     fw.close()
@@ -34,7 +41,7 @@ def test(testTbl):
             trainTbls.append(tbl)
 
     print trainTbls, testTbl
-    inforTrack = train_test(trainTbls, testTbl, consts.IOS, ifTrain=True)
+    inforTrack = train_test(trainTbls, testTbl, consts.IOS, ifTrain=False)
     output = _output_rst(inforTrack)
     log(trainTbls, testTbl, output)
     _compare_rst(inforTrack[consts.DISCOVERED_APP_LIST], inforTrack[consts.RESULT])
@@ -96,7 +103,7 @@ def _output_rst(inforTrack):
            (precision, recall, appCoverage, f1Score, instance_precision, instance_recall)
 
 
-def auto_test():
+def auto_test2():
     for path_scoreT in range(1,10,2):
         for path_labelT in range(1,10,2):
             conf.path_labelT = path_labelT / 10.0
@@ -132,7 +139,33 @@ def auto_test():
             output = "# Precision : %s Recall: %s F1: %s InstanceP: %s InstanceR: %s Score: %s LabelT: %s" % \
                      (precision, recall, f1Score, instancePrecision, instanceRecall, conf.path_scoreT, conf.path_labelT)
             log([], '', output)
-def auto_test2():
+
+def test_combine():
+    run.USED_CLASSIFIERS = [
+        consts.AGENT_CLASSIFIER,
+        consts.KV_CLASSIFIER,
+    ]
+    auto_test()
+    run.USED_CLASSIFIERS = [
+        consts.AGENT_CLASSIFIER,
+        consts.URI_CLASSIFIER,
+    ]
+    auto_test()
+    run.USED_CLASSIFIERS = [
+        # consts.HEAD_CLASSIFIER,
+        consts.KV_CLASSIFIER,
+        consts.AGENT_CLASSIFIER,
+        #consts.URI_CLASSIFIER,
+    ]
+    auto_test()
+    run.USED_CLASSIFIERS = [
+        # consts.HEAD_CLASSIFIER,
+        consts.URI_CLASSIFIER,
+        consts.KV_CLASSIFIER,
+        #consts.AGENT_CLASSIFIER,
+    ]
+    auto_test()
+def auto_test():
     totalPrecision = []
     totalRecall = []
     instancePrecisions = []
@@ -168,7 +201,11 @@ def auto_test2():
 
 
 def gen_rules():
-    train(tbls, consts.IOS)
+    print '>>> Start training'
+    utils.clean_rules()
+    trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
+    trainSet.set_label(consts.APP_RULE)
+    train(trainSet, consts.IOS)
     log(tbls, 'NO TEST', 'PURE TRAIN')
 
 
@@ -176,7 +213,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print 'python test.py [auto|gen|test]'
     elif sys.argv[1] == 'auto':
-        auto_test()
+        test_combine()
     elif sys.argv[1] == 'gen':
         gen_rules()
     elif sys.argv[1] == 'test':

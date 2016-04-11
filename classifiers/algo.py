@@ -523,10 +523,10 @@ class QueryClassifier(AbsClassifer):
                         regexObj = re.compile('.', re.IGNORECASE)
                     else:
                         value = '/'.join(value.split('/')[1:])
-                        regexObj = re.compile(r'\b' + re.escape(value) + r'\b', re.IGNORECASE)
+                        regexObj = re.compile(r'\W' + re.escape(value) + r'\W', re.IGNORECASE)
                 elif PATH not in key and self.miner.name == consts.KV_MINER:
                     valid = True
-                    regexObj = re.compile(r'\b' + re.escape(key + '=' + value) + r'\b', re.IGNORECASE)
+                    regexObj = re.compile(r'\W' + re.escape(key + '=' + value) + r'\W', re.IGNORECASE)
 
                 if valid:
                     self.rules[rule_type][host][regexObj][consts.SCORE] = confidence

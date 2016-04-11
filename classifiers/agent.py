@@ -248,6 +248,8 @@ class AgentClassifier(AbsClassifer):
         for host, prefix, identifier, suffix, label, support, confidence, ruleType, labelType in sqldao.execute(
                 const.sql.SQL_SELECT_AGENT_RULES):
             counter += 1
+            if identifier == 'mozilla':
+                continue
             agentRegex = gen_regex(prefix, identifier, suffix, label)
             lexicalR = consts.Rule(host, prefix, identifier, suffix, support, label)
             if host is None:

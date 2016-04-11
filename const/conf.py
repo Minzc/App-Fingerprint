@@ -41,3 +41,5 @@ with open("resource/config.json") as f:
         db_pwd = j["db"]["server"]["password"]
 
     mode = j["mode"]
+
+    region = j["region"]

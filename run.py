@@ -24,8 +24,8 @@ if not const.conf.TestBaseLine:
     USED_CLASSIFIERS = [
         # consts.HEAD_CLASSIFIER,
         consts.AGENT_CLASSIFIER,
-        consts.KV_CLASSIFIER,
-        consts.URI_CLASSIFIER,
+        #consts.KV_CLASSIFIER,
+        #consts.URI_CLASSIFIER,
     ]
 else:
      USED_CLASSIFIERS = [
@@ -254,8 +254,6 @@ def test(testTbl, appType):
 
     assert len(rst2) == len(rst)
     for pkgid in rst:
-        print(rst[pkgid][consts.APP_RULE])
-        print(rst2[pkgid][consts.APP_RULE])
         assert None not in rst[pkgid][consts.APP_RULE]
         if len(rst[pkgid][consts.APP_RULE]) > 0:
             assert None not in rst2[pkgid][consts.APP_RULE]
