@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.0</string>
+	<key>CFBundleName</key>
+	<string>instacollage2</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.0</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>UIMainStoryboardFile~ipad</key>
+	<string>iPad</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon57x57</string>
+				<string>AppIcon60x60</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>instacollage2</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>collage</string>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>collage</string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.instacollage.collage</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>22.png</string>
+		</dict>
+	</array>
+	<key>DTSDKBuild</key>
+	<string>12A365</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.5</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13E28</string>
+	<key>DTPlatformBuild</key>
+	<string>12A365</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6A313</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Architects Daughter.ttf</string>
+		<string>Beautiful Flaws.ttf</string>
+		<string>Honey Script.ttf</string>
+		<string>Janda Safe and Sound Solid.ttf</string>
+		<string>OZH.ttf</string>
+		<string>Throw My Hands Up in the Air.ttf</string>
+		<string>World Colors.ttf</string>
+		<string>A Safe Place to Fall.ttf</string>
+		<string>Aerovias Brasil NF.ttf</string>
+		<string>akaDora.ttf</string>
+		<string>Alice in Wonderland.ttf</string>
+		<string>AGLettericaCondensed.ttf</string>
+		<string>AnthologY.ttf</string>
+		<string>Alako-Bold.ttf</string>
+		<string>Bleeding Cowboys.ttf</string>
+		<string>Caviar Dreams.ttf</string>
+		<string>Coca Cola ii.ttf</string>
+		<string>Defused.ttf</string>
+		<string>Faith Collapsing.ttf</string>
+		<string>Flight mAybe Maj.ttf</string>
+		<string>Good Times.ttf</string>
+		<string>HARD ROCK.ttf</string>
+		<string>Harry Potter.ttf</string>
+		<string>Hawaii Lover.ttf</string>
+		<string>JAMES HAN.ttf</string>
+		<string>Ashcan BB.ttf</string>
+		<string>Bailey MF.ttf</string>
+		<string>Cadmium Egg.ttf</string>
+		<string>Chardin Doihle Shadow.ttf</string>
+		<string>Czaristite.ttf</string>
+		<string>DymaxionScript.ttf</string>
+		<string>handwriting-draft_free-version.ttf</string>
+		<string>Mouser Outline.ttf</string>
+		<string>Ozymandias Outline.ttf</string>
+		<string>Speedline MF.ttf</string>
+		<string>Stoney Billy.ttf</string>
+		<string>Wedgie.ttf</string>
+		<string>Worstveld Sling Bold Oblique.ttf</string>
+		<string>Dullard.ttf</string>
+		<string>Acquest Script.ttf</string>
+		<string>Lily Script One.ttf</string>
+		<string>Saucer BB.ttf</string>
+		<string>Ricks American NF.ttf</string>
+		<string>Big Apple NF.ttf</string>
+		<string>Planet Benson 2.ttf</string>
+		<string>Font formerly known as FONT.ttf</string>
+		<string>Phoenix Rising.ttf</string>
+		<string>Stereo MF.ttf</string>
+		<string>Captain Swabby NF.ttf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>1.0.5</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>com.instacollage.collage</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>instaCollage Document</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.mime-type</key>
+				<string>application/instacollage</string>
+				<key>public.filename-extension</key>
+				<string>collage</string>
+			</dict>
+		</dict>
+	</array>
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-568h</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+	</array>
+	<key>UILaunchImageFile</key>
+	<string>LaunchImage</string>
+	<key>MinimumOSVersion</key>
+	<string>7.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>CFBundleIdentifier</key>
+	<string>com.click2mobile.instacollage2click</string>
+	<key>DTXcode</key>
+	<string>0600</string>
+	<key>CFBundleExecutable</key>
+	<string>instacollage2</string>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon57x57</string>
+				<string>AppIcon60x60</string>
+				<string>AppIcon72x72</string>
+				<string>AppIcon76x76</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>UIMainStoryboardFile</key>
+	<string>iPhone</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb190978811108270free</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>RootURL</key>
+	<string>http://appsarefun.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb230640070306902</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>4.3</string>
+	<key>CFBundleName</key>
+	<string>App Tracker</string>
+	<key>DTSDKName</key>
+	<string>iphoneos4.3</string>
+	<key>MCApplicationId</key>
+	<string>0726C666-ACDD-46DA-8A4F-C23C2B09AEDF</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>AppName</key>
+	<string>Free App Tracker</string>
+	<key>CFBundleDisplayName</key>
+	<string>App Tracker</string>
+	<key>DTSDKBuild</key>
+	<string>8F190</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>AppLink</key>
+	<string>http://chibie.com/622918</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>10J567</string>
+	<key>DTPlatformBuild</key>
+	<string>8F190</string>
+	<key>MinimumOSVersion</key>
+	<string>3.0</string>
+	<key>DTXcodeBuild</key>
+	<string>4A304a</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleVersion</key>
+	<string>1.8</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>amrtypen.ttf</string>
+		<string>madechina.ttf</string>
+		<string>myriadprosemibold.ttf</string>
+		<string>myriadprosemiboldit.ttf</string>
+	</array>
+	<key>UIStatusBarHidden</key>
+	<false/>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.stuckpixelinc.freeapptracker</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon-ipad.png</string>
+		<string>Icon@2x.png</string>
+	</array>
+	<key>AdwhirlKey</key>
+	<string>590c6f7ef7c6444eaaa7354e3ab946de</string>
+	<key>DTXcode</key>
+	<string>0400</string>
+	<key>CFBundleExecutable</key>
+	<string>App Tracker</string>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindow-iPad</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>4.2</string>
+</dict>
+</plist>

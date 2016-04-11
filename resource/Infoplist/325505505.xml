@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>4.3</string>
+	<key>CFBundleIconFile</key>
+	<string>SillyStoriesLite_Icon.png</string>
+	<key>CFBundleName</key>
+	<string>Silly Stories Lite</string>
+	<key>DTSDKName</key>
+	<string>iphoneos4.3</string>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Silly Lite</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+	</array>
+	<key>DTSDKBuild</key>
+	<string>8F190</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.2</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>10J567</string>
+	<key>DTPlatformBuild</key>
+	<string>8F190</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+	</array>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>UIPrerenderedIcon</key>
+	<string>TRUE</string>
+	<key>CFBundleVersion</key>
+	<string>1.2</string>
+	<key>DTXcodeBuild</key>
+	<string>4A304a</string>
+	<key>MinimumOSVersion</key>
+	<string>3.2</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.sillystoriesapp.lite</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Logo_lite_57.png</string>
+		<string>Logo_lite_114.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0400</string>
+	<key>CFBundleExecutable</key>
+	<string>Silly Stories Lite</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>4.2</string>
+</dict>
+</plist>

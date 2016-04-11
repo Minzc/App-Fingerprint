@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>Ratatap Drums Free</string>
+	<key>DTXcode</key>
+	<string>0450</string>
+	<key>DTSDKName</key>
+	<string>iphoneos6.0</string>
+	<key>DTSDKBuild</key>
+	<string>10A403</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>1.91</string>
+	<key>BuildMachineOSBuild</key>
+	<string>11E53</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>CFBundleShortVersionString</key>
+	<string>1.91</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<dict>
+		<key>accelerometer</key>
+		<true/>
+		<key>opengles-1</key>
+		<true/>
+	</dict>
+	<key>CFBundleExecutable</key>
+	<string>Ratatap Drums Free</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvmgcc42</string>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.ratatapdrums.free</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>DTPlatformVersion</key>
+	<string>6.0</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon@2x.png</string>
+		<string>Icon-72.png</string>
+		<string>Icon-Small-50.png</string>
+		<string>Icon-Small.png</string>
+		<string>Icon-Small@2x.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<false/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>R-Tap Drums</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTXcodeBuild</key>
+	<string>4G182</string>
+	<key>DTPlatformBuild</key>
+	<string>10A403</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+</dict>
+</plist>

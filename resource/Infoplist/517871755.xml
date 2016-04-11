@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.2</string>
+	<key>CFBundleName</key>
+	<string>YouDoodle</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.2</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon-Free29x29</string>
+				<string>AppIcon-Free40x40</string>
+				<string>AppIcon-Free57x57</string>
+				<string>AppIcon-Free60x60</string>
+			</array>
+		</dict>
+	</dict>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>You Doodle</string>
+	<key>UIStatusBarHidden~ipad</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Image</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.image</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Instagram</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.instagram.photo</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+		</dict>
+	</array>
+	<key>DTSDKBuild</key>
+	<string>12D508</string>
+	<key>CFBundleShortVersionString</key>
+	<string>5.7.2</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14C1510</string>
+	<key>DTPlatformBuild</key>
+	<string>12D508</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>ig</string>
+			</dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.image</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>com.instagram.photo</string>
+		</dict>
+	</array>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>1942 report.ttf</string>
+		<string>2Dumb.ttf</string>
+		<string>3Dumb.ttf</string>
+		<string>A Charming Font.ttf</string>
+		<string>Airstream.ttf</string>
+		<string>Amadeus Regular.ttf</string>
+		<string>Aquiline.ttf</string>
+		<string>barcode font.ttf</string>
+		<string>batmanforeveralternate.ttf</string>
+		<string>Battlestar.ttf</string>
+		<string>BlackRose.ttf</string>
+		<string>Boycott.ttf</string>
+		<string>Brushstroke.ttf</string>
+		<string>Burnstown Dam.otf</string>
+		<string>CabinSketch.otf</string>
+		<string>Calligraffiti.ttf</string>
+		<string>CoolDots.ttf</string>
+		<string>Crazy Killer.ttf</string>
+		<string>Dark Crystal.ttf</string>
+		<string>Dearest.ttf</string>
+		<string>Destroy.ttf</string>
+		<string>District.ttf</string>
+		<string>Dragonwick.ttf</string>
+		<string>EmbossedBlack.ttf</string>
+		<string>Eraser.ttf</string>
+		<string>Exotica.ttf</string>
+		<string>Fiddums Family.ttf</string>
+		<string>Flubber.ttf</string>
+		<string>FortySecondStreetHB.ttf</string>
+		<string>GoodDog.otf</string>
+		<string>Gothic Ultra OT.otf</string>
+		<string>Harry P.ttf</string>
+		<string>Honey I Stole Your Jumper.ttf</string>
+		<string>Impact.ttf</string>
+		<string>JuneBug.ttf</string>
+		<string>Junkos Typewriter.ttf</string>
+		<string>Loki Cola.ttf</string>
+		<string>Minecraft.ttf</string>
+		<string>Mountains Of Christmas.ttf</string>
+		<string>Mutlu.ttf</string>
+		<string>Pacifico.ttf</string>
+		<string>Pincoyablack.otf</string>
+		<string>Plasma Drip (BRK).ttf</string>
+		<string>Rabiohead.ttf</string>
+		<string>Romeodn.ttf</string>
+		<string>Royal Acid.ttf</string>
+		<string>Sail.otf</string>
+		<string>SeasideResortNF.ttf</string>
+		<string>Spliffs.ttf</string>
+		<string>Starcraft.ttf</string>
+		<string>Santa'sSleighFull.ttf</string>
+		<string>Snickles.ttf</string>
+		<string>Snowdrift.ttf</string>
+		<string>Tangerine.ttf</string>
+		<string>Terminator Two.ttf</string>
+		<string>Toonish.ttf</string>
+		<string>Top Secret.ttf</string>
+		<string>UpperEastSide.ttf</string>
+		<string>Western Slant.ttf</string>
+		<string>Windsong.ttf</string>
+		<string>Xtrusion (BRK).ttf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>296</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>DTXcodeBuild</key>
+	<string>6C131e</string>
+	<key>FacebookAppID</key>
+	<string>119350384867635</string>
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default-568h</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Landscape</string>
+			<key>UILaunchImageName</key>
+			<string>Default-Landscape</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default-Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Landscape</string>
+			<key>UILaunchImageName</key>
+			<string>Default-Landscape-736h</string>
+			<key>UILaunchImageSize</key>
+			<string>{414, 736}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>8.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default-Portrait-736h</string>
+			<key>UILaunchImageSize</key>
+			<string>{414, 736}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>8.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default-Portrait-667h</string>
+			<key>UILaunchImageSize</key>
+			<string>{375, 667}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>8.0</string>
+		</dict>
+	</array>
+	<key>MinimumOSVersion</key>
+	<string>7.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>CFBundleIdentifier</key>
+	<string>com.digitalruby.youdoodle</string>
+	<key>DTXcode</key>
+	<string>0620</string>
+	<key>CFBundleExecutable</key>
+	<string>YouDoodle</string>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon-Free29x29</string>
+				<string>AppIcon-Free40x40</string>
+				<string>AppIcon-Free57x57</string>
+				<string>AppIcon-Free60x60</string>
+				<string>AppIcon-Free50x50</string>
+				<string>AppIcon-Free72x72</string>
+				<string>AppIcon-Free76x76</string>
+			</array>
+		</dict>
+	</dict>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.digitalruby.youdoodle</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>youdoodle-1</string>
+				<string>db-lfrgn7l04af8m4n</string>
+				<string>fb119350384867635</string>
+				<string>Fleksy-com.digitalruby.youdoodle</string>
+				<string>youdoodle</string>
+				<string>pin1431737</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

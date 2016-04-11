@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<key>CFBundleName</key>
+	<string>WeatherMagic</string>
+	<key>DTXcode</key>
+	<string>0600</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.0</string>
+	<key>DTSDKBuild</key>
+	<string>12A365</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>BuildMachineOSBuild</key>
+	<string>13E28</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>CFBundleShortVersionString</key>
+	<string>2.1</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>WeatherMagic</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.finggs.weathermagic</string>
+	<key>DTXcodeBuild</key>
+	<string>6A313</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Chalet London Nineteen Sixty-Bold.otf</string>
+		<string>Chalet London Nineteen Seventy.otf</string>
+		<string>Chalet London Nineteen Sixty.otf</string>
+	</array>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon@2x.png</string>
+		<string>Icon.png</string>
+		<string>Icon-120.png</string>
+		<string>Icon-152.png</string>
+		<string>Icon-76.png</string>
+		<string>Icon-72@2x.png</string>
+		<string>Icon-72.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>WeatherMagic</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformBuild</key>
+	<string>12A365</string>
+</dict>
+</plist>

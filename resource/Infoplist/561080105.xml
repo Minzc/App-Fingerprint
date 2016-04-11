@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.1</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>CFBundleName</key>
+	<string>Instawords</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.1</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Icon.png</string>
+				<string>Icon-50.png</string>
+				<string>Icon-50@2x.png</string>
+				<string>Icon-76.png</string>
+				<string>Icon-76@2x.png</string>
+				<string>Icon-60@2x.png</string>
+				<string>Icon-72.png</string>
+				<string>Icon-72@2x.png</string>
+				<string>Icon-40.png</string>
+				<string>Icon-Small.png</string>
+				<string>Icon-Small@2x.png</string>
+				<string>Icon@2x.png</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<false/>
+		</dict>
+	</dict>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Instawords</string>
+	<key>DTSDKBuild</key>
+	<string>12B411</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.8</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13F34</string>
+	<key>DTPlatformBuild</key>
+	<string>12B411</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6A2008a</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>black_jack.ttf</string>
+		<string>GreatVibes-Regular.otf</string>
+		<string>desyrel.ttf</string>
+		<string>Sears_Tower.ttf</string>
+		<string>AlexBrush-Regular-OTF.otf</string>
+		<string>slkscr.ttf</string>
+		<string>chalkdust.ttf</string>
+		<string>Sniglet.ttf</string>
+		<string>yukarimobil.ttf</string>
+		<string>FORTSSH_.ttf</string>
+		<string>Impact Label.ttf</string>
+		<string>tertre-xbol.otf</string>
+		<string>New Press Eroded.ttf</string>
+		<string>maksukehoitus.ttf</string>
+		<string>Lobster_1.3.otf</string>
+		<string>LindenHill.otf</string>
+		<string>lebowski.ttf</string>
+		<string>League_Gothic.otf</string>
+		<string>Junction.otf</string>
+		<string>JosefinSlab-Regular.ttf</string>
+		<string>Habibi-Regular.otf</string>
+		<string>goudy_bookletter_1911.otf</string>
+		<string>ghettomarquee.ttf</string>
+		<string>Fanwood.otf</string>
+		<string>Dooodleista.ttf</string>
+		<string>BebasNeue.otf</string>
+		<string>BEBAS___.ttf</string>
+		<string>AlfaSlabOne-Regular-OTF.otf</string>
+		<string>Aller_Rg.ttf</string>
+		<string>American Typewriter.ttc</string>
+		<string>airstrip.ttf</string>
+		<string>Cartoonia_3D.ttf</string>
+		<string>Artbrush.ttf</string>
+		<string>Plakkaat.ttf</string>
+		<string>dsposter.ttf</string>
+		<string>barrer.ttf</string>
+		<string>CircleCaps.ttf</string>
+		<string>chancur.ttf</string>
+		<string>Bauhaus_.ttf</string>
+		<string>Comic James.ttf</string>
+		<string>Army Condensed.ttf</string>
+		<string>distres2.ttf</string>
+		<string>Bauhaus 93.ttf</string>
+		<string>Humanoid.ttf</string>
+		<string>Komika Axis.ttf</string>
+		<string>LeviBrush.ttf</string>
+		<string>Octin Spraypaint Free.ttf</string>
+		<string>Pacifico.ttf</string>
+		<string>Tiza.ttf</string>
+		<string>Giddyup Std.otf</string>
+		<string>Lejana (grunge).TTF</string>
+		<string>alittlepot.ttf</string>
+		<string>MEgalopolis Extra.otf</string>
+		<string>Melbourne.otf</string>
+		<string>MLSJN.TTF</string>
+		<string>Val.otf</string>
+		<string>airmill_o.ttf</string>
+		<string>Arial Rounded MT Bold.ttf</string>
+		<string>bewilder.ttf</string>
+		<string>fbsbltc.ttf</string>
+		<string>Duepuntozero.ttf</string>
+		<string>Allstar4.ttf</string>
+		<string>dreamorp.ttf</string>
+		<string>Beast vs SpreadTall.ttf</string>
+		<string>Chalkboard.ttc</string>
+		<string>Channel.ttf</string>
+		<string>Arial.ttf</string>
+		<string>Tonight.ttf</string>
+		<string>Seven Monkey Fury BB.ttf</string>
+		<string>aberatn.ttf</string>
+		<string>Bebas Neue.otf</string>
+		<string>Airstream.ttf</string>
+		<string>Bauhaus 93</string>
+		<string>Barron.ttf</string>
+		<string>!PaulMaul.ttf</string>
+		<string>!SketchyTimes.ttf</string>
+		<string>Digit.ttf</string>
+		<string>!PaulMaul-b.ttf</string>
+		<string>KatieCaps.ttf</string>
+		<string>3Dumb.ttf</string>
+		<string>2Dumb.ttf</string>
+		<string>JoeHand2.ttf</string>
+		<string>diager.ttf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>3.8</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>AppLovinSdkKey</key>
+	<string>7yf3vdaJxwTKwIS_puae15F5rhNwDTEKUvOOWziRuAnoTEoG7Mv9S9EIrbC28RNdKm1skkIbv3OMIAdPXWT_go</string>
+	<key>UIStatusBarHidden</key>
+	<false/>
+	<key>MinimumOSVersion</key>
+	<string>7.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>CFBundleIdentifier</key>
+	<string>com.berzapp.instawordsDistribution</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon.png</string>
+		<string>Icon-50.png</string>
+		<string>Icon-50@2x.png</string>
+		<string>Icon-76.png</string>
+		<string>Icon-76@2x.png</string>
+		<string>Icon-60@2x.png</string>
+		<string>Icon-72.png</string>
+		<string>Icon-72@2x.png</string>
+		<string>Icon-Small.png</string>
+		<string>Icon-Small@2x.png</string>
+		<string>Icon@2x.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0611</string>
+	<key>CFBundleExecutable</key>
+	<string>InstawordMultiFree</string>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+	</dict>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb789465177757083</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

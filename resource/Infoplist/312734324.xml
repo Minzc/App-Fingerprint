@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DTSDKName</key>
+	<string>iphoneos4.0</string>
+	<key>CFBundleName</key>
+	<string>CarpentersHelper Lite</string>
+	<key>DTXcode</key>
+	<string>0323</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>2.0.1</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleDefault</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindowLite</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.0.1</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>CarpentersHelper Lite</string>
+	<key>DTCompiler</key>
+	<string>4.2</string>
+	<key>MinimumOSVersion</key>
+	<string>3.0</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.mypieinteractive.carpentershelper.lite</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformVersion</key>
+	<string>4.0 GM</string>
+	<key>UIPrerenderedIcon</key>
+	<false/>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>CH Lite</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+</dict>
+</plist>

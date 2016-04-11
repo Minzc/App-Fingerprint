@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UISupportedExternalAccessoryProtocols</key>
+	<array>
+		<string>com.namsung.xgps</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>1.0.2</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.dualav.navatlas</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIconFile</key>
+	<string>Dual_XGPS300.png</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.2</string>
+	<key>CFBundleExecutable</key>
+	<string>NaviPhone</string>
+	<key>DTSDKName</key>
+	<string>iphoneos3.0</string>
+	<key>MinimumOSVersion</key>
+	<string>3.0</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIPrerenderedIcon</key>
+	<false/>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>NavAtlas</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleName</key>
+	<string>NaviPhone</string>
+</dict>
+</plist>

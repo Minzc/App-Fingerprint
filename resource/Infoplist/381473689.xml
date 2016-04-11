@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>7.1</string>
+	<key>CFBundleIconFile</key>
+	<string>Pointstreak Mobile Icon.png</string>
+	<key>CFBundleName</key>
+	<string>PS Mobile</string>
+	<key>PSMobileProduct</key>
+	<string>PSMobile</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.1</string>
+	<key>PSMobileAdPage</key>
+	<string>http://m.pointstreak.com/ads_gamelive.html?sport=%@</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UIRequiresPersistentWiFi</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Pointstreak</string>
+	<key>PSMobileLeagueImgUrl</key>
+	<string></string>
+	<key>DTSDKBuild</key>
+	<string>11D167</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.4</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>PSMobileLogo</key>
+	<string>Pointstreak Mobile Logo.png</string>
+	<key>PSMobileSplash</key>
+	<string>Pointstreak Mobile Splash.png</string>
+	<key>BuildMachineOSBuild</key>
+	<string>14A283o</string>
+	<key>DTPlatformBuild</key>
+	<string>11D167</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>5B1008</string>
+	<key>PSMobileNavbarColor</key>
+	<string>(0.0, 0.0, 0.0)</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>140717</string>
+	<key>UILaunchImageFile</key>
+	<string>Default</string>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>PSMobileRootUrl</key>
+	<string>http://m.pointstreak.com/iphoneappv2</string>
+	<key>UIApplicationExitsOnSuspend</key>
+	<true/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.rakonza.iPhone.PSMobile6</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Pointstreak Mobile Icon</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0511</string>
+	<key>CFBundleExecutable</key>
+	<string>PS Mobile</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>PSMobileUrl</key>
+	<string>http://m.pointstreak.com/iphoneappv2/</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

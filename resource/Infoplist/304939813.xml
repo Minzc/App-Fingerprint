@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleVersion</key>
+	<string>1.2</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.treelineinteractive.girldrinks</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIconFile</key>
+	<string>icon.png</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.2</string>
+	<key>CFBundleExecutable</key>
+	<string>Girl Drinks</string>
+	<key>DTSDKName</key>
+	<string>iphoneos2.1</string>
+	<key>MinimumOSVersion</key>
+	<string>2.1</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>CFBundleDisplayName</key>
+	<string>Girl Drinks</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleName</key>
+	<string>Girl Drinks</string>
+</dict>
+</plist>

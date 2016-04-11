@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>ONV App Title</key>
+	<string>Onavo Protect\u2122</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.onavo.url.main.protect</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>onavoProtect</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.onavo.url.fb.protect</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb416083735147690</string>
+			</array>
+		</dict>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.1</string>
+	<key>AUTO MinorVersion</key>
+	<string>e9fa94f</string>
+	<key>CFBundleName</key>
+	<string>protect</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.1</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>ONV App Id For Server</key>
+	<string>protect</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>app_icon_ipad</string>
+				<string>app_icon_iphone</string>
+				<string>spotlight_icon_ipad</string>
+				<string>spotlight_icon_iphone</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>CFBundleDisplayName</key>
+	<string>Onavo Protect</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>ONV Google Analytics ID</key>
+	<string>UA-19430735-17</string>
+	<key>DTSDKBuild</key>
+	<string>12B411</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.2.2</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14C1510</string>
+	<key>DTPlatformBuild</key>
+	<string>12B411</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6A2008a</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleVersion</key>
+	<string>1.2.2</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>ONV Apple App ID</key>
+	<string>577491499</string>
+	<key>FacebookAppID</key>
+	<string>416083735147690</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>FacebookDisplayName</key>
+	<string>Onavo Protect</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.onavo.protect</string>
+	<key>DTXcode</key>
+	<string>0611</string>
+	<key>FacebookClientToken</key>
+	<string>639232f98c36a10241a26fc0631d9a9f</string>
+	<key>SplunkAPIKey</key>
+	<string>474c9d7c</string>
+	<key>CFBundleExecutable</key>
+	<string>protect</string>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindow-iPad</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>NSHumanReadableCopyright</key>
+	<string></string>
+</dict>
+</plist>

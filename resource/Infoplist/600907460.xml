@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIViewControllerIdentifiersToNibNames</key>
+	<dict>
+		<key>UIViewController-qtk-23-Blg</key>
+		<string>UIViewController-qtk-23-Blg</string>
+		<key>V3</key>
+		<string>V3</string>
+		<key>UIViewController-zZc-WL-0cq</key>
+		<string>UIViewController-zZc-WL-0cq</string>
+		<key>V1</key>
+		<string>V1</string>
+		<key>UIViewController-pyE-zv-tIX</key>
+		<string>UIViewController-pyE-zv-tIX</string>
+		<key>quizController</key>
+		<string>quizController</string>
+		<key>V2</key>
+		<string>V2</string>
+	</dict>
+	<key>UIStoryboardDesignatedEntryPointIdentifier</key>
+	<string>UIViewController-qtk-23-Blg</string>
+	<key>UIStoryboardVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

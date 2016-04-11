@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.srividya.nycway</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb672181226144711nyc</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.srividya.nycway.inapp</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>nycway</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>6.1</string>
+	<key>CFBundleName</key>
+	<string>NYCWAY</string>
+	<key>DTSDKName</key>
+	<string>iphoneos6.1</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Icon.png</string>
+				<string>Icon@2x.png</string>
+				<string>Icon-29.png</string>
+				<string>Icon-29@2x.png</string>
+				<string>Icon-40.png</string>
+				<string>Icon-40@2x.png</string>
+				<string>Icon-60.png</string>
+				<string>Icon-60@2x.png</string>
+				<string>Icon-76.png</string>
+				<string>Icon-76@2x.png</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>NYC Way</string>
+	<key>DTSDKBuild</key>
+	<string>10B141</string>
+	<key>ACFacebookClientAccessInfo</key>
+	<dict>
+		<key>ACFacebookPermissionsKey</key>
+		<array>
+			<string>status_update</string>
+			<string>publish_checkins</string>
+			<string>user_checkins</string>
+			<string>friends_checkins</string>
+			<string>user_birthday</string>
+			<string>user_hometown</string>
+			<string>email</string>
+			<string>user_likes</string>
+			<string>user_education_history</string>
+			<string>friends_education_history</string>
+			<string>friends_likes</string>
+			<string>user_interests</string>
+			<string>friends_interests</string>
+			<string>user_activities</string>
+			<string>friends_activities</string>
+		</array>
+		<key>ACFacebookAppVersionKey</key>
+		<string>1.0</string>
+		<key>ACFacebookAppIdKey</key>
+		<string>672181226144711</string>
+	</dict>
+	<key>CFBundleShortVersionString</key>
+	<string>7.0.3</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13A603</string>
+	<key>DTPlatformBuild</key>
+	<string>10B141</string>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>DTXcodeBuild</key>
+	<string>4H1503</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleVersion</key>
+	<string>7.0.3</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Pakt Black.ttf</string>
+		<string>Pakt Bold.ttf</string>
+		<string>Pakt Condensed Black.ttf</string>
+		<string>Pakt Condensed Bold.ttf</string>
+		<string>Pakt Condensed ExtraBold.ttf</string>
+		<string>Pakt Condensed SemiBold.ttf</string>
+		<string>Pakt Condensed.ttf</string>
+		<string>Pakt ExtraBold.ttf</string>
+		<string>Pakt SemiBold.ttf</string>
+		<string>Pakt.ttf</string>
+		<string>HelveticaNeueLTCom-Cn.ttf</string>
+	</array>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>FacebookAppID</key>
+	<string>672181226144711</string>
+	<key>ServiceURL</key>
+	<string>http://www.parkpalnyc.com/</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.srividya.nycway</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon@2x.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0463</string>
+	<key>CFBundleExecutable</key>
+	<string>NYCWAY</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string></string>
+</dict>
+</plist>

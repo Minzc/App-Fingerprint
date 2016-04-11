@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DTSDKName</key>
+	<string>iphoneos3.2</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleVersion</key>
+	<string>2.3.1</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleSignature</key>
+	<string>PTBM</string>
+	<key>CFBundleIdentifier</key>
+	<string>hu.peretb.grandlite</string>
+	<key>CFBundleExecutable</key>
+	<string>Virtuoso Piano Free</string>
+	<key>UIInterfaceOrientation</key>
+	<string>UIInterfaceOrientationLandscapeRight</string>
+	<key>CFBundleDisplayName</key>
+	<string>Virtuoso</string>
+	<key>CFBundleName</key>
+	<string>Virtuoso Piano Free 2 HD</string>
+	<key>MMediaAPIDDict</key>
+	<dict>
+		<key>1337</key>
+		<string>15090</string>
+	</dict>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon_iPhone.png</string>
+		<string>Icon_iPad.png</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow_Phone</string>
+	<key>DTCompiler</key>
+	<string>4.2</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon_iPhone.png</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+	</array>
+	<key>UIStatusBarHidden~ipad</key>
+	<false/>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindow_Pad</string>
+	<key>MinimumOSVersion</key>
+	<string>3.1</string>
+	<key>DTXcode</key>
+	<string>0323</string>
+	<key>DTPlatformVersion</key>
+	<string>4.0 GM</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>MMediaDefaultEmbedWebView</key>
+	<true/>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+</dict>
+</plist>

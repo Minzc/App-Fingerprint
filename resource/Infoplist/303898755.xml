@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DTXcodeBuild</key>
+	<string>10M2423</string>
+	<key>CFBundleName</key>
+	<string>Cypress</string>
+	<key>DTSDKName</key>
+	<string>iphoneos4.2</string>
+	<key>DTXcode</key>
+	<string>0325</string>
+	<key>DrupalClientHost</key>
+	<string>cypressmountain.com</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleVersion</key>
+	<string>2.0.1</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DrupalClientKey</key>
+	<string>b022c9521814ae36d28c2b390da99c7e</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>Cypress</string>
+	<key>DTCompiler</key>
+	<string>4.2</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>MinimumOSVersion</key>
+	<string>4.0</string>
+	<key>DTPlatformVersion</key>
+	<string>4.2 Seed 2</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.80elements.cypress</string>
+	<key>EEThemeDefault</key>
+	<string>light</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>Cypress</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>ContentCacheLength</key>
+	<string>300</string>
+	<key>DTPlatformBuild</key>
+	<string>8C134</string>
+</dict>
+</plist>

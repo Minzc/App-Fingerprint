@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>Eat St</string>
+	<key>DTXcode</key>
+	<string>0432</string>
+	<key>DTSDKName</key>
+	<string>iphoneos5.1</string>
+	<key>DTSDKBuild</key>
+	<string>9B176</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>2.1</string>
+	<key>BuildMachineOSBuild</key>
+	<string>11D50</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.1</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>location-services</string>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>Eat St</string>
+	<key>DTCompiler</key>
+	<string></string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb264136873656699</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleIdentifier</key>
+	<string>com.invokemedia.eatstreet</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Museo_Slab_500.otf</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>5.1</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Eat St</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTXcodeBuild</key>
+	<string>4E2002</string>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>DTPlatformBuild</key>
+	<string>9B176</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+</dict>
+</plist>

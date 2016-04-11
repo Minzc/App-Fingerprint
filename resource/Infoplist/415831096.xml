@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>6.0</string>
+	<key>CFBundleIconFile</key>
+	<string>1857.png</string>
+	<key>CFBundleName</key>
+	<string>Big Button Box With Camera</string>
+	<key>DTSDKName</key>
+	<string>iphoneos6.0</string>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Funny Sounds</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+	</array>
+	<key>DTSDKBuild</key>
+	<string>10A403</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.1</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>11G63</string>
+	<key>DTPlatformBuild</key>
+	<string>10A403</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+	</array>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleVersion</key>
+	<string>1.4.4</string>
+	<key>DTXcodeBuild</key>
+	<string>4G182</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>jp.liberteenz.funcamera</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>1857.png</string>
+		<string>18114.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0450</string>
+	<key>CFBundleExecutable</key>
+	<string>Big Button Box With Camera</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string></string>
+</dict>
+</plist>

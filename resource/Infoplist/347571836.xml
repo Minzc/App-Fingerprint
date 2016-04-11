@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleVersion</key>
+	<string>1.5</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.primalpictures.primalquiz</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon.png</string>
+	<key>CFBundleExecutable</key>
+	<string>primalquiz</string>
+	<key>DTSDKName</key>
+	<string>iphoneos3.0</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>MinimumOSVersion</key>
+	<string>3.0</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>primalquiz</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleName</key>
+	<string>primalquiz</string>
+</dict>
+</plist>

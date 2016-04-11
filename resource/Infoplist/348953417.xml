@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>Weather Lite</string>
+	<key>DTXcode</key>
+	<string>0402</string>
+	<key>DTSDKName</key>
+	<string>iphoneos4.3</string>
+	<key>UIApplicationExitsOnSuspend</key>
+	<true/>
+	<key>DTSDKBuild</key>
+	<string>8H7</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>3.1</string>
+	<key>BuildMachineOSBuild</key>
+	<string>10J869</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>Weather Lite</string>
+	<key>DTCompiler</key>
+	<string>4.2</string>
+	<key>MinimumOSVersion</key>
+	<string>3.1</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.yourcompany.Weather-Lite</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>DTPlatformVersion</key>
+	<string>4.3</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>icon.png</string>
+		<string>icon@2x.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>Thermometer</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTXcodeBuild</key>
+	<string>4A2002a</string>
+	<key>DTPlatformBuild</key>
+	<string>8H7</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+</dict>
+</plist>

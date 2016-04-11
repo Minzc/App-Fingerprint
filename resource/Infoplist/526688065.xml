@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIViewControllerIdentifiersToNibNames</key>
+	<dict>
+		<key>CityMapDetailPopOverController</key>
+		<string>CityMapDetailPopOverController</string>
+		<key>RouteViewController</key>
+		<string>RouteViewController</string>
+		<key>UIViewController-Orh-QR-VrW</key>
+		<string>UIViewController-Orh-QR-VrW</string>
+		<key>CityMapDetailViewController</key>
+		<string>CityMapDetailViewController</string>
+		<key>DisplayPDFViewController</key>
+		<string>DisplayPDFViewController</string>
+	</dict>
+	<key>UIStoryboardDesignatedEntryPointIdentifier</key>
+	<string>UIViewController-Orh-QR-VrW</string>
+	<key>UIStoryboardVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

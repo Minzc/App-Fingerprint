@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DTXcode</key>
+	<string>0441</string>
+	<key>CFBundleName</key>
+	<string>Office HotKey</string>
+	<key>DTSDKName</key>
+	<string>iphoneos5.1</string>
+	<key>DTSDKBuild</key>
+	<string>9B176</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>2.0</string>
+	<key>BuildMachineOSBuild</key>
+	<string>12B19</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>Office HotKey</string>
+	<key>DTCompiler</key>
+	<string></string>
+	<key>MinimumOSVersion</key>
+	<string>3.0</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.blogspot.bbakse</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformVersion</key>
+	<string>5.1</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon@2x.png</string>
+		<string>Icon-Small@2x.png</string>
+		<string>Icon-Small.png</string>
+		<string>Icon-Small-50.png</string>
+		<string>Icon-72.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Office HotKey</string>
+	<key>DTXcodeBuild</key>
+	<string>4F1003</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>DTPlatformBuild</key>
+	<string>9B176</string>
+</dict>
+</plist>

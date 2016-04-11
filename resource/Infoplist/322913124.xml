@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleDisplayName</key>
+	<string>Battery</string>
+	<key>DTSDKName</key>
+	<string>iphoneos3.0</string>
+	<key>CFBundleExecutable</key>
+	<string>batteryMeter</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.vilcsak.batteryMeter</string>
+	<key>CFBundleIconFile</key>
+	<string>icon.png</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>batteryMeter</string>
+	<key>CFBundleVersion</key>
+	<string>3.6.12</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>MinimumOSVersion</key>
+	<string>3.0</string>
+</dict>
+</plist>

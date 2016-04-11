@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb231289070352813</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>7.0</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon</string>
+	<key>CFBundleName</key>
+	<string>Emoji Ace</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.0</string>
+	<key>UIMainStoryboardFile~ipad</key>
+	<string>MainStoryboard_iPad</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Emoji Ace</string>
+	<key>DTSDKBuild</key>
+	<string>11B508</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.0</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleIconFile~ipad</key>
+	<string>Icon</string>
+	<key>BuildMachineOSBuild</key>
+	<string>13A603</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTPlatformBuild</key>
+	<string>11B508</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleVersion</key>
+	<string>2.0</string>
+	<key>DTXcodeBuild</key>
+	<string>5A3005</string>
+	<key>AppLovinSdkKey</key>
+	<string>tTJWriFr1-c3NkGW6VSZJ9dRqDHS6G6zkPUZ7kP8i1B5lScsy3PGD1h1EzTLEZIz-oW5WwEDyQJguwWr-w5Cyn</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>FacebookAppID</key>
+	<string>231289070352813</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>FacebookDisplayName</key>
+	<string>Emoji ACE</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.iphonebestsoft.emojiace</string>
+	<key>DTXcode</key>
+	<string>0502</string>
+	<key>CFBundleExecutable</key>
+	<string>Emoji Ace</string>
+	<key>UIMainStoryboardFile</key>
+	<string>MainStoryboard_iPhone</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

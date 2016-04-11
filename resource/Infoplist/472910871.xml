@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIInterfaceOrientation</key>
+	<string>UIInterfaceOrientationLandscapeLeft</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon Ex 57x57.png</string>
+	<key>CFBundleName</key>
+	<string>TCMSightWordsExpandable</string>
+	<key>DTPlatformVersion</key>
+	<string>7.0</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.0</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Sight Words - Kids Learn - Expandable - Icon 29</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 58</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 76</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 80</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 120</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 152</string>
+				<string>Icon Ex 57x57.png</string>
+				<string>Icon Ex 72x72.png</string>
+				<string>Icon Ex 114x114.png</string>
+				<string>Icon Ex 144x144.png</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Sight Words</string>
+	<key>DTSDKBuild</key>
+	<string>11B508</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.1</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13A603</string>
+	<key>DTPlatformBuild</key>
+	<string>11B508</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>5A3005</string>
+	<key>BuildVariantSeries</key>
+	<string>Kids</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>3.1</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>SofiaProMedium.otf</string>
+		<string>HMAveReg.ttf</string>
+		<string>HMAveBol.ttf</string>
+		<string>FinkBold.otf</string>
+	</array>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>BuildVariantPrefix</key>
+	<string>Expandable</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>UIApplicationExitsOnSuspend</key>
+	<false/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.teachercreatedmaterials.KidsLearnSightWords101To105Lite</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon Ex 57x57.png</string>
+		<string>Icon Ex 72x72.png</string>
+		<string>Icon Ex 114x114.png</string>
+		<string>Icon Ex 144x144.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0502</string>
+	<key>UILaunchImages~ipad</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Landscape</string>
+			<key>UILaunchImageName</key>
+			<string>Default-Landscape</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default-Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>TCMSightWordsExpandable</string>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindow-iPad</string>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Sight Words - Kids Learn - Expandable - Icon 58</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 29</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 80</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 40</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 100</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 50</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 152</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 76</string>
+				<string>Sight Words - Kids Learn - Expandable - Icon 120</string>
+				<string>Icon Ex 57x57.png</string>
+				<string>Icon Ex 72x72.png</string>
+				<string>Icon Ex 114x114.png</string>
+				<string>Icon Ex 144x144.png</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

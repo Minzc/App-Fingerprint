@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>TN - XX-Full Page</key>
+	<string>10849049</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>mh-mc</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>8.2</string>
+	<key>CFBundleName</key>
+	<string>My Cycles</string>
+	<key>AG_MOBILE_APP_ID</key>
+	<string>5120</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>DTSDKName</key>
+	<string>iphoneos8.2</string>
+	<key>AG_MOBILE_APP_CHIP_KEY</key>
+	<string>33c3b200a5bb013293420024e87a30c2</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleDefault</string>
+	<key>TN - X-Leaderboard</key>
+	<string>10849051</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>MC</string>
+	<key>TN - X-Full Page</key>
+	<string>10849057</string>
+	<key>DTSDKBuild</key>
+	<string>12D508</string>
+	<key>TN - X-Wide Banner</key>
+	<string>10849052</string>
+	<key>CFBundleShortVersionString</key>
+	<string>5.3.1</string>
+	<key>TN - Unrestricted</key>
+	<string>10849056</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>TN - XX-Medium Rectangle</key>
+	<string>10849050</string>
+	<key>USE_HTTPS</key>
+	<false/>
+	<key>BuildMachineOSBuild</key>
+	<string>14B25</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6C131e</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>my-cycles.ttf</string>
+		<string>mobile-master-set.ttf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>5.3.1</string>
+	<key>TN - XX-Wide Banner</key>
+	<string>10849055</string>
+	<key>TN - X-Medium Rectangle</key>
+	<string>10849054</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>DTPlatformBuild</key>
+	<string>12D508</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>MinimumOSVersion</key>
+	<string>7.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.medhelp.MyCycles</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>mc_icn_80</string>
+		<string>mc_icn_58</string>
+		<string>mc_icn_29</string>
+		<string>mc_icn_120</string>
+		<string>mc_icn_114</string>
+		<string>mc_icn_57</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0620</string>
+	<key>CFBundleExecutable</key>
+	<string>MC</string>
+	<key>TN - XX-Leaderboard</key>
+	<string>10849053</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

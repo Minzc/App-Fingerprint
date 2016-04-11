@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>LandTracker</string>
+	<key>DTXcode</key>
+	<string>0511</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.1</string>
+	<key>DTSDKBuild</key>
+	<string>11D167</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleVersion</key>
+	<string>1.2.0</string>
+	<key>BuildMachineOSBuild</key>
+	<string>13C64</string>
+	<key>UIStatusBarHidden</key>
+	<false/>
+	<key>CFBundleShortVersionString</key>
+	<string>1.2.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>Old Bundle identifier</key>
+	<string>Rocanda-Technologies-Inc.LandTracker</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>LandTracker</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+	<key>CFBundleIdentifier</key>
+	<string>LTIOS</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformVersion</key>
+	<string>7.1</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>icon120</string>
+		<string>icon.png</string>
+		<string>icon@2x.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>LandTracker</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTXcodeBuild</key>
+	<string>5B1008</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformBuild</key>
+	<string>11D167</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DTXcode</key>
+	<string>0420</string>
+	<key>CFBundleName</key>
+	<string>MyBabyLite</string>
+	<key>DTSDKName</key>
+	<string>iphoneos5.0</string>
+	<key>DTSDKBuild</key>
+	<string>9A334</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>3.1</string>
+	<key>BuildMachineOSBuild</key>
+	<string>10K549</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>MyBabyLite</string>
+	<key>DTCompiler</key>
+	<string></string>
+	<key>MinimumOSVersion</key>
+	<string>3.1</string>
+	<key>CFBundleIdentifier</key>
+	<string>MyBaby.lite</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformVersion</key>
+	<string>5.0</string>
+	<key>DTXcodeBuild</key>
+	<string>4C199</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>My Baby Lite</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>DTPlatformBuild</key>
+	<string>9A334</string>
+</dict>
+</plist>

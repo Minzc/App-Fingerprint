@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>MerriamWebster</string>
+	<key>DTXcode</key>
+	<string>0511</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.1</string>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Collegiate Free iPhone Icons29x29</string>
+				<string>Collegiate Free iPhone Icons40x40</string>
+				<string>Collegiate Free iPhone Icons57x57</string>
+				<string>Collegiate Free iPhone Icons60x60</string>
+				<string>Collegiate Free iPhone Icons50x50</string>
+				<string>Collegiate Free iPhone Icons72x72</string>
+				<string>Collegiate Free iPhone Icons76x76</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>DTSDKBuild</key>
+	<string>11D167</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>3.1.2</string>
+	<key>BuildMachineOSBuild</key>
+	<string>13F34</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.1.2</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>MerriamWebster</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Collegiate Free iPhone Launch-700</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Collegiate Free iPhone Launch-700-568h</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIdentifier</key>
+	<string>com.m-w.dictionary</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb178450008855735iphonefree</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>mw-collegiate</string>
+			</array>
+		</dict>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>7.1</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Collegiate Free iPhone Icons29x29</string>
+				<string>Collegiate Free iPhone Icons40x40</string>
+				<string>Collegiate Free iPhone Icons57x57</string>
+				<string>Collegiate Free iPhone Icons60x60</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Dictionary</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTXcodeBuild</key>
+	<string>5B1008</string>
+	<key>UILaunchImageFile</key>
+	<string>Collegiate Free iPhone Launch</string>
+	<key>DTPlatformBuild</key>
+	<string>11D167</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+</dict>
+</plist>

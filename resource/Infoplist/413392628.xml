@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>kCertType</key>
+	<string>external</string>
+	<key>kFeedURLs</key>
+	<dict>
+		<key>kVideoFeed</key>
+		<string>http://mobileroadie.com/videos/v2flux/%i/1/%@</string>
+		<key>kAttendeesFeed</key>
+		<string>http://mobileroadie.com/attendees/flux</string>
+		<key>kLivestreamFeed</key>
+		<string>http://mobileroadie.com/livestream/flux</string>
+		<key>kShowFeed</key>
+		<string>http://mobileroadie.com/shows/v2flux/%i/%@/1</string>
+		<key>NewsFeed</key>
+		<string>http://mobileroadie.com/news/v2flux</string>
+		<key>kPhotoFeed</key>
+		<string>http://mobileroadie.com/photos/v2flux/%@/%@</string>
+		<key>kNewsFeed</key>
+		<string>http://mobileroadie.com/news/v2flux/%@/%@/%@</string>
+		<key>kSessionsFeed</key>
+		<string>http://mobileroadie.com/shows/v2flux</string>
+		<key>kUstreamFeed</key>
+		<string>http://mobileroadie.com/ustream/flux</string>
+		<key>kPlaylistsFeed</key>
+		<string>http://mobileroadie.com/playlists/flux</string>
+		<key>kProfileFeed</key>
+		<string>http://mobileroadie.com/profiles/flux/%i/1/%@</string>
+		<key>UpdatesFeed</key>
+		<string>http://mobileroadie.com/services/updates/index</string>
+		<key>kExtrasFeed</key>
+		<string>http://mobileroadie.com/extras/flux</string>
+		<key>kBioFeed</key>
+		<string>http://mobileroadie.com/band/flux/%i/%@</string>
+		<key>AudioFeed</key>
+		<string>http://mobileroadie.com/services/audio/plist</string>
+		<key>kUpdatesFeed</key>
+		<string>http://mobileroadie.com/updates/flux/%i/%@</string>
+		<key>kStoreFeed</key>
+		<string>http://mobileroadie.com/store/v2flux/%i/%@</string>
+		<key>kItemsFeed</key>
+		<string>http://mobileroadie.com/items/flux</string>
+		<key>kHomeFeed</key>
+		<string>http://mobileroadie.com/home-photos/flux/%i/%@</string>
+		<key>kDiscFeed</key>
+		<string>http://mobileroadie.com/albums/v2flux/%i/1/%@</string>
+		<key>ShowFeed</key>
+		<string>http://mobileroadie.com/shows/v2flux</string>
+		<key>kMusicFeed</key>
+		<string>http://mobileroadie.com/music/flux/%i/1/%@</string>
+	</dict>
+	<key>DTPlatformVersion</key>
+	<string>7.1</string>
+	<key>active_since</key>
+	<string>03/24/2010</string>
+	<key>kThemeData</key>
+	<dict>
+		<key>kMusicTableOddColor</key>
+		<dict>
+			<key>red</key>
+			<string>30</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>30</string>
+			<key>green</key>
+			<string>30</string>
+		</dict>
+		<key>kMusicPlayerLabel</key>
+		<dict>
+			<key>red</key>
+			<string>250</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>250</string>
+			<key>green</key>
+			<string>250</string>
+		</dict>
+		<key>kMusicTableSeparatorColor</key>
+		<dict>
+			<key>red</key>
+			<string>36</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>36</string>
+			<key>green</key>
+			<string>36</string>
+		</dict>
+		<key>kMusicPlayerTime</key>
+		<dict>
+			<key>red</key>
+			<string>104</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>104</string>
+			<key>green</key>
+			<string>104</string>
+		</dict>
+		<key>kNavigationItemTitleColor</key>
+		<dict>
+			<key>red</key>
+			<string>255</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>255</string>
+			<key>green</key>
+			<string>255</string>
+		</dict>
+		<key>kTableBackgroundColor</key>
+		<dict>
+			<key>red</key>
+			<string>15</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>15</string>
+			<key>green</key>
+			<string>15</string>
+		</dict>
+		<key>kNavigationBarColor</key>
+		<dict>
+			<key>red</key>
+			<string>91</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>91</string>
+			<key>green</key>
+			<string>91</string>
+		</dict>
+		<key>kGlobalTextColor</key>
+		<dict>
+			<key>red</key>
+			<string>255</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>255</string>
+			<key>green</key>
+			<string>255</string>
+		</dict>
+		<key>kAltTextColor</key>
+		<dict>
+			<key>red</key>
+			<string>150</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>150</string>
+			<key>green</key>
+			<string>150</string>
+		</dict>
+		<key>kTabBackgroundColor</key>
+		<dict>
+			<key>red</key>
+			<string>30</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>30</string>
+			<key>green</key>
+			<string>30</string>
+		</dict>
+		<key>headerImage</key>
+		<string>http://img.mblrd.com/image_composite.php?img=&amp;rgb=91,91,91</string>
+		<key>kLinkColor</key>
+		<dict>
+			<key>red</key>
+			<string>46</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>237</string>
+			<key>green</key>
+			<string>179</string>
+		</dict>
+		<key>kMusicTableEvenColor</key>
+		<dict>
+			<key>red</key>
+			<string>15</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>15</string>
+			<key>green</key>
+			<string>15</string>
+		</dict>
+		<key>kDarkBackgroundColor</key>
+		<dict>
+			<key>red</key>
+			<string>12</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>12</string>
+			<key>green</key>
+			<string>12</string>
+		</dict>
+		<key>useDynamicTheme</key>
+		<string>1</string>
+		<key>kHighlightColor</key>
+		<dict>
+			<key>red</key>
+			<string>214</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>214</string>
+			<key>green</key>
+			<string>214</string>
+		</dict>
+		<key>kMusicPlayerProgress</key>
+		<dict>
+			<key>red</key>
+			<string>150</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>150</string>
+			<key>green</key>
+			<string>150</string>
+		</dict>
+		<key>kLightBackgroundColor</key>
+		<dict>
+			<key>red</key>
+			<string>46</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>46</string>
+			<key>green</key>
+			<string>46</string>
+		</dict>
+		<key>kMusicPlayerProgressBackground</key>
+		<dict>
+			<key>red</key>
+			<string>44</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>44</string>
+			<key>green</key>
+			<string>44</string>
+		</dict>
+		<key>kMoreTableSeparatorColor</key>
+		<dict>
+			<key>red</key>
+			<string>33</string>
+			<key>alpha</key>
+			<string>255</string>
+			<key>blue</key>
+			<string>33</string>
+			<key>green</key>
+			<string>33</string>
+		</dict>
+	</dict>
+	<key>kNewsListType</key>
+	<string>default</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>kFanwallAutoRefresh</key>
+	<string>5</string>
+	<key>kFeedbackURL</key>
+	<string>"http:</string>
+	<key>DTSDKBuild</key>
+	<string>11D167</string>
+	<key>socialServices</key>
+	<array>
+		<string>twitter</string>
+		<string>facebook</string>
+		<string>foursquare</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>title</key>
+	<string>Porn &amp; Sex Addiction Support</string>
+	<key>applink</key>
+	<string>http://road.ie/psasupport</string>
+	<key>CFBundleDisplayName</key>
+	<string>PSA Support</string>
+	<key>kAudioURL</key>
+	<string>http://mobileroadie.com/music/grab-music/%@/%@/%@</string>
+	<key>copyright</key>
+	<string>Please note that use of this mobile application is subject to Hope for One's terms of use and privacy policy listed below.  We encourage interaction between our users, but reserve the right to manage comments and accounts that are not aligned with our Terms of Use.
+
+We welcome your feedback any time at admin@hopeforone.com.
+
+
+TERMS OF USE
+
+Your use of this mobile application is subject to certain terms and conditions.  The terms and conditions set forth below (“Terms of Use”), as well as the privacy policy listed below (“Privacy Policy”), apply to and govern your use of the Hope For One Diet and Weight Loss Support mobile application (the “App”) operated by Social Systems LLC (referred to herein as “Social Systems”, “us”, “we”, or “our”).  The Privacy Policy is an integral part of these Terms, and is incorporated herein by this reference.  By accessing and using the App, or by clicking “I Accept” when downloading the App, you acknowledge that you have read, understood, and agree to be bound by these Terms of Use and the Privacy Policy.  If you do not accept these Terms of Use and the Privacy Policy, you are not authorized to use this App.  
+
+We may modify these Terms of Use and the Privacy Policy at any time, and we will post on the home page of the App notification of any such modification for at least fourteen (14) days prior to the effective date of the modified Terms of Use or Privacy Policy.  Your use of the App after the effective date of any modified Terms of Use or Privacy Policy shall be subject to and governed by such modified Terms of Use and Privacy Policy.  Please note that we do not make any assurances that we will keep the App up and running forever, and we may discontinue operating some or all of the App at any time in our sole discretion.  Also, please note that any of your individual membership privileges in the App are subject to termination at any time in our sole discretion, in which case we will have no obligation to you other than to reimburse unused fees, if any, paid by you for such privileges.
+
+By using the App, you represent and warrant that you are 18 years of age or older.  Your account may be terminated without warning, if we believe that you are under 18 years of age.
+
+Your Use of the App and Our Provision of Services
+
+This App and the services and functionality associated therewith (the “Services”) are provided using, in significant part, website functionality and Internet services provided by one or more service providers, including Mobile Roadie LLC, and their respective content providers, business partners, and subcontractors, if any (collectively, the “Service Provider”).
+
+This App is provided as an interactive and informational resource only; the information and materials contained in the App are intended solely for the general information of the user.  Nothing contained in the App is intended to be considered medical advice, to diagnose medical problems, or to take the place of professional medical or mental health care.  Furthermore, you acknowledge and agree that we are not, in providing the App, agreeing to serve as a “Business Associate” with respect to any “Protected Health Information” (“PHI”) as defined in the Health Insurance Portability and Accountability Act and regulations promulgated pursuant thereto.  You shall refrain from uploading any PHI to the Site or from using the Site or the Services for the storage or transfer of any PHI. 
+
+This Site contains material, such as software, text, graphics, images, video, audio and other material (collectively referred to as the “Content”).  The Content may be owned by us or may be provided through an arrangement we have with others, including other users of the App, or our Service Provider.  The Content is protected by copyright under both United States and foreign laws.  Unauthorized use of the Content may violate copyright, trademark, and other laws.  Except as to any rights you have in Content originally posted to the App by you (“Your Original Content”), you have no rights in or to the Content, and you may not use the Content except as permitted under these Terms of Use.  No other use is permitted without prior written consent from us or the owner of the Content.  You must retain all copyright and other proprietary notices contained in the original Content on any copy you make of the Content.  You may not sell, transfer, assign, license, sublicense, or modify the Content or reproduce, display, publicly perform, make a derivative version of, distribute, or otherwise use the Content in any way for any public or commercial purpose (other than pursuant to any rights you have in Your Original Content).  The use or posting of the Content (other than Your Original Content) on any other website or in a networked computer environment for any purpose is expressly prohibited.  If you violate any part of these Terms of Use, your permission to access and/or use the App and the Services automatically terminates and you must immediately destroy any copies you have made of the Content (other than Your Original Content).
+
+Various company, product, and service names displayed on the Site may be trademarks or service marks owned by others (the “Third-Party Trademarks”).  Nothing on this App should be construed as granting, by implication, estoppel, or otherwise, any license or right to use any Third-Party Trademark displayed on this Site.  The Third-Party Trademarks may not be used to disparage any applicable third-party, any of their products or services, or in any manner in which, in our or our Service Provider’s reasonable judgment, may damage any goodwill in the Third-Party Trademarks. 
+
+The Site contains links to third-party websites (“External Sites”).  These links are provided solely as a convenience to you and not as an endorsement by us of the content on or any other aspect of such External Sites.  The content of such External Sites is developed and provided by others.  You should contact the site administrator or webmaster for those External Sites if you have any concerns regarding any content located on such External Sites.  In addition, the App contains content posted, stored, or displayed at the direction of users of the Site, for which we and our Service Provider cannot accept any responsibility or liability.
+
+The App is for personal use only and may not be used in connection with any commercial endeavors except those that are specifically approved by us or our Service Provider.  The following activities are expressly prohibited: (i) collecting usernames and/or email addresses of other users from the App by electronic or other means for the purpose of sending unsolicited email or other communications, (ii) any use of the App, which in our or our Service Provider’s sole judgment, degrades the reliability, speed, or operation of the Site or any underlying hardware or software thereof, (iii) any use of the App which is unlawful or in violation of these Terms of Use, and (iv) any use of the App for an illegal or improper purpose.
+
+
+
+
+User Content
+
+The App may now or in the future permit the submission of Content at the direction of users of the App (“User Content”) and the hosting, sharing, and/or publishing of such User Content.  You understand that whether or not such User Content is published, we and our Service Provider do not guarantee any confidentiality with respect to any submissions.  In addition, you understand that the default setting is for all submitted User Content to be public and available for all users of the App to review and use, and that in fact all users of the App are encouraged to review any and all available postings, subject to these Terms of Use.     You further understand and agree that we may review any User Content (regardless of any public or private settings) to monitor such content for compliance with the restrictions and other matters set forth in these Terms of Use.
+
+You shall be solely responsible for User Content you submit and the consequences of our or our Service Provider’s  posting or publishing such User Content. In connection with any User Content you submit, you affirm, represent, and/or warrant that: (i) you own or have the necessary licenses, rights, consents, and permissions to use and authorize both us and our Service Provider to use all patent, trademark, trade secret, copyright or other proprietary rights in and to any and all User Content to enable inclusion and use of the User Content in the manner contemplated by the App and these Terms of Use; and (ii) you have the written consent, release, and/or permission of each and every identifiable individual person in the User Content to use the name or likeness of each and every such identifiable individual person to enable inclusion and use of the User Content in the manner contemplated by the App and these Terms of Use. By submitting the User Content to us, you hereby grant both us and our Service Provider a perpetual, worldwide, non-exclusive, royalty-free, sublicenseable and transferable license to use, reproduce, distribute, prepare derivative works of, modify, display, and perform all or any portion of the User Content in connection with the App and our (and our successors’) business, including without limitation for promoting and redistributing part or all of the Site (and derivative works thereof) in any media formats and through any media channels. You also hereby grant each user of the App a non-exclusive license to access your User Content through the App, and to use, reproduce, distribute, prepare derivative works of, display and perform such User Content as permitted through the functionality of the App and under these Terms of Use. We or our Service Provider may maintain copies of any User Content for purposes of backup, security, or maintenance, or as required by law.
+
+In connection with User Content and use of the App, you further agree that you will not: (i) submit material that is copyrighted, protected by trade secret or otherwise subject to third party proprietary rights, including privacy and publicity rights, unless you are the owner of such rights or have permission from their rightful owner to post the material and to grant us and our Service Provider all of the license rights granted herein; (ii) publish falsehoods or misrepresentations that could damage us or any third party; (iii) submit material that is unlawful, obscene, defamatory, libelous, threatening, pornographic, harassing, hateful, racially or ethnically offensive, or that encourages conduct that would be considered a criminal offense, give rise to civil liability, violate any law, or is otherwise inappropriate; (iv) post advertisements or solicitations of business; (v) post User Content files that are unreasonably large or that otherwise could interfere with the normal operation and functioning of the App; or (vi) impersonate another person.  We do not endorse any User Content or any opinion, recommendation, or advice expressed therein, and we expressly disclaim any and all liability in connection with any User Content.  We do not permit copyright infringing activities and infringement of intellectual property rights on this App, and we will remove all Content and User Content if notified that such Content or User Content infringes on another's intellectual property rights. In addition, we and our Service Provider may remove any Content and User Content in our sole discretion and without prior notice.  We or our Service Provider will terminate your ability to post Content to the App if we believe you are a repeat copyright infringer as determined under our internal policies and procedures.  We and our Service Provider also reserve the right to decide whether Content or User Content is appropriate and complies with these Terms of Use for violations other than copyright infringement and violations of intellectual property law, such as, but not limited to, pornography, obscene or defamatory material, or excessive User Content length or file size.  We or our Service Provider may remove such User Content and/or terminate your access for uploading such material in violation of these Terms of Use at any time, without prior notice and in our sole discretion.
+
+If you are a copyright owner or an agent thereof and believe that any User Content or other Content infringes upon your copyrights, you may submit a notification pursuant to the Digital Millennium Copyright Act ("DMCA") by providing our Copyright Agent with the following information in writing (see 17 U.S.C § 512(c)(3) for further detail): 
+
+(i)  A physical or electronic signature of a person authorized to act on behalf of the owner of an exclusive right that is allegedly infringed; 
+
+(ii)  Identification of the copyrighted work claimed to have been infringed, or, if multiple copyrighted works at a single online site are covered by a single notification, a representative list of such works at that site; 
+
+(iii)  Identification of the material that is claimed to be infringing or to be the subject of infringing activity and that is to be removed or access to which is to be disabled and information reasonably sufficient to permit the service provider to locate the material;
+
+(iv)  Information reasonably sufficient to permit the service provider to contact you, such as an address, telephone number, and, if available, an electronic mail; 
+
+(v)  A statement that you have a good faith belief that use of the material in the manner complained of is not authorized by the copyright owner, its agent, or the law; and 
+
+(vi)  A statement that the information in the notification is accurate, and under penalty of perjury, that you are authorized to act on behalf of the owner of an exclusive right that is allegedly infringed. 
+
+
+
+
+Our designated Copyright Agent to receive notifications of claimed infringement and other notices relating to User Content and/or violation of these Terms of Use is:
+
+Kurt Trauth
+
+c/o Social Systems, LLC
+
+6110 Oakwood Trail
+
+Email: admin@hopeforone.com
+
+
+
+For clarity, only DMCA notices and notices relating to complaints in connection with User Content or violations of these Terms of Use should go to the Copyright Agent; any other feedback, comments, requests for technical support, and other communications should be addressed to our standard support contacts as identified on the Site. 
+
+Indemnity
+
+You agree to defend, indemnify, and hold Social Systems, our Service Provider, and all of their respective directors, officers, employees, shareholders, and agents (collectively, the “Indemnified Parties”) harmless from and against any and all claims, actions or demands, including, without limitation, reasonable legal and accounting fees, as a result of or in connection with (i) any actual or alleged use or misuse of the App or Content by you or by any other person using your membership or account, if any; (ii) any communication or content uploaded or provided to the App by you or by any other person using your membership or account , if any; or (iii) any breach or threatened breach by you of these Terms of Use.  We or our Service Provider shall provide notice to you of any such claim, suit, or proceeding and shall assist you, at your expense, in defending any such claim, suit or proceeding.  We reserve the right to assume the exclusive defense and control of any matter which is subject to indemnification under this section. In such case, you agree to cooperate with all reasonable requests assisting our defense of such matter.  YOU ACKNOWLEDGE AND AGREE THAT THE INDEMNIFICATION OBLIGATION SET FORTH IN THE PRECEDING PARAGRAPH SHALL APPLY REGARDLESS OF WHETHER AND THE EXTENT TO WHICH SOCIAL SYSTEMS OR ANY OTHER INDEMNIFIED PARTY IS NEGLIGENT IN WHOLE OR IN PART.  
+
+As stated above, technology and hosting for aspects of the Site are provided by Mobile Roadie, a Third Party Application Service Provider ("Mobile Roadie”).  However, Social Systems controls the content, membership and policy of the Site, including those pages served by Mobile Roadie on behalf of the App.  Notwithstanding anything to the contrary, by participating on the Site you agree to indemnify and hold harmless Mobile Roadie on all matters related to your interaction with others using the App and participation with the App, including your representation that you are at least eighteen years old.  As such, Mobile Roadie is a third party beneficiary to your agreement with the App as set forth in these Terms of Use.
+
+Disclaimer of Warranty and Limitation of Liability
+
+YOUR USE OF THE APP, THE SERVICES, AND THE CONTENT (INCLUDING ANY USER CONTENT) IS AT YOUR OWN RISK.  WE, OUR SERVICE PROVIDER, AND OUR AND THEIR RESPECTIVE OFFICERS, DIRECTORS, EMPLOYEES, AGENTS, SUPPLIERS, AFFILIATES, AND LICENSORS, MAKE NO WARRANTIES OR REPRESENTATIONS ABOUT THE CONTENT (INCLUDING THE USER CONTENT), INCLUDING BUT NOT LIMITED TO ITS ACCURACY,  COMPLETENESS, TIMELINESS, OR RELIABILITY.  NEITHER WE NOR OUR SERVICE PROVIDER SHALL BE SUBJECT TO LIABILITY FOR TRUTH, ACCURACY, OR COMPLETENESS OF ANY INFORMATION CONVEYED TO THE USER OR FOR ERRORS, MISTAKES OR OMISSIONS THEREIN OR FOR ANY DELAYS OR INTERRUPTIONS OF THE DATA OR INFORMATION STREAM FROM WHATEVER CAUSE.
+
+NEITHER WE NOR OUR SERVICE PROVIDER WARRANT THAT THE APP WILL OPERATE ERROR‑FREE OR THAT THIS APP, ITS SERVER, OR THE CONTENT ARE FREE OF COMPUTER VIRUSES OR SIMILAR CONTAMINATION OR DESTRUCTIVE FEATURES. IF YOUR USE OF THE SITE OR THE CONTENT RESULTS IN THE NEED FOR SERVICING OR REPLACING EQUIPMENT OR DATA, WE SHALL NOT BE RESPONSIBLE FOR THOSE COSTS.
+
+THE APP AND CONTENT ARE PROVIDED ON AN “AS IS” AND “AS AVAILABLE” BASIS WITHOUT ANY WARRANTIES OF ANY KIND. WE AND OUR SERVICE PROVIDER HEREBY DISCLAIM ALL WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE WARRANTY OF TITLE, MERCHANTABILITY, NON‑INFRINGEMENT OF THIRD PARTIES’ RIGHTS, AND FITNESS FOR PARTICULAR PURPOSE.
+
+IN NO EVENT SHALL WE OR OUR SERVICE PROVIDER BE LIABLE FOR ANY DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, INCIDENTAL AND CONSEQUENTIAL DAMAGES, LOST PROFITS, OR DAMAGES RESULTING FROM LOST DATA OR BUSINESS INTERRUPTION) RESULTING FROM THE USE OR INABILITY TO USE THE SITE AND THE CONTENT, WHETHER BASED ON WARRANTY, CONTRACT, TORT (INCLUDING NEGLIGENCE), OR ANY OTHER LEGAL THEORY, EVEN IF WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+Some states do not allow exclusion of implied warranties or limitation of liability for incidental or consequential damages, so the above limitations or exclusions may not apply to you.  IN SUCH STATES, OUR AND OUR SERVICE PROVIDER’S LIABILITY SHALL BE LIMITED TO THE GREATEST EXTENT PERMITTED BY LAW.
+
+General
+
+These Terms of Use, and any rights and licenses granted hereunder, may not be transferred or assigned by you, but may be assigned by us and our Service Provider without restriction.
+
+The App is primarily controlled, operated, and administered by Social Systems from San Antonio, Texas, United States.  Social Systems makes no representation that this App or any Content therein is appropriate or available for use outside of the United States and its territories.  If you choose to access and use this App from other locations, you are responsible for compliance with applicable local laws.  You agree to comply with all applicable laws and regulations, including U.S. export and re-export control laws and regulations.
+
+This agreement shall be governed by United States federal law and the laws of the state of Texas without regard to Texas rules regarding conflicts of laws.  The exclusive venue and jurisdiction for any and all disputes arising out of or relating to this agreement shall be the state and federal courts located in Bexar County, Texas.  You waive all objections to venue and personal jurisdiction with respect to such disputes in those courts.
+
+If any provision of these Terms of Use is found to be invalid by any court having competent jurisdiction, the invalidity of such provision shall not affect the validity of the remaining provisions of the Terms of Use, which shall remain in full force and effect.  Failure by us or our Service Provider to act on or enforce any provision of the Terms of Use shall not be construed as a waiver of that provision or any other provision in these Terms of Use.  No waiver shall be effective against us or our Service Provider unless made in writing, and no such waiver shall be construed as a waiver in any other or subsequent instance.  Except as expressly agreed by the us and you, these Terms of Use constitute the entire agreement between you and us with respect to the subject matter, and supersede all previous or contemporaneous agreements, whether written or oral, between the parties with respect to the subject matter.  The section headings are provided merely for convenience and shall not be given any legal import.  These Terms of Use will inure to the benefit of our successors, assigns, licensees, and sublicensees.
+
+Privacy Policy
+(last updated September 21, 2010)
+
+Our Policy
+
+At Hope for One, we value your privacy.  This privacy policy applies  to and governs information submitted by or generated concerning  you in connection with the Hope For One website (the “Site”) operated by Social Systems LLC  (referred to herein as “Social Systems”, “us”, “we”, or “our”), and the services and functionality provided through or in connection with the App (the “Services”).  As stated in our Terms of Service (see above) the Services use in significant part, website functionality and Internet services provided by one or more service providers, including Mobile Roadie, and their respective content providers, business partners, and subcontractors, if any (collectively, the “Service Provider”).
+
+Information We Collect
+
+When you interact with us or use the App, we and our Service Provider may collect personally identifiable data (“Personal Data”) and other information from you, as further described below:
+
+Personal Data That You Provide Through the Site:  We and our Service Provider collect Personal Data from you when you voluntarily choose to provide such information such as when you contact us with inquiries, respond to one of our surveys, register for access to the Services or use certain Services.  By voluntarily providing Personal Data, you are consenting to use of it in accordance with this Privacy Policy.  If you provide Personal Data to this Site, you acknowledge and agree that such Personal Data may be transferred from your current location to our offices and servers and the offices and servers of our Service Provider, its affiliates, and their contractors located in the United States and other countries.
+
+Non-Identifiable Data:  When you utilize the App, we and our Service Provider may receive or generate certain non-identifiable information about your use of the App.  Such information, which is collected passively using various technologies, cannot presently be used to specifically identify you.  We may store such information ourselves or it may be included in databases owned and maintained by our affiliates, agents or Service Provider.  We or our Service Provider may use such information and pool it with other information to track, for example, the total number of visitors to the App, the number of views of media files provided through the App, and the domain names of our visitors' Internet service providers. 
+
+In operating this App, we or our Service Provider may use “cookies” or similar technology.   A “cookie” is a piece of information that the computer or computers that host our Site give to your browser when you access the Site.  Such cookies or similar technology help provide additional functionality to the Site and permit more accurate analysis of Site usage.  On most web browsers, you will find a “help” section on the toolbar.  Please refer to such a section or other readily available Internet resources for information on how to receive notification when you are receiving a new cookie and how to turn cookies “off”.  Please also note that, if you turn cookies “off”, you may not be able to use all of the App’s features. 
+
+Aggregated Personal Data:  In an ongoing effort to better understand and serve the users of the Services, we may conduct research on our end user’s demographics, interests and behavior based on the Personal Data and other information provided to us.  This research may be compiled and analyzed on an aggregate basis, and we may share this aggregated data with our affiliates, agents, Service Provider, and business partners for their similar use.  This aggregate information does not identify you personally.  We may also disclose aggregated user statistics in order to describe our services to current and prospective business partners, and to other third parties for other lawful purposes.
+ 
+Our Use of Your Personal Data and Other Information:
+
+We and our Service Provider may use the Personal Data you provide in a manner that is consistent with this Privacy Policy.  We and our Service Provider will use Personal Data in order to provide the Services.   In addition, if you provide Personal Data for a certain reason, we or our Service Provider may use the Personal Data in connection with the reason for which it was provided.  For instance, if you contact us by email, we will use the Personal Data you provide to answer your question or resolve your problem.  We may also use your Personal Data and other personally non-identifiable information collected or generated through the Site to enforce the Terms of Use, to improve the content and functionality of the Site, to better understand our users, and to improve the Services.  In addition, we may use this information to contact you in the future to tell you about services we believe will be of interest to you.
+
+Our Disclosure of Your Personal Data and Other Information
+
+There are certain circumstances in which we may share your Personal Data with certain third parties without further notice to you.  As we develop our business, we might sell or buy businesses or assets.  In the event of a sale, merger, reorganization, dissolution or similar event relating to all or a portion of our business, assets or this App, Personal Data may be part of the transferred assets.  We and our Service Provider also sometimes hire other companies to perform certain business-related functions.  Examples include mailing information, maintaining databases and processing payments.  When we or our Service Provider employ another company to perform a function of this nature, they may need to access certain Personal Data, and they will be provided with the information that they need to perform their specific function.  In addition, we or our Service Provider may disclose your Personal Data if required to do so by law or in the good faith belief that such action is necessary to (i) comply with a legal obligation; (ii) protect and defend our rights or property, or that of our Service Provider; (iii) act in urgent circumstances to protect the personal safety of users of the App or the public; or (iv) protect against legal liability.
+
+Exclusions
+
+This Privacy Policy shall not apply to any unsolicited information you provide to any public areas of the App, such as the Chat section or adding Comments to media files (collectively, “Public Areas”), any ideas for new products or modifications to existing services, and other such unsolicited submissions (collectively, “Unsolicited Information”), including all User Content as that term is defined in our Terms of Use.  All such Unsolicited Information shall be deemed to be non-confidential and we shall be free to reproduce, use, disclose, and distribute such Unsolicited Information to others without limitation or attribution.  Please also note that any Personal Data or other information you provide to be displayed in your publicly available online profile will be displayed for others to see and thus will not be subject to the terms of this Privacy Policy. We and our Service Provider cannot and will not be responsible for what third parties do with any Personal Data or other information that you choose to make publicly available. As such, we advise that you exercise great care in determining what information you choose to make publicly available through this App.
+
+Children
+Our App is not intended for persons under the age of 18.  Consequently, we do not knowingly collect Personal Data from persons under the age of 18.  If you are under eighteen, you may not use the App or submit any Personal Data through the App.  If you have reason to believe that a person under the age of 18 has provided Personal Data to us through this App, please contact us, so that we may respond appropriately.  
+
+Links to Other Websites
+
+This Privacy Policy applies only to the App.  As a convenience, the App may frame or contain references or links to other websites not operated or controlled by us or our Service Provider (the “Third Party Sites”).  This Privacy Policy does not apply to any Third Party Sites.  The links from the Site do not imply or suggest that we have reviewed or that we endorse the privacy practices of any Third Party Sites.
+
+Security
+
+We take reasonable steps to protect Personal Data provided through the App from loss, misuse, and unauthorized access, disclosure, alteration, or destruction.  However, no Internet or email transmission or computer technology is ever fully secure or error free, and email sent to or from the App may not be secure.  You should take special care in deciding what information you send to us.
+
+Changes to this Privacy Policy
+
+It may be necessary for us to make changes to this Privacy Policy from time to time, in order to reflect changes to the Site, the Services, technology, or legal guidelines.  Accordingly, we reserve the right to update or modify this Privacy Policy from time to time without prior notice to you.  Please review this policy periodically, and especially before you provide any Personal Data.  The submission of Personal Data by you will be subject to the Privacy Policy in effect at the time of such submission.
+
+</string>
+	<key>MRMoviePreviewStyle</key>
+	<string>MRMoviePreviewStyleFullscreen</string>
+	<key>kCommentsEnabled</key>
+	<string>1</string>
+	<key>kCommentsFeed</key>
+	<string>http://mobileroadie.com/comments/flux/%@/%@/%@/%@/%@/%@</string>
+	<key>DTXcodeBuild</key>
+	<string>5B1008</string>
+	<key>kHasBadges</key>
+	<string>1</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.mobileroadie.548</string>
+	<key>tier</key>
+	<string>plus</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>kConfigurationBundleHash</key>
+	<string></string>
+	<key>kShowsCellStyle</key>
+	<string>EventTableViewCell</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>kRoadieLink</key>
+	<string>http://road.ie/psasupport</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>kArtistName</key>
+	<string>Porn &amp; Sex Addiction Support</string>
+	<key>onboarding</key>
+	<string>0</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon@2x.png</string>
+		<string>Icon-60@2x.png</string>
+		<string>Icon-76@2x.png</string>
+		<string>Icon-76.png</string>
+	</array>
+	<key>QRInfoText</key>
+	<string>Here is the QR dynamic text</string>
+	<key>kHasRadioInput</key>
+	<string>0</string>
+	<key>kHasGenreList</key>
+	<string>0</string>
+	<key>CFBundleName</key>
+	<string>Demo</string>
+	<key>CFBundleShortVersionString</key>
+	<string>5.2.0</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>kPhotoGridSize</key>
+	<dict>
+		<key>width</key>
+		<string>104</string>
+		<key>height</key>
+		<string>104</string>
+	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>MoRo548</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>guid</key>
+	<string>548</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>kUpdateCheck</key>
+	<string>0</string>
+	<key>kOfflineMode</key>
+	<string>none</string>
+	<key>kSessionLogMaxRecords</key>
+	<string>50</string>
+	<key>kBandID</key>
+	<string>548</string>
+	<key>kItemViewDefault</key>
+	<string>flow</string>
+	<key>kHomeGalleryStyle</key>
+	<string>default</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>kCommentPost</key>
+	<string>http://mobileroadie.com/comments/post/%@/%@/%@/%@/%@</string>
+	<key>kHasTopSpin</key>
+	<string>0</string>
+	<key>BuildMachineOSBuild</key>
+	<string>13D65</string>
+	<key>kHomeViewStyle</key>
+	<string>slideshow</string>
+	<key>kAppStoreURL</key>
+	<string>http://road.ie/%@</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>kSocialEnabled</key>
+	<string>1</string>
+	<key>kSessionLogFlag</key>
+	<string>1</string>
+	<key>CFBundleVersion</key>
+	<string>5.2.0</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>kFanWallStyle</key>
+	<string>BubbleStyle</string>
+	<key>kTabData</key>
+	<array>
+		<dict>
+			<key>kFeedName</key>
+			<string>kVideoFeed</string>
+			<key>kTabController</key>
+			<string>VideosCategoriesViewController</string>
+			<key>id</key>
+			<string>7</string>
+			<key>default_title</key>
+			<string>Videos</string>
+			<key>kTabDisplayName</key>
+			<string>Videos</string>
+			<key>ipad_bg_class</key>
+			<string>MRVideosViewControllerPad</string>
+			<key>kPadController</key>
+			<string>MRVideosGridSectionViewControllerPad</string>
+			<key>installed</key>
+			<true/>
+			<key>kTabDefaultName</key>
+			<string>Videos</string>
+		</dict>
+		<dict>
+			<key>kTabController</key>
+			<string>NewsCategoriesViewController</string>
+			<key>id</key>
+			<string>4</string>
+			<key>default_title</key>
+			<string>News</string>
+			<key>kTabDisplayName</key>
+			<string>Articles</string>
+			<key>ipad_bg_class</key>
+			<string>MRNewsViewControllerPad</string>
+			<key>kPadController</key>
+			<string>MRNewsGridSectionViewControllerPad</string>
+			<key>installed</key>
+			<true/>
+			<key>kTabDefaultName</key>
+			<string>News</string>
+		</dict>
+		<dict>
+			<key>kTabController</key>
+			<string>MusicCategoriesViewController</string>
+			<key>id</key>
+			<string>2</string>
+			<key>default_title</key>
+			<string>Music</string>
+			<key>kTabDisplayName</key>
+			<string>Podcasts</string>
+			<key>ipad_bg_class</key>
+			<string>MRMusicViewControllerPad,MRMusicDetailViewControllerPad</string>
+			<key>kPadController</key>
+			<string>MRMusicSectionViewControllerPad</string>
+			<key>installed</key>
+			<true/>
+			<key>kTabDefaultName</key>
+			<string>Music</string>
+		</dict>
+		<dict>
+			<key>kTabController</key>
+			<string>FeedbackViewController</string>
+			<key>id</key>
+			<string>12</string>
+			<key>default_title</key>
+			<string>Mailing List</string>
+			<key>kTabDisplayName</key>
+			<string>Sign Up!</string>
+			<key>ipad_bg_class</key>
+			<string></string>
+			<key>kPadController</key>
+			<string>MRMailingListNavigationController</string>
+			<key>installed</key>
+			<true/>
+			<key>kTabDefaultName</key>
+			<string>Mailing List</string>
+		</dict>
+		<dict>
+			<key>kTabController</key>
+			<string>MRUserViewController</string>
+			<key>id</key>
+			<string>14</string>
+			<key>default_title</key>
+			<string>Accounts</string>
+			<key>kTabDisplayName</key>
+			<string>Accounts</string>
+			<key>ipad_bg_class</key>
+			<string></string>
+			<key>kPadController</key>
+			<string>MRMyAccountNavigationController</string>
+			<key>installed</key>
+			<true/>
+			<key>kTabDefaultName</key>
+			<string>Accounts</string>
+		</dict>
+		<dict>
+			<key>kFeedName</key>
+			<string>kProfileFeed</string>
+			<key>kTabController</key>
+			<string>ProfileViewController</string>
+			<key>id</key>
+			<string>11</string>
+			<key>default_title</key>
+			<string>Links</string>
+			<key>kTabDisplayName</key>
+			<string>Websites</string>
+			<key>ipad_bg_class</key>
+			<string>MRLinksListSectionViewControllerPad</string>
+			<key>kPadController</key>
+			<string>MRLinksListSectionViewControllerPad</string>
+			<key>installed</key>
+			<true/>
+			<key>kTabDefaultName</key>
+			<string>Links</string>
+		</dict>
+		<dict>
+			<key>kTabController</key>
+			<string>AboutViewController</string>
+			<key>id</key>
+			<string>13</string>
+			<key>default_title</key>
+			<string>Copyright</string>
+			<key>kTabDisplayName</key>
+			<string>About</string>
+			<key>ipad_bg_class</key>
+			<string></string>
+			<key>kPadController</key>
+			<string>MRAboutNavigationController</string>
+			<key>installed</key>
+			<true/>
+			<key>kTabDefaultName</key>
+			<string>Copyright</string>
+		</dict>
+		<dict>
+			<key>kTabController</key>
+			<string>FavoritesViewController</string>
+			<key>id</key>
+			<string>1011</string>
+			<key>default_title</key>
+			<string>Favorites</string>
+			<key>kTabDisplayName</key>
+			<string>Favorites</string>
+			<key>ipad_bg_class</key>
+			<string></string>
+			<key>kPadController</key>
+			<string></string>
+			<key>installed</key>
+			<true/>
+			<key>kTabDefaultName</key>
+			<string>Favorites</string>
+		</dict>
+		<dict>
+			<key>kTabController</key>
+			<string>FanWallViewController</string>
+			<key>id</key>
+			<string>3</string>
+			<key>default_title</key>
+			<string>Fan Wall</string>
+			<key>kTabDisplayName</key>
+			<string>Chat!</string>
+			<key>ipad_bg_class</key>
+			<string>MRFanWallSectionViewControllerPad</string>
+			<key>kPadController</key>
+			<string>MRFanWallSectionViewControllerPad</string>
+			<key>installed</key>
+			<true/>
+			<key>kTabDefaultName</key>
+			<string>Fan Wall</string>
+		</dict>
+	</array>
+	<key>kAdData</key>
+	<dict>
+		<key>useiAds</key>
+		<string>1</string>
+		<key>provider_site_identifier</key>
+		<string>a1532723b3189f5</string>
+		<key>provider</key>
+		<string>admob</string>
+	</dict>
+	<key>kIAPurchaseAndroid</key>
+	<array>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>kSessionLogFrequency</key>
+	<string>86000</string>
+	<key>kHomeActionType</key>
+	<string>qr</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.1</string>
+	<key>kIAPurchase</key>
+	<array>
+	</array>
+	<key>kSonicNotify</key>
+	<string>0</string>
+	<key>topuserstext</key>
+	<string>You earn points every time you use this app, and the more engaged you are, the more points you'll earn.  
+
+Earn more points by commenting, posting photos, sharing items to Facebook and Twitter, and even just listening to music. Everything will add up and make you Top User!</string>
+	<key>DTPlatformBuild</key>
+	<string>11D167</string>
+	<key>DTXcode</key>
+	<string>0511</string>
+	<key>kSharingEnabled</key>
+	<string>1</string>
+	<key>bio_img</key>
+	<string></string>
+	<key>kHasMozes</key>
+	<string>0</string>
+</dict>
+</plist>

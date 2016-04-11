@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>4.3</string>
+	<key>CFBundleIconFile</key>
+	<string>icon.png</string>
+	<key>CFBundleName</key>
+	<string>Tap Band</string>
+	<key>googleAdSenseKeywords</key>
+	<string>music,band,rock,guitar,keyboard,beat,drums,sound,instruments</string>
+	<key>DTSDKName</key>
+	<string>iphoneos4.3</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleOpaqueBlack</string>
+	<key>googleAdSenseAllowAdsafeMedium</key>
+	<true/>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>AppName</key>
+	<string>Tap Band</string>
+	<key>CFBundleDisplayName</key>
+	<string>Tap Band</string>
+	<key>DTSDKBuild</key>
+	<string>8F190</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>AppLink</key>
+	<string>http://chibie.com/0ebca3</string>
+	<key>googleAdSenseApplicationAppleID</key>
+	<string>328865276</string>
+	<key>BuildMachineOSBuild</key>
+	<string>10J567</string>
+	<key>DTPlatformBuild</key>
+	<string>8F190</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>googleAdSenseCompanyName</key>
+	<string>StuckPixel, Inc.</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleVersion</key>
+	<string>1.3</string>
+	<key>DTXcodeBuild</key>
+	<string>4A304a</string>
+	<key>MinimumOSVersion</key>
+	<string>3.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.stuckpixelinc.tapband</string>
+	<key>AdwhirlKey</key>
+	<string>f1cc5efddfbf4493b00d9888872fd4ed</string>
+	<key>DTXcode</key>
+	<string>0400</string>
+	<key>googleAdSenseChannelIDs</key>
+	<string>9500180464</string>
+	<key>CFBundleExecutable</key>
+	<string>Tap Band</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>4.2</string>
+</dict>
+</plist>

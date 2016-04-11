@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>beleelaidocslite</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>db-iuk0l1c5wh583vi</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.1</string>
+	<key>CFBundleName</key>
+	<string>iDocs</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.1</string>
+	<key>UIMainStoryboardFile~ipad</key>
+	<string>Main_iPad</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>iDocsAppIcon60x60</string>
+			</array>
+		</dict>
+	</dict>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>iDocs</string>
+	<key>UIBackgroundModes</key>
+	<array>
+	</array>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>All File Types</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.item</string>
+			</array>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+		</dict>
+	</array>
+	<key>DTSDKBuild</key>
+	<string>12B411</string>
+	<key>CFBundleShortVersionString</key>
+	<string>7.1</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14B25</string>
+	<key>DTPlatformBuild</key>
+	<string>12B411</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Andalus (nearest).ttf</string>
+		<string>Arial Black (nearest).ttf</string>
+		<string>Book Antiqua (nearest).ttf</string>
+		<string>Calibri (nearest).ttf</string>
+		<string>Cambria (nearest).ttf</string>
+		<string>Candara (nearest).ttf</string>
+		<string>Comic Sans MS (nearest).ttf</string>
+		<string>Consolas (nearest).ttf</string>
+		<string>Constantia (nearest).ttf</string>
+		<string>Franklin Gothic Medium (nearest).ttf</string>
+		<string>Impact (nearest).ttf</string>
+		<string>Lucida Console (nearest).ttf</string>
+		<string>Microsoft Sans Serif (nearest).ttf</string>
+		<string>Palatino Linotype (nearest).ttf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>81</string>
+	<key>PSPDFKIT_LICENSE_KEY</key>
+	<string>m/i+QXWhxH6iWac+oCOWxZXty1ljG0067LELNP6Nmhh0E8RI0ZJEMdHqO0u2IV03Ve8HZzJuk4gOl294tLmWzqIYhVV9zXDThAPYSpdCuKxvSSohw+4FVuHt8fh5V+5/lX4DRopjceEe+iWWJqfrTsSrCh5hA3/bPBCvTpMVkukuUCrzz/PwXuUtZXCLvP1OV5FdPyc0MQ5ARsV7hjBYvZaQLs+g8yx040ETUPhiDeekxQsVcsHLxBC9syiFq0q65p04D95iJzNKaDMhpr/9XrUwWTqRiz6BKIL+LYDJsD1isflvTBIx7eWCp8yLnpc5X3FVqc1GFhpbOYsb42Lp5o3DbxJd5c5penO21O3DQxXm3Q1P2Z9k70ExfYD414BmJ/Rd2YzSRMzsenMZwQ2/x2Pj46QRQwQefaPBnbBqhyt1MhD2O4UCCXjvL+R2s4U7T7mgbiVWc1K6uZ28idul3XjaJx+oZyxapHH4u97Jc/rXfa8Y0GW9vhbH6uiJDI1hZFXP65h2pSKvNcpJU98S8mkZlLfZWjgPz8XBDykzw9jjIX/IBXXNjEWMRxMfqqoWuISJJ8GVmgO/xewcA62f/w==</string>
+	<key>DTXcodeBuild</key>
+	<string>6A2008a</string>
+	<key>subscriptionInApps</key>
+	<dict>
+		<key>com.beleela.iDocs.1MonthFullPrice</key>
+		<string></string>
+		<key>com.beleela.iDocs.6Month</key>
+		<integer>6</integer>
+		<key>com.beleela.iDocs.1Month</key>
+		<integer>1</integer>
+		<key>com.beleela.iDocs.3MonthFullPrice</key>
+		<string></string>
+		<key>com.beleela.iDocs.12Month</key>
+		<integer>12</integer>
+		<key>com.beleela.iDocs.12MonthFullPrice</key>
+		<string></string>
+		<key>com.beleela.iDocs.3Month</key>
+		<integer>3</integer>
+		<key>com.beleela.iDocs.6MonthFullPrice</key>
+		<string></string>
+	</dict>
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-800-Portrait-736h</string>
+			<key>UILaunchImageSize</key>
+			<string>{414, 736}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>8.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-800-667h</string>
+			<key>UILaunchImageSize</key>
+			<string>{375, 667}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>8.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-568h</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Landscape</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-Landscape</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+	</array>
+	<key>DropboxAppSecret</key>
+	<string>8favbo0g5l36h6a</string>
+	<key>SafariLink</key>
+	<string>idocslite/safari</string>
+	<key>MinimumOSVersion</key>
+	<string>7.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>CFBundleBuildVersion</key>
+	<string>v7.1+</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.beleela.FileManager</string>
+	<key>DTXcode</key>
+	<string>0611</string>
+	<key>CFBundleExecutable</key>
+	<string>iDocs Lite</string>
+	<key>DropboxAppKey</key>
+	<string>iuk0l1c5wh583vi</string>
+	<key>GoogleAnalyticsID</key>
+	<string>UA-42712617-1</string>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>iDocsAppIcon60x60</string>
+				<string>iDocsAppIcon76x76</string>
+			</array>
+		</dict>
+	</dict>
+	<key>UIMainStoryboardFile</key>
+	<string>Main_iPhone</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

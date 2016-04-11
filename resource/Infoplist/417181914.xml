@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb414207551961170</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.2</string>
+	<key>DTPlatformVersion</key>
+	<string>6.1</string>
+	<key>CFBundleIconFile</key>
+	<string>lowresicon.png</string>
+	<key>CFBundleName</key>
+	<string>iPhoneSecrets</string>
+	<key>DTSDKName</key>
+	<string>iphoneos6.1</string>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+	</array>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Tips</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+	</array>
+	<key>DTSDKBuild</key>
+	<string>10B141</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>12F37</string>
+	<key>DTPlatformBuild</key>
+	<string>10B141</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+	</array>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleVersion</key>
+	<string>7.5</string>
+	<key>DTXcodeBuild</key>
+	<string>4H1003</string>
+	<key>AppLovinSdkKey</key>
+	<string>SpltmGbMpRRVvkbsqzOTKvqbfa8WA3xcsgUcx4zlVPFP7rFxpeP8TDkCptizxeanJ4NF9L_flE3t4IptxC_UQk
+&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;
+&lt;plist version="1.0"&gt;
+&lt;string&gt;SpltmGbMpRRVvkbsqzOTKvqbfa8WA3xcsgUcx4zlVPFP7rFxpeP8TDkCptizxeanJ4NF9L_flE3t4IptxC_UQk&lt;/string&gt;
+&lt;/plist&gt;
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;
+&lt;plist version="1.0"&gt;
+&lt;string&gt;SpltmGbMpRRVvkbsqzOTKvqbfa8WA3xcsgUcx4zlVPFP7rFxpeP8TDkCptizxeanJ4NF9L_flE3t4IptxC_UQk&lt;/string&gt;
+&lt;/plist&gt;
+</string>
+	<key>MinimumOSVersion</key>
+	<string>6.1</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.3ight.TipsiPhone</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>lowresicon.png</string>
+		<string>hiresicon.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0462</string>
+	<key>CFBundleExecutable</key>
+	<string>iPhoneSecrets</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string></string>
+</dict>
+</plist>

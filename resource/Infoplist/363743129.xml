@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>AlcoholQC</string>
+	<key>DTSDKName</key>
+	<string>iphoneos3.2</string>
+	<key>DTXcode</key>
+	<string>0324</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>French</string>
+	<key>CFBundleVersion</key>
+	<string>1.1</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>AlcoholQC</string>
+	<key>DTCompiler</key>
+	<string>4.2</string>
+	<key>MinimumOSVersion</key>
+	<string>3.2</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.swoo.saq</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformVersion</key>
+	<string>4.1 GM</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>icon_72.png</string>
+		<string>icon_57.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<false/>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindow-iPad</string>
+	<key>CFBundleDisplayName</key>
+	<string>AlcoholQc</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+</dict>
+</plist>

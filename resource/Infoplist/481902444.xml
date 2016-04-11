@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>singalongfree</string>
+	<key>DTSDKName</key>
+	<string>iphoneos4.2</string>
+	<key>DTXcode</key>
+	<string>0325</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>singalongfree</string>
+	<key>DTCompiler</key>
+	<string>4.2</string>
+	<key>MinimumOSVersion</key>
+	<string>4.0</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.greenfrogmusic.singalongfree</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>DTPlatformVersion</key>
+	<string>4.2 Seed 2</string>
+	<key>DTXcodeBuild</key>
+	<string>10M2423</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindowIpad</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon@2x.png</string>
+		<string>IconIpad.png</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>Sing Free</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>UIInterfaceOrientation</key>
+	<string>UIInterfaceOrientationLandscapeRight</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformBuild</key>
+	<string>8C134</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+</dict>
+</plist>

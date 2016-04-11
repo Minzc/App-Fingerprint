@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DTXcodeBuild</key>
+	<string>4H1503</string>
+	<key>CFBundleName</key>
+	<string>Baby Names</string>
+	<key>DTXcode</key>
+	<string>0463</string>
+	<key>DTSDKName</key>
+	<string>iphoneos6.1</string>
+	<key>DTSDKBuild</key>
+	<string>10B141</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleVersion</key>
+	<string>5.0</string>
+	<key>BuildMachineOSBuild</key>
+	<string>12E55</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleShortVersionString</key>
+	<string>5.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>FacebookAppID</key>
+	<string>495760353794614</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>Baby Names</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.schatzisoft.babynamesplusfree</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Calibri Bold Italic.ttf</string>
+		<string>Calibri Bold.ttf</string>
+		<string>Calibri Italic.ttf</string>
+		<string>Calibri.ttf</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>6.1</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>iPhoneIcon.png</string>
+		<string>iPhoneIcon@2x.png</string>
+		<string>iPadIcon.png</string>
+		<string>iPadIcon@2x.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Baby Names</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformBuild</key>
+	<string>10B141</string>
+</dict>
+</plist>

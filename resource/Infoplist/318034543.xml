@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb556699454343614</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>6.0</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>CFBundleName</key>
+	<string>ColorCapture</string>
+	<key>DTSDKName</key>
+	<string>iphoneos6.0</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Icon.png</string>
+				<string>Icon@2x.png</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Color Capture</string>
+	<key>Share subject</key>
+	<string>Benjamin Moore ColorCapture App</string>
+	<key>DTSDKBuild</key>
+	<string>10A403</string>
+	<key>Share text</key>
+	<string>Benjamin Moore Color Capture®
+        Download for iOS
+        https://itunes.apple.com/us/app/color-capture/id318034543?mt=8
+    </string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.1</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>12C60</string>
+	<key>DTPlatformBuild</key>
+	<string>10A403</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>4G2008a</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleVersion</key>
+	<string>3.8</string>
+	<key>Share title</key>
+	<string>@Benjamin_Moore #ColorCapture App</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>MinimumOSVersion</key>
+	<string>5.1</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>Flurry API key</key>
+	<string>7MHKG8TMXBP482HKXRF3</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.benmoore.colorcapture</string>
+	<key>DTXcode</key>
+	<string>0452</string>
+	<key>CFBundleExecutable</key>
+	<string>ColorCapture</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

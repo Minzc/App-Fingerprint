@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DTXcode</key>
+	<string>0324</string>
+	<key>DTSDKName</key>
+	<string>iphoneos4.1</string>
+	<key>UIApplicationExitsOnSuspend</key>
+	<true/>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>1.03</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>AwesomeHUD</string>
+	<key>DTCompiler</key>
+	<string>4.2</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<dict>
+		<key>telephony</key>
+		<true/>
+		<key>opengles-1</key>
+		<true/>
+		<key>gps</key>
+		<true/>
+		<key>location-services</key>
+		<true/>
+	</dict>
+	<key>MinimumOSVersion</key>
+	<string>3.0</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.mustbegames.AwesomeHUD</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformVersion</key>
+	<string>4.1 GM</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>AwesomeHUD</string>
+</dict>
+</plist>

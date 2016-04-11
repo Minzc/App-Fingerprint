@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>6.1</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>CFBundleName</key>
+	<string>ABC Alphabet Phonics - Preschool Kids Game Free Lite</string>
+	<key>DTSDKName</key>
+	<string>iphoneos6.1</string>
+	<key>Flurry App Key</key>
+	<string>IX48678QHW725DC881YR</string>
+	<key>UIRequiresPersistentWiFi</key>
+	<true/>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>ABC Alphabet Phonics - Preschool Kids Game Free Lite</string>
+	<key>DTSDKBuild</key>
+	<string>10B141</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.1</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>12C3012</string>
+	<key>DTPlatformBuild</key>
+	<string>10B141</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>UIPrerenderedIcon</key>
+	<false/>
+	<key>CFBundleVersion</key>
+	<string>3.1</string>
+	<key>DTXcodeBuild</key>
+	<string>4H512</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow_iPhone</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.grasshopperapps.phototouch.abc</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon.png</string>
+		<string>Icon-72.png</string>
+		<string>Icon@2x.png</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0461</string>
+	<key>CFBundleExecutable</key>
+	<string>ABC Alphabet Phonics - Preschool Kids Game Free Lite</string>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindow_iPad</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string></string>
+</dict>
+</plist>

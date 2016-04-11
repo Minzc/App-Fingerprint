@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>Product_ID2</key>
+	<string>MCV_2P</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>CFBundleName</key>
+	<string>Webcam</string>
+	<key>DTSDKName</key>
+	<string>iphoneos4.2</string>
+	<key>DTPlatformVersion</key>
+	<string>4.2 Seed 2</string>
+	<key>Receipt_Data</key>
+	<string></string>
+	<key>Product_ID1</key>
+	<string>MCV_1P</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>CamViewer</string>
+	<key>Product_ID7</key>
+	<string>MCV_7P</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformBuild</key>
+	<string>8C134</string>
+	<key>MinimumOSVersion</key>
+	<string>4.2</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>Product_ID6</key>
+	<string>MCV_6P</string>
+	<key>CFBundleVersion</key>
+	<string>3.7</string>
+	<key>DTXcodeBuild</key>
+	<string>10M2423</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>Product_ID5</key>
+	<string>MCV_5P</string>
+	<key>UIApplicationExitsOnSuspend</key>
+	<true/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.mobideos.camviewer.webcamEBEI</string>
+	<key>DTXcode</key>
+	<string>0325</string>
+	<key>Product_ID4</key>
+	<string>MCV_4P</string>
+	<key>CFBundleExecutable</key>
+	<string>Webcam</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>Product_ID3</key>
+	<string>MCV_3P</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>4.2</string>
+</dict>
+</plist>

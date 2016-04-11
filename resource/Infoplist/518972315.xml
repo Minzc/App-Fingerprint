@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>TextPicFree</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.2</string>
+	<key>DTXcode</key>
+	<string>0620</string>
+	<key>DTSDKBuild</key>
+	<string>12D508</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleVersion</key>
+	<string>1.1.5</string>
+	<key>BuildMachineOSBuild</key>
+	<string>14C109</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.1.5</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+		<string>armv6</string>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>TextPicFree</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.click2mobile.textGramFree</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>A Cut Above The Rest.ttf</string>
+		<string>A Love of Thunder.ttf</string>
+		<string>A Safe Place to Fall.ttf</string>
+		<string>A Star is Born.ttf</string>
+		<string>Aardvark Cafe.ttf</string>
+		<string>Abbey Dawn by ThaiAvrilLavigne.ttf</string>
+		<string>Aerovias Brasil NF.ttf</string>
+		<string>akaDora.ttf</string>
+		<string>Alice in Wonderland.ttf</string>
+		<string>Alpha Echo.ttf</string>
+		<string>AnthologY.ttf</string>
+		<string>AquilineTwo.ttf</string>
+		<string>Barber shop.ttf</string>
+		<string>BlackBoard.ttf</string>
+		<string>Bleeding Cowboys.ttf</string>
+		<string>Buffied.ttf</string>
+		<string>Caviar Dreams.ttf</string>
+		<string>ChaserDemo.ttf</string>
+		<string>Coca Cola ii.ttf</string>
+		<string>Defused.ttf</string>
+		<string>Faith Collapsing.ttf</string>
+		<string>FFF Tusj.ttf</string>
+		<string>Flight mAybe Maj.ttf</string>
+		<string>Good Times.ttf</string>
+		<string>HARD ROCK.ttf</string>
+		<string>Harry Potter.ttf</string>
+		<string>Hawaii Lover.ttf</string>
+		<string>Heineken.ttf</string>
+		<string>JAMES HAN.ttf</string>
+		<string>Jellyka Castle's Queen.ttf</string>
+		<string>Acquest Script.ttf</string>
+		<string>AGLettericaCondensed.ttf</string>
+		<string>Alako-Bold.ttf</string>
+		<string>Architects Daughter.ttf</string>
+		<string>Ashcan BB.ttf</string>
+		<string>Bailey MF.ttf</string>
+		<string>Beautiful Flaws.ttf</string>
+		<string>Big Apple NF.ttf</string>
+	</array>
+	<key>DTXcodeBuild</key>
+	<string>6C131e</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>57.png</string>
+		<string>114.png</string>
+		<string>72.png</string>
+		<string>144.png</string>
+		<string>76.png</string>
+		<string>120.png</string>
+		<string>156.png</string>
+		<string>152.png</string>
+		<string>160.png</string>
+		<string>29.png</string>
+		<string>40.png</string>
+		<string>58.png</string>
+		<string>80.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>TextPicFree</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformVersion</key>
+	<string>8.2</string>
+	<key>DTPlatformBuild</key>
+	<string>12D508</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+</dict>
+</plist>

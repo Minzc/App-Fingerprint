@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>G1 Test</string>
+	<key>DTXcode</key>
+	<string>0500</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.0</string>
+	<key>AppLovinSdkKey</key>
+	<string>UocEDtRaJ3FXlq2w-O1JpTEhPctQgAnAyOPAGrlZu-6dp8ToXZ6K7K0Wxtyc1kn-7A8N0uxvt2WfA3SicT1kt1</string>
+	<key>DTSDKBuild</key>
+	<string>11A465</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>3.0.0</string>
+	<key>BuildMachineOSBuild</key>
+	<string>13C64</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>G1 Test</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIdentifier</key>
+	<string>OntarioG1TestLite</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>DTPlatformVersion</key>
+	<string>7.0</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>icon40.png</string>
+		<string>icon76.png</string>
+		<string>icon80.png</string>
+		<string>icon100.png</string>
+		<string>icon120.png</string>
+		<string>icon144.png</string>
+		<string>icon152.png</string>
+		<string>Icon.png</string>
+		<string>Icon-72.png</string>
+		<string>Icon@2x.png</string>
+		<string>Icon-Small-50.png</string>
+		<string>Icon-Small.png</string>
+		<string>Icon-Small@2x.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>G1 Test</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTXcodeBuild</key>
+	<string>5A1413</string>
+	<key>DTPlatformBuild</key>
+	<string>11A465</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+</dict>
+</plist>

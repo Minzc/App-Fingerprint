@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+	</array>
+	<key>CFBundleName</key>
+	<string>TrackerFree</string>
+	<key>DTSDKName</key>
+	<string>iphoneos4.0</string>
+	<key>DTXcode</key>
+	<string>0323</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+	</array>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+	</array>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>2.0.1</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleDefault</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+	</array>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleIconFile</key>
+	<string>57-free.png</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>TrackerFree</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvmgcc42</string>
+	<key>MinimumOSVersion</key>
+	<string>3.0</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>4.0 GM</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+	</array>
+	<key>CFBundleIdentifier</key>
+	<string>com.fboweb.trackerfree</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>114-free.png</string>
+		<string>57-free.png</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Tracker Free</string>
+	<key>UIInterfaceOrientation</key>
+	<string>UIInterfaceOrientationPortrait</string>
+	<key>MCApplicationId</key>
+	<string>7A019343-5EA2-4E30-B78D-95E6DD6E3575</string>
+	<key>MCAdsCanAutoplay</key>
+	<true/>
+</dict>
+</plist>

@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb248093382009777</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>7.0</string>
+	<key>CFBundleName</key>
+	<string>CropVideoSquare™</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.0</string>
+	<key>UILaunchImageFile~ipad</key>
+	<string>Default</string>
+	<key>UIMainStoryboardFile~ipad</key>
+	<string>Main_iPad</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>icon</string>
+				<string>120</string>
+				<string>80</string>
+				<string>58</string>
+				<string>29</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackTranslucent</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>CropVS</string>
+	<key>DTSDKBuild</key>
+	<string>11B508</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.3.0</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13B42</string>
+	<key>DTPlatformBuild</key>
+	<string>11B508</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>DTXcodeBuild</key>
+	<string>5A3005</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleVersion</key>
+	<string>1.3.0</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>always forever.ttf</string>
+		<string>Baron Neue Bold 60.otf</string>
+		<string>Baron Neue Bold italic 60.otf</string>
+		<string>Baron Neue Bold ultra italic 60.otf</string>
+		<string>Baron Neue Extra Bold 70.otf</string>
+		<string>Baron Neue Extra Bold italic 70.otf</string>
+		<string>Baron Neue Extra Bold ultra italic 70.otf</string>
+		<string>Baron Neue Italic 50.otf</string>
+		<string>Baron Neue Normal 50.otf</string>
+		<string>Baron Neue Outline 50.otf</string>
+		<string>Baron Neue Ultra Italic 50.otf</string>
+		<string>Bellota-Bold.otf</string>
+		<string>Bellota-BoldItalic.otf</string>
+		<string>Bellota-Italic.otf</string>
+		<string>Bellota-Light.otf</string>
+		<string>Bellota-LightItalic.otf</string>
+		<string>Bellota-Regular.otf</string>
+		<string>Bernard.ttf</string>
+		<string>Brandy Script.ttf</string>
+		<string>cac_champagne.ttf</string>
+		<string>Caviar Dreams Bold.ttf</string>
+		<string>CaviarDreams_BoldItalic.ttf</string>
+		<string>CaviarDreams_Italic.ttf</string>
+		<string>CaviarDreams.ttf</string>
+		<string>cinecaption.TTF</string>
+		<string>CookieMonster.ttf</string>
+		<string>DEBONAIR.TTF</string>
+		<string>desyrel.ttf</string>
+		<string>DraconianTypewriter.ttf</string>
+		<string>dreamian.ttf</string>
+		<string>elegant_ink.ttf</string>
+		<string>EVERAFTE.TTF</string>
+		<string>Global Medium Stencil.otf</string>
+		<string>GoodMorning.ttf</string>
+		<string>GrandHotel-Regular.otf</string>
+		<string>Graziano.ttf</string>
+		<string>Gutsy-Bold.ttf</string>
+		<string>Gutsy-BoldItalic.ttf</string>
+		<string>Gutsy-Italic.ttf</string>
+		<string>Gutsy.ttf</string>
+		<string>HaloHandletter.otf</string>
+		<string>HOMOARAK.TTF</string>
+		<string>HuiFont.ttf</string>
+		<string>Japan.ttf</string>
+		<string>JennaSue.ttf</string>
+		<string>Junction.otf</string>
+		<string>Kankin.otf</string>
+		<string>Kenzo Regular Italic.otf</string>
+		<string>Kenzo Regular.otf</string>
+		<string>KFhimaji.otf</string>
+		<string>Langdon.otf</string>
+		<string>LearningCurve_OT.otf</string>
+		<string>LearningCurveDashed_OT.otf</string>
+		<string>LITTLELO.TTF</string>
+		<string>LittleLordFontleroyNF.ttf</string>
+		<string>LobsterTwo-Bold.otf</string>
+		<string>LobsterTwo-BoldItalic.otf</string>
+		<string>LobsterTwo-Italic.otf</string>
+		<string>LobsterTwo-Regular.otf</string>
+		<string>Lovelo Black.otf</string>
+		<string>Lovelo Line Bold.otf</string>
+		<string>Lovelo Line Light.otf</string>
+		<string>MakibaFont.ttf</string>
+		<string>Marte.otf</string>
+		<string>MaryKate.ttf</string>
+		<string>Mathlete-Bulky.otf</string>
+		<string>Mathlete-BulkySlant.otf</string>
+		<string>Mathlete-Skinny.otf</string>
+		<string>Mathlete-SkinnySlant.otf</string>
+		<string>MerriweatherSans-Bold.otf</string>
+		<string>MerriweatherSans-BoldItalic.otf</string>
+		<string>MerriweatherSans-ExtraBold.otf</string>
+		<string>MerriweatherSans-ExtraBoldItalic.otf</string>
+		<string>MerriweatherSans-Italic.otf</string>
+		<string>MerriweatherSans-Light.otf</string>
+		<string>MerriweatherSans-LightItalic.otf</string>
+		<string>MerriweatherSans-Regular.otf</string>
+		<string>Multicolore.otf</string>
+		<string>MuroRegular.otf</string>
+		<string>MuroSlant.otf</string>
+		<string>Nautik-Black.otf</string>
+		<string>Nautik-Bold.otf</string>
+		<string>Nautik-Extralight.otf</string>
+		<string>Nautik-Light.otf</string>
+		<string>Nautik-Regular.otf</string>
+		<string>Nostalgic.ttf</string>
+		<string>OhisamaFont.ttf</string>
+		<string>Pacifico.ttf</string>
+		<string>Parisienne-Regular.ttf</string>
+		<string>PonsRoundedSlab-Regular.otf</string>
+		<string>Prophecy_Script.ttf</string>
+		<string>Sail-Regular.otf</string>
+		<string>Saniretro.ttf</string>
+		<string>SEASRN__.ttf</string>
+		<string>Sertig.otf</string>
+		<string>Shelley.ttf</string>
+		<string>Shelley_Dead.ttf</string>
+		<string>Sofia-Regular.otf</string>
+		<string>Sprinklescolors.ttf</string>
+		<string>Star_Jedi_Rounded.ttf</string>
+		<string>Starjedi.ttf</string>
+		<string>Starjhol.ttf</string>
+		<string>SugarPie.ttf</string>
+		<string>Tanuki-Permanent-Marker.ttf</string>
+		<string>Tr2n.ttf</string>
+		<string>Vetka.otf</string>
+		<string>WildCrazy.ttf</string>
+		<string>Windsor-Hand.otf</string>
+	</array>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>UILaunchImageFile</key>
+	<string>Default</string>
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>default</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+	</array>
+	<key>MinimumOSVersion</key>
+	<string>5.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>CFBundleIdentifier</key>
+	<string>com.iappcreation.videocropfree</string>
+	<key>DTXcode</key>
+	<string>0502</string>
+	<key>UILaunchImages~ipad</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Landscape</string>
+			<key>UILaunchImageName</key>
+			<string>splash-ios7-lanscape</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>splash-ios7</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>Default</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>default</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>CropVideoFREE</string>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>40x40</string>
+				<string>100x100</string>
+				<string>50x50</string>
+				<string>152x152</string>
+				<string>76x76</string>
+				<string>icon</string>
+				<string>120</string>
+				<string>80</string>
+				<string>58</string>
+				<string>29</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>UIMainStoryboardFile</key>
+	<string>Main_iPhone</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

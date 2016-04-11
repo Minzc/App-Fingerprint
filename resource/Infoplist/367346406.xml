@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb113447978681027birthdayexpress</string>
+			</array>
+		</dict>
+	</array>
+	<key>NSContactsUsageDescription</key>
+	<string>This app needs to be authorized to access your contacts' birthdays in order to automatically remind you of these important days</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>7.0</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>CFBundleName</key>
+	<string>BirthdayCalendar</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.0</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Birthdays</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Birthday Sweet Backup</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.bestsparks.birthdaysweet.backupfile</string>
+			</array>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+		</dict>
+	</array>
+	<key>DTSDKBuild</key>
+	<string>11B508</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.0.1</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13B42</string>
+	<key>DTPlatformBuild</key>
+	<string>11B508</string>
+	<key>MinimumOSVersion</key>
+	<string>5.0</string>
+	<key>DTXcodeBuild</key>
+	<string>5A3005</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleVersion</key>
+	<string>3.0.1</string>
+	<key>UIPrerenderedIcon</key>
+	<string>YES</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>com.bestsparks.birthdaysweet.backupfile</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Birthday Sweet Backup</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.mime-type</key>
+				<string>application/x-plist</string>
+				<key>public.filename-extension</key>
+				<string>birthdayjson</string>
+			</dict>
+		</dict>
+	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Harry Potter.ttf</string>
+		<string>Electrodots.ttf</string>
+		<string>File.otf</string>
+		<string>Freebooter Script.ttf</string>
+		<string>Mia's Scribblings ~.ttf</string>
+		<string>Scriptina.ttf</string>
+		<string>BoboWhite.ttf</string>
+		<string>Party LET.dfont</string>
+		<string>Quixotte.ttf</string>
+		<string>CODE Light.otf</string>
+		<string>Escuela.ttf</string>
+	</array>
+	<key>FacebookAppID</key>
+	<string>113447978681027</string>
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>iOS7Launch</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>iOS7Launch</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+	</array>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindowNew</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.bestsparks.birthdaycalendar</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon</string>
+		<string>Icon-60</string>
+		<string>Icon-72</string>
+		<string>Icon-76</string>
+	</array>
+	<key>DTXcode</key>
+	<string>0502</string>
+	<key>CFBundleExecutable</key>
+	<string>BirthdayCalendar</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

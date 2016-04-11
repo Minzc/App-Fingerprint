@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>Wallpapers</string>
+	<key>DTXcode</key>
+	<string>0433</string>
+	<key>DTSDKName</key>
+	<string>iphoneos5.1</string>
+	<key>UIApplicationExitsOnSuspend</key>
+	<false/>
+	<key>DTSDKBuild</key>
+	<string>9B176</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>1.42</string>
+	<key>BuildMachineOSBuild</key>
+	<string>11E53</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>Wallpapers</string>
+	<key>DTCompiler</key>
+	<string></string>
+	<key>MinimumOSVersion</key>
+	<string>4.0</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.yekai.Wallpapers</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformVersion</key>
+	<string>5.1</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>icon.png</string>
+		<string>icon@2x.png</string>
+	</array>
+	<key>DTXcodeBuild</key>
+	<string>4E3002</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Wp &amp; Bg</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>DTPlatformBuild</key>
+	<string>9B176</string>
+</dict>
+</plist>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>BedIntruder</string>
+	<key>DTXcode</key>
+	<string>0420</string>
+	<key>DTSDKName</key>
+	<string>iphoneos5.0</string>
+	<key>UIApplicationExitsOnSuspend</key>
+	<true/>
+	<key>DTSDKBuild</key>
+	<string>9A334</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>1.2</string>
+	<key>BuildMachineOSBuild</key>
+	<string>11C74</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.2</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>Icon files</key>
+	<array>
+		<string>Icon_114.png</string>
+		<string>Icon_72.png</string>
+		<string>Icon.png</string>
+		<string>Icon-Small-50.png</string>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>BedIntruder</string>
+	<key>DTCompiler</key>
+	<string></string>
+	<key>MinimumOSVersion</key>
+	<string>3.0</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.appmosys.bedintruder</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTPlatformVersion</key>
+	<string>5.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>BedIntruder</string>
+	<key>DTXcodeBuild</key>
+	<string>4D199</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>DTPlatformBuild</key>
+	<string>9A334</string>
+</dict>
+</plist>

@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.2</string>
+	<key>CFBundleName</key>
+	<string>MarioBrosFaqs</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.2</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon57x57</string>
+				<string>AppIcon60x60</string>
+			</array>
+		</dict>
+	</dict>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>PF: SMB</string>
+	<key>DTSDKBuild</key>
+	<string>12D508</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.20</string>
+	<key>BundledGames</key>
+	<array>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/wii-u/718915-super-mario-3d-world</string>
+			<key>Title</key>
+			<string>Super Mario 3D World</string>
+			<key>Platform</key>
+			<string>WII U</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/wii-u/704055-new-super-luigi-u</string>
+			<key>Title</key>
+			<string>New Super Luigi U</string>
+			<key>Platform</key>
+			<string>Wii U</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/wii-u/632934-new-super-mario-bros-u</string>
+			<key>Title</key>
+			<string>New Super Mario Bros. U</string>
+			<key>Platform</key>
+			<string>Wii U</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/3ds/667819-new-super-mario-bros-2</string>
+			<key>Title</key>
+			<string>New Super Mario Bros. 2</string>
+			<key>Platform</key>
+			<string>3DS</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/3ds/620831-super-mario</string>
+			<key>Title</key>
+			<string>Super Mario 3D Land</string>
+			<key>Platform</key>
+			<string>3DS</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/wii/960544-new-super-mario-bros-wii</string>
+			<key>Title</key>
+			<string>New Super Mario Bros. Wii</string>
+			<key>Platform</key>
+			<string>Wii</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/ds/920787-new-super-mario-bros</string>
+			<key>Title</key>
+			<string>New Super Mario Bros.</string>
+			<key>Platform</key>
+			<string>DS</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/snes/588740-super-mario-world-2-yoshis-island</string>
+			<key>Title</key>
+			<string>Super Mario World 2: Yoshi's Island</string>
+			<key>Platform</key>
+			<string>SNES</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/snes/519824-super-mario-world</string>
+			<key>Title</key>
+			<string>Super Mario World</string>
+			<key>Platform</key>
+			<string>SNES</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/nes/525245-super-mario-bros-3</string>
+			<key>Title</key>
+			<string>Super Mario Bros. 3</string>
+			<key>Platform</key>
+			<string>NES</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/nes/525244-super-mario-bros-2</string>
+			<key>Title</key>
+			<string>Super Mario Bros.2 </string>
+			<key>Platform</key>
+			<string>NES</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/wii/939288-super-mario-bros-the-lost-levels</string>
+			<key>Title</key>
+			<string>Super Mario Bros.: The Lost Levels</string>
+			<key>Platform</key>
+			<string>Wii</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/nes/525243-super-mario-bros</string>
+			<key>Title</key>
+			<string>Super Mario Bros.</string>
+			<key>Platform</key>
+			<string>NES</string>
+		</dict>
+		<dict>
+			<key>Url</key>
+			<string>http://www.gamefaqs.com/nes/563439-mario-bros</string>
+			<key>Title</key>
+			<string>Mario Bros.</string>
+			<key>Platform</key>
+			<string>NES</string>
+		</dict>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14C1510</string>
+	<key>DTPlatformBuild</key>
+	<string>12D508</string>
+	<key>SamplesTitle</key>
+	<string>Games</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>DTXcodeBuild</key>
+	<string>6C131e</string>
+	<key>AppStoreId</key>
+	<string>446608409</string>
+	<key>CFBundleVersion</key>
+	<string>1.20</string>
+	<key>UILaunchImageFile</key>
+	<string>LaunchImage</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-568h</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>Launch Screen</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindowFree</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.tutong.mariobrosfaqs</string>
+	<key>LinkedGames</key>
+	<array>
+		<dict>
+			<key>Title</key>
+			<string>Donkey Kong Country Returns</string>
+			<key>AppStoreId</key>
+			<string>406603641</string>
+		</dict>
+		<dict>
+			<key>Title</key>
+			<string>Kirby's Epic Yarn</string>
+			<key>AppStoreId</key>
+			<string>404124131</string>
+		</dict>
+		<dict>
+			<key>Title</key>
+			<string>L.A. Noire</string>
+			<key>AppStoreId</key>
+			<string>439477367</string>
+		</dict>
+	</array>
+	<key>DTXcode</key>
+	<string>0620</string>
+	<key>CFBundleExecutable</key>
+	<string>MarioBrosFaqs</string>
+	<key>FreeVersion</key>
+	<true/>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon57x57</string>
+				<string>AppIcon60x60</string>
+				<string>AppIcon72x72</string>
+				<string>AppIcon76x76</string>
+			</array>
+		</dict>
+	</dict>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindowHDFree</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

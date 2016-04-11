@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.feaa.pickupmaturef</string>
+	<key>CFBundleExecutable</key>
+	<string>pickupmaturef</string>
+	<key>UIInterfaceOrientation</key>
+	<string>UIInterfaceOrientationLandscapeRight</string>
+	<key>CFBundleDisplayName</key>
+	<string>Pickup</string>
+	<key>CFBundleName</key>
+	<string>pickupmaturef</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIconFile</key>
+	<string>Icon.png</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>MinimumOSVersion</key>
+	<string>2.0</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>DTSDKName</key>
+	<string>iphoneos2.0</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+</dict>
+</plist>

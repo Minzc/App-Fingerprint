@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>DTPlatformVersion</key>
+	<string>8.2</string>
+	<key>CFBundleName</key>
+	<string>Drunk Mode</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.2</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon29x29</string>
+				<string>AppIcon40x40</string>
+				<string>AppIcon60x60</string>
+			</array>
+		</dict>
+	</dict>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleDefault</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Drunk Mode</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Get yo drank on! Let Drunk Mode know where you're at so you can meet up with friends when you're out partying.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
+	<key>DTSDKBuild</key>
+	<string>12D508</string>
+	<key>CFBundleShortVersionString</key>
+	<string>4.1.0</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Get yo drank on! Let Drunk Mode know where you're at so you can meet up with friends when you're out partying.</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14C109</string>
+	<key>DTPlatformBuild</key>
+	<string>12D508</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6C131e</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>clanpro-book.ttf</string>
+		<string>clanpro-bold.ttf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>33</string>
+	<key>MinimumOSVersion</key>
+	<string>7.1</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>FacebookAppID</key>
+	<string>331991863620152</string>
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-800-Portrait-736h</string>
+			<key>UILaunchImageSize</key>
+			<string>{414, 736}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>8.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-568h</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+	</array>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>ubertesters_project_id</key>
+	<string>82850fb0-fdc8-11e3-aae8-22000ac44c54</string>
+	<key>FacebookDisplayName</key>
+	<string>DrunkMode</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.launch.Drunk-Mode</string>
+	<key>DTXcode</key>
+	<string>0620</string>
+	<key>CFBundleExecutable</key>
+	<string>Drunk Mode</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb331991863620152</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

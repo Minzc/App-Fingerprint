@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PropertyCode</key>
+	<string>TORONTOPATH</string>
+	<key>DTCompiler</key>
+	<string></string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>APP_CODE</key>
+	<string>TORONTOPATH_IPHONE</string>
+	<key>CFBundleIconFile</key>
+	<string>app_icon_small.png</string>
+	<key>CFBundleName</key>
+	<string>Toronto Path</string>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>6.0</string>
+	<key>DTSDKName</key>
+	<string>iphoneos6.0</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Toronto Path</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+	</array>
+	<key>DTSDKBuild</key>
+	<string>10A403</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.3</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>11G63</string>
+	<key>DTPlatformBuild</key>
+	<string>10A403</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+	</array>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleVersion</key>
+	<string>1.3</string>
+	<key>DTXcodeBuild</key>
+	<string>4G182</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>MinimumOSVersion</key>
+	<string>5.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.mobilefringe.torontopath</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>app_icon_small.png</string>
+		<string>app_icon_small@2x.png</string>
+	</array>
+	<key>ServerURL</key>
+	<string>http://www.mobilefringeserver.com</string>
+	<key>DTXcode</key>
+	<string>0450</string>
+	<key>CFBundleExecutable</key>
+	<string>Toronto Path</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+	</array>
+</dict>
+</plist>

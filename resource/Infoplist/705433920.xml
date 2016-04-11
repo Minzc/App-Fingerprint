@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb233137900222119</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>id705433920</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>7.1</string>
+	<key>AppleAppID</key>
+	<string>705433920</string>
+	<key>CFBundleName</key>
+	<string>Update Guide</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>UIMainStoryboardFile~ipad</key>
+	<string>Main~ipad</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.1</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon57x57</string>
+				<string>AppIcon60x60</string>
+			</array>
+		</dict>
+	</dict>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackTranslucent</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>CFBundleDisplayName</key>
+	<string>Update Guide</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>DTSDKBuild</key>
+	<string>11D167</string>
+	<key>CFBundleShortVersionString</key>
+	<string>8.0.1</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>13F34</string>
+	<key>DTPlatformBuild</key>
+	<string>11D167</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>FeedReader</key>
+	<dict>
+		<key>Excludes</key>
+		<array>
+			<string>Jailbreak</string>
+			<string>Cydia</string>
+		</array>
+		<key>Categories</key>
+		<array>
+			<string>ipad</string>
+			<string>iPhone, iPad, iPod</string>
+			<string>iCloud</string>
+			<string>iOS</string>
+			<string>iOS 7</string>
+			<string>iOS 7.0</string>
+			<string>iOS 7.1</string>
+			<string>iOS 8</string>
+			<string>iPhone</string>
+			<string>iPhone 4</string>
+			<string>iPhone 4s</string>
+			<string>iPhone 5</string>
+			<string>iPhone 5c</string>
+			<string>iPhone 5s</string>
+			<string>iPhone 6</string>
+			<string>iPod</string>
+			<string>iPad</string>
+			<string>iPad 1</string>
+			<string>iPad 2</string>
+			<string>iPad 3</string>
+			<string>iPad 4</string>
+			<string>iPad 5</string>
+			<string>iPad Air</string>
+			<string>iPad mini</string>
+			<string>iPad mini 2</string>
+			<string>iPhoto</string>
+			<string>iTunes</string>
+			<string>iTunes Store</string>
+		</array>
+		<key>Feed limit</key>
+		<integer>48</integer>
+		<key>Maximum age</key>
+		<integer>30</integer>
+	</dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>Flurry</key>
+	<dict>
+		<key>App key</key>
+		<string>CF6VB9D27B73T22VX749</string>
+	</dict>
+	<key>CFBundleVersion</key>
+	<string>8012</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Impact.ttf</string>
+	</array>
+	<key>UIStatusBarHidden</key>
+	<false/>
+	<key>Share messages</key>
+	<dict>
+		<key>Default message</key>
+		<string>Hey, I learned how to update my iPhone to iOS 8 with %@ . You can download the app here (%@). It's free.</string>
+		<key>Mail</key>
+		<string>&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Hey,&lt;br /&gt;&lt;br /&gt;I learned how to update my iPhone to iOS 8 with &lt;a href="%@"&gt;%@&lt;/a&gt;. It really helped me and I thought it could help you, too. You can download the app &lt;a href="%@"&gt;here&lt;/a&gt;. It's free&lt;/p&gt;&lt;hr /&gt;&lt;/body&gt;&lt;/html&gt;</string>
+		<key>Facebook</key>
+		<string>Hey, I learned how to update my iPhone to iOS 8 with %@. You can download the app here (%@). It's free.</string>
+	</dict>
+	<key>FacebookAppID</key>
+	<string>233137900222119</string>
+	<key>iAP</key>
+	<array>
+		<string>iOS7_Upgrade_0</string>
+		<string>iOS7_Upgrade_1</string>
+		<string>iOS7_Upgrade_2</string>
+		<string>iOS7_Upgrade_4</string>
+		<string>iOS7_Upgrade_5</string>
+		<string>iOS7_Upgrade_6</string>
+		<string>iOS7_Upgrade_7_new</string>
+		<string>iOS7_Upgrade_8</string>
+		<string>iOS7_Upgrade_9</string>
+		<string>iOS7_Upgrade_9_new</string>
+		<string>iOS7_Upgrade_10</string>
+		<string>iOS7_Upgrade_11</string>
+		<string>iOS7_Upgrade_12</string>
+		<string>iOS7_Upgrade_13</string>
+		<string>iOS7_Upgrade_14</string>
+		<string>iOS7_Upgrade_15</string>
+		<string>iOS7_Upgrade_15_new</string>
+		<string>iOS7_Upgrade_16</string>
+		<string>iOS7_Upgrade_17</string>
+	</array>
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-568h</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageOrientation</key>
+			<string>Landscape</string>
+			<key>UILaunchImageName</key>
+			<string>LaunchImage-700-Landscape</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+		</dict>
+	</array>
+	<key>PushWizard</key>
+	<dict>
+		<key>AppKey</key>
+		<string>52ae116ba7cd2ee11b0001b1</string>
+		<key>Tokens</key>
+		<array>
+		</array>
+		<key>AppKey-Sandbox</key>
+		<string>539320aaa3fc272d6e8b4579</string>
+	</dict>
+	<key>UILaunchImageFile</key>
+	<string>LaunchImage</string>
+	<key>DTXcodeBuild</key>
+	<string>5B1008</string>
+	<key>MinimumOSVersion</key>
+	<string>6.0</string>
+	<key>Appearance</key>
+	<dict>
+		<key>Start button text</key>
+		<string>Update Tutorial</string>
+		<key>Bar color</key>
+		<string>#FF2A68</string>
+		<key>Tint color</key>
+		<string>#FFFFFF</string>
+	</dict>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>FacebookDisplayName</key>
+	<string>iOS Update Guide</string>
+	<key>CFBundleIdentifier</key>
+	<string>de.CSC-Hildebrand.UpgradeGuideForIOS</string>
+	<key>DTXcode</key>
+	<string>0511</string>
+	<key>CFBundleExecutable</key>
+	<string>Update Guide</string>
+	<key>Advertising</key>
+	<dict>
+		<key>isOff</key>
+		<false/>
+		<key>CSC</key>
+		<dict>
+			<key>More apps url</key>
+			<string>http://www.csc-hildebrand.de/ios/update_guide_app_list.html</string>
+		</dict>
+		<key>Admob Mediation</key>
+		<dict>
+			<key>Banner key</key>
+			<string>ca-app-pub-8580824143358427/2745310791</string>
+			<key>Interstitial key</key>
+			<string>ca-app-pub-8580824143358427/6047723994</string>
+		</dict>
+	</dict>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon57x57</string>
+				<string>AppIcon60x60</string>
+				<string>AppIcon72x72</string>
+				<string>AppIcon76x76</string>
+			</array>
+		</dict>
+	</dict>
+	<key>UIMainStoryboardFile</key>
+	<string>Main~iphone</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+</dict>
+</plist>

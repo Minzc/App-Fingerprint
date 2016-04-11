@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>8.1</string>
+	<key>CFBundleName</key>
+	<string>Busuu</string>
+	<key>DTSDKName</key>
+	<string>iphoneos8.1</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon29x29</string>
+				<string>AppIcon40x40</string>
+				<string>AppIcon57x57</string>
+				<string>AppIcon60x60</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>GooglePlusSecret</key>
+	<string>yQLrOo_FFMiVwyWvqm-D3Dcb</string>
+	<key>CFBundleDisplayName</key>
+	<string>busuu</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>DTSDKBuild</key>
+	<string>12B411</string>
+	<key>CFBundleShortVersionString</key>
+	<string>5.5</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>BuildMachineOSBuild</key>
+	<string>14A389</string>
+	<key>DTPlatformBuild</key>
+	<string>12B411</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>DTXcodeBuild</key>
+	<string>6A2008a</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>MuseoSans 100.otf</string>
+		<string>MuseoSans 300.otf</string>
+		<string>MuseoSans 500.otf</string>
+		<string>MuseoSans 700.otf</string>
+		<string>MuseoSans 900.otf</string>
+		<string>MuseoSans 100Italic.otf</string>
+		<string>MuseoSans 300Italic.otf</string>
+		<string>MuseoSans 500Italic.otf</string>
+		<string>MuseoSans 700Italic.otf</string>
+		<string>MuseoSans 900Italic.otf</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>AppStoreID</key>
+	<string>379968583</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>FacebookAppID</key>
+	<string>406812862731193</string>
+	<key>UILaunchImageFile</key>
+	<string>LaunchImage</string>
+	<key>MinimumOSVersion</key>
+	<string>7.0</string>
+	<key>UILaunchStoryboardName</key>
+	<string>Launch Screen-all</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>FacebookDisplayName</key>
+	<string>busuu</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.busuu.english.app</string>
+	<key>DTXcode</key>
+	<string>0611</string>
+	<key>SailthruPnsID</key>
+	<string>535a61449dbcd42d4b000043</string>
+	<key>CFBundleExecutable</key>
+	<string>Busuu</string>
+	<key>GooglePlusID</key>
+	<string>25916871337-r4fosjp8sc5tijhgh554gjrrterd2imi.apps.googleusercontent.com</string>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon29x29</string>
+				<string>AppIcon40x40</string>
+				<string>AppIcon57x57</string>
+				<string>AppIcon60x60</string>
+				<string>AppIcon50x50</string>
+				<string>AppIcon72x72</string>
+				<string>AppIcon76x76</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.busuu.english.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>busuu</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb406812862731193</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.busuu.english.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.busuu.english.app</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

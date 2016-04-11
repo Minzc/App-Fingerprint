@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIViewControllerIdentifiersToNibNames</key>
+	<dict>
+		<key>Article</key>
+		<string>Article</string>
+		<key>Deal</key>
+		<string>Deal</string>
+		<key>UIViewController-8ge-8Y-jcN</key>
+		<string>UIViewController-8ge-8Y-jcN</string>
+		<key>MasterView</key>
+		<string>MasterView</string>
+		<key>WebView</key>
+		<string>WebView</string>
+		<key>MasterNav</key>
+		<string>MasterNav</string>
+		<key>DetailView</key>
+		<string>DetailView</string>
+		<key>SplitView</key>
+		<string>SplitView</string>
+		<key>DetailNav</key>
+		<string>DetailNav</string>
+		<key>UIViewController-FfB-Lz-Qsn</key>
+		<string>UIViewController-FfB-Lz-Qsn</string>
+		<key>UIViewController-q8p-wb-MxF</key>
+		<string>UIViewController-q8p-wb-MxF</string>
+	</dict>
+	<key>UIStoryboardDesignatedEntryPointIdentifier</key>
+	<string>UIViewController-8ge-8Y-jcN</string>
+	<key>UIStoryboardVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

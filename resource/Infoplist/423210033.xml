@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>Quran Stories</string>
+	<key>DTXcode</key>
+	<string>0502</string>
+	<key>DTSDKName</key>
+	<string>iphoneos7.0</string>
+	<key>NSMainNibFile~iphone</key>
+	<string>MainWindow</string>
+	<key>DTSDKBuild</key>
+	<string>11B508</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleVersion</key>
+	<string>1.6</string>
+	<key>BuildMachineOSBuild</key>
+	<string>13C64</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.6</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>FacebookAppID</key>
+	<string>448673411842912</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>Quran Stories</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CFBundleIdentifier</key>
+	<string>com.imranqureshi.quranstories</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb448673411842912</string>
+			</array>
+		</dict>
+	</array>
+	<key>DTPlatformVersion</key>
+	<string>7.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>icon-120</string>
+				<string>icon.png</string>
+				<string>icon-72</string>
+				<string>icon-114x114.png</string>
+				<string>icon-144x144.png</string>
+				<string>icon-76</string>
+				<string>icon-152</string>
+			</array>
+		</dict>
+	</dict>
+	<key>NSMainNibFile~ipad</key>
+	<string>MainWindowIpad</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Quran Stories</string>
+	<key>CFBundleResourceSpecification</key>
+	<string>ResourceRules.plist</string>
+	<key>DTXcodeBuild</key>
+	<string>5A3005</string>
+	<key>DTPlatformBuild</key>
+	<string>11B508</string>
+	<key>MinimumOSVersion</key>
+	<string>4.3</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+</dict>
+</plist>
