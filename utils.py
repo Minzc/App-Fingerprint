@@ -2,9 +2,10 @@
 # -*- coding: UTF-8 -*-
 # 
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import re
 import string
-
 import const.sql
 import tldextract
 from const import conf
@@ -145,7 +146,7 @@ def add_appinfo(packages, app_type):
     for package in packages:
         appInfo = appInfos.get(app_type, package.app)
         if appInfo is None:
-            print 'Error', package.app
+            print('Error', package.app)
         else:
             package.set_appinfo(appInfo)
     return packages
@@ -158,7 +159,7 @@ def load_pkgs(DB, appType, limit, filterFunc=lambda x: True):
         QUERY = const.sql.SQL_SELECT_HTTP_PKGS % DB
     else:
         QUERY = const.sql.SQL_SELECT_HTTP_PKGS_LIMIT % (DB, limit)
-    print '[UTILS]', QUERY
+    print('[UTILS]', QUERY)
 
     for pkgid, app, add_header, path, refer, host, agent, dst, method, raw in sqldao.execute(QUERY):
         package = Package(DB)
@@ -286,7 +287,7 @@ def load_xml_features():
                 appFeatures[app] = features
             except:
                 missed.add(f)
-    print "[DO NOT HAVE IOS_INFO]", len(missed)
+    print("[DO NOT HAVE IOS_INFO]", len(missed))
     return appFeatures
 
 
@@ -442,15 +443,6 @@ def load_folder(folder):
             fileContents[f] = content
     return fileContents
 
-def process_agent( agent, app):
-    agent = re.sub(r'[a-z]?[0-9]+-[a-z]?[0-9]+-[a-z]?[0-9]+', r'[VERSION]', agent)
-    agent = re.sub(r'(/)([0-9]+)([ ;])', r'\1[VERSION]\3', agent)
-    agent = re.sub(r'/[0-9][.0-9]+', r'/[VERSION]', agent)
-    agent = re.sub(r'([ :v])([0-9][.0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
-    agent = re.sub(r'([ :v])([0-9][_0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
-    agent = re.sub(r'(^[0-9a-z]*)(.'+app+r'$)', r'[RANDOM]\2', agent)
-    return agent
-
 def get_label(pkg, ruleType):
     if ruleType == consts.APP_RULE:
         return pkg.app
@@ -474,7 +466,7 @@ def clean_rules():
     sqldao = SqlDao()
     sqldao.execute(const.sql.SQL_CLEAN_ALL_RULES)
     sqldao.close()
-    print const.sql.SQL_CLEAN_ALL_RULES
+    print(const.sql.SQL_CLEAN_ALL_RULES)
 
 
 def load_data_set(trainTbls, appType):
@@ -486,7 +478,7 @@ def load_data_set(trainTbls, appType):
   Output
   - record : {table_name : [list of packages]}
   """
-    print 'Loading data set', trainTbls
+    print('Loading data set', trainTbls)
     expApp = load_exp_app()
 
     def _keep_exp_app(package):
@@ -503,7 +495,7 @@ def _clean_up():
     sqldao = SqlDao()
     sqldao.execute(const.sql.SQL_CLEAN_ALL_RULES)
     sqldao.close()
-    print const.sql.SQL_CLEAN_ALL_RULES
+    print(const.sql.SQL_CLEAN_ALL_RULES)
 
 def get_label(pkg, ruleType):
     if ruleType == consts.APP_RULE:
@@ -514,3 +506,39 @@ def get_label(pkg, ruleType):
         return pkg.category
     else:
         assert "Rule Type Error"
+
+def cal_idf(itemAppCounter):
+    import math
+    apps = set()
+    for v in itemAppCounter.values():
+        apps |= v
+    IDF = {}
+    apps = len(apps)
+    for item, v in itemAppCounter.items():
+        IDF[item] = math.log(apps / len(v)) * 1 / math.log(apps)
+    return IDF
+
+
+def process_agent(agent):
+    agent = agent.replace("%20", " ")
+    agent = re.sub(r'/[0-9]+[a-zA-Z][0-9]+', r'/[VERSION]', agent)
+    agent = re.sub(r'/[0-9][._\-0-9]+', r'/[VERSION]', agent)
+    agent = re.sub(r'(/)([0-9]+)([ ;])', r'\1[VERSION]\3', agent)
+    agent = re.sub(r'[a-z]?[0-9]+-[a-z]?[0-9]+-[a-z]?[0-9]+', r'[VERSION]', agent)
+    agent = re.sub(r'([ :v])([0-9][.0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
+    agent = re.sub(r'-[0-9]+[._\-][_\-.0-9]+', r'[VERSION]', agent)
+    agent = re.sub(r'[0-9]+[._\-][_\-.0-9]+', r'[VERSION]', agent)
+    # agent = re.sub(r'(^[0-9a-z]*)(.' + app + r'$)', r'[RANDOM]\2', agent)
+    agent = agent.replace('springboard', '[VERSION]')
+    agent = agent.replace('/', ' / ')
+    agent = agent.replace('(', ' ( ')
+    agent = agent.replace(')', ' ) ')
+    agent = agent.replace(';', ' ; ')
+    return agent
+
+# def process_agent2(agent):
+#     agent = agent.replace('/', ' / ')
+#     agent = agent.replace('(', ' ( ')
+#     agent = agent.replace(')', ' ) ')
+#     agent = agent.replace(';', ' ; ')
+#     return agent

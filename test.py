@@ -203,8 +203,8 @@ def auto_test():
                 if tbl != testTbl:
                     trainTbls.append(tbl)
 
-            print(trainTbls, testTbl, conf.agent_support) #, conf.path_labelT
-            inforTrack = train_test(trainTbls, testTbl, consts.IOS, True)
+            print(trainTbls, [testTbl], conf.agent_support) #, conf.path_labelT
+            inforTrack = train_test(trainTbls, [testTbl], consts.IOS, ifRoc=False, ifTrain=True)
             totalPrecision.append(inforTrack[consts.PRECISION])
             totalRecall.append(inforTrack[consts.RECALL])
             instancePrecisions.append(inforTrack[consts.INSTANCE_PRECISION])

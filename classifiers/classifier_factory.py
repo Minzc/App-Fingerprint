@@ -1,6 +1,6 @@
 from classifiers.agent import AgentClassifier
 from classifiers.agent_bl import AgentBLClassifier
-from classifiers.agent_pattern import AgentBoundary
+from classifiers.agent_pattern_bak import AgentBoundary
 from classifiers.algo import QueryClassifier
 from classifiers.baseline import BaseLineClassifier
 from classifiers.head import HeaderClassifier
