@@ -2,75 +2,37 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import re
 from collections import defaultdict
 
-
+import utils
 from classifiers.classifier import AbsClassifer
 from const.dataset import DataSetIter, DataSetFactory
 from const import consts, conf
 from utils import flatten, const
 from sqldao import SqlDao
 
+K = 1
 
-def persist(appRule, ruleType):
-    def convert_regex(regexStr):
-        regexStr = regexStr.replace(re.escape(consts.VERSION), r'\b[a-z0-9-.]+\b')
-        regexStr = regexStr.replace(re.escape(consts.RANDOM), r'[0-9a-z]*')
-        return regexStr
 
+def persist(appRule):
     """
     Input
-    :param companyRule:
     :param appRule : {regex: {app1, app2}}
-    :param ruleType : type of prune (App, Company, Category)
-    :param hostAgent: (host, regex) -> label
     """
     sqldao = SqlDao()
     params = set()
 
-    for rule in appRule.values():
-        prefix, suffix, signature, fuse_score, current_len, c, support = rule
-        prefix = ' '.join(prefix)
-        suffix = ' '.join(suffix)
-        signature = ' '.join(signature)
-        params.add((None, prefix, signature, suffix, c, support, fuse_score, 3, consts.APP_RULE))
+    for rules in appRule.values():
+        for rule in rules:
+            prefix, suffix, signature, fuse_score, current_len, c, support = rule
+            prefix = ' '.join(prefix)
+            suffix = ' '.join(suffix)
+            signature = ' '.join(signature)
+            params.add((None, prefix, signature, suffix, c, support, fuse_score, 3, consts.APP_RULE))
 
     sqldao.executeBatch(const.sql.SQL_INSERT_AGENT_RULES, params)
     sqldao.close()
 
 
-def cal_average_idf(signature, counter):
-    t = 0
-    for i in signature:
-        t += 1 / len(counter[i])
-    return t / len(signature)
-
-
-def process_agent(agent):
-    agent = agent.replace("%20", " ")
-    agent = re.sub(r'/[0-9]+[a-zA-Z][0-9]+', r'/[VERSION]', agent)
-    agent = re.sub(r'/[0-9][._\-0-9]+', r'/[VERSION]', agent)
-    agent = re.sub(r'(/)([0-9]+)([ ;])', r'\1[VERSION]\3', agent)
-    agent = re.sub(r'[a-z]?[0-9]+-[a-z]?[0-9]+-[a-z]?[0-9]+', r'[VERSION]', agent)
-    agent = re.sub(r'([ :v])([0-9][.0-9]+)([ ;),])', r'\1[VERSION]\3', agent)
-    agent = re.sub(r'-[0-9]+[._\-][_\-.0-9]+', r'[VERSION]', agent)
-    agent = re.sub(r'[0-9]+[._\-][_\-.0-9]+', r'[VERSION]', agent)
-    # agent = re.sub(r'(^[0-9a-z]*)(.' + app + r'$)', r'[RANDOM]\2', agent)
-    agent = agent.replace('springboard', '[VERSION]')
-    agent = agent.replace('/', ' / ')
-    agent = agent.replace('(', ' ( ')
-    agent = agent.replace(')', ' ) ')
-    agent = agent.replace(';', ' ; ')
-    return agent
-
-def process_agent2(agent):
-    agent = agent.replace('/', ' / ')
-    agent = agent.replace('(', ' ( ')
-    agent = agent.replace(')', ' ) ')
-    agent = agent.replace(';', ' ; ')
-    return agent
-
-
 SPLITTER = re.compile("[" + r'''"#$%&*+,:<=>?@[\]^`{|}~ \-''' + "]")
-
 
 class RulesTree:
     def __init__(self):
@@ -112,31 +74,29 @@ class AgentBoundary(AbsClassifer):
     def __init__(self):
         self.rules = {}
         # self.support_t = conf.agent_support
-        self.support_t = 1500
+        self.support_t = 10
         self.conf_t = conf.agent_conf
-        self.idf_t = 1 / 1000
+        self.idf_t = 0
         self.db = set()
-        self.counter = defaultdict(set)
-        self.contexts = {}
-        print('Support', self.support_t,'IDF', self.idf_t)
+        print('Support', self.support_t, 'IDF', self.idf_t)
 
     def train(self, trainSet, ruleType, ifPersist=True):
-        potentialHost = defaultdict(set)
+        potentialHost = defaultdict(set); counter = defaultdict(set)
 
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
-            map(lambda w: self.counter[w].add(pkg.app),filter(None, SPLITTER.split(process_agent(pkg.agent))))
+            map(lambda w: counter[w].add(pkg.app), filter(None, SPLITTER.split(utils.process_agent(pkg.agent))))
             self.db.add((pkg.agent, pkg.app))
             potentialHost[pkg.host].add(pkg.app)
         print("Data Size", len(self.db))
-        self.db = [(['^'] + filter(None, SPLITTER.split(process_agent(x[0]))) + ['$'], x[1]) for x in self.db]
+        self.db = [(['^'] + filter(None, SPLITTER.split(utils.process_agent(x[0]))) + ['$'], x[1]) for x in self.db]
 
         for (t, c) in self.db:
-            map(lambda w: self.counter[w].add(c), t)
-
+            map(lambda w: counter[w].add(c), t)
+        self.IDF = utils.cal_idf(counter)
         self.mine_rec([], [(i, len(self.db[i][0]) - 1) for i in range(len(self.db))], 10000, False)
 
         if ifPersist:
-            persist(self.rules, consts.APP_RULE)
+            persist(self.rules)
 
     def mine_rec(self, prefix, mdb, gap, expSuffix):
         occurs = defaultdict(list)
@@ -162,8 +122,15 @@ class AgentBoundary(AbsClassifer):
                 self.mine_rec([c] + prefix, newmdb, 0, childSupport != support)
 
     def mine_suffix(self, prefix, suffix, mdb, gap):
+        def idf(sig):
+            return sum([self.IDF[i] for i in sig]) / len(sig)
+
+        def rel(sig):
+            return 1 / len(app_sig_map[list(sig_app_map[sig])[0]])
+
         occurs = defaultdict(list)
-        signatures = defaultdict(set)
+        sig_app_map = defaultdict(set)
+        app_sig_map = defaultdict(set)
         support = len({i for (i, _, _) in mdb})
         tmpRule = set()
         for (i, prefix_pos, startpos) in mdb:
@@ -171,7 +138,8 @@ class AgentBoundary(AbsClassifer):
             signature = tuple(seq[prefix_pos + 1: startpos - len(suffix)])
             if len(suffix) > 0:
                 tmpRule.add((i, signature))
-                signatures[signature].add(app)
+                sig_app_map[signature].add(app)
+                app_sig_map[app].add(signature)
 
             for j in xrange(startpos, len(seq)):
                 if j - startpos <= gap:
@@ -180,27 +148,22 @@ class AgentBoundary(AbsClassifer):
 
         find_good = False
         if len(suffix) != 0:
-            avg_idf = 0
-            for signature in signatures:
-                avg_idf += cal_average_idf(signature, self.counter) / len(signatures)
+            quality = sum([idf(signature) * rel(signature) for signature in sig_app_map]) / len(sig_app_map)
             support /= len(self.db)
-            context_score = support * avg_idf / (support + avg_idf)
-
+            context_score = support * quality / (support + quality)
 
             for i, signature in tmpRule:
-                if len(signatures[signature]) == 1:
-                    idf = cal_average_idf(signature, self.counter)
-                    if idf < self.idf_t:
+                if len(sig_app_map[signature]) == 1:
+                    quality = idf(signature) * rel(signature)
+                    if quality < self.idf_t:
                         continue
                     find_good = True
-                    #fuse_score = idf * context_score / (idf + context_score)
-                    #fuse_score = idf * support / (idf + support)
-                    fuse_score = idf * context_score
+                    fuse_score = quality * context_score
                     current_len = len(prefix) + len(suffix) + len(signature)
-                    if i not in self.rules \
-                            or self.rules[i][3] < fuse_score \
-                            or (self.rules[i][3] == fuse_score and self.rules[i][4] > current_len):
-                        self.rules[i] = (prefix, suffix, signature, fuse_score, current_len, self.db[i][1], support)
+                    if i not in self.rules:
+                        self.rules[i] = list()
+                    self.rules[i].append((prefix, suffix, signature, fuse_score, current_len, self.db[i][1], support))
+                    self.rules[i] = sorted(self.rules[i], key=lambda x: (x[3], 10000 - x[4]), reverse=True)[:K]
         else:
             find_good = True
 
@@ -233,7 +196,7 @@ class AgentBoundary(AbsClassifer):
             if fuse_score > self.conf_t:
                 x = prefix + ' ' + signature + ' ' + suffix
                 length += len(re.escape(x).replace(re.escape("VERSION"), r'\b[a-z0-9-.]+\b'))
-                r = filter(None, prefix.split(' ')  + signature.split(' ') + suffix.split(' '))
+                r = filter(None, prefix.split(' ') + signature.split(' ') + suffix.split(' '))
                 self.rules[consts.APP_RULE].add_rule((r, c, fuse_score))
                 counter += 1
         print('>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules))
@@ -250,10 +213,10 @@ class AgentBoundary(AbsClassifer):
 
         compressed = defaultdict(lambda: defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(testSet):
-            agent = tuple(['^'] + filter(None, SPLITTER.split(process_agent(pkg.agent))) + ['$'])
+            agent = tuple(['^'] + filter(None, SPLITTER.split(utils.process_agent(pkg.agent))) + ['$'])
             compressed[agent][pkg.rawHost].add(pkg)
 
-        batchPredicts = {}
+        batchPredicts, groundTruth = {}, {}
         for agent, host, pkgs in flatten(compressed):
             assert (type(pkgs) == set, "Type of pkgs is not correct" + str(type(pkgs)))
             predict = self.c((agent, host))
@@ -264,7 +227,7 @@ class AgentBoundary(AbsClassifer):
                 if l is not None and l != pkg.app:
                     print('>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', predict[
                         consts.APP_RULE])
-        return batchPredicts #, groundTruth
+        return batchPredicts  # , groundTruth
 
     def c(self, pkgInfo):
         agent, host = pkgInfo
