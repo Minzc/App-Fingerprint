@@ -25,7 +25,7 @@ class Rule:
         self.service = 'HTTP'
         self.flow = 'from_client'
         self.weight = min(weight, 255)
-        self.name = '[%s][%s]%s' % (self.weight, trackID, name)
+        self.name = '[%s][%s]%s' % (vulnID, trackID, name)
         self.features = []
 
     def add_feature_str(self, patternType, featureStr, context, parsedType=None):

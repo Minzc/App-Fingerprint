@@ -1,5 +1,6 @@
 from classifiers.agent import AgentClassifier
 from classifiers.agent_bl import AgentBLClassifier
+from classifiers.agent_pattern import AgentBoundary
 from classifiers.algo import QueryClassifier
 from classifiers.baseline import BaseLineClassifier
 from classifiers.head import HeaderClassifier
@@ -24,6 +25,8 @@ def classifier_factory(names, appType):
             classifier = AgentBLClassifier(inferFrmData=True)
         elif name == consts.CMAR_CLASSIFIER:
             classifier = CMAR()
+        elif name == consts.AGENT_BOUNDARY_CLASSIFIER:
+            classifier = AgentBoundary()
         classifiers.append((name, classifier))
     return classifiers
 

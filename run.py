@@ -11,6 +11,7 @@ from const.conf import INSERT
 from const.dataset import DataSetFactory as DataSetFactory
 from const.dataset import DataSetIter as DataSetIter
 from sqldao import SqlDao
+from tools.evaluate import cal_pr, cal_roc
 
 TRAIN_LABEL = consts.APP_RULE
 
@@ -22,8 +23,9 @@ VALID_LABEL = {
 
 if not const.conf.TestBaseLine:
     USED_CLASSIFIERS = [
-        # consts.HEAD_CLASSIFIER,
-        consts.AGENT_CLASSIFIER,
+        #consts.HEAD_CLASSIFIER,
+        #consts.AGENT_CLASSIFIER,
+        consts.AGENT_BOUNDARY_CLASSIFIER,
         #consts.KV_CLASSIFIER,
         #consts.URI_CLASSIFIER,
     ]
@@ -76,14 +78,12 @@ class PredictRst:
 def pipeline(rst, tmprst):
     for pkg_id, predictions in tmprst.iteritems():
         if pkg_id not in rst:
-            rst[pkg_id] = {}
-            for rule_type in VALID_LABEL:
-                rst[pkg_id][rule_type] = {}
+            rst[pkg_id] = {rule_type: None for rule_type in VALID_LABEL}
 
         for rule_type in VALID_LABEL:
             label = tmprst[pkg_id][rule_type].label
-            if len(rst[pkg_id][rule_type]) == 0 and label is not None:
-                rst[pkg_id][rule_type][label] = 1
+            if rst[pkg_id][rule_type] is None and label is not None:
+                rst[pkg_id][rule_type] = tmprst[pkg_id][rule_type]
     return rst
 
 def vote_rst(rst, tmprst):
@@ -117,85 +117,6 @@ def train(trainSet, appType):
         print ">>> [train#%s] " % name
         classifier.train(trainSet, TRAIN_LABEL)
     print '>>> Finish training all classifiers'
-
-
-
-
-def _evaluate(rst, testSet, testApps):
-    """
-  Compare predictions with test data set
-  Input:
-  :param  rst : Predictions got from test. {pkgId : {ruleType : prediction}}
-  :param  testSet : Test data set. {pkgId : pacakge}
-  :param  testApps : Tested apps
-  Output:
-  - InforTrack : contains evaluation information
-  """
-
-    # app_rst, record_id
-    inforTrack = {}
-    correct, recall = 0, 0
-    wrongApp, correctApp, detectedApp = set(), set(), set()
-    appPkgs = defaultdict(set)
-    for tbl, pkg in DataSetIter.iter_pkg(testSet):
-        appPkgs[pkg.app].add(pkg)
-
-    for app, pkgs in appPkgs.items():
-        cPrdcts = PredictRst()
-        for pkg in pkgs:
-            cPrdcts.set_appInfo(pkg.appInfo)
-            predictions = rst[pkg.id]
-            correctLabels = [0, 0, 0]
-            ifPredict = False
-
-            for ruleType in VALID_LABEL:
-                predict = None
-                if len(predictions[ruleType]) > 0:
-                    ifPredict = True
-                    predict = max(predictions[ruleType].items(), key=lambda x:x[1])[0]
-                label = utils.get_label(pkg, ruleType)
-                correctLabels[ruleType] = 1 if label == predict else 0
-
-            if ifPredict:
-                cPrdcts.inc_total()
-                if sum(correctLabels) > 0:
-                    cPrdcts.inc_correct(1)
-                else:
-                    print '[ERROR]', predictions, pkg.app
-
-        if cPrdcts.if_all_right():
-            correctApp.add((cPrdcts.package, cPrdcts.trackId))
-        if cPrdcts.correct > 0:
-            detectedApp.add((cPrdcts.package, cPrdcts.trackId))
-        if cPrdcts.wrong > 0:
-            wrongApp.add((cPrdcts.package, cPrdcts.trackId))
-        correct += cPrdcts.correct
-        recall += cPrdcts.total
-
-    assert len(correctApp.intersection(wrongApp)) == 0
-    print '[TEST] Total:', testSet.get_size().values()[0]
-    print '[TEST] Recall:', recall
-    print '[TEST] Correct:', correct
-    print '[TEST] Correct Number of App:', len(correctApp)
-    print '[TEST] Wrong Number of App:', len(wrongApp)
-    print '[TEST] Total Detect Number of App:', len(detectedApp)
-    print '[TEST] Total Number of App:', len(testApps)
-
-    instance_precision = correct * 1.0 / recall
-    instance_recall = recall * 1.0 / testSet.get_size().values()[0]
-    precision = len(correctApp) * 1.0 / (len(correctApp) + len(wrongApp))
-    recall = (len(correctApp) + len(wrongApp)) * 1.0 / len(testApps)
-    f1Score = 2.0 * precision * recall / (precision + recall)
-    inforTrack[consts.DISCOVERED_APP] = len(correctApp.difference(wrongApp)) * 1.0 / len(testApps)
-    inforTrack[consts.PRECISION] = precision
-    inforTrack[consts.INSTANCE_PRECISION] = instance_precision
-    inforTrack[consts.INSTANCE_RECALL] = instance_recall
-    inforTrack[consts.RECALL] = recall
-    inforTrack[consts.F1SCORE] = f1Score
-    inforTrack[consts.DISCOVERED_APP_LIST] = detectedApp
-    inforTrack[consts.RESULT] = rst
-    return inforTrack
-
 
 def _classify(classifier, testSet):
     """
@@ -235,39 +156,31 @@ def _insert_rst(testSet, DB, inforTrack):
     print 'Finish inserting %s items' % len(params)
 
 
-def test(testTbl, appType):
-    testSet = DataSetFactory.get_traindata(tbls=[testTbl], appType=appType)
-    testApps = testSet.apps
-
-    rst = {}
-    rst2 = {}
+def test(testSet, appType):
+    predictions = {}
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
     for name, classifier in classifiers:
         print ">>> [test#%s] " % name
         classifier.set_name(name)
         classifier.load_rules()
         tmprst = _classify(classifier, testSet)
-        # if conf.ensamble == "pipeline":
-        rst = pipeline(rst, tmprst)
-        # elif conf.ensamble == "vote":
-        rst2 = vote_rst(rst2, tmprst)
+        if conf.ensamble == "pipeline":
+            predictions = pipeline(predictions, tmprst)
+        elif conf.ensamble == "vote":
+            predictions = vote_rst(predictions, tmprst)
 
-    assert len(rst2) == len(rst)
-    for pkgid in rst:
-        assert None not in rst[pkgid][consts.APP_RULE]
-        if len(rst[pkgid][consts.APP_RULE]) > 0:
-            assert None not in rst2[pkgid][consts.APP_RULE]
-            assert len(rst2[pkgid][consts.APP_RULE]) > 0
+    # assert len(rst2) == len(predictions)
+    # for pkgid in predictions:
+    #     assert None not in predictions[pkgid][consts.APP_RULE]
+    #     if len(predictions[pkgid][consts.APP_RULE]) > 0:
+    #         assert None not in rst2[pkgid][consts.APP_RULE]
+    #         assert len(rst2[pkgid][consts.APP_RULE]) > 0
 
-
-    print '>>> Start evaluating'
-    inforTrack = _evaluate(rst, testSet, testApps)
-    if INSERT:
-        _insert_rst(testSet, testTbl, inforTrack)
-    return inforTrack
+    return predictions
 
 
-def train_test(trainTbls, testTbl, appType, ifTrain=True):
+
+def train_test(trainTbls, testTbl, appType, ifRoc, ifTrain):
     if ifTrain:
         print '>>> Start training'
         utils.clean_rules()
@@ -275,13 +188,19 @@ def train_test(trainTbls, testTbl, appType, ifTrain=True):
         trainSet.set_label(TRAIN_LABEL)
         train(trainSet, appType)
     print '>>> Start testing'
-    inforTrack = test(testTbl, appType)
+    testSet = DataSetFactory.get_traindata(tbls=testTbl, appType=appType)
+    testApps = testSet.apps
+    rst = test(testSet, appType)
 
-    precision = inforTrack[consts.PRECISION]
-    recall = inforTrack[consts.RECALL]
-    appCoverage = inforTrack[consts.DISCOVERED_APP]
-    f1Score = inforTrack[consts.F1SCORE]
-    print 'Precision %s, Recall: %s, App: %s, F1 Score: %s' % (precision, recall, appCoverage, f1Score)
+    print '>>> Start evaluating'
+    inforTrack = cal_pr(rst, testSet, testApps)
+
+    if ifRoc:
+        roc = cal_roc(rst, testSet)
+        inforTrack['ROC'] = roc
+
+    if INSERT:
+        _insert_rst(testSet, testTbl, inforTrack)
     return inforTrack
 
 
@@ -299,6 +218,8 @@ if __name__ == '__main__':
     if args.t == 'cross':
         if args.apptype.lower() == 'ios':
             appType = consts.IOS
+            train_test(args.train, args.test, appType, False, True)
         elif args.apptype.lower() == 'android':
             appType = consts.ANDROID
-        train_test(args.train, args.test, appType)
+            train_test(args.train, args.test, appType, False, True)
+

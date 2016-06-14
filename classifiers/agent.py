@@ -14,7 +14,7 @@ VALID_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier',
                   'CFBundleDisplayName', 'CFBundleURLSchemes'}
 STRONG_FEATURES = {'CFBundleName', 'CFBundleExecutable', 'CFBundleIdentifier', 'CFBundleDisplayName'}
 
-STOPWORDS = {'iphone', 'app'}
+STOPWORDS = {'iphone', 'app', 'springboard'}
 
 
 def gen_regex(prefix, identifier, suffix, app):
@@ -65,7 +65,11 @@ def _parse_xml(filePath):
         if key in plistObj:
             value = plistObj[key]
             if type(plistObj[key]) != unicode:
-                value = plistObj[key].decode('ascii')
+                try:
+                    value = plistObj[key].decode('ascii')
+                except:
+                    print plistObj[key], key
+                    continue
 
             value = unescape(value.lower()).strip()
             if value.lower() not in STOPWORDS:
@@ -99,8 +103,8 @@ def persist(appRule, ruleType):
         prefix = convert_regex(prefix)
         identifier = convert_regex(identifier)
         suffix = convert_regex(suffix)
-        if label in identifier:
-            prefix = suffix = r'\b'
+        # if label in identifier:
+        #     prefix = suffix = r'\b'
         params.append((host, prefix, identifier, suffix, label, 1, score, 3, consts.APP_RULE))
 
     sqldao.executeBatch(const.sql.SQL_INSERT_AGENT_RULES, params)
@@ -122,11 +126,11 @@ class AgentClassifier(AbsClassifer):
             for identifier, records in extractor.match2.items():
                 for app, host in records:
                     if len(potentialId[identifier]) == 1:
-                        r = consts.Rule(None, extractor.prefix.pattern, identifier, extractor.suffix.pattern, 100, app)
+                        r = consts.Rule(None, extractor.prefix.pattern, identifier, extractor.suffix.pattern, extractor.weight(), app)
                         appRules.add(r)
 
                     elif len(potentialId[identifier]) > 1 and len(potentialHost[host]) == 1:
-                        r = consts.Rule(host, extractor.prefix.pattern, identifier, extractor.suffix.pattern, 100, app)
+                        r = consts.Rule(host, extractor.prefix.pattern, identifier, extractor.suffix.pattern, extractor.weight(), app)
                         appRules.add(r)
 
         # for identifier in check:
@@ -157,8 +161,10 @@ class AgentClassifier(AbsClassifer):
         checkValue = lambda value: value not in STOPWORDS and value in agent
         extractors = {}
         for appAgent in agentTuples.values():
+            if conf.debug : print "[DEBUG]", appAgent
             for app, agent, host in appAgent:
                 for key, v in sorted(appFeatures[app].items(), key=sortFunc, reverse=True):
+                    if conf.debug: print "[DEBUG]", key, v
                     ifMatch = False
                     for value in filter(checkValue, self._gen_features(v)):
                         tmp = agent.replace(value, consts.IDENTIFIER, 1)
@@ -188,13 +194,6 @@ class AgentClassifier(AbsClassifer):
                                 extractor.add_identifier(app, identifier, host)
         return potentialId
 
-    # def _infer_from_xml(self, appFeatureRegex, agentTuples):
-    #     for app, features in filter(lambda x: x[0] not in agentTuples, self.appFeatures.items()):
-    #         for f in features.values():
-    #             if len(self.valueApp[f]) == 1 and f not in STOPWORDS:
-    #                 for featureStr in self._gen_features(f):
-    #                     for regexStr in self._gen_regex(featureStr):
-    #                         appFeatureRegex[app][regexStr] = FRegex(featureStr, regexStr, f)
 
     def train(self, trainSet, ruleType, ifPersist=True):
         trainData = defaultdict(set)
@@ -208,13 +207,13 @@ class AgentClassifier(AbsClassifer):
         for appLexicalId in appFeatures.values():
             for lexicalId in appLexicalId.values():
                 lexicalIds.add(lexicalId)
+        if conf.debug: print "[DEBUG] number of lexicalId", len(lexicalIds)
         '''
         Compose regular expression
         '''
         extractors = self.__compose_idextractor(trainData, appFeatures)
+        if conf.debug: print "[DEBUG] number of extractors", len(extractors)
         extractors = sorted(extractors.items(), key=lambda x: x[1].weight(), reverse=True)
-
-        #     self._infer_from_xml(appFeatureRegex, trainData)
 
         '''
         Count regex
@@ -224,7 +223,6 @@ class AgentClassifier(AbsClassifer):
 
         print "Finish Counter"
 
-        # identifierApps, extractors = self._prune(regexApp)
         appRule = self._app(potentialId, potentialHost, extractors)
 
         if ifPersist:
@@ -245,28 +243,24 @@ class AgentClassifier(AbsClassifer):
 
         sqldao = SqlDao()
         counter = 0
+        length = 0
         for host, prefix, identifier, suffix, label, support, confidence, ruleType, labelType in sqldao.execute(
                 const.sql.SQL_SELECT_AGENT_RULES):
             counter += 1
             if identifier == 'mozilla':
                 continue
             agentRegex = gen_regex(prefix, identifier, suffix, label)
-            lexicalR = consts.Rule(host, prefix, identifier, suffix, support, label)
+            length += len(agentRegex)
+            lexicalR = consts.Rule(host, prefix, identifier, suffix, confidence, label)
             if host is None:
                 self.rules[labelType][lexicalR] = (re.compile(agentRegex), label)
             else:
                 self.rulesHost[labelType][host][lexicalR] = (re.compile(agentRegex), label)
         print '>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules)
+        print '>>> [Agent Rules#loadRules] Average Rule Length is', length * 1.0 / counter
         sqldao.close()
 
     def classify(self, testSet):
-        def wrap_predict(predicts):
-            wrapPredicts = {}
-            for ruleType, predict in predicts.items():
-                label, evidence = predict
-                wrapPredicts[ruleType] = consts.Prediction(label, 1.0, evidence) if label else consts.NULLPrediction
-            return wrapPredicts
-
         compressed = defaultdict(lambda: defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(testSet):
             compressed[pkg.agent][pkg.rawHost].add(pkg)
@@ -274,7 +268,7 @@ class AgentClassifier(AbsClassifer):
         batchPredicts = {}
         for agent, host, pkgs in flatten(compressed):
             assert (type(pkgs) == set, "Type of pkgs is not correct" + str(type(pkgs)))
-            predict = wrap_predict(self.c((agent, host)))
+            predict = self.c((agent, host))
             for pkg in pkgs:
                 batchPredicts[pkg.id] = predict
                 l = predict[consts.APP_RULE].label
@@ -303,8 +297,8 @@ class AgentClassifier(AbsClassifer):
                     rstLabel = label
                     longestWord = lexicalR.identifier
                     matchRule = lexicalR
-
-            rst[ruleType] = (rstLabel, matchRule)
+            score = 0 if matchRule is None else matchRule.score
+            rst[ruleType] = consts.Prediction(rstLabel, score, matchRule)
         return rst
 
     def classify2(self, testSet):

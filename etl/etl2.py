@@ -5,7 +5,6 @@ import const.consts as consts
 from const import sql
 from const.app_info import AppInfos
 from sqldao import SqlDao
-from utils import loadfile
 
 
 class ETLConsts:

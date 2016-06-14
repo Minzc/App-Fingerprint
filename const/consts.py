@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+
 Prediction = namedtuple('Prediction', 'label, score, evidence')
 QueryKey = namedtuple('Rule', 'secdomain, key, score, labelNum, hostNum')
 Rule = namedtuple('Rule', 'host, prefix, identifier, suffix, score, label')
@@ -31,6 +32,7 @@ AGENT_CLASSIFIER = "Agent Rule"
 CMAR_CLASSIFIER = 'CMAR Rule'
 Query_BL_CLASSIFIER = 'Query_bl'
 Agent_BL_CLASSIFIER = 'Agent_bl'
+AGENT_BOUNDARY_CLASSIFIER = 'Agent_bndry'
 
 PATH_MINER = 'P'
 KV_MINER = 'K'

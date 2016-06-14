@@ -164,7 +164,7 @@ def load_pkgs(DB, appType, limit, filterFunc=lambda x: True):
         package = Package(DB)
         package.set_app(app)
         package.set_path(path.decode('utf-8'))
-        package.set_id(pkgid)
+        package.set_id(DB + '_' + str(pkgid))
         package.set_add_header(add_header)
         package.set_refer(refer.decode('utf-8'))
         package.set_host(host)
@@ -207,8 +207,11 @@ def load_exp_app():
             app_type = consts.IOS
         elif app_type == consts.ANDROID_STR:
             app_type = consts.ANDROID
-        package = appInfos.get(app_type, app.strip().lower()).package
-        expApp[app_type].add(package)
+        try:
+            package = appInfos.get(app_type, app.strip().lower()).package
+            expApp[app_type].add(package)
+        except:
+            pass
     return expApp
 
 
@@ -372,10 +375,13 @@ def load_info_features(_parse_xml):
         filePath = join(folder, f)
         if isfile(filePath):
             trackId = f[0:-4]
-            app = AppInfos.get(consts.IOS, trackId).package
-            features = _parse_xml(filePath)
-            features['BUNDLE_ID'] = app
-            appFeatures[app] = features
+            try:
+                app = AppInfos.get(consts.IOS, trackId).package
+                features = _parse_xml(filePath)
+                features['BUNDLE_ID'] = app
+                appFeatures[app] = features
+            except:
+                pass
     return appFeatures
 
 def get_app_features(appInfo, xmlFeature):

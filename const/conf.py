@@ -43,3 +43,6 @@ with open("resource/config.json") as f:
     mode = j["mode"]
 
     region = j["region"]
+
+    #TODO
+    agent_conf = 0
