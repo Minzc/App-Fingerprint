@@ -113,6 +113,8 @@ class ETL:
                     pkgInfo['app_category'] = app_category
                     pkgInfo['app_company'] = app_company
                     pkgInfos.append(pkgInfo)
+                    if len(pkgInfos) > 500:
+                        break
                 else:
                   print app_name, app_category, app_company
                   print 'ERROR WRONG PACKAGE TYPE'
