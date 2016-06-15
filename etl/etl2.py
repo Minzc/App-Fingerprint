@@ -77,21 +77,25 @@ class ETL:
 
         appInfo = self.apps.get(app_package, None)
         if appInfo == None:
-          print 'Error!! Can not find', app_package
-          return 
+            if app_type == consts.IOS:
+                print 'Error!! Can not find', app_package
         packages = pyshark.FileCapture(file_path, display_filter='http')
         timeStampTwo = time.time()
         print 'Get appInfo', timeStampTwo - startTime
-        
-        app_package = appInfo.package
 
-        totalIndexer = 0
         dns_info = {}
         comunicate_host = set()
-        
-        app_name = appInfo.name
-        app_category = appInfo.category
-        app_company = appInfo.company
+
+        if appInfo is not None:
+            app_package = appInfo.package
+            app_name = appInfo.name
+            app_category = appInfo.category
+            app_company = appInfo.company
+        else:
+            app_name = None
+            app_category = None
+            app_company = None
+
 
         pkgInfos = []
         while True:
