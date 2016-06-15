@@ -1,14 +1,23 @@
 {
     "query": {
         "score": 0.5,
-        "label": 0.3
+        "label": 0.3,
+        "K":3
     },
     "path": {
         "score": 0.9,
-        "label": 0.9
+        "label": 0.9,
+        "K":1
+    },
+    "head": {
+        "score": 0.9,
+        "label": 0.9,
+        "K":1
     },
     "agent": {
-        "support": 2.0
+        "support": 2.0,
+        "score": 0.0,
+        "K":1
     },
     "sample" : 1.0,
     "package.limit" : 0.0,
@@ -17,7 +26,7 @@
     "ruleset": "patterns",
     "debug" : false,
     "ensamble":"pipeline",
-    "mode":"l",
+    "mode":"s",
     "db" : {
         "local":{
             "username" : "root",
@@ -29,6 +38,6 @@
             "password" : "5636595"
         }
     },
-    "region":"ca"
+    "region":"all"
 }
 

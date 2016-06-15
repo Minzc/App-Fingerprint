@@ -1,15 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import re
 from collections import defaultdict
-
 import utils
 from classifiers.classifier import AbsClassifer
 from const.dataset import DataSetIter, DataSetFactory
 from const import consts, conf
 from utils import flatten, const
 from sqldao import SqlDao
-
-K = 1
 
 
 def persist(appRule):
@@ -33,6 +30,7 @@ def persist(appRule):
 
 
 SPLITTER = re.compile("[" + r'''"#$%&*+,:<=>?@[\]^`{|}~ \-''' + "]")
+
 
 class RulesTree:
     def __init__(self):
@@ -73,20 +71,19 @@ class RulesTree:
 class AgentBoundary(AbsClassifer):
     def __init__(self):
         self.rules = {}
-        # self.support_t = conf.agent_support
-        self.support_t = 10
-        self.conf_t = conf.agent_conf
+        self.support_t = conf.agent_support
+        self.conf_t = conf.agent_score
         self.idf_t = 0
+        self.K = conf.agent_K
         self.db = set()
         print('Support', self.support_t, 'IDF', self.idf_t)
 
     def train(self, trainSet, ruleType, ifPersist=True):
-        potentialHost = defaultdict(set); counter = defaultdict(set)
+        counter = defaultdict(set)
 
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             map(lambda w: counter[w].add(pkg.app), filter(None, SPLITTER.split(utils.process_agent(pkg.agent))))
             self.db.add((pkg.agent, pkg.app))
-            potentialHost[pkg.host].add(pkg.app)
         print("Data Size", len(self.db))
         self.db = [(['^'] + filter(None, SPLITTER.split(utils.process_agent(x[0]))) + ['$'], x[1]) for x in self.db]
 
@@ -163,7 +160,7 @@ class AgentBoundary(AbsClassifer):
                     if i not in self.rules:
                         self.rules[i] = list()
                     self.rules[i].append((prefix, suffix, signature, fuse_score, current_len, self.db[i][1], support))
-                    self.rules[i] = sorted(self.rules[i], key=lambda x: (x[3], 10000 - x[4]), reverse=True)[:K]
+                    self.rules[i] = sorted(self.rules[i], key=lambda x: (x[3], 10000 - x[4]), reverse=True)[:self.K]
         else:
             find_good = True
 
@@ -204,13 +201,6 @@ class AgentBoundary(AbsClassifer):
         sqldao.close()
 
     def classify(self, testSet):
-        def wrap_predict(predicts):
-            wrapPredicts = {}
-            for ruleType, predict in predicts.items():
-                label, evidence = predict
-                wrapPredicts[ruleType] = consts.Prediction(label, 1.0, evidence) if label else consts.NULLPrediction
-            return wrapPredicts
-
         compressed = defaultdict(lambda: defaultdict(set))
         for tbl, pkg in DataSetIter.iter_pkg(testSet):
             agent = tuple(['^'] + filter(None, SPLITTER.split(utils.process_agent(pkg.agent))) + ['$'])

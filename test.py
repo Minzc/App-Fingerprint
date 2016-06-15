@@ -175,9 +175,10 @@ def test_combine():
     auto_test()
 
 def enumerate_conf():
-    test_rate = [0.22, 0.18, 0.14, 0.10, 0.06, 0.02, 0]
+    test_rate = [0, 0.22, 0.18, 0.14, 0.10, 0.06, 0.02, 0]
     for i in test_rate:
         conf.agent_conf = i
+        print("Agent Confidence: " + str(i))
         yield ("Agent Confidence: " + str(i))
 
 def enumerate_support():
@@ -223,16 +224,6 @@ def auto_test():
                  (precision, recall, f1Score, instancePrecision, instanceRecall, conf.agent_support, conf.agent_support, FPR)
         log([], '', output)
 
-def train_data(testSize):
-    for testTbl in tbls:
-        if testTbl == 'ios_packages_2015_06_08':
-            continue
-        trainTbls = []
-        for tbl in tbls:
-            if tbl != testTbl:
-                trainTbls.append(tbl)
-        yield (trainTbls, testTbl)
-
 def draw_roc(fileName):
     trainTbls = ['ios_packages_2015_08_04', 'ios_packages_2015_10_16',
                 'ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29',
@@ -250,6 +241,163 @@ def draw_roc(fileName):
         fw.write(str(FPR)+','+str(TPR)+'\n')
     fw.close()
 
+def test_agent():
+    def enumerate_K():
+        test_rate = [1, 2, 3, 4, 5]
+        conf.agent_score = 0.1
+        conf.agent_support = 30
+        for i in test_rate:
+            conf.agent_K = i
+            print("Agent K: " + str(i))
+            yield ("Agent K: " + str(i))
+
+    def enumerate_Sup():
+        test_rate = [2, 10, 30, 50, 70]
+        conf.agent_K = 1
+        conf.agent_score = 0.1
+        for i in test_rate:
+            conf.agent_support = i
+            print("Agent Support: " + str(i))
+            yield ("Agent Support: " + str(i))
+
+    def enumerate_Score():
+        test_rate = [0.1, 0.3, 0.5, 0.7, 0.9]
+        conf.agent_support = 30
+        conf.agent_K = 1
+        for i in test_rate:
+            conf.agent_score = i
+            print("Agent Score: " + str(i))
+            yield ("Agent Score: " + str(i))
+    enuFuncs = [enumerate_K, enumerate_Sup, enumerate_Score]
+
+
+    for func in enuFuncs:
+        totalPrecision, totalRecall, instancePrecisions, instanceRecalls, FPRs  = [], [], [], [], []
+        for i in func():
+            for testTbl in tbls:
+                if testTbl == 'ios_packages_2015_06_08':
+                    continue
+
+                trainTbls = [tbl for tbl in tbls if tbl != testTbl]
+
+                print(trainTbls, [testTbl], conf.agent_score, conf.agent_support, conf.agent_K)
+                local_stat(FPRs, instancePrecisions, instanceRecalls, testTbl, totalPrecision, totalRecall, trainTbls)
+
+            FPR, f1Score, instancePrecision, instanceRecall, precision, recall = global_stat(FPRs, instancePrecisions,
+                                                                                             instanceRecalls,
+                                                                                             totalPrecision,
+                                                                                             totalRecall)
+            output = "# Precision : %s Recall: %s F1: %s InstanceP: %s InstanceR: %s Score: %s LabelT: %s K: %s FPR: %s" % \
+                     (precision, recall, f1Score, instancePrecision, instanceRecall, conf.agent_score, conf.agent_support,
+                      conf.agent_K, FPR)
+            log([], '', output)
+
+def test_path():
+    def enumerate_K():
+        test_rate = [1, 2, 3, 4, 5]
+        for i in test_rate:
+            conf.path_K = i
+            print("Path K: " + str(i))
+            yield ("Path K: " + str(i))
+    def enumerate_Sup():
+        test_rate = [0.1, 0.3, 0.5, 0.7, 0.9]
+        for i in test_rate:
+            conf.path_labelT = i
+            print("Path Support: " + str(i))
+            yield ("Path Support: " + str(i))
+    def enumerate_Score():
+        test_rate = [0.1, 0.3, 0.5, 0.7, 0.9]
+        for i in test_rate:
+            conf.path_scoreT = i
+            print("Path Score: " + str(i))
+            yield ("Path Score: " + str(i))
+    enuFuncs = [enumerate_K, enumerate_Sup, enumerate_Score]
+
+
+    for func in enuFuncs:
+        totalPrecision, totalRecall, instancePrecisions, instanceRecalls, FPRs  = [], [], [], [], []
+        for i in func():
+            for testTbl in tbls:
+                if testTbl == 'ios_packages_2015_06_08':
+                    continue
+
+                trainTbls = [tbl for tbl in tbls if tbl != testTbl]
+
+                print(trainTbls, [testTbl], conf.query_scoreT, conf.query_labelT, conf.query_K)
+                local_stat(FPRs, instancePrecisions, instanceRecalls, testTbl, totalPrecision, totalRecall, trainTbls)
+
+            FPR, f1Score, instancePrecision, instanceRecall, precision, recall = global_stat(FPRs, instancePrecisions,
+                                                                                             instanceRecalls,
+                                                                                             totalPrecision,
+                                                                                             totalRecall)
+            output = "# Precision : %s Recall: %s F1: %s InstanceP: %s InstanceR: %s Score: %s LabelT: %s K: %s FPR: %s" % \
+                     (precision, recall, f1Score, instancePrecision, instanceRecall, conf.path_scoreT, conf.path_labelT,
+                      conf.path_K, FPR)
+            log([], '', output)
+
+def test_kv():
+    def enumerate_K():
+        test_rate = [1, 2, 3, 4, 5]
+        for i in test_rate:
+            conf.query_K = i
+            print("Query K: " + str(i))
+            yield ("Query K: " + str(i))
+    def enumerate_Sup():
+        test_rate = [0.1, 0.3, 0.5, 0.7, 0.9]
+        for i in test_rate:
+            conf.query_labelT = i
+            print("Query Support: " + str(i))
+            yield ("Query Support: " + str(i))
+    def enumerate_Score():
+        test_rate = [0.1, 0.3, 0.5, 0.7, 0.9]
+        for i in test_rate:
+            conf.query_scoreT = i
+            print("Query Score: " + str(i))
+            yield ("Query Score: " + str(i))
+    enuFuncs = [enumerate_K, enumerate_Sup, enumerate_Sup]
+
+
+    for func in enuFuncs:
+        totalPrecision, totalRecall, instancePrecisions, instanceRecalls, FPRs  = [], [], [], [], []
+        for i in func():
+            for testTbl in tbls:
+                if testTbl == 'ios_packages_2015_06_08':
+                    continue
+
+                trainTbls = [tbl for tbl in tbls if tbl != testTbl]
+
+                print(trainTbls, [testTbl], conf.query_scoreT, conf.query_labelT, conf.query_K)
+                local_stat(FPRs, instancePrecisions, instanceRecalls, testTbl, totalPrecision, totalRecall, trainTbls)
+
+            FPR, f1Score, instancePrecision, instanceRecall, precision, recall = global_stat(FPRs, instancePrecisions,
+                                                                                             instanceRecalls,
+                                                                                             totalPrecision,
+                                                                                             totalRecall)
+            output = "# Precision : %s Recall: %s F1: %s InstanceP: %s InstanceR: %s Score: %s LabelT: %s K: %s FPR: %s" % \
+                     (precision, recall, f1Score, instancePrecision, instanceRecall, conf.query_scoreT, conf.query_labelT,
+                      conf.query_K, FPR)
+            log([], '', output)
+
+
+def global_stat(FPRs, instancePrecisions, instanceRecalls, totalPrecision, totalRecall):
+    recall = sum(totalRecall) * 1.0 / len(totalRecall)
+    instanceRecall = sum(instanceRecalls) * 1.0 / len(instanceRecalls)
+    precision = sum(totalPrecision) * 1.0 / len(totalPrecision)
+    instancePrecision = sum(instancePrecisions) * 1.0 / len(instancePrecisions)
+    FPR = sum(FPRs) * 1.0 / len(FPRs)
+    f1Score = 2.0 * precision * recall / (precision + recall)
+    return FPR, f1Score, instancePrecision, instanceRecall, precision, recall
+
+
+def local_stat(FPRs, instancePrecisions, instanceRecalls, testTbl, totalPrecision, totalRecall, trainTbls):
+    inforTrack = train_test(trainTbls, [testTbl], consts.IOS, ifRoc=False, ifTrain=True)
+    totalPrecision.append(inforTrack[consts.PRECISION])
+    totalRecall.append(inforTrack[consts.RECALL])
+    instancePrecisions.append(inforTrack[consts.INSTANCE_PRECISION])
+    instanceRecalls.append(inforTrack[consts.INSTANCE_RECALL])
+    FPRs.append(inforTrack['FPR'])
+    output = _output_rst(inforTrack)
+    log(trainTbls, testTbl, output)
 
 
 def gen_rules():
@@ -273,6 +421,12 @@ if __name__ == '__main__':
         test(sys.argv[2])
     elif sys.argv[1] == 'auto':
         auto_test()
+    elif sys.argv[1] == 'kv':
+        test_kv()
+    elif sys.argv[1] == 'path':
+        test_path()
+    elif sys.argv[1] == 'agent':
+        test_agent()
     elif sys.argv[1] == 'roc':
         if sys.argv[2] == 'agentconf':
             draw_roc('agentconf')

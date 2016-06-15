@@ -10,13 +10,21 @@ with open("resource/config.json") as f:
 
     query_scoreT = j["query"]["score"]
     query_labelT = j["query"]["label"]
+    query_K = j["query"]["K"]
 
     assert type(query_labelT) == float
 
     path_scoreT = j["path"]["score"]
     path_labelT = j["path"]["label"]
+    path_K = j["path"]["K"]
+
+    head_scoreT = j["head"]["score"]
+    head_labelT = j["head"]["label"]
+    head_K = j["head"]["K"]
 
     agent_support = j["agent"]["support"]
+    agent_score = j["agent"]["score"]
+    agent_K = j["agent"]["K"]
 
     sample_rate = j["sample"]
 
@@ -43,6 +51,3 @@ with open("resource/config.json") as f:
     mode = j["mode"]
 
     region = j["region"]
-
-    #TODO
-    agent_conf = 0

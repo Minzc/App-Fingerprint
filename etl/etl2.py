@@ -254,7 +254,7 @@ class ETL:
 
 def create_tbl(tableName):
     sqldao = SqlDao()
-    sqldao.execute(sql.SQL_CREATE_PACKAGE, tableName)
+    sqldao.execute(sql.SQL_CREATE_PACKAGE % tableName)
     sqldao.close()
 
 if __name__ == '__main__':

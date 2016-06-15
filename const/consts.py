@@ -36,6 +36,7 @@ AGENT_BOUNDARY_CLASSIFIER = 'Agent_bndry'
 
 PATH_MINER = 'P'
 KV_MINER = 'K'
+Head_MINER = 'H'
 #############EVALUATIONS###############
 DISCOVERED_APP = 'discoveried_app'
 DISCOVERED_APP_LIST = 'discoveried_app_list'

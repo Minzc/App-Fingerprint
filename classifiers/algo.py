@@ -25,11 +25,11 @@ HOST = '[HOST]:'
 
 
 class Path:
-    def __init__(self, dbcover, scoreGap):
+    def __init__(self, scoreGap):
         self.scoreThreshold = conf.path_scoreT
         self.labelThreshold = conf.path_labelT
         self.name = consts.PATH_MINER
-        self.dbcover = dbcover
+        self.dbcover = conf.path_K
         self.scoreGap = scoreGap
 
 
@@ -103,7 +103,10 @@ def classify_format(package):
 
 
 class KV:
-    def __init__(self, dbcover, scoreGap):
+    def _info(self):
+        print("K:", conf.query_K, "Score:", conf.query_scoreT, "Support:", conf.query_labelT)
+
+    def __init__(self, scoreGap):
         self.lexicalIds = load_xml_features()
         self.potentialId = defaultdict(set)
         for app, fields in self.lexicalIds.items():
@@ -111,9 +114,10 @@ class KV:
                 self.potentialId[value].add(app)
         self.scoreThreshold = conf.query_scoreT
         self.labelThreshold = conf.query_labelT
-        self.dbcover = dbcover
+        self.dbcover = conf.query_K
         self.scoreGap = scoreGap
         self.name = consts.KV_MINER
+        self._info()
 
     @staticmethod
     def get_f(package):
@@ -189,6 +193,98 @@ class KV:
     def mine_host(self, trainSet, ruleType):
         pass
 
+class Head:
+    def _info(self):
+        print("K:", conf.query_K, "Score:", conf.query_scoreT, "Support:", conf.query_labelT)
+
+    def __init__(self, scoreGap):
+        self.lexicalIds = load_xml_features()
+        self.potentialId = defaultdict(set)
+        for app, fields in self.lexicalIds.items():
+            for _, value in fields:
+                self.potentialId[value].add(app)
+        self.scoreThreshold = conf.head_scoreT
+        self.labelThreshold = conf.head_labelT
+        self.dbcover = conf.head_K
+        self.scoreGap = scoreGap
+        self.name = consts.Head_MINER
+        self._info()
+
+    @staticmethod
+    def get_f(package):
+        def filter_func(v):
+            v = v.strip()
+            return if_version(v) == False and len(v) > 1
+
+        host = re.sub('[0-9]+\.', '[0-9]+.', package.rawHost)
+        addHeaders = package.add_header.split('\n')
+        for ln in addHeaders:
+            if ':' in ln:
+                k, v = ln.split(":")
+                k = k.replace("\t", "")
+                if if_version(v) == False and len(v) > 1:
+                    v = re.sub('[0-9]+x[0-9]+', '', v.strip())
+                    if '/' in v:
+                        v = v.split('/')[0]
+                    yield (host, k, v)
+
+    def txt_analysis(self, k, v, host, app, tbl, xmlGenRules, xmlSpecificRules):
+        """
+        Match xml information in training data
+        Output
+        :return xmlGenRules : (host, key) -> value -> {app}
+        :return xmlSpecificRules
+        """
+        for fieldName in [name for name, value in self.lexicalIds[app] if value == v
+        and len(self.potentialId[value]) == 1]:
+            xmlGenRules[(host, k)][v][fieldName] += 1
+            xmlSpecificRules[(host, k)][v][app].add(tbl)
+        for fieldName in [name for name, value in self.lexicalIds[app] if value in v
+        and len(self.potentialId[value]) == 1]:
+            return consts.Rule(host, k, None, "\b", 1, None)
+        return None
+            # xmlSpecificRules.add(consts.Rule(host, k, v, '\b', 1, app))
+
+
+    def prune(self, keys):
+        """
+        key format Rule(secdomain, key, score, labelNum)
+        :param keys:
+        :return:
+        """
+        prunedK = {}
+        for secdomain, keys in keys.items():
+            keys = [key for key in keys if key.score >= self.scoreThreshold and key.labelNum >= self.labelThreshold]
+            prunedK[secdomain] = keys
+        return prunedK
+
+    @staticmethod
+    def sort(genRules, txtRules):
+        def compare(genRule):
+            ifTxtRule = 1 if (genRule.secdomain, genRule.key) in txtRules else 0
+            return (ifTxtRule, genRule.score, genRule.hostNum, genRule.labelNum)
+
+        sGenRules = sorted(genRules, key=compare, reverse=True)
+        return sGenRules
+
+    @staticmethod
+    def gen_txt_rule(xmlSpecificRules, specificRules, trackIds):
+        """
+        :param trackIds:
+        :param xmlSpecificRules:
+        :param specificRules : specific prune for apps
+             host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
+        """
+        for rule, v, app, tbls in flatten(xmlSpecificRules):
+            if v not in trackIds and len(re.sub('[0-9]', '', v)) < 2:
+                continue
+            host, key = rule
+            specificRules[host][key][v][app][consts.SCORE] = 1.0
+            specificRules[host][key][v][app][consts.SUPPORT] = tbls
+        return specificRules
+
+    def mine_host(self, trainSet, ruleType):
+        pass
 
 def _generate_keys(keyScore, hostLabelTbl):
     """
@@ -275,9 +371,11 @@ class QueryClassifier(AbsClassifer):
         self.appType = appType
 
         if minerType == consts.PATH_MINER:
-            self.miner = Path(dbcover=1, scoreGap=0.3)
+            self.miner = Path(scoreGap=0.3)
         elif minerType == consts.KV_MINER:
-            self.miner = KV(dbcover=3, scoreGap=0.3)
+            self.miner = KV(scoreGap=0.3)
+        elif minerType == consts.Head_MINER:
+            self.miner = Head(scoreGap=0.3)
 
         self.rules = {consts.APP_RULE: defaultdict(lambda: defaultdict(
             lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
@@ -375,31 +473,6 @@ class QueryClassifier(AbsClassifer):
         for host, key, value, app, scoreType, score in flatten(categorySpecificRules):
             specificRules[consts.CATEGORY_RULE][host][key][value][app][scoreType] = score
         return specificRules
-
-    # def _infer_from_xml(self, specificRules, xmlGenRules, rmApps):
-    #     print 'Start Infering'
-    #     xmlFieldValues = defaultdict(lambda: defaultdict(set))
-    #     for app in self.xmlFeatures:
-    #         for k, v in self.xmlFeatures[app]:
-    #             if len(v) != 0 and if_version(v) == False:
-    #                 xmlFieldValues[app][k].add(v)
-    #     interestedXmlRules = defaultdict(set)
-    #     for rule in xmlGenRules:
-    #         host, key = rule
-    #         if len(specificRules[host][key]) != 0:
-    #             for _, fieldName, _ in flatten(xmlGenRules[rule]):
-    #                 interestedXmlRules[fieldName].add((host, key, len(specificRules[host][key])))
-    #
-    #     for fieldName, prune in interestedXmlRules.items():
-    #         for app in rmApps:
-    #             if len(xmlFieldValues[app][fieldName]) == 1:
-    #                 for value in xmlFieldValues[app][fieldName]:
-    #                     prune = sorted(prune, key=lambda x: x[2], reverse=True)[:3]
-    #                     for rule in prune:
-    #                         host, key, score = rule
-    #                         specificRules[host][key][value][app][consts.SCORE] = 1.0
-    #                         specificRules[host][key][value][app][consts.SUPPORT] = {1, 2, 3, 4}
-    #     return specificRules
 
     def init(self):
         def create_dict():
