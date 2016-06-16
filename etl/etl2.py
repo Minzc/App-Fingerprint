@@ -115,6 +115,9 @@ class ETL:
                     pkgInfos.append(pkgInfo)
                     if len(pkgInfos) > 500:
                         break
+                    if time.time() - timeStampTwo > 5:
+                        print "Spent more than 10s. Stop"
+                        break
                 else:
                   print app_name, app_category, app_company
                   print 'ERROR WRONG PACKAGE TYPE'
@@ -156,14 +159,14 @@ class ETL:
         print 'inserting', time.time() - timeStampThree
         print "Finish", app_package, "Package:", len(params), len(pkgInfos)
 
-    def _parse_dns_package(self, package, dns_info):
-        amount = package[DNS].ancount
-        for i in range(amount):
-            dnsrr = package[DNSRR][i]
-            host = dnsrr.rrname
-            ip = dnsrr.rdata
-            dns_info.setdefault(ip, set())
-            dns_info[ip].add(package.qd.qname[:-1])
+    # def _parse_dns_package(self, package, dns_info):
+    #     amount = package[DNS].ancount
+    #     for i in range(amount):
+    #         dnsrr = package[DNSRR][i]
+    #         host = dnsrr.rrname
+    #         ip = dnsrr.rdata
+    #         dns_info.setdefault(ip, set())
+    #         dns_info[ip].add(package.qd.qname[:-1])
 
 
     def _parse_http_package(self, package):
