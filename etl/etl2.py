@@ -125,7 +125,7 @@ class ETL:
             except StopIteration:
                 break
             except:
-                 print 'ERROR'
+                 print 'ERROR', sys.exc_info()[0]
         timeStampThree = time.time()
         print 'Parsing pcaps', timeStampThree - timeStampTwo
         params = []
