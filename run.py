@@ -23,11 +23,11 @@ VALID_LABEL = {
 
 if not const.conf.TestBaseLine:
     USED_CLASSIFIERS = [
-        #consts.HEAD_CLASSIFIER,
+        consts.HEAD_CLASSIFIER,
         #consts.AGENT_CLASSIFIER,
         consts.AGENT_BOUNDARY_CLASSIFIER,
-        #consts.KV_CLASSIFIER,
-        #consts.URI_CLASSIFIER,
+        consts.KV_CLASSIFIER,
+        consts.URI_CLASSIFIER,
     ]
 else:
      USED_CLASSIFIERS = [

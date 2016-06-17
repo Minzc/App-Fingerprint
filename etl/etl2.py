@@ -126,6 +126,7 @@ class ETL:
                 break
             except:
                  print 'ERROR', sys.exc_info()[0]
+        packages.close()
         timeStampThree = time.time()
         print 'Parsing pcaps', timeStampThree - timeStampTwo
         params = []

@@ -3,21 +3,19 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import re
 import urllib
+from collections import defaultdict
 
 import const.conf
 import const.consts as consts
-import re
-
 import const.sql
+from classifiers.classifier import AbsClassifer
 from classifiers.uri import UriClassifier
 from const import conf
+from const.dataset import DataSetIter as DataSetIter
 from sqldao import SqlDao
 from utils import load_xml_features, if_version, flatten, get_label
-
-from collections import defaultdict
-from classifiers.classifier import AbsClassifer
-from const.dataset import DataSetIter as DataSetIter
 
 DEBUG = False
 PATH = '[PATH]:'
@@ -95,11 +93,18 @@ class Path:
         return specificRules
 
 
-def classify_format(package):
-    host = package.refer_rawHost if package.refer_rawHost else package.rawHost
-    host = re.sub('[0-9]+\.', '[0-9]+.', host)
-    path = package.refer_origpath if package.refer_rawHost else package.origPath
+def classify_format(package, miner):
+    if miner.name != consts.Head_MINER:
+        host = package.refer_rawHost if package.refer_rawHost else package.rawHost
+        host = re.sub('[0-9]+\.', '[0-9]+.', host)
+        path = package.refer_origpath if package.refer_rawHost else package.origPath
+    else:
+        if conf.debug: print("Header Miner")
+        host = package.refer_rawHost if package.refer_rawHost else package.rawHost
+        host = re.sub('[0-9]+\.', '[0-9]+.', host)
+        path = package.add_header
     return host, path
+
 
 
 class KV:
@@ -195,7 +200,7 @@ class KV:
 
 class Head:
     def _info(self):
-        print("K:", conf.query_K, "Score:", conf.query_scoreT, "Support:", conf.query_labelT)
+        print("K:", conf.head_K, "Score:", conf.head_scoreT, "Support:", conf.head_labelT)
 
     def __init__(self, scoreGap):
         self.lexicalIds = load_xml_features()
@@ -220,7 +225,7 @@ class Head:
         addHeaders = package.add_header.split('\n')
         for ln in addHeaders:
             if ':' in ln:
-                k, v = ln.split(":")
+                k, v = ln.split(":", 1)
                 k = k.replace("\t", "")
                 if if_version(v) == False and len(v) > 1:
                     v = re.sub('[0-9]+x[0-9]+', '', v.strip())
@@ -235,13 +240,6 @@ class Head:
         :return xmlGenRules : (host, key) -> value -> {app}
         :return xmlSpecificRules
         """
-        for fieldName in [name for name, value in self.lexicalIds[app] if value == v
-        and len(self.potentialId[value]) == 1]:
-            xmlGenRules[(host, k)][v][fieldName] += 1
-            xmlSpecificRules[(host, k)][v][app].add(tbl)
-        for fieldName in [name for name, value in self.lexicalIds[app] if value in v
-        and len(self.potentialId[value]) == 1]:
-            return consts.Rule(host, k, None, "\b", 1, None)
         return None
             # xmlSpecificRules.add(consts.Rule(host, k, v, '\b', 1, app))
 
@@ -275,12 +273,6 @@ class Head:
         :param specificRules : specific prune for apps
              host -> key -> value -> label -> { rule.score, support : { tbl, tbl, tbl } }
         """
-        for rule, v, app, tbls in flatten(xmlSpecificRules):
-            if v not in trackIds and len(re.sub('[0-9]', '', v)) < 2:
-                continue
-            host, key = rule
-            specificRules[host][key][v][app][consts.SCORE] = 1.0
-            specificRules[host][key][v][app][consts.SUPPORT] = tbls
         return specificRules
 
     def mine_host(self, trainSet, ruleType):
@@ -303,7 +295,7 @@ def _generate_keys(keyScore, hostLabelTbl):
     for host in keyScore:
         for key in keyScore[host]:
             labelNum = len(keyScore[host][key][consts.LABEL]) / (1.0 * len(hostLabelTbl[host]))
-            if host == 'metrics.ally.com':
+            if host == 'pbs.twimg.com':
                 if conf.debug: print('[algo296]', labelNum, key, len(hostLabelTbl[host]), keyScore[host][key][consts.LABEL])
             score = keyScore[host][key][consts.SCORE]
             generalRules[host].add(consts.QueryKey(host, key, score, labelNum, len(hostNum[key])))
@@ -346,7 +338,7 @@ def _score(hstKLblValue, vAppCounter, vCategoryCounter, hostLabelTbl):
                                        * numOfLabels)
         appKScore[host][k][consts.LABEL].add(label)
         categoryKScore[host][k][consts.LABEL].add(label)
-        if host == 'metrics.ally.com':
+        if host == 'pbs.twimg.com':
             if conf.debug: print('[algo262]',
                   '[Value]', len(hstKLblValue[host][k][label]),
                   '[AllTbls]', len(hostLabelTbl[host][label]),
@@ -357,10 +349,11 @@ def _score(hstKLblValue, vAppCounter, vCategoryCounter, hostLabelTbl):
                   '[Labels]', len(hstKLblValue[host][k]),
                   '[Vc]', vAppCounter[v],
                   '[BV]', if_version(v),
-                  '[Value]', appKScore[host][k][consts.SCORE])
+                  '[Value]', appKScore[host][k][consts.SCORE],
+                  '[Host]', host)
 
-    if conf.debug: print('[algo269APP]', appKScore['metrics.ally.com'])
-    if conf.debug: print('[algo269CAT]', categoryKScore['metrics.ally.com'])
+    if conf.debug: print('[algo269APP]', appKScore['pbs.twimg.com'])
+    if conf.debug: print('[algo269CAT]', categoryKScore['pbs.twimg.com'])
     return appKScore, categoryKScore
 
 
@@ -393,9 +386,9 @@ class QueryClassifier(AbsClassifer):
         :param trainData : { tbl : [ packet, packet, ... ] }
         :param xmlGenRules : {( host, key) }
         """
-        if conf.debug: print('[algo217]', generalRules['metrics.ally.com'])
+        if conf.debug: print('[algo217]', generalRules['pbs.twimg.com'])
         generalRules = self.miner.prune(generalRules)
-        if conf.debug: print('[algo219]', generalRules['metrics.ally.com'])
+        if conf.debug: print('[algo219]', generalRules['pbs.twimg.com'])
 
         # Prune by coverage
         for host in generalRules:
@@ -408,8 +401,8 @@ class QueryClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 kv[key] = value
 
-            if pkg.host == 'metrics.ally.com':
-                if conf.debug: print('[algo222]', kv, generalRules['metrics.ally.com'])
+            if pkg.host == 'pbs.twimg.com':
+                if conf.debug: print('[algo222]', kv, generalRules['pbs.twimg.com'])
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -420,7 +413,7 @@ class QueryClassifier(AbsClassifer):
         # Prune by grouping
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
-            if host == 'metrics.ally.com':
+            if host == 'pbs.twimg.com':
                 if conf.debug: print('[algo228]', prunedGenRules[host])
             tmp = set()
             for index, rule in enumerate(prunedGenRules[host]):
@@ -428,7 +421,7 @@ class QueryClassifier(AbsClassifer):
                     break
                 tmp.add(consts.Rule(host, rule.key, None, "\b", rule.score, None))
             prunedGenRules[host] = tmp
-            if host == 'metrics.ally.com':
+            if host == 'pbs.twimg.com':
                 if conf.debug: print('[algo237]', prunedGenRules[host])
         return prunedGenRules
 
@@ -600,6 +593,9 @@ class QueryClassifier(AbsClassifer):
                 elif PATH not in key and self.miner.name == consts.KV_MINER:
                     valid = True
                     regexObj = re.compile(r'\W' + re.escape(key + '=' + value) + r'\W', re.IGNORECASE)
+                elif PATH not in key and self.miner.name == consts.Head_MINER:
+                    valid = True
+                    regexObj = re.compile(r'\W' + re.escape(key + ': ' + value) + r'\W', re.IGNORECASE)
 
                 if valid:
                     self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
@@ -615,11 +611,11 @@ class QueryClassifier(AbsClassifer):
             fatherScore = -1
             rst = consts.NULLPrediction
             if not pkg.refer_host:
-                host, path = classify_format(pkg)
+                host, path = classify_format(pkg, self.miner)
                 for regexObj, scores in self.rules[ruleType][host].iteritems():
                     hostRegex = re.compile(host)
                     assert hostRegex.search(pkg.rawHost)
-                    if pkg.app == 'com.ally.auto' and pkg.host == 'metrics.ally.com':
+                    if pkg.app == 'com.ally.auto' and pkg.host == 'pbs.twimg.com':
                         if conf.debug: print('[algo523]', regexObj.search(path), regexObj.pattern, path)
 
                     if regexObj.search(path):
