@@ -31,7 +31,7 @@ SQL_DELETE_KV_RULES = (' DELETE FROM {}'
 SQL_INSERT_KV_RULES = (' INSERT INTO {} (label, support, confidence, host, paramkey, paramvalue, rule_type)'
                        ' VALUES (%s, %s, %s, %s, %s, %s, %s)').format(conf.ruleSet)
 
-SQL_SELECT_KV_RULES = (' SELECT paramkey, paramvalue, host, label, confidence, rule_type, support'
+SQL_SELECT_KV_RULES = (' SELECT id, paramkey, paramvalue, host, label, confidence, rule_type, support'
                        ' FROM {}'
                        ' WHERE paramkey IS NOT NULL').format(conf.ruleSet)
 ############################
@@ -41,9 +41,12 @@ SQL_INSERT_AGENT_RULES = (' INSERT INTO {} (host, prefix, identifier, suffix, la
 SQL_DELETE_AGENT_RULES = (' DELETE FROM {}'
                           ' WHERE agent IS NOT NULL and rule_type=%s').format(conf.ruleSet)
 
-SQL_SELECT_AGENT_RULES = (' SELECT host, prefix, identifier, suffix, label, support, confidence, rule_type, label_type'
+SQL_SELECT_AGENT_RULES = (' SELECT id, host, prefix, identifier, suffix, label, support, confidence, rule_type, label_type'
                           ' FROM {}'
                           ' WHERE rule_type = 3').format(conf.ruleSet)
+
+SQL_SELECT_ALL_RULES = (' SELECT id'
+                          ' FROM {}').format(conf.ruleSet)
 ############################
 SQL_UPDATE_PKG = (' UPDATE %s SET classified = %s'
                   ' WHERE id = %s')

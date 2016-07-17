@@ -2,10 +2,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import re
 from collections import defaultdict
 import utils
+from classifiers.classifier import AbsClassifer
 from const.dataset import DataSetIter, DataSetFactory
-from const import consts
+from const import consts, conf
+from utils import flatten, const
 import math
 import datetime
+
+from sqldao import SqlDao
+
 
 def print(*args, **kwargs):
     return __builtins__.print(*tuple(['[%s]' % str(datetime.datetime.now())] + list(args)), **kwargs)
@@ -15,23 +20,24 @@ SPLITTER = re.compile("[" + r'''"#$%&*+,:<=>?@[\]^`{|}~ \-''' + "]")
 class ContextsTree:
     def __init__(self):
         class Node:
-            def __init__(self, item, clss, score):
+            def __init__(self, item, clss, score, id):
                 self.i, self.clss, self.score, self.child = item, clss, score, {}
+                self.id = id
 
-            def add(self, item, clss, score):
-                self.child[item] = Node(item, clss, score)
+            def add(self, item, clss, score, id):
+                self.child[item] = Node(item, clss, score, id)
 
-        self.root = Node(None, None, 0)
+        self.root = Node(None, None, 0, None)
 
     def add_rule(self, rule):
         n = self.root
-        r, clss, score = rule
+        r, clss, score, id = rule
         for i, w in enumerate(r):
             if w not in n.child:
                 if i == len(r) - 1:
-                    n.add(w, clss, score)
+                    n.add(w, clss, score, id)
                 else:
-                    n.add(w, None, 0)
+                    n.add(w, None, 0, None)
             n = n.child[w]
 
     def search(self, ws):
@@ -42,7 +48,7 @@ class ContextsTree:
                 if w in n.child:
                     n = n.child[w]
                     if n.score > rst[1]:
-                        rst = consts.Prediction(n.clss, n.score, ws[i:i + j + 1])
+                        rst = consts.Prediction(n.clss, n.score, ws[i:i + j + 1], n.id)
                 else:
                     break
         return rst
@@ -53,16 +59,16 @@ def context_quality(s, e):
 Rules = defaultdict(list)
 INFO = {}
 
-class AgentBoundary():
+class AgentBoundary(AbsClassifer):
     def __init__(self):
         self.rules = {}
-        self.support_t = 0.2
-        self.conf_t = 0.2
-        self.K = 1
+        self.support_t = conf.agent_support
+        self.conf_t = conf.agent_score
+        self.K = conf.agent_K
         self.HDB = []
         print('Support', self.support_t, 'Score', self.conf_t, 'K', self.K)
 
-    def train(self, trainSet, ruleType, datasize):
+    def train(self, trainSet, ruleType, ifPersist=True, datasize=0):
         counter = defaultdict(set); totalApps = set()
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             if pkg.agent == 'None':
@@ -75,13 +81,15 @@ class AgentBoundary():
         self.omega = len(totalApps) * self.support_t
         self.totalApp = len(totalApps) * 1.0
 
-        self.HDB = self.HDB[:datasize]
+        self.HDB = list(set(self.HDB))
         print("Data Size", len(self.HDB))
 
         for (t, c, l) in self.HDB:
             map(lambda w: counter[w].add(c), t)
         self.IDF = utils.cal_idf(counter)
         self.mine_context()
+        persist(Rules)
+
 
 
     def mine_context(self):
@@ -139,7 +147,7 @@ class AgentBoundary():
                 itemSupport[e].add(self.HDB[i][1])
 
         print('Find a Context', head, tail)
-        effective = 0;
+        effective = 0
         seqQuality = {}
 
         for seq, apps in seqAppMap.items():
@@ -156,9 +164,12 @@ class AgentBoundary():
             for seqStr in SC.keys():
                 if len(seqAppMap[seqStr]) == 1:
                     for i in SC[seqStr]:
+                        if '/' in seqStr:
+                            continue
                         sigQuality = seqQuality[seqStr]
                         currentLen = len(head) + len(tail) + len(seqStr.split(' '))
-                        Rules[i].append((head, tail, seqStr, contextQuality, sigQuality, currentLen, self.HDB[i][1]))
+                        #Rules[i].append((head, tail, seqStr, contextQuality, sigQuality, currentLen, self.HDB[i][1]))
+                        Rules[i].append((head, tail, seqStr, sigQuality, contextQuality, currentLen, self.HDB[i][1]))
                         Rules[i] = sorted(Rules[i], key=lambda x: (x[3], x[4], 10000 - x[5]), reverse=True)[:self.K]
 
         for e, newmdb in occurs.items():
@@ -175,16 +186,85 @@ class AgentBoundary():
     def rel(self, signature, appSigMap, sigAppMap):
         return math.sqrt(1 / len(appSigMap[list(sigAppMap[signature])[0]]))
 
+    def load_rules(self):
+        self.rules = {
+            consts.APP_RULE: ContextsTree(),
+            consts.COMPANY_RULE: ContextsTree(),
+            consts.CATEGORY_RULE: ContextsTree()
+        }
+        self.rulesHost = {
+            consts.APP_RULE: defaultdict(dict),
+            consts.COMPANY_RULE: defaultdict(dict),
+            consts.CATEGORY_RULE: defaultdict(dict)
+        }
+
+        sqldao = SqlDao()
+        counter = 0
+        length = 0
+        for id, host, prefix, signature, suffix, c, support, fuse_score, ruleType, labelType in sqldao.execute(
+                const.sql.SQL_SELECT_AGENT_RULES):
+            x = prefix + ' ' + signature + ' ' + suffix
+            if '/' in signature:
+                continue
+            length += len(re.escape(x).replace(re.escape("VERSION"), r'\b[a-z0-9-.]+\b'))
+            r = filter(None, prefix.split(' ') + signature.split(' ') + suffix.split(' '))
+            self.rules[consts.APP_RULE].add_rule((r, c, fuse_score, id))
+            counter += 1
+        print('>>> [Agent Rules#loadRules] total number of rules is', counter, 'Type of Rules', len(self.rules))
+        print('>>> [Agent Rules#loadRules] average length is', length / counter)
+        sqldao.close()
+
+    def classify(self, testSet):
+        compressed = defaultdict(lambda: defaultdict(set))
+        for tbl, pkg in DataSetIter.iter_pkg(testSet):
+            agent = tuple(['^'] + filter(None, SPLITTER.split(utils.process_agent(pkg.agent))) + ['$'])
+            compressed[agent][pkg.rawHost].add(pkg)
+
+        batchPredicts, groundTruth = {}, {}
+        for agent, host, pkgs in flatten(compressed):
+            assert (type(pkgs) == set, "Type of pkgs is not correct" + str(type(pkgs)))
+            predict = {}
+            for ruleType in self.rules:
+                predict[ruleType] = self.rules[ruleType].search(agent)
+
+            for pkg in pkgs:
+                batchPredicts[pkg.id] = predict
+                groundTruth[pkg.id] = pkg.app
+                if predict[consts.APP_RULE].label is not None and predict[consts.APP_RULE].label != pkg.app:
+                    print('>>>[AGENT CLASSIFIER ERROR] agent:', pkg.agent, 'App:', pkg.app, 'Prediction:', predict[
+                        consts.APP_RULE])
+        return batchPredicts  # , groundTruth
+
+    def c(self, pkgInfo):
+        pass
 
 
 
+def persist(appRule):
+    """
+    Input
+    :param appRule : {regex: {app1, app2}}
+    """
+    sqldao = SqlDao()
+    params = set()
+
+    for rules in appRule.values():
+        for rule in rules:
+            prefix, suffix, signature, contextQuality, sigQuality, currentLen, c  = rule
+            prefix = ' '.join(prefix)
+            suffix = ' '.join(suffix)
+            params.add((None, prefix, signature, suffix, c, contextQuality, sigQuality, 3, consts.APP_RULE))
+
+    sqldao.executeBatch(utils.const.sql.SQL_INSERT_AGENT_RULES, params)
+    sqldao.close()
 
 if __name__ == '__main__':
-    tbls = ['ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22','chi_ios_packages_2015_07_20', 'chi_ios_packages_2015_09_24', 'chi_ios_packages_2015_09_24']
-    for size  in [500000, 600000, 700000]:
+    tbls = ['ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22',
+           'ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2015_05_29']
+    for size  in [300000, 600000, 500000, 700000]:
         a = AgentBoundary()
         trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
-        a.train(trainSet, consts.IOS, size)
+        a.train(trainSet, consts.IOS, datasize=size)
         print('Finish Rule Mining')
     # for i, rules in Rules.items():
     #     for rule in rules:

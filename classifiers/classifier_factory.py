@@ -1,6 +1,6 @@
 from classifiers.agent import AgentClassifier
 from classifiers.agent_bl import AgentBLClassifier
-from classifiers.agent_pattern import AgentBoundary
+from classifiers.agent_pattern_new import AgentBoundary
 from classifiers.algo import QueryClassifier
 from classifiers.baseline import BaseLineClassifier
 from classifiers.head import HeaderClassifier
@@ -12,6 +12,7 @@ def classifier_factory(names, appType):
     classifiers = []
     for name in names:
         if name == consts.HEAD_CLASSIFIER:
+            #classifier = HeaderClassifier()
             classifier = QueryClassifier(appType, consts.Head_MINER)
         elif name == consts.AGENT_CLASSIFIER:
             classifier = AgentClassifier(inferFrmData=True)

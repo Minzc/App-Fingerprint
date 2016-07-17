@@ -62,7 +62,7 @@ class AgentBoundary():
         self.HDB = []
         print('Support', self.support_t, 'Score', self.conf_t, 'K', self.K)
 
-    def train(self, trainSet, ruleType, ifPersist=True):
+    def train(self, trainSet, ruleType, datasize):
         counter = defaultdict(set); totalApps = set()
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             if pkg.agent == 'None':
@@ -75,7 +75,7 @@ class AgentBoundary():
         self.omega = len(totalApps) * self.support_t
         self.totalApp = len(totalApps) * 1.0
 
-        # self.HDB = list(set(self.HDB))
+        self.HDB = self.HDB[:datasize]
         print("Data Size", len(self.HDB))
 
         for (t, c, l) in self.HDB:
@@ -132,44 +132,47 @@ class AgentBoundary():
             support.add(self.HDB[i][1])
             seqStr = ' '.join(self.HDB[i][0][hEnd + 1 : startpos - len(tail) + 1])
             # print('Find a sequence', seqStr, 'HEAD:', head, 'TAIL:', tail, 'Origin:', self.HDB[i][0])
-            SC[i].add(seqStr); seqAppMap[seqStr].add(self.HDB[i][1]); appSigMap[self.HDB[i][1]].add(seqStr)
+            SC[seqStr].add(i); seqAppMap[seqStr].add(self.HDB[i][1]); appSigMap[self.HDB[i][1]].add(seqStr)
             if startpos + 1 < self.HDB[i][2]:
                 e = self.HDB[i][0][startpos + 1]
                 occurs[e].append((i, hEnd, startpos + 1))
                 itemSupport[e].add(self.HDB[i][1])
 
         print('Find a Context', head, tail)
-        effective = 0; maxInf = -1
+        effective = 0; Eub = set()
         seqQuality = {}
-        for app, seqs in appSigMap.items():
-            for seq in seqs:
-                if len(seqAppMap[seq]) == 1:
-                    if seq not in seqQuality:
-                        inf = INFO[seq] if seq in INFO else self.idf(seq.split(' '))
-                        maxInf = max(maxInf, inf)
-                        seqQuality[seq] = inf * self.rel(seq, appSigMap, seqAppMap)
-                    effective += seqQuality[seq]
+
+        for seq, apps in seqAppMap.items():
+            if len(apps) == 1:
+                if seq not in seqQuality:
+                    inf = self.idf(seq)
+                    Eub.add(inf)
+                    seqQuality[seq] = inf * self.rel(seq, appSigMap, seqAppMap)
+                effective += seqQuality[seq]
 
 
         contextQuality = context_quality(len(support) / self.totalApp, effective * 1.0 / len(seqAppMap))
         print('Context Quality:', contextQuality)
         if contextQuality > self.conf_t:
-            for i in SC.keys():
-                for seqStr in filter(lambda seqStr: len(seqAppMap[seqStr]) == 1,SC[i]):
-                    sigQuality = seqQuality[seqStr]
-                    currentLen = len(head) + len(tail) + len(seqStr.split(' '))
-                    Rules[i].append((head, tail, seqStr, contextQuality, sigQuality, currentLen, self.HDB[i][1]))
-                    Rules[i] = sorted(Rules[i], key=lambda x: (x[3], x[4], 10000 - x[5]), reverse=True)[:self.K]
+            for seqStr in SC.keys():
+                if len(seqAppMap[seqStr]) == 1:
+                    for i in SC[seqStr]:
+                        sigQuality = seqQuality[seqStr]
+                        currentLen = len(head) + len(tail) + len(seqStr.split(' '))
+                        Rules[i].append((head, tail, seqStr, contextQuality, sigQuality, currentLen, self.HDB[i][1]))
+                        Rules[i] = sorted(Rules[i], key=lambda x: (x[3], x[4], 10000 - x[5]), reverse=True)[:self.K]
 
+        Eub =  sum(Eub) * 1.0 / len(Eub) if len(Eub) > 0 else 0
         for e, newmdb in occurs.items():
-            qualityUb = context_quality(len(itemSupport[e]) / self.totalApp, maxInf)
+            qualityUb = context_quality(len(itemSupport[e]) / self.totalApp, Eub)
             if len(itemSupport[e])  > self.omega and qualityUb >= self.conf_t:
                 self.mine_tail_rec(tail + [e], newmdb, head)
 
 
     def idf(self, signature):
         if signature not in INFO:
-            INFO[signature] = sum([self.IDF[i] for i in signature]) / len(signature)
+            sigSeg = signature.split(' ')
+            INFO[signature] = sum([self.IDF[i] for i in sigSeg]) / len(sigSeg)
         return INFO[signature]
 
     def rel(self, signature, appSigMap, sigAppMap):
@@ -180,12 +183,14 @@ class AgentBoundary():
 
 
 if __name__ == '__main__':
-    tbls = ['ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22',
+    tbls = ['ios_packages_2015_06_08', 'ios_packages_2015_08_04', 'ios_packages_2015_08_10',
             'chi_ios_packages_2015_07_20','chi_ios_packages_2015_09_24',]
-    a = AgentBoundary()
-    trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
-    a.train(trainSet, consts.IOS, ifPersist=False)
-    print('Finish Rule Mining')
+
+    for size  in [225521, 300000, 500000, 600000, 700000]:
+        a = AgentBoundary()
+        trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
+        a.train(trainSet, consts.IOS, size)
+        print('Finish Rule Mining')
     # for i, rules in Rules.items():
     #     for rule in rules:
     #         print("Find a rule", rule, "Origin:", a.HDB[i][0])

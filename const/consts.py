@@ -1,11 +1,11 @@
 from collections import namedtuple
 
 
-Prediction = namedtuple('Prediction', 'label, score, evidence')
+Prediction = namedtuple('Prediction', 'label, score, evidence, ruleid')
 QueryKey = namedtuple('Rule', 'secdomain, key, score, labelNum, hostNum')
 Rule = namedtuple('Rule', 'host, prefix, identifier, suffix, score, label')
 
-NULLPrediction = Prediction(None, -1, None)
+NULLPrediction = Prediction(None, -1, None, None)
 
 LABEL = 'l'
 ERROR = 'e'

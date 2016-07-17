@@ -2,11 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-
 import re
 import urllib
 from collections import defaultdict
-
 import const.conf
 import const.consts as consts
 import const.sql
@@ -29,7 +27,6 @@ class Path:
         self.name = consts.PATH_MINER
         self.dbcover = conf.path_K
         self.scoreGap = scoreGap
-
 
     def mine_host(self, trainSet, ruleType):
         uriClassifier = UriClassifier(consts.IOS)
@@ -99,12 +96,11 @@ def classify_format(package, miner):
         host = re.sub('[0-9]+\.', '[0-9]+.', host)
         path = package.refer_origpath if package.refer_rawHost else package.origPath
     else:
-        if conf.debug: print("Header Miner")
-        host = package.refer_rawHost if package.refer_rawHost else package.rawHost
+        #host = package.refer_rawHost if package.refer_rawHost else package.rawHost
+        host = package.rawHost
         host = re.sub('[0-9]+\.', '[0-9]+.', host)
-        path = package.add_header
+        path = ' ' + package.add_header + ' '
     return host, path
-
 
 
 class KV:
@@ -155,8 +151,7 @@ class KV:
         and len(self.potentialId[value]) == 1]:
             return consts.Rule(host, k, None, "\b", 1, None)
         return None
-            # xmlSpecificRules.add(consts.Rule(host, k, v, '\b', 1, app))
-
+        # xmlSpecificRules.add(consts.Rule(host, k, v, '\b', 1, app))
 
     def prune(self, keys):
         """
@@ -198,6 +193,7 @@ class KV:
     def mine_host(self, trainSet, ruleType):
         pass
 
+
 class Head:
     def _info(self):
         print("K:", conf.head_K, "Score:", conf.head_scoreT, "Support:", conf.head_labelT)
@@ -222,6 +218,8 @@ class Head:
             return if_version(v) == False and len(v) > 1
 
         host = re.sub('[0-9]+\.', '[0-9]+.', package.rawHost)
+        if package.app == "air.au.com.metro.DumbWaysToDie".lower():
+            print("[algo230]",host)
         addHeaders = package.add_header.split('\n')
         for ln in addHeaders:
             if ':' in ln:
@@ -241,8 +239,7 @@ class Head:
         :return xmlSpecificRules
         """
         return None
-            # xmlSpecificRules.add(consts.Rule(host, k, v, '\b', 1, app))
-
+        # xmlSpecificRules.add(consts.Rule(host, k, v, '\b', 1, app))
 
     def prune(self, keys):
         """
@@ -278,6 +275,7 @@ class Head:
     def mine_host(self, trainSet, ruleType):
         pass
 
+
 def _generate_keys(keyScore, hostLabelTbl):
     """
     Find interesting ( secdomain, key ) pairs
@@ -295,8 +293,9 @@ def _generate_keys(keyScore, hostLabelTbl):
     for host in keyScore:
         for key in keyScore[host]:
             labelNum = len(keyScore[host][key][consts.LABEL]) / (1.0 * len(hostLabelTbl[host]))
-            if host == 'pbs.twimg.com':
-                if conf.debug: print('[algo296]', labelNum, key, len(hostLabelTbl[host]), keyScore[host][key][consts.LABEL])
+            if host == 'www.fuseboxx.com':
+                if conf.debug: print('[algo296]', labelNum, key, len(hostLabelTbl[host]),
+                                     keyScore[host][key][consts.LABEL])
             score = keyScore[host][key][consts.SCORE]
             generalRules[host].add(consts.QueryKey(host, key, score, labelNum, len(hostNum[key])))
         generalRules[host] = sorted(list(generalRules[host]), key=lambda rule: rule.score, reverse=True)
@@ -317,7 +316,6 @@ def _score(hstKLblValue, vAppCounter, vCategoryCounter, hostLabelTbl):
     # secdomain -> app -> key -> value -> tbls
     # secdomain -> key -> (label, score)
     appKScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
-    categoryKScore = defaultdict(lambda: defaultdict(lambda: {consts.LABEL: set(), consts.SCORE: 0}))
 
     for host, k, label, v, tbls in flatten(hstKLblValue):
         tbls = len(tbls)
@@ -330,31 +328,23 @@ def _score(hstKLblValue, vAppCounter, vCategoryCounter, hostLabelTbl):
                     (tbls - 1) / float(numOfTbls
                                        * numOfValues * numOfValues
                                        * numOfLabels)
-
-            elif len(vCategoryCounter[v]) == 1:
-                categoryKScore[host][k][consts.SCORE] += \
-                    (tbls - 1) / float(numOfTbls
-                                       * numOfValues * numOfValues
-                                       * numOfLabels)
         appKScore[host][k][consts.LABEL].add(label)
-        categoryKScore[host][k][consts.LABEL].add(label)
-        if host == 'pbs.twimg.com':
+        if host == 'www.fuseboxx.com':
             if conf.debug: print('[algo262]',
-                  '[Value]', len(hstKLblValue[host][k][label]),
-                  '[AllTbls]', len(hostLabelTbl[host][label]),
-                  '[Key]', k,
-                  '[V]', hstKLblValue[host][k][label],
-                  '[B]', (len(vAppCounter[v]) == 1 and if_version(v) == False),
-                  '[Tbls]', tbls,
-                  '[Labels]', len(hstKLblValue[host][k]),
-                  '[Vc]', vAppCounter[v],
-                  '[BV]', if_version(v),
-                  '[Value]', appKScore[host][k][consts.SCORE],
-                  '[Host]', host)
+                                 '[Value]', len(hstKLblValue[host][k][label]),
+                                 '[AllTbls]', len(hostLabelTbl[host][label]),
+                                 '[Key]', k,
+                                 '[V]', hstKLblValue[host][k][label],
+                                 '[B]', (len(vAppCounter[v]) == 1 and if_version(v) == False),
+                                 '[Tbls]', tbls,
+                                 '[Labels]', len(hstKLblValue[host][k]),
+                                 '[Vc]', vAppCounter[v],
+                                 '[BV]', if_version(v),
+                                 '[Value]', appKScore[host][k][consts.SCORE],
+                                 '[Host]', host)
 
-    if conf.debug: print('[algo269APP]', appKScore['pbs.twimg.com'])
-    if conf.debug: print('[algo269CAT]', categoryKScore['pbs.twimg.com'])
-    return appKScore, categoryKScore
+    if conf.debug: print('[algo269APP]', appKScore['www.fuseboxx.com'])
+    return appKScore
 
 
 class QueryClassifier(AbsClassifer):
@@ -376,6 +366,12 @@ class QueryClassifier(AbsClassifer):
                           lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
                       consts.CATEGORY_RULE: defaultdict(lambda: defaultdict(
                           lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None}))}
+        self.rules2 = {consts.APP_RULE: defaultdict(lambda: defaultdict(
+            lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
+                      consts.COMPANY_RULE: defaultdict(lambda: defaultdict(
+                          lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None})),
+                      consts.CATEGORY_RULE: defaultdict(lambda: defaultdict(
+                          lambda: {'score': 0, 'support': 0, 'regexObj': None, 'label': None}))}
 
     def _prune_general_rules(self, generalRules, trainData, xmlGenRules):
         """
@@ -386,9 +382,9 @@ class QueryClassifier(AbsClassifer):
         :param trainData : { tbl : [ packet, packet, ... ] }
         :param xmlGenRules : {( host, key) }
         """
-        if conf.debug: print('[algo217]', generalRules['pbs.twimg.com'])
+        if conf.debug: print('[algo217]', generalRules['www.fuseboxx.com'])
         generalRules = self.miner.prune(generalRules)
-        if conf.debug: print('[algo219]', generalRules['pbs.twimg.com'])
+        if conf.debug: print('[algo219]', generalRules['www.fuseboxx.com'])
 
         # Prune by coverage
         for host in generalRules:
@@ -401,8 +397,8 @@ class QueryClassifier(AbsClassifer):
             for host, key, value in self.miner.get_f(pkg):
                 kv[key] = value
 
-            if pkg.host == 'pbs.twimg.com':
-                if conf.debug: print('[algo222]', kv, generalRules['pbs.twimg.com'])
+            if pkg.host == 'www.fuseboxx.com':
+                if conf.debug: print('[algo222]', kv, generalRules['www.fuseboxx.com'])
 
             if host in generalRules:
                 for rule in generalRules[host]:
@@ -413,7 +409,7 @@ class QueryClassifier(AbsClassifer):
         # Prune by grouping
         for host, rules in prunedGenRules.items():
             prunedGenRules[host] = sorted(rules, key=lambda x: x[2], reverse=True)
-            if host == 'pbs.twimg.com':
+            if host == 'www.fuseboxx.com':
                 if conf.debug: print('[algo228]', prunedGenRules[host])
             tmp = set()
             for index, rule in enumerate(prunedGenRules[host]):
@@ -421,7 +417,7 @@ class QueryClassifier(AbsClassifer):
                     break
                 tmp.add(consts.Rule(host, rule.key, None, "\b", rule.score, None))
             prunedGenRules[host] = tmp
-            if host == 'pbs.twimg.com':
+            if host == 'www.fuseboxx.com':
                 if conf.debug: print('[algo237]', prunedGenRules[host])
         return prunedGenRules
 
@@ -448,14 +444,14 @@ class QueryClassifier(AbsClassifer):
                     for value in hstKLblValue[host][rule.prefix][label]:
                         if len(valueLabelCounter[value]) == 1:
                             specificRules[host][rule.prefix][value][label] = {
-                                consts.SCORE   : rule.score,
-                                consts.SUPPORT : hstKLblValue[host][rule.prefix][label][value]
-                                #consts.SUPPORT : rule.hostNum
+                                consts.SCORE: rule.score,
+                                consts.SUPPORT: hstKLblValue[host][rule.prefix][label][value]
+                                # consts.SUPPORT : rule.hostNum
                             }
         return specificRules
 
     @staticmethod
-    def _merge_result(appSpecificRules, categorySpecificRules):
+    def _merge_result(appSpecificRules):
         def __create_dic():
             return defaultdict(lambda: defaultdict(
                 lambda: defaultdict(lambda: defaultdict(lambda: {consts.SCORE: 0, consts.SUPPORT: set()}))))
@@ -463,8 +459,6 @@ class QueryClassifier(AbsClassifer):
         specificRules = {consts.APP_RULE: __create_dic(), consts.CATEGORY_RULE: __create_dic()}
         for host, key, value, app, scoreType, score in flatten(appSpecificRules):
             specificRules[consts.APP_RULE][host][key][value][app][scoreType] = score
-        for host, key, value, app, scoreType, score in flatten(categorySpecificRules):
-            specificRules[consts.CATEGORY_RULE][host][key][value][app][scoreType] = score
         return specificRules
 
     def init(self):
@@ -487,10 +481,10 @@ class QueryClassifier(AbsClassifer):
         lexicalRules = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
         return compressedDB, valueLabelCounter, hostLabelTable, lexicalKey, lexicalRules
 
-    def train(self, trainData, rule_type):
+    def train(self, trainData, ruleType):
         """
         Sample Training Data
-        :param rule_type:
+        :param ruleType:
         :param trainData:
         """
 
@@ -501,7 +495,7 @@ class QueryClassifier(AbsClassifer):
 
         compressedDB, valueLabelCounter, hostLabelTable, lexicalKey, lexicalRules = self.init()
 
-        self.miner.mine_host(trainData, rule_type)
+        self.miner.mine_host(trainData, ruleType)
         trackIds = {}
         baseLine = defaultdict(set)
         for tbl, pkg in DataSetIter.iter_pkg(trainData):
@@ -516,7 +510,7 @@ class QueryClassifier(AbsClassifer):
         ##################
         # Count
         ##################
-        appKeyScore, categoryKeyScore = _score(compressedDB[consts.APP_RULE],
+        appKeyScore = _score(compressedDB[consts.APP_RULE],
                                                valueLabelCounter[consts.APP_RULE],
                                                valueLabelCounter[consts.CATEGORY_RULE],
                                                hostLabelTable[consts.APP_RULE])
@@ -524,15 +518,14 @@ class QueryClassifier(AbsClassifer):
         # Generate interesting keys
         #############################
         appGeneralRules = _generate_keys(appKeyScore, hostLabelTable[consts.APP_RULE])
-        #categoryGeneralRules = _generate_keys(categoryKeyScore, hostLabelTable[consts.CATEGORY_RULE])
         #############################
         # Pruning general prune
         #############################
         print(">>>[KV] Before pruning appGeneralRules", len(appGeneralRules))
         appGeneralRules = self._prune_general_rules(appGeneralRules, trainData, lexicalKey)
-        #categoryGeneralRules = self._prune_general_rules(categoryGeneralRules, trainData, lexicalKey)
+        # categoryGeneralRules = self._prune_general_rules(categoryGeneralRules, trainData, lexicalKey)
         print(">>>[KV] appGeneralRules", len(appGeneralRules))
-        #print(">>>[KV] categoryGeneralRules", len(categoryGeneralRules))
+        # print(">>>[KV] categoryGeneralRules", len(categoryGeneralRules))
         #############################
         # Generate specific prune
         #############################
@@ -541,24 +534,12 @@ class QueryClassifier(AbsClassifer):
 
         appSpecificRules = self._generate_rules(compressedDB[consts.APP_RULE], appGeneralRules,
                                                 valueLabelCounter[consts.APP_RULE])
-
-        # categorySpecifcRules = self._generate_rules(compressedDB[consts.CATEGORY_RULE], categoryGeneralRules,
-        #                                             valueLabelCounter[consts.CATEGORY_RULE])
-        categorySpecifcRules = defaultdict(lambda: defaultdict(
-            lambda: defaultdict(lambda: defaultdict(lambda: {consts.SCORE: 0, consts.SUPPORT: set()}))))
-        # appSpecificRules = self._generate_rules(trainData, appGeneralRules,
-        #                                         valueLabelCounter[consts.APP_RULE], consts.APP_RULE)
-        #
-        # categorySpecifcRules = self._generate_rules(trainData, categoryGeneralRules,
-        #                                             valueLabelCounter[consts.CATEGORY_RULE], consts.CATEGORY_RULE)
-
-        # appSpecificRules = self._infer_from_xml(appSpecificRules, lexicalKey, trainData.rmapp)
         appSpecificRules = self.miner.gen_txt_rule(lexicalRules, appSpecificRules, trackIds)
-        specificRules = self._merge_result(appSpecificRules, categorySpecifcRules)
+        specificRules = self._merge_result(appSpecificRules)
         #############################
         # Persist prune
         #############################
-        self.persist(specificRules, rule_type)
+        self.persist(specificRules, ruleType)
         return self
 
     @staticmethod
@@ -573,7 +554,7 @@ class QueryClassifier(AbsClassifer):
         sqldao = SqlDao()
         QUERY = const.sql.SQL_SELECT_KV_RULES
         counter = 0
-        for key, value, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
+        for id, key, value, host, label, confidence, rule_type, support in sqldao.execute(QUERY):
             if len(value.split('\n')) == 1 and ';' not in label:
                 if rule_type == consts.APP_RULE:
                     counter += 1
@@ -598,11 +579,18 @@ class QueryClassifier(AbsClassifer):
                     regexObj = re.compile(r'\W' + re.escape(key + ': ' + value) + r'\W', re.IGNORECASE)
 
                 if valid:
+                    # self.rules2[rule_type][key][value][consts.SCORE] = confidence
+                    # self.rules2[rule_type][key][value][consts.SUPPORT] = support
+                    # self.rules2[rule_type][key][value][consts.LABEL] = label
+                    # self.rules2[rule_type][key][value][consts.EVIDENCE] = (
+                    # id, key, value, host, label, confidence, rule_type, support)
                     self.rules[rule_type][host][regexObj][consts.SCORE] = confidence
                     self.rules[rule_type][host][regexObj][consts.SUPPORT] = support
                     self.rules[rule_type][host][regexObj][consts.LABEL] = label
-                    self.rules[rule_type][host][regexObj][consts.EVIDENCE] = (key, value, host, label, confidence, rule_type, support)
-        if conf.debug: print('>>> [KV Rules#Load Rules] total number of prune is', counter)
+                    self.rules[rule_type][host][regexObj][consts.EVIDENCE] = (
+                    key, value, host, label, confidence, rule_type, support)
+                    self.rules[rule_type][host][regexObj]['ID'] = id
+        if conf.debug: print('>>> [KV Rules#Load Rules] total number of rules is', counter)
         sqldao.close()
 
     def c(self, pkg):
@@ -610,24 +598,22 @@ class QueryClassifier(AbsClassifer):
         for ruleType in self.rules:
             fatherScore = -1
             rst = consts.NULLPrediction
-            if not pkg.refer_host:
-                host, path = classify_format(pkg, self.miner)
-                for regexObj, scores in self.rules[ruleType][host].iteritems():
-                    hostRegex = re.compile(host)
-                    assert hostRegex.search(pkg.rawHost)
-                    if pkg.app == 'com.ally.auto' and pkg.host == 'pbs.twimg.com':
-                        if conf.debug: print('[algo523]', regexObj.search(path), regexObj.pattern, path)
+            # if not pkg.refer_host:
+            host, path = classify_format(pkg, self.miner)
+            for regexObj, ruleInfo in self.rules[ruleType][host].iteritems():
+                if conf.debug and pkg.app == 'air.au.com.metro.dumbwaystodie' and host == 'www.fuseboxx.com':
+                    print('[algo523]', regexObj.search(path), regexObj.pattern, path)
 
-                    if regexObj.search(path):
-                        label, support, confidence = scores[consts.LABEL], scores[consts.SUPPORT], scores[consts.SCORE]
-                        if confidence > rst.score or (confidence == rst.score and support > fatherScore):
-                            fatherScore = support
-                            evidence = (host, regexObj.pattern)
-                            rst = consts.Prediction(label, confidence, evidence)
+                if regexObj.search(path):
+                    label, support, confidence = ruleInfo[consts.LABEL], ruleInfo[consts.SUPPORT], ruleInfo[consts.SCORE]
+                    if confidence > rst.score or (confidence == rst.score and support > fatherScore):
+                        fatherScore = support
+                        evidence = (host, regexObj.pattern)
+                        rst = consts.Prediction(label, confidence, evidence, ruleInfo['ID'])
             predictRst[ruleType] = rst
-            if rst != consts.NULLPrediction and rst.label != get_label(pkg, ruleType):
-                if conf.debug: print('[WRONG]', rst, pkg.app, pkg.category, ruleType)
-                if conf.debug: print('=' * 10)
+            if conf.debug and rst != consts.NULLPrediction and rst.label != get_label(pkg, ruleType):
+                print('[WRONG]', rst, pkg.app, pkg.category, ruleType)
+                print('=' * 10)
 
         return predictRst
 

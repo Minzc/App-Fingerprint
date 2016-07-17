@@ -1,4 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+
+import random
 import re
 from collections import defaultdict
 import utils
@@ -54,9 +56,9 @@ class AgentBoundary():
     def __init__(self):
         self.rules = {}
         #self.support_t = conf.agent_support
-        self.support_t = 0.2
+        self.support_t = 0.5
         #self.conf_t = conf.agent_score
-        self.conf_t = 0.2
+        self.conf_t = 0.5
         self.K = conf.agent_K
         self.HDB = []
         print('Support', self.support_t, 'Score', self.conf_t, 'K', self.K)
@@ -66,22 +68,33 @@ class AgentBoundary():
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             if pkg.agent == 'None':
                 continue
-            map(lambda w: counter[w].add(pkg.app), filter(None, SPLITTER.split(utils.process_agent(pkg.agent))))
-            segAgent = tuple(['^'] + filter(None, SPLITTER.split(utils.process_agent(pkg.agent))) + ['$'])
-            self.HDB.append((segAgent, pkg.app, len(segAgent)))
+            map(lambda w: counter[w].add(pkg.app), filter(None, pkg.path.split('/')))
+            segPath = tuple(['^'] + filter(None, SPLITTER.split(utils.process_agent(pkg.agent))) + ['$'])
+            host = re.sub('[0-9]+\.', '[0-9]+.', pkg.rawHost)
+            self.HDB.append((segPath, pkg.app, len(segPath), host))
             totalApps.add(pkg.app)
 
         self.omega = len(totalApps) * self.support_t
         self.totalApp = len(totalApps) * 1.0
 
         #self.HDB = list(set(self.HDB))
-        self.HDB = self.HDB[:datasize]
+        self.HDB = [self.HDB[i] for i in sorted(random.sample(xrange(len(self.HDB)), datasize)) ]
         print("Data Size", len(self.HDB))
 
-        for (t, c, l) in self.HDB:
-            map(lambda w: counter[w].add(c), t)
-        self.IDF = utils.cal_idf(counter)
-        self.mine_context()
+        groups = defaultdict(list)
+        for (t, c, l, host) in self.HDB:
+            groups[host].append((t,c,l))
+
+
+        for host in groups:
+            self.host = host
+            self.HDB = groups[host]
+            for (t, c, l) in self.HDB:
+                map(lambda w: counter[w].add(c), t)
+            self.IDF = utils.cal_idf(counter)
+            self.mine_context()
+
+        self.HDB = groups
 
 
     def mine_context(self):
@@ -133,7 +146,7 @@ class AgentBoundary():
                 occurs[e].append((i, startpos + 1))
                 support[e].add(self.HDB[i][1])
         print('Find a Context', tuple(prefix), tuple(suffix))
-        Contexts.add((tuple(prefix), tuple(suffix)))
+        Contexts.add((tuple(prefix), tuple(suffix), self.host))
 
         for e, newmdb in occurs.items():
             if len(support[e])  > self.omega:
@@ -151,19 +164,20 @@ class AgentBoundary():
 
         contexts = dict()
         Rules = defaultdict(list)
-        dataset = [(' '.join(r[0]), r[1]) for r in self.HDB]
+        dataset = [('/'.join(r[0]), r[1]) for r in self.HDB]
 
         for context in Contexts:
-            head, tail = map(lambda lst : ' '.join(lst), context)
-            contexts[re.compile('(?=(' + re.escape(head) + ' (.*?) ' + re.escape(tail)+'))')] = (head, tail)
+            head, tail, host = context
+            head, tail = map(lambda lst : ' '.join(lst), [head, tail])
+            contexts[re.compile('(?=(' + re.escape(head) + '/(.*?)/' + re.escape(tail) + '))')] = (head, tail, host)
 
         for reg in contexts:
             appSigMap = defaultdict(set); seqAppMap = defaultdict(set)
             SC = defaultdict(set)
-            head, tail = contexts[reg]
+            head, tail, host = contexts[reg]
             support = set()
 
-            for i in range(len(dataset)):
+            for i in range(len(self.HDB[host])):
                 (t, app) = dataset[i]
                 if head in t and tail in t:
                     for seqStr in map(lambda x:x[1], reg.findall(t)):
@@ -196,9 +210,10 @@ class AgentBoundary():
 if __name__ == '__main__':
     tbls = ['ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22',
             'chi_ios_packages_2015_07_20', 'chi_ios_packages_2015_09_24', 'chi_ios_packages_2015_09_24']
-    a = AgentBoundary()
+
     trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
-    for size  in [225521, 300000, 600000, 400000]:
+    for size  in [25521, 30000, 40000, 50000, 60000]:
+        a = AgentBoundary()
         a.train(trainSet, consts.IOS, size)
         print('Find Contexts', len(Contexts))
         print('Start Building Rule')

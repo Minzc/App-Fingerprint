@@ -1,6 +1,11 @@
 # -*- coding:utf-8 -*-
 import sys
 
+import re
+
+import utils
+from classifiers.algo import KV, Path, Head
+from const.dataset import DataSetFactory
 from utils import  load_pkgs, load_xml_features
 from sqldao import SqlDao
 from collections import defaultdict
@@ -97,7 +102,54 @@ def rmOtherApp():
               sqldao.commit()
     sqldao.close()
 
+SPLITTER = re.compile("[" + r'''"#$%&*+,:<=>?@[\]^`{|}~ \-''' + "]")
+def statData():
+    tbls = ['ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22']
+
+    trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
+    length = defaultdict(int)
+    distinctItems = defaultdict(set)
+    counter = defaultdict(int)
+    kv = KV(0)
+    head = Head(0)
+    for tbl, pkg in trainSet:
+        if pkg.agent != 'None':
+            items = SPLITTER.split(utils.process_agent(pkg.agent))
+            for item in items:
+                distinctItems['agent'].add(item)
+            length['agent'] += len(items)
+            counter['agent'] += 1
+        kvs = [(host, key, value) for (host, key, value) in kv.get_f(pkg)]
+        if len(kvs) > 1:
+            length['kv'] += len(kvs)
+            counter['kv'] += 1
+            for h, k, v in kvs:
+                distinctItems['kv'].add(k)
+                distinctItems['kv'].add(v)
+
+        paths = filter(None, pkg.path.split('/'))
+        if len(paths) > 1:
+            length['path'] += len(paths)
+            counter['path'] += 1
+            for i in paths:
+                distinctItems['path'].add(i)
+
+
+        heads = [(host, key, value) for (host, key, value) in head.get_f(pkg)]
+        if len(heads) > 1:
+            length['head'] += len(heads)
+            counter['head'] += 1
+            for h, k, v in heads:
+                distinctItems['head'].add(k)
+                distinctItems['head'].add(v)
+    print('[Agent] distinct items:', len(distinctItems['agent']), 'Average length:', length['agent'] * 1.0 / counter['agent'])
+    print('[KV] distinct items:', len(distinctItems['kv']), 'Average length:', length['kv'] * 1.0 / counter['kv'])
+    print('[Path] distinct items:', len(distinctItems['path']), 'Average length:', length['path'] * 1.0 / counter['path'])
+    print('[Head] distinct items:', len(distinctItems['head']), 'Average length:', length['head'] * 1.0 / counter['head'])
+
+
+
 
 
 if __name__ == '__main__':
-    stat_pos_content_kv()
+    statData()
