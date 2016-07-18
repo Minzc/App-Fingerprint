@@ -5,7 +5,7 @@ import re
 
 import utils
 from classifiers.algo import KV, Path, Head
-from const.dataset import DataSetFactory
+from const.dataset import DataSetFactory, DataSetIter
 from utils import  load_pkgs, load_xml_features
 from sqldao import SqlDao
 from collections import defaultdict
@@ -103,8 +103,11 @@ def rmOtherApp():
     sqldao.close()
 
 SPLITTER = re.compile("[" + r'''"#$%&*+,:<=>?@[\]^`{|}~ \-''' + "]")
+
 def statData():
-    tbls = ['ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22']
+    tbls = ['ios_packages_2015_08_04', 'ios_packages_2015_10_16','ios_packages_2015_10_21',
+                'ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22',
+                'chi_ios_packages_2015_07_20','chi_ios_packages_2015_09_24','chi_ios_packages_2015_12_15']
 
     trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
     length = defaultdict(int)
@@ -112,23 +115,29 @@ def statData():
     counter = defaultdict(int)
     kv = KV(0)
     head = Head(0)
-    for tbl, pkg in trainSet:
+    omega = set()
+    recordCounter = 0
+    agentItemDist = defaultdict(set)
+    for tbl, pkg in DataSetIter.iter_pkg(trainSet):
+        recordCounter += 1
+        omega.add(pkg.app)
         if pkg.agent != 'None':
             items = SPLITTER.split(utils.process_agent(pkg.agent))
             for item in items:
+                agentItemDist[item].add(pkg.app)
                 distinctItems['agent'].add(item)
             length['agent'] += len(items)
             counter['agent'] += 1
         kvs = [(host, key, value) for (host, key, value) in kv.get_f(pkg)]
         if len(kvs) > 1:
-            length['kv'] += len(kvs)
+            length['kv'] += len(kvs) * 2
             counter['kv'] += 1
             for h, k, v in kvs:
                 distinctItems['kv'].add(k)
                 distinctItems['kv'].add(v)
 
-        paths = filter(None, pkg.path.split('/'))
-        if len(paths) > 1:
+        paths = filter(None, pkg.path.replace('/', ' / ').split(' '))
+        if len(paths) > 1 and pkg.path != 'None':
             length['path'] += len(paths)
             counter['path'] += 1
             for i in paths:
@@ -136,20 +145,42 @@ def statData():
 
 
         heads = [(host, key, value) for (host, key, value) in head.get_f(pkg)]
-        if len(heads) > 1:
-            length['head'] += len(heads)
+        if len(heads) > 1 and pkg.path != 'None':
+            length['head'] += len(heads) * 2
             counter['head'] += 1
             for h, k, v in heads:
                 distinctItems['head'].add(k)
                 distinctItems['head'].add(v)
+    writer = open("ios_agent_item_distribution.txt", "w")
+    for item in agentItemDist:
+        writer.write(item + '\t' + str(len(agentItemDist[item])) + '\n')
+    writer.close()
+    print("Output file name is ios_agent_item_distribution.txt")
     print('[Agent] distinct items:', len(distinctItems['agent']), 'Average length:', length['agent'] * 1.0 / counter['agent'])
     print('[KV] distinct items:', len(distinctItems['kv']), 'Average length:', length['kv'] * 1.0 / counter['kv'])
     print('[Path] distinct items:', len(distinctItems['path']), 'Average length:', length['path'] * 1.0 / counter['path'])
     print('[Head] distinct items:', len(distinctItems['head']), 'Average length:', length['head'] * 1.0 / counter['head'])
+    print('Total Number of Apps', len(omega))
+    print('Total Number of Records', recordCounter)
 
+
+def statitem_dist():
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from collections import defaultdict
+    x = []
+
+    itemDist = defaultdict(int)
+    for ln in open('/Users/congzicun/ios_agent_item_distribution.txt'):
+        lnseg = ln.strip().split('\t')
+        x.append(int(lnseg[1]))
+    opacity = 0.5
+    plt.hist(x, alpha=opacity)
+    plt.show()
 
 
 
 
 if __name__ == '__main__':
     statData()
+    #statitem_dist()
