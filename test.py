@@ -28,8 +28,8 @@ else:
     elif conf.region == "android":
         tbls = ['packages_20150210', 'packages_20150429','packages_20150509','packages_20150526','packages_20150616']
 
-#testDataSet = 'ios_packages_2015_10_21'
-testDataSet = 'ios_packages_2015_10_16'
+#testDataSet = 'packages_20150429'
+testDataSet = 'ios_packages_2015_10_21'
 
 def log(trainTbls, testTbl, output):
     import time
@@ -51,7 +51,7 @@ def test(testTbl):
             trainTbls.append(tbl)
 
     print(trainTbls, testTbl)
-    inforTrack = train_test(trainTbls, testTbl, consts.IOS, ifTrain=False)
+    inforTrack = train_test(trainTbls, testTbl, consts.IOS, ifTrain=True)
     output = _output_rst(inforTrack)
     log(trainTbls, testTbl, output)
     _compare_rst(inforTrack[consts.DISCOVERED_APP_LIST], inforTrack[consts.RESULT])
@@ -363,11 +363,9 @@ def test_kv():
 def test_all():
     totalPrecision, totalRecall, instancePrecisions, instanceRecalls, FPRs  = [], [], [], [], []
     for testTbl in tbls:
-        # if testTbl != 'packages_20150429':
-        #     continue
         if testTbl == testDataSet:
             trainTbls = [tbl for tbl in tbls if tbl != testTbl]
-            print(trainTbls, [testTbl], conf.query_scoreT, conf.query_labelT, conf.query_K)
+            print(trainTbls, [testTbl], conf.agent_support, conf.agent_score, conf.query_K)
             local_stat(FPRs, instancePrecisions, instanceRecalls, testTbl, totalPrecision, totalRecall, trainTbls)
 
     FPR, f1Score, instancePrecision, instanceRecall, precision, recall = global_stat(FPRs, instancePrecisions,

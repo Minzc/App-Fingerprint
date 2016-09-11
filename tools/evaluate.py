@@ -75,6 +75,11 @@ def __compare(rst, testSet):
     for pkgId, predictions in rst.items():
         if predictions[consts.APP_RULE] is not None:
             label = predictions[consts.APP_RULE].label
+            # label, vote = None, 0
+            # for l in predictions[consts.APP_RULE]:
+            #     if predictions[consts.APP_RULE][l] > vote:
+            #         vote = predictions[consts.APP_RULE][l]
+            #         label = l
             if label is not None:
                 P[label].add(pkgId)
 
@@ -107,6 +112,8 @@ def __compare(rst, testSet):
     FPR = accFP / (accFP + accTN)
     TPR = accTP / (accTP + accFN) # Recall
     PPV = accTP / (accTP + accFP) # Precision
+    print('Recall:', (accTP + accFN), '#', accTP)
+    print('Precision:', (accTP + accFP), '#', accTP)
     return FPR, TPR, PPV, correctApp, wrongApp, detectApp
 
 def __wrap_result(rst, FPR, TPR, PPV, correctApp, wrongApp, detectApp, testApps):

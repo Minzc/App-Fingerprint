@@ -29,13 +29,13 @@
     "mode":"l",
     "db" : {
         "local":{
-            "username" : "root",
-            "password" : "123"
+            "username" : "",
+            "password" : ""
         },
 
         "server":{
-            "username" : "zicun",
-            "password" : "5636595"
+            "username" : "",
+            "password" : ""
         }
     },
     "region":"all"

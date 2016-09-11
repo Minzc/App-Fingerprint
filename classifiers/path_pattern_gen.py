@@ -1,4 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+
+import random
 import re
 from collections import defaultdict
 import utils
@@ -6,8 +8,6 @@ from const.dataset import DataSetIter, DataSetFactory
 from const import consts
 import math
 import datetime
-
-# This is designed to test the speed of the algorithm with rule generation on the fly
 
 def print(*args, **kwargs):
     return __builtins__.print(*tuple(['[%s]' % str(datetime.datetime.now())] + list(args)), **kwargs)
@@ -56,34 +56,52 @@ Rules = defaultdict(list)
 INFO = {}
 
 class AgentBoundary():
-    def __init__(self, support):
+    def __init__(self):
         self.rules = {}
-        self.support_t = support
+        self.support_t = 0.2
         self.conf_t = 0.2
         self.K = 1
         self.HDB = []
         print('Support', self.support_t, 'Score', self.conf_t, 'K', self.K)
 
-    def train(self, trainSet):
+    def train(self, trainSet, ruleType, datasize):
         counter = defaultdict(set); totalApps = set()
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
-            if pkg.agent == 'None':
+            if pkg.path == 'None':
                 continue
-            map(lambda w: counter[w].add(pkg.app), filter(None, SPLITTER.split(utils.process_agent(pkg.agent))))
-            segAgent = tuple(['^'] + filter(None, SPLITTER.split(utils.process_agent(pkg.agent))) + ['$'])
-            self.HDB.append((segAgent, pkg.app, len(segAgent)))
+            map(lambda w: counter[w].add(pkg.app), filter(None, pkg.path.split('/')))
+            segPath = tuple(['^'] + filter(None, pkg.path.split('/')) + ['$'])
+            host = re.sub('[0-9]+\.', '[0-9]+.', pkg.rawHost)
+            self.HDB.append((segPath, pkg.app, len(segPath), host))
             totalApps.add(pkg.app)
 
         self.omega = len(totalApps) * self.support_t
         self.totalApp = len(totalApps) * 1.0
 
-
+        #self.HDB = list(set(self.HDB))
+        self.HDB = [self.HDB[i] for i in sorted(random.sample(xrange(len(self.HDB)), datasize)) ]
         print("Data Size", len(self.HDB))
 
-        for (t, c, l) in self.HDB:
-            map(lambda w: counter[w].add(c), t)
-        self.IDF = utils.cal_idf(counter)
-        self.mine_context()
+        groups = defaultdict(list)
+        for (t, c, l, host) in self.HDB:
+            groups[host].append((t,c,l))
+
+        for host in groups:
+            omega = set()
+            for (t, c, l) in groups[host]:
+                omega.add(c)
+            if len(omega) == 1:
+                groups[host] = []
+                print('skipped', omega, host)
+
+        for host in groups:
+            self.host = host
+            self.HDB = groups[host]
+
+            for (t, c, l) in self.HDB:
+                map(lambda w: counter[w].add(c), t)
+            self.IDF = utils.cal_idf(counter)
+            self.mine_context()
 
 
     def mine_context(self):
@@ -141,7 +159,7 @@ class AgentBoundary():
                 itemSupport[e].add(self.HDB[i][1])
 
         print('Find a Context', head, tail)
-        effective = 0
+        effective = 0;
         seqQuality = {}
 
         for seq, apps in seqAppMap.items():
@@ -182,11 +200,12 @@ class AgentBoundary():
 
 
 if __name__ == '__main__':
-    tbls = ['ios_packages_2015_08_04', 'ios_packages_2015_10_16','ios_packages_2015_10_21',
-                'ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22',
-                'chi_ios_packages_2015_07_20','chi_ios_packages_2015_09_24','chi_ios_packages_2015_12_15']
-    trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
-    for support  in [0.2, 0.4, 0.6, 0.8]:
-        a = AgentBoundary(support)
-        a.train(trainSet)
+    tbls = ['ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22','chi_ios_packages_2015_07_20', 'chi_ios_packages_2015_09_24', 'chi_ios_packages_2015_09_24']
+    for size  in [500000, 600000, 700000]:
+        a = AgentBoundary()
+        trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
+        a.train(trainSet, consts.IOS, size)
         print('Finish Rule Mining')
+    # for i, rules in Rules.items():
+    #     for rule in rules:
+    #         print("Find a rule", rule, "Origin:", a.HDB[i][0])

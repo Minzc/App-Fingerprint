@@ -51,14 +51,15 @@ class ContextsTree:
         return rst
 
 Contexts = set()
+SPLITTER = re.compile("[" + r'''/''' + "]")
 
 class AgentBoundary():
     def __init__(self):
         self.rules = {}
         #self.support_t = conf.agent_support
-        self.support_t = 0.5
+        self.support_t = 0.2
         #self.conf_t = conf.agent_score
-        self.conf_t = 0.5
+        self.conf_t = 0.2
         self.K = conf.agent_K
         self.HDB = []
         print('Support', self.support_t, 'Score', self.conf_t, 'K', self.K)
@@ -66,10 +67,11 @@ class AgentBoundary():
     def train(self, trainSet, ruleType, datasize):
         counter = defaultdict(set); totalApps = set()
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
-            if pkg.agent == 'None':
+            if pkg.path == 'None':
                 continue
-            map(lambda w: counter[w].add(pkg.app), filter(None, pkg.path.split('/')))
-            segPath = tuple(['^'] + filter(None, SPLITTER.split(utils.process_agent(pkg.agent))) + ['$'])
+            path = pkg.path.replace('/', ' / ')
+            map(lambda w: counter[w].add(pkg.app), filter(None, path.split(' ')))
+            segPath = tuple(['^'] + filter(None, path.split(' ')) + ['$'])
             host = re.sub('[0-9]+\.', '[0-9]+.', pkg.rawHost)
             self.HDB.append((segPath, pkg.app, len(segPath), host))
             totalApps.add(pkg.app)
@@ -85,14 +87,23 @@ class AgentBoundary():
         for (t, c, l, host) in self.HDB:
             groups[host].append((t,c,l))
 
+        for host in groups:
+            omega = set()
+            for (t, c, l) in groups[host]:
+                omega.add(c)
+            if len(omega) == 1:
+                groups[host] = []
+                print('skipped', omega, host)
 
         for host in groups:
             self.host = host
             self.HDB = groups[host]
+
             for (t, c, l) in self.HDB:
                 map(lambda w: counter[w].add(c), t)
             self.IDF = utils.cal_idf(counter)
             self.mine_context()
+
 
         self.HDB = groups
 
@@ -153,7 +164,7 @@ class AgentBoundary():
                 self.mine_tail_rec(suffix + [e], newmdb, prefix)
 
     def idf(self, signature):
-            return sum([self.IDF[i] for i in signature]) / len(signature)
+            return sum([self.IDF.get(i, 0) for i in signature]) / len(signature)
 
     def rel(self, signature, appSigMap, sigAppMap):
         return math.sqrt(1 / len(appSigMap[list(sigAppMap[signature])[0]]))
@@ -164,12 +175,12 @@ class AgentBoundary():
 
         contexts = dict()
         Rules = defaultdict(list)
-        dataset = [('/'.join(r[0]), r[1]) for r in self.HDB]
 
         for context in Contexts:
             head, tail, host = context
-            head, tail = map(lambda lst : ' '.join(lst), [head, tail])
-            contexts[re.compile('(?=(' + re.escape(head) + '/(.*?)/' + re.escape(tail) + '))')] = (head, tail, host)
+            head, tail = map(lambda lst : ''.join(lst), [head, tail])
+            print("Head:", head, "Tail:", tail)
+            contexts[re.compile('(?=(' + re.escape(head) + '(.*?)' + re.escape(tail) + '))')] = (head, tail, host)
 
         for reg in contexts:
             appSigMap = defaultdict(set); seqAppMap = defaultdict(set)
@@ -178,8 +189,12 @@ class AgentBoundary():
             support = set()
 
             for i in range(len(self.HDB[host])):
-                (t, app) = dataset[i]
+                dataset = self.HDB[host]
+                (t, app, l) = dataset[i]
+                t = ''.join(t)
                 if head in t and tail in t:
+                    print(t, head, tail, reg.pattern)
+                    print(reg.findall(t))
                     for seqStr in map(lambda x:x[1], reg.findall(t)):
                         support.add(app); SC[seqStr].add(i)
                         seqAppMap[seqStr].add(app); appSigMap[app].add(seqStr)
@@ -189,7 +204,8 @@ class AgentBoundary():
             for app, seqs in appSigMap.items():
                 for seq in seqs:
                     if len(seqAppMap[seq]) == 1:
-                        effective += self.idf(seq.split(' ')) * self.rel(seq, appSigMap, seqAppMap)
+                        effective += self.idf(seq.split('/')) * self.rel(seq, appSigMap, seqAppMap)
+
 
             contextQuality = context_quality(len(support) / self.totalApp, effective * 1.0 / len(seqAppMap))
 
@@ -197,10 +213,10 @@ class AgentBoundary():
                 for seqStr in SC.keys():
                     if len(seqAppMap[seqStr]) == 1:
                         for i in SC[seqStr]:
-                            sigQuality = self.idf(seqStr.split(' ')) * self.rel(seqStr, appSigMap, seqAppMap)
-                            currentLen = len(head.split(' ')) + len(tail.split(' ')) + len(seqStr.split(' '))
-                            Rules[i].append((head, tail, seqStr, contextQuality, sigQuality, currentLen, self.HDB[i][1]))
-                            Rules[i] = sorted(Rules[i], key=lambda x: (x[3], x[4], 10000 - x[5]), reverse=True)[:self.K]
+                            sigQuality = self.idf(seqStr.split('/')) * self.rel(seqStr, appSigMap, seqAppMap)
+                            currentLen = len(head.split('/')) + len(tail.split('/')) + len(seqStr.split('/'))
+                            Rules[host+str(i)].append((head, tail, seqStr, contextQuality, sigQuality, currentLen, self.HDB[i][1]))
+                            Rules[host+str(i)] = sorted(Rules[host+str(i)], key=lambda x: (x[3], x[4], 10000 - x[5]), reverse=True)[:self.K]
                         # print('Find a signature', seqStr, 'HEAD:', head, 'TAIL:', tail, 'Score:', contextQuality)
         # for i, rules in Rules.items():
         #     for rule in rules:
@@ -212,7 +228,7 @@ if __name__ == '__main__':
             'chi_ios_packages_2015_07_20', 'chi_ios_packages_2015_09_24', 'chi_ios_packages_2015_09_24']
 
     trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
-    for size  in [25521, 30000, 40000, 50000, 60000]:
+    for size  in [300000]:
         a = AgentBoundary()
         a.train(trainSet, consts.IOS, size)
         print('Find Contexts', len(Contexts))

@@ -8,6 +8,7 @@ from const import consts, conf
 import math
 import datetime
 
+# This is designed to test the speed of the base algorithm
 def print(*args, **kwargs):
     return __builtins__.print(*tuple(['[%s]' % str(datetime.datetime.now())] + list(args)), **kwargs)
 
@@ -51,17 +52,15 @@ class ContextsTree:
 Contexts = set()
 
 class AgentBoundary():
-    def __init__(self):
+    def __init__(self, support):
         self.rules = {}
-        #self.support_t = conf.agent_support
-        self.support_t = 0.2
-        #self.conf_t = conf.agent_score
+        self.support_t = support
         self.conf_t = 0.2
         self.K = conf.agent_K
         self.HDB = []
         print('Support', self.support_t, 'Score', self.conf_t, 'K', self.K)
 
-    def train(self, trainSet, ruleType, datasize):
+    def train(self, trainSet):
         counter = defaultdict(set); totalApps = set()
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             if pkg.agent == 'None':
@@ -74,8 +73,6 @@ class AgentBoundary():
         self.omega = len(totalApps) * self.support_t
         self.totalApp = len(totalApps) * 1.0
 
-        #self.HDB = list(set(self.HDB))
-        self.HDB = self.HDB[:datasize]
         print("Data Size", len(self.HDB))
 
         for (t, c, l) in self.HDB:
@@ -194,12 +191,15 @@ class AgentBoundary():
 
 
 if __name__ == '__main__':
-    tbls = ['ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22',
-            'chi_ios_packages_2015_07_20', 'chi_ios_packages_2015_09_24', 'chi_ios_packages_2015_09_24']
-    a = AgentBoundary()
+    tbls = ['ios_packages_2015_08_04', 'ios_packages_2015_10_16','ios_packages_2015_10_21',
+                'ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22',
+                'chi_ios_packages_2015_07_20','chi_ios_packages_2015_09_24','chi_ios_packages_2015_12_15']
+
     trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
-    for size  in [225521, 300000, 600000, 400000]:
-        a.train(trainSet, consts.IOS, size)
+    for support  in [0.2, 0.4, 0.6, 0.8]:
+        a = AgentBoundary(support)
+        a.train(trainSet)
         print('Find Contexts', len(Contexts))
         print('Start Building Rule')
         a.build_rules()
+        print('Finish Building Rules')

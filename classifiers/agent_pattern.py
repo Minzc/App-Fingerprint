@@ -6,44 +6,28 @@ from classifiers.classifier import AbsClassifer
 from const.dataset import DataSetIter, DataSetFactory
 from const import consts, conf
 from utils import flatten, const
-from sqldao import SqlDao
 import math
+import datetime
+
+from sqldao import SqlDao
 
 
-
-def persist(appRule):
-    """
-    Input
-    :param appRule : {regex: {app1, app2}}
-    """
-    sqldao = SqlDao()
-    params = set()
-
-    for rules in appRule.values():
-        for rule in rules:
-            prefix, suffix, signature, fuse_score, current_len, c, support = rule
-            prefix = ' '.join(prefix)
-            suffix = ' '.join(suffix)
-            signature = ' '.join(signature)
-            params.add((None, prefix, signature, suffix, c, support, fuse_score, 3, consts.APP_RULE))
-
-    sqldao.executeBatch(const.sql.SQL_INSERT_AGENT_RULES, params)
-    sqldao.close()
-
+def print(*args, **kwargs):
+    return __builtins__.print(*tuple(['[%s]' % str(datetime.datetime.now())] + list(args)), **kwargs)
 
 SPLITTER = re.compile("[" + r'''"#$%&*+,:<=>?@[\]^`{|}~ \-''' + "]")
 
-
-class RulesTree:
+class ContextsTree:
     def __init__(self):
         class Node:
             def __init__(self, item, clss, score, id):
-                self.i, self.clss, self.score, self.child, self.id = item, clss, score, {}, id
+                self.i, self.clss, self.score, self.child = item, clss, score, {}
+                self.id = id
 
             def add(self, item, clss, score, id):
                 self.child[item] = Node(item, clss, score, id)
 
-        self.root = Node(None, None, 0, -1)
+        self.root = Node(None, None, 0, None)
 
     def add_rule(self, rule):
         n = self.root
@@ -69,139 +53,144 @@ class RulesTree:
                     break
         return rst
 
+def context_quality(s, e):
+    return 2 * s * e / (s + e)
 
-
+Rules = defaultdict(list)
+INFO = {}
 
 class AgentBoundary(AbsClassifer):
-    def cal_sup(self, mdb):
-        host_app = defaultdict(set)
-        for (i, _, _) in mdb:
-            host_app[self.id_host_map[self.db[i]]].add(self.db[i][1])
-        support = sum([len(apps) / len(self.host_app_map[host]) for host, apps in host_app.items()])
-        return support / len(host_app)
-
-
     def __init__(self):
         self.rules = {}
         self.support_t = conf.agent_support
         self.conf_t = conf.agent_score
         self.K = conf.agent_K
-        self.db = []
-        print('Support', self.support_t, 'Score', self.conf_t)
+        self.HDB = []
+        print('Support', self.support_t, 'Score', self.conf_t, 'K', self.K)
 
-    def train(self, trainSet, ruleType, ifPersist=True):
-        counter = defaultdict(set); self.id_host_map = {}; self.host_app_map = defaultdict(set)
-        totalApps = set()
+    def train(self, trainSet, ruleType, ifPersist=True, datasize=0):
+        counter = defaultdict(set); totalApps = set()
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
-            totalApps.add(pkg.app)
-            map(lambda w: counter[w].add(pkg.app), filter(None, SPLITTER.split(utils.process_agent(pkg.agent))))
             if pkg.agent == 'None':
                 continue
+            map(lambda w: counter[w].add(pkg.app), filter(None, SPLITTER.split(utils.process_agent(pkg.agent))))
             segAgent = tuple(['^'] + filter(None, SPLITTER.split(utils.process_agent(pkg.agent))) + ['$'])
-            if len(segAgent) > 0:
-                self.db.append((segAgent, pkg.app))
-                self.id_host_map[(segAgent, pkg.app)] = pkg.secdomain
-                self.host_app_map[pkg.secdomain].add(pkg.app)
+            self.HDB.append((segAgent, pkg.app, len(segAgent)))
+            totalApps.add(pkg.app)
 
-        self.support_t = conf.agent_support * len(totalApps)
+        self.omega = len(totalApps) * self.support_t
+        self.totalApp = len(totalApps) * 1.0
 
-        self.db = list(set(self.db))
-        print("Data Size", len(self.db))
-        #self.db = [(tuple(['^'] + filter(None, SPLITTER.split(utils.process_agent(x[0]))) + ['$']), x[1]) for x in self.db]
+        self.HDB = list(set(self.HDB))
+        print("Data Size", len(self.HDB))
 
-        for (t, c) in self.db:
+        for (t, c, l) in self.HDB:
             map(lambda w: counter[w].add(c), t)
         self.IDF = utils.cal_idf(counter)
-        self.mine_rec([], [(i, len(self.db[i][0]) - 1) for i in range(len(self.db))], 10000, False)
+        self.mine_context()
+        persist(Rules)
 
-        if ifPersist:
-            persist(self.rules)
 
-    def mine_rec(self, prefix, mdb, gap, expSuffix):
+
+    def mine_context(self):
+        print('[%s] Start Mining Context' % str(datetime.datetime.now()))
         occurs = defaultdict(list)
+        support = defaultdict(set)
+        for i in range(len(self.HDB)):
+            seq, app, length = self.HDB[i]
+            for j in xrange(length):
+                occurs[seq[j]].append((i, j))
+                support[seq[j]].add(app)
+
+        for item, apps in support.items():
+            if len(apps)  > self.omega:
+                self.mine_head([item], occurs[item])
+
+    def mine_head(self, prefix, mdb):
+        occurs = defaultdict(list)
+        support = defaultdict(set)
         for (i, startpos) in mdb:
-            seq = self.db[i][0]
-            for j in xrange(startpos, -1, -1):
-                if startpos - j <= gap:
-                    l = occurs[seq[j]]
-                    l.append((i, j - 1))
-        if expSuffix:
-            suffix_mdb = [
-                # dbindex, last position of prefix, start position of suffix
-                (i, startpos + 1, startpos + 3) for (i, startpos) in mdb if startpos + 3 < len(self.db[i][0])
-                ]
-            self.mine_suffix(prefix, [], suffix_mdb, 10000)
+            if startpos + 1 < self.HDB[i][2]:
+                e = self.HDB[i][0][startpos + 1]
+                occurs[e].append((i, startpos + 1))
+                support[e].add(self.HDB[i][1])
+        self.mine_tail(mdb, prefix)
+        for e, newmdb in occurs.items():
+            if len(support[e])  > self.omega:
+                self.mine_head(prefix + [e], newmdb)
 
-        for c, newmdb in occurs.items():
-            childSupport = len({self.db[i][1] for (i, _) in newmdb})
-            if childSupport > self.support_t:
-                self.mine_rec([c] + prefix, newmdb, 0, True)
-
-    def mine_suffix(self, prefix, suffix, mdb, gap):
-        def idf(sig):
-            return sum([self.IDF[i] for i in sig]) / len(sig)
-
-        def rel(sig):
-            import math
-            # if sig == tuple(['com.mm.ilady.ipad.client']):
-            #     print('prefix:', prefix, 'suffix:', suffix)
-            #     print("sig:", sig, "rel:", math.sqrt(1 / len(app_sig_map[list(sig_app_map[sig])[0]])))
-            #     print(list(sig_app_map[sig])[0])
-            #     print(app_sig_map[list(sig_app_map[sig])[0]])
-            return math.sqrt(1 / len(app_sig_map[list(sig_app_map[sig])[0]]))
-
+    def mine_tail(self, mdb, prefix):
         occurs = defaultdict(list)
-        sig_app_map = defaultdict(set)
-        app_sig_map = defaultdict(set)
-        tmpRule = set()
-        for (i, prefix_pos, startpos) in mdb:
-            seq, app = self.db[i]
-            signature = seq[prefix_pos + 1: startpos - len(suffix)]
-            if len(suffix) > 0:
-                tmpRule.add((i, signature))
-                sig_app_map[signature].add(app)
-                app_sig_map[app].add(signature)
+        support = defaultdict(set)
+        for (i, startpos) in mdb:
+            if startpos + 2 < len(self.HDB[i][0]):
+                for j in xrange(startpos + 2, self.HDB[i][2]):
+                    e = self.HDB[i][0][j]
+                    occurs[e].append((i, startpos, j))
+                    support[e].add(self.HDB[i][1])
+        for item, apps in support.items():
+            if len(apps)  > self.omega:
+                self.mine_tail_rec([item], occurs[item], prefix)
 
-            for j in xrange(startpos, len(seq)):
-                if j - startpos <= gap:
-                    l = occurs[seq[j]]
-                    l.append((i, prefix_pos, j + 1))
+    def mine_tail_rec(self, tail, mdb, head):
+        occurs = defaultdict(list)
+        itemSupport = defaultdict(set); support = set()
+        SC = defaultdict(set); appSigMap = defaultdict(set); seqAppMap = defaultdict(set)
+        for (i, hEnd, startpos) in mdb:
+            support.add(self.HDB[i][1])
+            seqStr = ' '.join(self.HDB[i][0][hEnd + 1 : startpos - len(tail) + 1])
+            # print('Find a sequence', seqStr, 'HEAD:', head, 'TAIL:', tail, 'Origin:', self.HDB[i][0])
+            SC[seqStr].add(i); seqAppMap[seqStr].add(self.HDB[i][1]); appSigMap[self.HDB[i][1]].add(seqStr)
+            if startpos + 1 < self.HDB[i][2]:
+                e = self.HDB[i][0][startpos + 1]
+                occurs[e].append((i, hEnd, startpos + 1))
+                itemSupport[e].add(self.HDB[i][1])
 
-        find_good = False
-        if len(suffix) != 0:
-            quality = sum([math.sqrt(idf(signature) * rel(signature)) for signature in sig_app_map]) / len(sig_app_map)
-            support = self.cal_sup(mdb)
-            context_score = 2 * support * quality / (support + quality)
-            if context_score >= self.conf_t:
-                for i, signature in tmpRule:
-                    if len(sig_app_map[signature]) == 1:
-                        quality = idf(signature) * rel(signature)
-                        if '/' in set(signature):
+        print('Find a Context', head, tail)
+        effective = 0
+        seqQuality = {}
+
+        for seq, apps in seqAppMap.items():
+            if len(apps) == 1:
+                if seq not in seqQuality:
+                    inf = self.idf(seq)
+                    seqQuality[seq] = inf * self.rel(seq, appSigMap, seqAppMap)
+                effective += seqQuality[seq]
+
+
+        contextQuality = context_quality(len(support) / self.totalApp, effective * 1.0 / len(seqAppMap))
+        print('Context Quality:', contextQuality)
+        if contextQuality > self.conf_t:
+            for seqStr in SC.keys():
+                if len(seqAppMap[seqStr]) == 1:
+                    for i in SC[seqStr]:
+                        if '/' in seqStr:
                             continue
-                        find_good = True
-                        fuse_score = quality * context_score
-                        current_len = len(prefix) + len(suffix) + len(signature)
-                        if i not in self.rules:
-                            self.rules[i] = list()
-                        self.rules[i].append((prefix, suffix, signature, fuse_score, current_len, self.db[i][1], support))
-                        self.rules[i] = sorted(self.rules[i], key=lambda x: (x[3], 10000 - x[4]), reverse=True)[:self.K]
-        else:
-            find_good = True
+                        sigQuality = seqQuality[seqStr]
+                        currentLen = len(head) + len(tail) + len(seqStr.split(' '))
+                        #Rules[i].append((head, tail, seqStr, contextQuality, sigQuality, currentLen, self.HDB[i][1]))
+                        Rules[i].append((head, tail, seqStr, sigQuality, contextQuality, currentLen, self.HDB[i][1]))
+                        Rules[i] = sorted(Rules[i], key=lambda x: (x[3], x[4], 10000 - x[5]), reverse=True)[:self.K]
 
-        maxSuffixSupport = 0
-        if find_good:
-            for (c, newmdb) in occurs.iteritems():
-                childSupport = len({self.db[i][1] for (i, _, _) in newmdb})
-                maxSuffixSupport = max(childSupport, maxSuffixSupport)
-                if childSupport > self.support_t:
-                    self.mine_suffix(prefix, suffix + [c], newmdb, 0)
-        return maxSuffixSupport
+        for e, newmdb in occurs.items():
+            if len(itemSupport[e])  > self.omega:
+                self.mine_tail_rec(tail + [e], newmdb, head)
+
+
+    def idf(self, signature):
+        if signature not in INFO:
+            sigSeg = signature.split(' ')
+            INFO[signature] = sum([self.IDF[i] for i in sigSeg]) / len(sigSeg)
+        return INFO[signature]
+
+    def rel(self, signature, appSigMap, sigAppMap):
+        return math.sqrt(1 / len(appSigMap[list(sigAppMap[signature])[0]]))
 
     def load_rules(self):
         self.rules = {
-            consts.APP_RULE: RulesTree(),
-            consts.COMPANY_RULE: RulesTree(),
-            consts.CATEGORY_RULE: RulesTree()
+            consts.APP_RULE: ContextsTree(),
+            consts.COMPANY_RULE: ContextsTree(),
+            consts.CATEGORY_RULE: ContextsTree()
         }
         self.rulesHost = {
             consts.APP_RULE: defaultdict(dict),
@@ -217,7 +206,7 @@ class AgentBoundary(AbsClassifer):
             x = prefix + ' ' + signature + ' ' + suffix
             if '/' in signature:
                 continue
-            length += len(re.escape(x).replace(re.escape("VERSION"), r'\b[a-z0-9-.]+\b'))
+            length += len(x.split(' '))
             r = filter(None, prefix.split(' ') + signature.split(' ') + suffix.split(' '))
             self.rules[consts.APP_RULE].add_rule((r, c, fuse_score, id))
             counter += 1
@@ -250,26 +239,33 @@ class AgentBoundary(AbsClassifer):
         pass
 
 
-if __name__ == '__main__':
-    tbls = ['ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22']
-    # tbls = ['ios_packages_2015_08_10']
-    a = AgentBoundary()
-    if True:
-        trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
-        a.train(trainSet, consts.IOS)
-    a.load_rules()
-    testSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
-    print("Start Testing")
-    batchPredicts, groundTruth = a.classify(testSet)
-    correctApp = set()
-    wrongApp = set()
-    for pID, predict in batchPredicts.items():
-        if predict[consts.APP_RULE].label is None:
-            continue
-        if predict[consts.APP_RULE].label == groundTruth[pID]:
-            correctApp.add(groundTruth[pID])
-        else:
-            wrongApp.add(groundTruth[pID])
 
-    print("Correct APP", len(correctApp - wrongApp))
-    print("Wrong APP", len(wrongApp))
+def persist(appRule):
+    """
+    Input
+    :param appRule : {regex: {app1, app2}}
+    """
+    sqldao = SqlDao()
+    params = set()
+
+    for rules in appRule.values():
+        for rule in rules:
+            prefix, suffix, signature, contextQuality, sigQuality, currentLen, c  = rule
+            prefix = ' '.join(prefix)
+            suffix = ' '.join(suffix)
+            params.add((None, prefix, signature, suffix, c, contextQuality, sigQuality, 3, consts.APP_RULE))
+
+    sqldao.executeBatch(utils.const.sql.SQL_INSERT_AGENT_RULES, params)
+    sqldao.close()
+
+if __name__ == '__main__':
+    tbls = ['ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22',
+           'ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2015_05_29']
+    for size  in [300000, 600000, 500000, 700000]:
+        a = AgentBoundary()
+        trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
+        a.train(trainSet, consts.IOS, datasize=size)
+        print('Finish Rule Mining')
+    # for i, rules in Rules.items():
+    #     for rule in rules:
+    #         print("Find a rule", rule, "Origin:", a.HDB[i][0])

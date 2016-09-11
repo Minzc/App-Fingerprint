@@ -1,6 +1,9 @@
 # -*- coding=utf-8 -*-
+from __future__ import absolute_import, division, print_function, unicode_literals
 import argparse
 from collections import defaultdict
+
+import datetime
 
 import const.conf
 import const.consts as consts
@@ -13,6 +16,9 @@ from const.dataset import DataSetIter as DataSetIter
 from sqldao import SqlDao
 from tools.evaluate import cal_pr, cal_roc
 
+def print(*args, **kwargs):
+    return __builtins__.print(*tuple(['[%s]' % str(datetime.datetime.now())] + list(args)), **kwargs)
+
 TRAIN_LABEL = consts.APP_RULE
 
 VALID_LABEL = {
@@ -23,11 +29,12 @@ VALID_LABEL = {
 
 if not const.conf.TestBaseLine:
     USED_CLASSIFIERS = [
-        consts.HEAD_CLASSIFIER,
+        #consts.HEAD_CLASSIFIER,
         #consts.AGENT_CLASSIFIER,
-        consts.AGENT_BOUNDARY_CLASSIFIER,
+        #consts.AGENT_BOUNDARY_CLASSIFIER,
         consts.KV_CLASSIFIER,
         consts.URI_CLASSIFIER,
+        consts.CMAR_CLASSIFIER
     ]
 else:
      USED_CLASSIFIERS = [
@@ -95,11 +102,11 @@ def vote_rst(rst, tmprst):
 
         for rule_type in VALID_LABEL:
             label = tmprst[pkg_id][rule_type].label
-            if label is not None:
-                if label not in rst[pkg_id][rule_type]:
-                    rst[pkg_id][rule_type][label] = 1
-                else:
-                    rst[pkg_id][rule_type][label] += 1
+            # if label is not None:
+            if label not in rst[pkg_id][rule_type]:
+                rst[pkg_id][rule_type][label] = 1
+            else:
+                rst[pkg_id][rule_type][label] += 1
     return rst
 
 
@@ -114,9 +121,9 @@ def train(trainSet, appType):
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
     for name, classifier in classifiers:
         classifier.set_name(name)
-        print ">>> [train#%s] " % name
+        print(">>> [train#%s] " % name)
         classifier.train(trainSet, TRAIN_LABEL)
-    print '>>> Finish training all classifiers'
+    print('>>> Finish training all classifiers')
 
 def _classify(classifier, testSet):
     """
@@ -142,7 +149,7 @@ def _insert_rst(testSet, DB, inforTrack):
   - testSet : test packages
   - infoTrack : information about test result
   """
-    print 'Start inserting results'
+    print('Start inserting results')
     sqldao = SqlDao()
     params = []
     QUERY = 'UPDATE ' + DB[0] + ' SET classified = %s WHERE id = %s'
@@ -155,14 +162,14 @@ def _insert_rst(testSet, DB, inforTrack):
 
     sqldao.executeBatch(QUERY, params)
     sqldao.close()
-    print 'Finish inserting %s items' % len(params)
+    print('Finish inserting %s items' % len(params))
 
 
 def test(testSet, appType):
     predictions = {}
     classifiers = classifier_factory(USED_CLASSIFIERS, appType)
     for name, classifier in classifiers:
-        print ">>> [test#%s] " % name
+        print(">>> [test#%s] " % name)
         classifier.set_name(name)
         classifier.load_rules()
         tmprst = _classify(classifier, testSet)
@@ -184,17 +191,18 @@ def test(testSet, appType):
 
 def train_test(trainTbls, testTbl, appType, ifRoc, ifTrain):
     if ifTrain:
-        print '>>> Start training'
+        print('>>> Start training')
         utils.clean_rules()
         trainSet = DataSetFactory.get_traindata(tbls=trainTbls, appType=appType)
         trainSet.set_label(TRAIN_LABEL)
         train(trainSet, appType)
-    print '>>> Start testing'
-    testSet = DataSetFactory.get_traindata(tbls=testTbl, appType=appType)
+    print('>>> Start testing')
+    testSet = DataSetFactory.get_traindata(tbls=testTbl, appType=appType,
+                                           sampledApps=trainSet.apps if ifTrain else set())
     testApps = testSet.apps
     rst = test(testSet, appType)
 
-    print '>>> Start evaluating'
+    print('>>> Start evaluating')
     inforTrack = cal_pr(rst, testSet, testApps)
 
     if ifRoc:

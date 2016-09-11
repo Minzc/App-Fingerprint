@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from const import conf
 from utils import load_pkgs, load_exp_app
 import random
@@ -27,11 +29,10 @@ class DataSetIter:
 
 
 class DataSet:
-    def __init__(self, tbls, rmapp):
+    def __init__(self, tbls):
         self.tables = tbls
         self.__data = {}
         self.apps = set()
-        self.rmapp = rmapp
 
     def set_data(self, tbl, data):
         self.__data[tbl] = data
@@ -63,7 +64,7 @@ class DataSetFactory:
         pass
 
     @staticmethod
-    def get_traindata(tbls, appType):
+    def get_traindata(tbls, appType, sampledApps = set()):
         """
         Load data from given table
         :param sampleRate:
@@ -77,25 +78,36 @@ class DataSetFactory:
         """
 
         def _keep_exp_app(package):
-            return package.app in sampledApps
+            return package.app in expApp
 
         print '[TRAIN FACTORY] Loading data set', tbls, 'SAMPLE RATE is', conf.sample_rate
         expApp = load_exp_app()[appType]
 
         # Do sample
         print '[TRAIN FACTORY] Before Sample', len(expApp)
-        sampledApps = {app for app in expApp if random.uniform(0, 1) <= conf.sample_rate}
-        rmApps = expApp - sampledApps
-        print '[TRAIN FACTORY] After Sample', len(sampledApps)
+        if len(sampledApps) != 0:
+            expApp =sampledApps
+        print '[TRAIN FACTORY] After Sample', len(expApp)
 
-        dataSet = DataSet(tbls, rmApps)
+
+
+        dataSet = DataSet(tbls)
+        pkgs = []
 
         for tbl in tbls:
-            pkgs = load_pkgs(limit=conf.package_limit, filterFunc=_keep_exp_app, DB=tbl, appType=appType)
+            pkgs += [(tbl, pkg) for pkg in load_pkgs(limit=conf.package_limit, filterFunc=_keep_exp_app, DB=tbl, appType=appType)]
+
+
+        tblPkgs = defaultdict(list)
+        if len(sampledApps) == 0:
+            print(len(pkgs))
+            pkgs = {pkgs[i] for i in sorted(random.sample(xrange(len(pkgs)), conf.sample_rate))}
+        for pkg in pkgs:
+            tblPkgs[pkg[0]].append(pkg[1])
+        for tbl, pkgs in tblPkgs.items():
             dataSet.set_data(tbl, pkgs)
 
 
-        assert (len(rmApps) + len(sampledApps) == len(expApp), 'Sampling method is wrong')
         assert (dataSet.check(), "Did not load enough data")
 
         return dataSet

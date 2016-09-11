@@ -1,4 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+
+import random
 import re
 from collections import defaultdict
 import utils
@@ -6,6 +8,8 @@ from const.dataset import DataSetIter, DataSetFactory
 from const import consts
 import math
 import datetime
+
+# This is designed to test the speed of the algorithm with upper bound pruning
 
 def print(*args, **kwargs):
     return __builtins__.print(*tuple(['[%s]' % str(datetime.datetime.now())] + list(args)), **kwargs)
@@ -54,15 +58,15 @@ Rules = defaultdict(list)
 INFO = {}
 
 class AgentBoundary():
-    def __init__(self):
+    def __init__(self, support):
         self.rules = {}
-        self.support_t = 0.2
+        self.support_t = support
         self.conf_t = 0.2
         self.K = 1
         self.HDB = []
         print('Support', self.support_t, 'Score', self.conf_t, 'K', self.K)
 
-    def train(self, trainSet, ruleType, datasize):
+    def train(self, trainSet, ruleType):
         counter = defaultdict(set); totalApps = set()
         for tbl, pkg in DataSetIter.iter_pkg(trainSet):
             if pkg.agent == 'None':
@@ -75,7 +79,6 @@ class AgentBoundary():
         self.omega = len(totalApps) * self.support_t
         self.totalApp = len(totalApps) * 1.0
 
-        self.HDB = self.HDB[:datasize]
         print("Data Size", len(self.HDB))
 
         for (t, c, l) in self.HDB:
@@ -159,7 +162,7 @@ class AgentBoundary():
                     for i in SC[seqStr]:
                         sigQuality = seqQuality[seqStr]
                         currentLen = len(head) + len(tail) + len(seqStr.split(' '))
-                        Rules[i].append((head, tail, seqStr, contextQuality, sigQuality, currentLen, self.HDB[i][1]))
+                        Rules[i].append((head, tail, seqStr, sigQuality, currentLen, contextQuality, self.HDB[i][1]))
                         Rules[i] = sorted(Rules[i], key=lambda x: (x[3], x[4], 10000 - x[5]), reverse=True)[:self.K]
 
         Eub =  sum(Eub) * 1.0 / len(Eub) if len(Eub) > 0 else 0
@@ -183,13 +186,13 @@ class AgentBoundary():
 
 
 if __name__ == '__main__':
-    tbls = ['ios_packages_2015_06_08', 'ios_packages_2015_08_04', 'ios_packages_2015_08_10',
-            'chi_ios_packages_2015_07_20','chi_ios_packages_2015_09_24',]
-
-    for size  in [225521, 300000, 500000, 600000, 700000]:
-        a = AgentBoundary()
-        trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
-        a.train(trainSet, consts.IOS, size)
+    tbls = ['ios_packages_2015_08_04', 'ios_packages_2015_10_16','ios_packages_2015_10_21',
+                'ca_ios_packages_2015_12_10', 'ca_ios_packages_2015_05_29', 'ca_ios_packages_2016_02_22',
+                'chi_ios_packages_2015_07_20','chi_ios_packages_2015_09_24','chi_ios_packages_2015_12_15']
+    trainSet = DataSetFactory.get_traindata(tbls=tbls, appType=consts.IOS)
+    for support  in [0.2, 0.4, 0.6, 0.8]:
+        a = AgentBoundary(support)
+        a.train(trainSet, consts.IOS)
         print('Finish Rule Mining')
     # for i, rules in Rules.items():
     #     for rule in rules:
